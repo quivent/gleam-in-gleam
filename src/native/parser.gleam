@@ -355,6 +355,20 @@ fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
       use #(arms, rest) <- c.then(arms(rest, []))
       Ok(#(a.Case(subject, arms), rest))
     }
+    [
+      l.Token(l.Word(id), _),
+      l.Token(l.Symbol("("), _),
+      l.Token(l.Symbol(".."), _),
+      ..rest
+    ] -> {
+      use #(target, rest) <- c.then(expression(rest, 0))
+      use #(args, rest) <- c.then(case rest {
+        [l.Token(l.Symbol(")"), _), ..rest] -> Ok(#([], rest))
+        [l.Token(l.Symbol(","), _), ..rest] -> arguments(rest, [])
+        _ -> error(rest, "Expected ',' or ')' after record update target")
+      })
+      Ok(#(a.RecordUpdate(id, target, args), rest))
+    }
     [l.Token(l.Word(id), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(args, rest) <- c.then(arguments(rest, []))
       Ok(#(a.Call(id, args), rest))

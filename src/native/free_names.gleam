@@ -89,7 +89,7 @@ fn expression(
         bound,
         add(n, bound, free),
       )
-    a.Apply(target, args) ->
+    a.RecordUpdate(_, target, args) | a.Apply(target, args) ->
       expressions([target, ..c.map(args, fn(arg) { arg.value })], bound, free)
     a.Block(body) -> statements(body, bound, free)
     a.Lambda(params, _, body) -> {

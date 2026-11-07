@@ -6,7 +6,7 @@ count or test count is not a defensible completion percentage.
 
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records and patterns | Imports, updates, bit arrays and more syntax |
+| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates and patterns | Imports, bit arrays and more syntax |
 | Data types | Tuples/lists, recursive generic ADTs, labels and record access execute natively | Full inference/coverage, equality, dynamic strings, remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
@@ -14,7 +14,7 @@ count or test count is not a defensible completion percentage.
 | Project compilation | Single source module compiled through a Node IO bootstrap | Module graph/loading/linking and a native compiler entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current closures milestone has 210 passing checks and 31 agreeing upstream
+The current record-update milestone has 230 passing checks and 42 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,7 +26,7 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add the compiler's record-update, bit-array and module features with upstream
+1. Add the compiler's bit-array and module features with upstream
    differential tests. Continue closing explicit inference/semantic gaps.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
@@ -41,3 +41,8 @@ Closures currently retain copied captures in the owned arena. The descriptor ABI
 is shared with named values, with a saved descriptor word passed to indirect
 callees. This establishes tested lifetime semantics without stack captures; it
 does not establish memory reclamation or a finalized optimized ABI.
+
+Record updates now lower to a saved original and immutable reconstruction. Their
+type-changing behavior and declaration-order effects match the tested upstream
+cases. This removes another syntax dependency in our own source without adding
+runtime dependencies or establishing native self-hosting.

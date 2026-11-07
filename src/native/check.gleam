@@ -315,6 +315,8 @@ fn expression(
       Ok(plain(BinaryNode(op, left, right), result))
     }
     a.Call(name, args) -> named_call(name, args, env, globals)
+    a.RecordUpdate(name, target, args) ->
+      record_update(name, target, args, env, globals)
     a.Apply(target, args) -> {
       use target <- c.then(expression(target, env, globals))
       indirect_source_call(target, args, env, globals)
@@ -1230,5 +1232,150 @@ fn tag_cover(arms: List(Arm), tag: Int, globals: Globals) -> Bool {
       { id == tag && fields_cover(fields, globals) }
       || tag_cover(rest, tag, globals)
     [_, ..rest] -> tag_cover(rest, tag, globals)
+  }
+}
+
+// Update syntax is lowered to a scoped saved target and a new constructor.
+// Retained fields constrain the new generic parameters; overwritten fields may
+// change them, as upstream permits. The original object is never mutated.
+type UpdateArgument {
+  KeepField
+  ReplaceField(a.Expression)
+}
+
+fn record_update(
+  name: String,
+  target: a.Expression,
+  args: List(a.Argument),
+  env: Environment,
+  globals: Globals,
+) -> Result(Typed, String) {
+  use definition <- c.then(c.lookup(globals.constructors, name))
+  use _ <- c.then(case definition.fields {
+    [] -> Error("Invalid record update constructor: no fields")
+    _ -> Ok(Nil)
+  })
+  use target <- c.then(expression(target, env, globals))
+  use old_args <- c.then(constructor_type_arguments(definition, target.type_))
+  use owner <- c.then(c.lookup(globals.custom_types, definition.owner))
+  use _ <- c.then(
+    case
+      c.length(owner.variants) == 1 || target.known_variant == definition.tag
+    {
+      True -> Ok(Nil)
+      False -> Error("Unsafe record update: target constructor is not known")
+    },
+  )
+  use _ <- c.then(
+    c.try_map(args, fn(arg) {
+      case arg.label {
+        "" -> Error("Record updates require labelled fields")
+        _ -> Ok(Nil)
+      }
+    }),
+  )
+  use ordered <- c.then(labels.order(
+    c.map(args, fn(arg) { #(arg.label, ReplaceField(arg.value)) }),
+    definition.labels,
+    labels.FillMissing(KeepField),
+  ))
+  use old_bindings <- c.then(types.bindings(definition.parameters, old_args))
+  let saved =
+    Typed(VariableNode("$record-update"), target.type_, definition.tag)
+  use retained <- c.then(update_fields(
+    ordered,
+    definition.fields,
+    old_bindings,
+    saved,
+    0,
+    env,
+    globals,
+  ))
+  // Every output parameter is fresh. Retained fields constrain it; parameters
+  // absent from all fields remain free, including phantom parameters.
+  let initial = c.map(definition.parameters, fn(n) { #(n, a.Unresolved) })
+  use bindings <- c.then(infer_ready(retained, definition.fields, initial))
+  use #(fields, bindings) <- c.then(finish_arguments(
+    retained,
+    bindings,
+    env,
+    globals,
+  ))
+  use params <- c.then(
+    c.try_map(definition.parameters, fn(n) { c.lookup(bindings, n) }),
+  )
+  let result = types.apply(definition.owner, params)
+  Ok(Typed(
+    BlockNode([
+      Bind(a.VariablePattern("$record-update"), target),
+      Evaluate(Typed(
+        ConstructorNode(definition.tag, fields),
+        result,
+        definition.tag,
+      )),
+    ]),
+    result,
+    definition.tag,
+  ))
+}
+
+fn update_fields(
+  args: List(UpdateArgument),
+  formal: List(a.Type),
+  old: types.Bindings,
+  saved: Typed,
+  index: Int,
+  env: Environment,
+  globals: Globals,
+) -> Result(List(PreparedArgument), String) {
+  case args, formal {
+    [], [] -> Ok([])
+    [arg, ..args], [t, ..formal] -> {
+      use value <- c.then(case arg {
+        ReplaceField(a.Lambda(_, _, _) as e) -> Ok(Pending(e, t))
+        ReplaceField(e) -> {
+          use typed <- c.then(expression(e, env, globals))
+          Ok(Ready(typed))
+        }
+        KeepField -> {
+          use field_type <- c.then(types.substitute(t, old))
+          Ok(
+            Ready(plain(
+              FieldNode(saved, index, [saved.known_variant]),
+              field_type,
+            )),
+          )
+        }
+      })
+      use tail <- c.then(update_fields(
+        args,
+        formal,
+        old,
+        saved,
+        index + 1,
+        env,
+        globals,
+      ))
+      Ok([value, ..tail])
+    }
+    _, _ -> Error("Record update field count mismatch")
+  }
+}
+
+fn infer_ready(
+  args: List(PreparedArgument),
+  formal: List(a.Type),
+  bindings: types.Bindings,
+) -> Result(types.Bindings, String) {
+  case args, formal {
+    [], [] -> Ok(bindings)
+    [arg, ..args], [t, ..formal] -> {
+      use bindings <- c.then(case arg {
+        Ready(value) -> types.infer(t, value.type_, bindings)
+        Pending(_, _) -> Ok(bindings)
+      })
+      infer_ready(args, formal, bindings)
+    }
+    _, _ -> Error("Record update field count mismatch")
   }
 }

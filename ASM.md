@@ -166,3 +166,25 @@ function example to 1,050 bytes; its current listing is
 `evidence/functions-descriptor-disassembly.txt`. The old raw-pointer listing
 above remains historical evidence, not the current ABI. Neither artifact size
 is compiler size or a performance benchmark.
+
+## Record-update milestone inspection
+
+Record update lowering uses an internal scoped binding for the original and
+existing checked field loads plus constructor allocation. It adds no new native
+instruction family, mutation operation or dynamic label lookup. Source replacement
+expressions evaluate in declaration order after evaluating the original once.
+
+For record-update example SHA256
+`e9f4236e62b01c9351f170ee36fbdc3005f2bb40aab7986f2c23bd5e8913042a`,
+the original pointer is saved at `0x40011b`. The retained first field is read at
+`0x400145` after null/tag checks. The replacement 7 is loaded at `0x40014d`, then
+the new allocation is called at `0x40015d`. Stores at `0x400172` and `0x40017a`
+write into the new object, leaving the original unchanged. The later all-field
+replacement still loads/saves the original at `0x400188`/`0x40018f`, before creating
+its Bool fields. Runtime output is `3,7,True`. The full executable is 930 bytes.
+
+The assembler's relocation emission now uses a reversed chunk accumulator and a
+direct tail-recursive traversal, avoiding one bootstrap host stack frame per
+instruction. Relocation offsets/order are unchanged: all seven older example
+binaries retain their previous SHA256 values. A dedicated regression checks a
+forward jump over 12,000 instructions and rejects an unresolved label.

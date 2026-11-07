@@ -52,6 +52,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('generics_records', '21\n2\n21\n2\n'),
         ('functions', '22\n3\n4\n'),
         ('closures', '12\n22\n6\n'),
+        ('record_updates', '3\n7\nTrue\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -65,7 +66,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -123,6 +124,17 @@ oracle_cases = [
     ('use-refutable-pattern', 'fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }', False, ''),
     ('discarded-callable', 'fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }', False, ''),
     ('closure-case-context', 'fn make(n: Int,b: Bool) -> fn(Int) -> Int { case b { True -> fn(x) { n+x } False -> fn(x) { n-x } } } pub fn main() -> Nil { let f=make(7,True) echo f(3) Nil }', True, '10\n'),
+    ('update-evaluation-order', 'type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }', True, '1\n6\n4\n7\n5\n'),
+    ('update-type-change', 'type Box(a) { Box(value: a) } pub fn main() -> Nil { let a=Box(1) let b=Box(..a,value: True) echo b.value Nil }', True, 'True\n'),
+    ('update-unsafe-variant', 'type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }', False, ''),
+    ('update-known-variant', 'type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }', True, '2\n'),
+    ('update-empty', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a) echo b.x Nil }', True, '1\n'),
+    ('update-partial-type-change-rejected', 'type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }', False, ''),
+    ('update-unknown-label', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }', False, ''),
+    ('update-original-effects', 'type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }', True, '9\n2\n3\n'),
+    ('update-zero-field-invalid', 'pub type R { R } pub fn main() -> R { let r=R R(..r) }', False, ''),
+    ('update-phantom-type-change', 'type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }', True, '3\n'),
+    ('update-lambda-retained-context', 'type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }', True, '5\n'),
 ]
 oracle_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as tmp:
@@ -161,10 +173,10 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-(evidence / 'closures-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'record-updates-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 receipt = dict(
-    schema='gleam-in-gleam.closures-verification/1',
+    schema='gleam-in-gleam.record-updates-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -177,7 +189,7 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/closures-upstream-checks.json'),
+                                  path='evidence/record-updates-upstream-checks.json'),
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
     compilerRunsNatively=False,
     selfHosting=False,
@@ -185,12 +197,12 @@ receipt = dict(
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
     limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
-                 'No polymorphic named function values/labelled function calls/record updates/module imports yet',
+                 'No polymorphic named function values/labelled function calls/module imports yet',
                  'Anonymous parameters require annotations or a sufficiently resolved expected function type',
                  'Bounded arena only: no collection or native compiler file IO yet',
                  'Compound structural equality/printing and complex coverage are not implemented',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'closures-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'closures-test-output.tap').write_text(suite.stdout)
+(evidence / 'record-updates-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'record-updates-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

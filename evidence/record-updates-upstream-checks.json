@@ -1,0 +1,422 @@
+[
+  {
+    "name": "known-local-variant",
+    "source": "type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "zero-field-is-not-callable",
+    "source": "pub type A { Zero } pub fn main() -> A { Zero() }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:42\n  \u2502\n1 \u2502 pub type A { Zero } pub fn main() -> A { Zero() }\n  \u2502                                          ^^^^\n\nThis value is being called as a function but its type is:\n\n    A\n\n",
+    "nativeDiagnostic": "In function main: Zero-field constructor is a value, not a function: Zero\n"
+  },
+  {
+    "name": "private-type-in-public-api",
+    "source": "type A { Zero } pub fn main() -> A { Zero }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Private type used in public interface\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:17\n  \u2502\n1 \u2502 type A { Zero } pub fn main() -> A { Zero }\n  \u2502                 ^^^^^^^^^^^^^^^^^^\n\nThe following type is private, but is being used by this public export.\n\n    A\n\nPrivate types can only be used within the module that defines them.\n\n",
+    "nativeDiagnostic": "Private type used in public interface: A\n"
+  },
+  {
+    "name": "unknown-variant-let",
+    "source": "type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:15\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502               ^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:26\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502                          ^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive pattern\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:49\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502                                                 ^^^^^^^^^^^^^^\n\nThis assignment uses a pattern that does not match all possible values. If\none of the other values is used then the assignment will crash.\n\nThe missing patterns are:\n\n    Zero\n\nHint: Use a more general pattern or use `let assert` instead.\n\n",
+    "nativeDiagnostic": "In function read: Refutable let pattern: use case (let assert is not implemented)\n"
+  },
+  {
+    "name": "custom-result-names",
+    "source": "type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:23\n  \u2502\n1 \u2502 type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }\n  \u2502                       ^^^^^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "missing-variant",
+    "source": "type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:16\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                ^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:25\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                         ^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive patterns\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:48\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                                                ^^^^^^^^^^^^^^^^^^^^^\n\nThis case expression does not have a pattern for all possible values. If it\nis run on one of the values without a pattern then it will crash.\n\nThe missing patterns are:\n\n    Second\n\n",
+    "nativeDiagnostic": "In function read: Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+  },
+  {
+    "name": "wrong-field-type",
+    "source": "pub type A { One(Int) } pub fn main() -> A { One(True) }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:50\n  \u2502\n1 \u2502 pub type A { One(Int) } pub fn main() -> A { One(True) }\n  \u2502                                                  ^^^^\n\nExpected type:\n\n    Int\n\nFound type:\n\n    Bool\n\n",
+    "nativeDiagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+  },
+  {
+    "name": "nested-constructor-not-refined",
+    "source": "type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive pattern\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:65\n  \u2502\n1 \u2502 type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }\n  \u2502                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n\nThis assignment uses a pattern that does not match all possible values. If\none of the other values is used then the assignment will crash.\n\nThe missing patterns are:\n\n    B(Zero)\n\nHint: Use a more general pattern or use `let assert` instead.\n\n",
+    "nativeDiagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+  },
+  {
+    "name": "generic-repeated-parameter",
+    "source": "type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused variable\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:55\n  \u2502\n1 \u2502 type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }\n  \u2502                                                       ^ This variable is never used\n\nHint: You can ignore it with an underscore: `_x`.\n\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:66\n  \u2502\n1 \u2502 type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }\n  \u2502                                                                  ^^^^\n\nExpected type:\n\n    Int\n\nFound type:\n\n    Bool\n\n",
+    "nativeDiagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+  },
+  {
+    "name": "generic-argument-mismatch",
+    "source": "type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:32\n  \u2502\n1 \u2502 type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }\n  \u2502                                ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_x`.\n\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:89\n  \u2502\n1 \u2502 type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }\n  \u2502                                                                                         ^^^^^^\n\nExpected type:\n\n    Box(Bool)\n\nFound type:\n\n    Box(Int)\n\n",
+    "nativeDiagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+  },
+  {
+    "name": "label-declaration-order",
+    "source": "type Pair { Pair(first: Int,second: Int) } pub fn main() -> Nil { let p = Pair(second: echo 2,first: echo 1) echo p.first echo p.second Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "generic-record",
+    "source": "type Box(a) { Box(value: a,count: Int) } pub fn main() -> Nil { let box = Box(count: 2,value: 7) let Box(value:,..) = box echo value echo box.count Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "record-offset-mismatch",
+    "source": "type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^^^^^^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:28\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                            ^^^^^^^^^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:48\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                                ^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:56\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                                        ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_v`.\n\nerror: Unknown record field\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:73\n  \u2502\n1 \u2502 type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                                                         ^ This field does not exist\n\nThe value being accessed has this type:\n\n    V\n\nIt does not have fields that are common across all variants.\n\nNote: The field you are trying to access is not defined consistently across\nall variants of this custom type. To fix this, ensure that all variants\ninclude the field with the same name, position, and type.\n\n",
+    "nativeDiagnostic": "In function read: Record field must have the same position and declared type across variants\n"
+  },
+  {
+    "name": "record-template-mismatch",
+    "source": "type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:13\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502             ^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:21\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                     ^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:33\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                 ^^^^^^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:41\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                         ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_v`.\n\nerror: Unknown record field\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:63\n  \u2502\n1 \u2502 type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }\n  \u2502                                                               ^ This field does not exist\n\nThe value being accessed has this type:\n\n    V(Int)\n\nIt does not have fields that are common across all variants.\n\nNote: The field you are trying to access is not defined consistently across\nall variants of this custom type. To fix this, ensure that all variants\ninclude the field with the same name, position, and type.\n\n",
+    "nativeDiagnostic": "In function read: Record field must have the same position and declared type across variants\n"
+  },
+  {
+    "name": "label-positional-order",
+    "source": "type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused variable\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:62\n  \u2502\n1 \u2502 type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }\n  \u2502                                                              ^ This variable is never used\n\nHint: You can ignore it with an underscore: `_p`.\n\nerror: Unexpected positional argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:76\n  \u2502\n1 \u2502 type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }\n  \u2502                                                                            ^\n\nThis unlabeled argument has been supplied after a labelled argument.\nOnce a labelled argument has been supplied all following arguments must\nalso be labelled.\n\n",
+    "nativeDiagnostic": "In function main: Positional argument after labelled argument\n"
+  },
+  {
+    "name": "generic-function-instantiation",
+    "source": "fn identity(x: a) -> a { x } pub fn main() -> Nil { echo identity(7) echo identity(True) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "higher-order-function",
+    "source": "fn inc(x: Int) -> Int { x+1 } fn apply(f: fn(a) -> b,x: a) -> b { f(x) } pub fn main() -> Nil { echo apply(inc,7) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "indirect-evaluation-order",
+    "source": "fn add(a: Int,b: Int) -> Int { a+b } fn target() -> fn(Int,Int) -> Int { echo 1 add } pub fn main() -> Nil { echo target()(echo 2,echo 3) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "generic-rigid-body",
+    "source": "fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:6\n  \u2502\n1 \u2502 fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }\n  \u2502      ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_x`.\n\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:19\n  \u2502\n1 \u2502 fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }\n  \u2502                   ^\n\nThe type of this returned value doesn't match the return type\nannotation of this function.\n\nExpected type:\n\n    a\n\nFound type:\n\n    Int\n\n",
+    "nativeDiagnostic": "In function f: Type mismatch: expected a, found Int\n"
+  },
+  {
+    "name": "generic-self-recursion",
+    "source": "fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:23\n  \u2502\n1 \u2502 fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }\n  \u2502                       ^^^\n\nExpected type:\n\n    a\n\nFound type:\n\n    List(a)\n\n",
+    "nativeDiagnostic": "In function f: Type mismatch: expected List(a), found a\n"
+  },
+  {
+    "name": "generic-mutual-recursion",
+    "source": "fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:30\n  \u2502\n1 \u2502 fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }\n  \u2502                              ^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "private-function-type",
+    "source": "type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:16\n  \u2502\n1 \u2502 type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }\n  \u2502                ^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:40\n  \u2502\n1 \u2502 type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }\n  \u2502                                        ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_f`.\n\nerror: Private type used in public interface\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:26\n  \u2502\n1 \u2502 type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }\n  \u2502                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nThe following type is private, but is being used by this public export.\n\n    Private\n\nPrivate types can only be used within the module that defines them.\n\n",
+    "nativeDiagnostic": "Private type used in public interface: Private\n"
+  },
+  {
+    "name": "returned-closure-capture",
+    "source": "fn make(n: Int) -> fn(Int) -> Int { fn(x) { n+x } } pub fn main() -> Nil { let f=make(7) echo f(3) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "nested-closure-capture",
+    "source": "fn make(n: Int) -> fn(Int) -> fn(Int) -> Int { fn(x) { fn(y) { n+x+y } } } pub fn main() -> Nil { let outer=make(7) let inner=outer(2) echo inner(3) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "use-callback-scope",
+    "source": "fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let offset=2 let value={ use x <- run(7) x+offset } echo value Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "use-tuple-pattern",
+    "source": "fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let value={ use #(x,y) <- run(#(2,3)) x+y } echo value Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "use-lazy-continuation",
+    "source": "fn skip(_next: fn() -> Int) -> Int { 7 } pub fn main() -> Nil { let value={ use <- skip() echo 999 9 } echo value Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "closure-wrong-return",
+    "source": "fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused function argument\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:8\n  \u2502\n1 \u2502 fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }\n  \u2502        ^ This argument is never used\n\nHint: You can ignore it with an underscore: `_f`.\n\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:70\n  \u2502\n1 \u2502 fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }\n  \u2502                                                                      ^^^^^^^^^^^^^\n\nExpected type:\n\n    fn(Int) -> Bool\n\nFound type:\n\n    fn(Int) -> Int\n\n",
+    "nativeDiagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+  },
+  {
+    "name": "use-refutable-pattern",
+    "source": "fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Inexhaustive pattern\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:77\n  \u2502\n1 \u2502 fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }\n  \u2502                                                                             ^\n\nThis assignment uses a pattern that does not match all possible values. If\none of the other values is used then the assignment will crash.\n\nThe missing patterns are:\n\n    _\n\nHint: Use a more general pattern or use `let assert` instead.\n\n",
+    "nativeDiagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+  },
+  {
+    "name": "discarded-callable",
+    "source": "fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\nerror: Syntax error\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:32\n  \u2502\n1 \u2502 fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }\n  \u2502                                ^^ I was not expecting this\n\nFound a discard name, expected one of: \n- `}`\n\n",
+    "nativeDiagnostic": "In function f: Discarded variable cannot be read\n"
+  },
+  {
+    "name": "closure-case-context",
+    "source": "fn make(n: Int,b: Bool) -> fn(Int) -> Int { case b { True -> fn(x) { n+x } False -> fn(x) { n-x } } } pub fn main() -> Nil { let f=make(7,True) echo f(3) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-evaluation-order",
+    "source": "type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Redundant record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:90\n  \u2502\n1 \u2502 type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }\n  \u2502                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This record update specifies all fields\n\nHint: It is better style to use the record creation syntax.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-type-change",
+    "source": "type Box(a) { Box(value: a) } pub fn main() -> Nil { let a=Box(1) let b=Box(..a,value: True) echo b.value Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Redundant record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:73\n  \u2502\n1 \u2502 type Box(a) { Box(value: a) } pub fn main() -> Nil { let a=Box(1) let b=Box(..a,value: True) echo b.value Nil }\n  \u2502                                                                         ^^^^^^^^^^^^^^^^^^^^ This record update specifies all fields\n\nHint: It is better style to use the record creation syntax.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-unsafe-variant",
+    "source": "type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:20\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }\n  \u2502                    ^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:32\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }\n  \u2502                                ^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Unsafe record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:58\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }\n  \u2502                                                          ^ I'm not sure this is always a `A`\n\nThis value cannot be used to build an updated `A` as it could be some other\nvariant.\n\nConsider pattern matching on it with a case expression and then\nconstructing a new record with its values.\n\n",
+    "nativeDiagnostic": "In function update: Unsafe record update: target constructor is not known\n"
+  },
+  {
+    "name": "update-known-variant",
+    "source": "type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:20\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }\n  \u2502                    ^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Redundant record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:72\n  \u2502\n1 \u2502 type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }\n  \u2502                                                                        ^^^^^^^^^^ This record update specifies all fields\n\nHint: It is better style to use the record creation syntax.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-empty",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a) echo b.x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Fieldless record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:62\n  \u2502\n1 \u2502 type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a) echo b.x Nil }\n  \u2502                                                              ^^^^^^ This record update doesn't change any fields\n\nHint: Add some fields to change or replace it with the record itself.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-partial-type-change-rejected",
+    "source": "type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused variable\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:68\n  \u2502\n1 \u2502 type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }\n  \u2502                                                                    ^ This variable is never used\n\nHint: You can ignore it with an underscore: `_b`.\n\nerror: Incomplete record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:74\n  \u2502\n1 \u2502 type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }\n  \u2502                                                                          ^ This is a `R(Int)`\n\nThe `y` field of this value is a `Int`, but the arguments given to the\nrecord update indicate that it should be a `Bool`.\n\nNote: If the same type variable is used for multiple fields, all those\nfields need to be updated at the same time if their type changes.\n\n",
+    "nativeDiagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+  },
+  {
+    "name": "update-unknown-label",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused variable\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:60\n  \u2502\n1 \u2502 type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }\n  \u2502                                                            ^ This variable is never used\n\nHint: You can ignore it with an underscore: `_b`.\n\nerror: Unknown record field\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:68\n  \u2502\n1 \u2502 type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }\n  \u2502                                                                    ^^^ Did you mean `x`?\n\nThe value being accessed has this type:\n\n    R\n\nIt has these accessible fields:\n\n    .x\n\n",
+    "nativeDiagnostic": "In function main: Unknown constructor label: y\n"
+  },
+  {
+    "name": "update-original-effects",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Redundant record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:62\n  \u2502\n1 \u2502 type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }\n  \u2502                                                              ^^^^^^^^^^^^^^^^^^^ This record update specifies all fields\n\nHint: It is better style to use the record creation syntax.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-zero-field-invalid",
+    "source": "pub type R { R } pub fn main() -> R { let r=R R(..r) }",
+    "accepted": false,
+    "upstreamRuntimeCompared": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Invalid record constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:47\n  \u2502\n1 \u2502 pub type R { R } pub fn main() -> R { let r=R R(..r) }\n  \u2502                                               ^ This is not a record constructor\n\nOnly record constructors can be used with the update syntax.\n\n",
+    "nativeDiagnostic": "In function main: Invalid record update constructor: no fields\n"
+  },
+  {
+    "name": "update-phantom-type-change",
+    "source": "type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Redundant record update\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:59\n  \u2502\n1 \u2502 type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }\n  \u2502                                                           ^^^^^^^^^^ This record update specifies all fields\n\nHint: It is better style to use the record creation syntax.\n\n   Compiled in 0.01s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "update-lambda-retained-context",
+    "source": "type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }",
+    "accepted": true,
+    "upstreamRuntimeCompared": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  }
+]

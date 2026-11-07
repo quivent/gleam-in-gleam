@@ -32,6 +32,7 @@ pub type Expression {
   Binary(String, Expression, Expression)
   Call(String, List(Argument))
   Apply(Expression, List(Argument))
+  RecordUpdate(String, Expression, List(Argument))
   Lambda(List(LambdaParameter), Annotation, List(Statement))
   Block(List(Statement))
   Case(Expression, List(Arm))

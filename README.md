@@ -147,6 +147,14 @@ historical. Indirect calls save the descriptor before evaluating arguments,
 check its tag, and call its static code pointer. Captures hold copied value
 words, never pointers to a returned stack frame. See [ASM.md](ASM.md).
 
+Record updates (`Record(..original, field: value)`) save and evaluate the original
+once, then construct a new immutable record. Retained fields constrain generic
+parameters; overwritten fields may change those parameters when other retained
+fields do not constrain them. Phantom parameters remain fresh. Replacement fields
+use declaration order, including label shorthand. Multi-variant updates require
+the original's constructor to be statically known and match the named constructor;
+unknown/wrong variants and zero-field update constructors are rejected.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
@@ -158,7 +166,7 @@ words, never pointers to a returned stack frame. See [ASM.md](ASM.md).
   have their checked function types; there is no general let-polymorphism or
   omitted-signature inference. Generic equality/printing remain rejected where
   the current erased representation cannot provide their semantics.
-* Opaque types, record updates and empty custom types are not implemented.
+* Opaque types and empty custom types are not implemented.
   Shadowing built-in Int/Bool/Nil/String/List types or True/False/Nil constructors
   is explicitly rejected for now. User-defined Result/Ok/Error names
   are supported. Private-type checking covers public function signatures and
@@ -248,9 +256,20 @@ of the intentional descriptor ABI change; its old receipt/disassembly are
 preserved, and the current listing is `evidence/functions-descriptor-disassembly.txt`.
 See [SELF_HOSTING.md](SELF_HOSTING.md) for the remaining bootstrap criteria.
 
+The record-update milestone passes **230/230** checks and **42/42** fresh upstream
+comparisons. This includes generic type changes, retained-field constraints,
+phantom parameters, nested updates, captured records, callback context, unsafe
+variants, immutable originals and observable evaluation order. Its receipt is
+`evidence/record-updates-verification.json`; its native listing is
+`evidence/record_updates-disassembly.txt`. The 930-byte example prints `3,7,True`.
+All seven prior example binaries remain byte-identical. Larger input testing also
+exposed bootstrap recursion in relocation emission; the pass now accumulates
+chunks iteratively, with a 12,000-instruction relocation regression test. This
+changes host traversal, not emitted bytes. [JOURNEY.md](JOURNEY.md) records findings.
+
 Next actions, in dependency order:
 
-1. Add record updates, bit arrays and
+1. Add bit arrays and
    module imports, testing each against upstream results and failures. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node

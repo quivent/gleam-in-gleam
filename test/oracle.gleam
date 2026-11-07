@@ -628,3 +628,66 @@ pub fn closure_context_case(n: Int) -> Int {
   let second = make_case(n, False)
   first(3) + second(3)
 }
+
+type UpdatePair(a, b) {
+  UpdatePair(first: a, second: b)
+}
+
+pub fn record_update_keep(n: Int) -> Int {
+  let old = UpdatePair(n, n + 1)
+  let new = UpdatePair(..old, second: n + 3)
+  old.second + new.first + new.second
+}
+
+pub fn record_update_type(n: Int) -> Int {
+  let old = UpdatePair(n, True)
+  let new = UpdatePair(..old, first: False)
+  case new.first {
+    True -> 0
+    False ->
+      case new.second {
+        True -> old.first + n + 2
+        False -> 0
+      }
+  }
+}
+
+fn update_generic(p: UpdatePair(a, b), n: Int) -> UpdatePair(a, Int) {
+  UpdatePair(..p, second: n)
+}
+
+pub fn record_update_generic(n: Int) -> Int {
+  let p = update_generic(UpdatePair(n, True), n + 5)
+  p.first + p.second
+}
+
+pub fn record_update_nested(n: Int) -> Int {
+  let p = UpdatePair(n, n + 1)
+  let q = UpdatePair(..p, first: UpdatePair(..p, second: n + 2))
+  q.first.second + q.second + p.second
+}
+
+pub fn record_update_closure(n: Int) -> Int {
+  let p = UpdatePair(n, n + 1)
+  let f = fn(x: Int) { UpdatePair(..p, second: x) }
+  let q = f(n + 2)
+  q.first + q.second + p.second
+}
+
+pub fn record_update_shorthand(n: Int) -> Int {
+  let p = UpdatePair(n, n + 1)
+  let second = n + 4
+  let q = UpdatePair(..p, second:)
+  q.first + q.second
+}
+
+type UpdateHandler {
+  UpdateHandler(run: fn(Int) -> Int, keep: Int)
+}
+
+pub fn record_update_callback(n: Int) -> Int {
+  let p = UpdateHandler(fn(x: Int) { x + 1 }, 0)
+  let q = UpdateHandler(..p, run: fn(x: Int) { n + x })
+  let f = q.run
+  f(3)
+}

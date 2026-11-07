@@ -1,4 +1,6 @@
 import {test} from 'node:test';
+import {assemble, Bytes, Label, Relative} from '../build/dev/javascript/gleam_native/native/assembler.mjs';
+import {toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import assert from 'node:assert/strict';
 import {mkdtempSync, readFileSync, writeFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -62,6 +64,13 @@ const cases = [
   ['closure_returned_data', [9]], ['closure_captures_function', [10]],
   ['use_indirect', [11]], ['use_repeated', [12]],
   ['closure_context_case', [8]],
+  ['record_update_keep', [7]],
+  ['record_update_type', [7]],
+  ['record_update_generic', [7]],
+  ['record_update_nested', [7]],
+  ['record_update_closure', [7]],
+  ['record_update_shorthand', [7]],
+  ['record_update_callback', [7]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -241,7 +250,32 @@ test('native arena rejects allocation beyond its end before writing', () => {
   assert.equal(result.signal, null);
   assert.equal(result.stdout, '');
 });
+test('record update saves original once and evaluates replacements in declaration order', () => {
+  const result = run('type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n6\n4\n7\n5\n');
+});
+test('fully replaced update still evaluates its original and keeps it immutable', () => {
+  const result = run('type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '9\n2\n3\n');
+});
+test('record update infers anonymous parameter from retained generic field', () => {
+  const result = run('type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '5\n');
+});
 const rejected = [
+  ['zero-field update is not a record constructor', 'pub type R { R } pub fn main() -> R { let r=R R(..r) }', /Invalid record update constructor/],
+  ['unsafe variant update', 'type R { A(x: Int) B(x: Int) } fn f(r: R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }', /Unsafe record update/],
+  ['wrong known variant update', 'type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=B(1) let b=A(..a,x:2) Nil }', /Unsafe record update/],
+  ['wrong nominal update', 'type R { R(x: Int) } type S { S(x: Int) } pub fn main() -> Nil { let a=S(1) let b=R(..a,x:2) Nil }', /Type mismatch/],
+  ['unknown update field', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }', /Unknown constructor label/],
+  ['duplicate update field', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,x:2,x:3) Nil }', /Duplicate constructor/],
+  ['positional update field', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,2) Nil }', /require labelled/],
+  ['update retained generic field constrains replacement', 'type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }', /Type mismatch/],
+  ['update cannot change concrete field type', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,x:True) Nil }', /Type mismatch/],
+
   ['return mismatch', 'pub fn main() -> Int { True }', /Type mismatch/],
   ['argument type', 'fn f(a: Int) -> Int { a } pub fn main() -> Int { f(True) }', /Type mismatch/],
   ['argument count', 'fn f(a: Int) -> Int { a } pub fn main() -> Int { f() }', /argument count/],
@@ -356,4 +390,19 @@ for (const [name, source, error] of rejected) {
 test('no declared third-party packages', () => {
   const manifest = readFileSync(new URL('../manifest.toml', import.meta.url), 'utf8');
   assert.match(manifest, /packages = \[\s*\]/);
+});
+
+test('relocation emission handles a large instruction stream without host recursion', () => {
+  const parts = [new Relative(new BitArray(Uint8Array.of(0xe9)), 'end'),
+    ...Array.from({length: 12000}, () => new Bytes(new BitArray(Uint8Array.of(0x90)))),
+    new Label('end')];
+  const result = assemble(toList(parts));
+  assert.equal(result.isOk(), true, result[0]);
+  const bytes = Buffer.from(result[0].rawBuffer);
+  assert.equal(bytes.length, 12005);
+  assert.equal(bytes[0], 0xe9);
+  assert.equal(bytes.readInt32LE(1), 12000);
+  assert.equal(bytes[12004], 0x90);
+  const missing = assemble(toList([new Relative(new BitArray(Uint8Array.of(0xe9)), 'missing')]));
+  assert.equal(missing.isOk(), false);
 });
