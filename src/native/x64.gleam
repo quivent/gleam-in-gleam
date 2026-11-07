@@ -11,6 +11,7 @@ type State {
     env: List(#(String, Int)),
     data: List(asm.Part),
     needs_heap: Bool,
+    closures: List(asm.Part),
   )
 }
 
@@ -70,7 +71,7 @@ fn add_string(bytes: BitArray, state: State) -> #(String, State) {
 pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
   use #(bodies, state) <- c.then(function_list(
     functions,
-    State(0, 0, [], [], False),
+    State(0, 0, [], [], False, []),
   ))
   let init = case state.needs_heap {
     True -> [call("rt:heap_init")]
@@ -86,7 +87,7 @@ pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
     c.append(
       entry,
       c.append(
-        bodies,
+        c.append(bodies, state.closures),
         c.append(runtime(), c.append(heap_runtime, c.reverse(state.data))),
       ),
     )
@@ -231,8 +232,9 @@ fn expression(e: t.Typed, state: State) -> Generated {
         state,
       ))
     }
-    t.FunctionNode(name) ->
-      Ok(#([asm.Relative(<<72, 141, 5>>, "fn:" <> name)], state))
+    t.FunctionNode(name) -> descriptor("fn:" <> name, [], state)
+    t.ClosureNode(params, body, captures) ->
+      closure(params, body, captures, state)
     t.IndirectCallNode(target, args) -> {
       use #(target_code, state) <- c.then(expression(target, state))
       use #(argument_code, state) <- c.then(arguments(args, state))
@@ -240,6 +242,10 @@ fn expression(e: t.Typed, state: State) -> Generated {
       let cleanup = offset + 8
       let invoke = [
         raw(<<72, 139, 132, 36, offset:32-little, 72, 133, 192>>),
+        branch(132, "rt:match"),
+        raw(<<72, 131, 120, 8, 0>>),
+        branch(133, "rt:match"),
+        raw(<<72, 139, 64, 16, 72, 133, 192>>),
         branch(132, "rt:match"),
         raw(<<255, 208, 72, 129, 196, cleanup:32-little>>),
       ]
@@ -267,6 +273,106 @@ fn expression(e: t.Typed, state: State) -> Generated {
       use #(code, state) <- c.then(expression(inner, state))
       let #(print, state) = render_echo(inner.type_, state)
       Ok(#(c.append(code, print), state))
+    }
+  }
+}
+
+fn descriptor(
+  entry: String,
+  captures: List(String),
+  state: State,
+) -> Generated {
+  use values <- c.then(capture_values(captures, state.env))
+  let n = c.length(captures)
+  let size = 24 + n * 8
+  let create = [
+    raw(<<191, size:32-little>>),
+    call("rt:allocate"),
+    raw(<<72, 199, 0, size:32-little, 72, 199, 64, 8, 0, 0, 0, 0>>),
+    asm.Relative(<<72, 141, 13>>, entry),
+    raw(<<72, 137, 72, 16>>),
+  ]
+  Ok(#(
+    c.append(values, c.append(create, capture_stores(n - 1))),
+    State(..state, needs_heap: True),
+  ))
+}
+
+fn capture_values(
+  captures: List(String),
+  env: List(#(String, Int)),
+) -> Result(List(asm.Part), String) {
+  case captures {
+    [] -> Ok([])
+    [name, ..rest] -> {
+      use offset <- c.then(c.lookup(env, name))
+      use tail <- c.then(capture_values(rest, env))
+      Ok([load(offset), raw(<<80>>), ..tail])
+    }
+  }
+}
+
+fn capture_stores(index: Int) -> List(asm.Part) {
+  case index < 0 {
+    True -> []
+    False -> {
+      let offset = 24 + index * 8
+      [raw(<<89, 72, 137, 136, offset:32-little>>), ..capture_stores(index - 1)]
+    }
+  }
+}
+
+fn closure(
+  params: List(#(String, a.Type)),
+  body: List(t.Statement),
+  captures: List(String),
+  state: State,
+) -> Generated {
+  let outer_env = state.env
+  let outer_slots = state.slots
+  let #(entry, state) = label(state)
+  let parameter_env = parameter_offsets(params, c.length(params), 0)
+  let helper_state = State(..state, env: parameter_env, slots: 0)
+  let hidden = 16 + c.length(params) * 8
+  let #(initialise, helper_state) =
+    capture_locals(captures, hidden, 0, helper_state)
+  use #(code, helper_state) <- c.then(statements(body, helper_state))
+  let frame = { { helper_state.slots * 8 + 15 } / 16 } * 16
+  let prologue = raw(<<85, 72, 137, 229, 72, 129, 236, frame:32-little>>)
+  let helper = [
+    asm.Label(entry),
+    prologue,
+    ..c.append(initialise, c.append(code, [raw(<<201, 195>>)]))
+  ]
+  let state =
+    State(
+      ..helper_state,
+      env: outer_env,
+      slots: outer_slots,
+      closures: c.append(helper_state.closures, helper),
+    )
+  descriptor(entry, captures, state)
+}
+
+fn capture_locals(
+  captures: List(String),
+  hidden: Int,
+  index: Int,
+  state: State,
+) -> #(List(asm.Part), State) {
+  case captures {
+    [] -> #([], state)
+    [name, ..rest] -> {
+      let #(offset, state) = slot(state)
+      let state = State(..state, env: [#(name, offset), ..state.env])
+      let field = 24 + index * 8
+      let instructions = [
+        load(hidden),
+        raw(<<72, 139, 128, field:32-little>>),
+        store(offset),
+      ]
+      let #(tail, state) = capture_locals(rest, hidden, index + 1, state)
+      #(c.append(instructions, tail), state)
     }
   }
 }

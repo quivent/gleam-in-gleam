@@ -6,6 +6,9 @@ import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {BitArray} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
+import {lex} from '../build/dev/javascript/gleam_native/native/lexer.mjs';
+import {parse} from '../build/dev/javascript/gleam_native/native/parser.mjs';
+import {module as checkModule} from '../build/dev/javascript/gleam_native/native/check.mjs';
 import * as oracle from '../build/dev/javascript/gleam_native/oracle.mjs';
 import {probe} from '../build/dev/javascript/gleam_native/allocator_probe.mjs';
 
@@ -52,6 +55,13 @@ const cases = [
   ['generic_variable_names', [7]], ['higher_order', [3]], ['higher_order', [-3]],
   ['returned_function', [8]], ['returned_generic_function', [9]], ['callback_record', [10]],
   ['function_shadowing', [1]], ['local_function_alias', [11]],
+  ['closure_returned', [7]], ['closure_nested', [8]], ['closure_shadow', [9]],
+  ['closure_parameter_shadow', [10]], ['closure_generic', [11]], ['closure_in_record', [12]],
+  ['use_nested', [3]], ['use_tuple', [4]], ['use_two', [-5]], ['use_two', [5]],
+  ['use_zero', [6]], ['closure_case_scope', [7]], ['closure_case_scope', [-7]], ['closure_capture_data', [8]],
+  ['closure_returned_data', [9]], ['closure_captures_function', [10]],
+  ['use_indirect', [11]], ['use_repeated', [12]],
+  ['closure_context_case', [8]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -145,6 +155,61 @@ test('indirect call evaluates target before arguments and cleans up its saved po
   const result = run(source);
   assert.equal(result.status, 0);
   assert.equal(result.stdout, '1\n2\n3\n5\n1\n9\n');
+});
+test('returned closures keep independent environments after their factory returns', () => {
+  const result = run(main('let first = make_adder(10) let second = make_adder(20) echo first(1) echo second(1) echo first(2)'));
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '11\n21\n12\n');
+});
+test('context is inferred from non-callback arguments without changing evaluation order', () => {
+  const source = `fn run(f: fn(Int) -> Int,x: Int) -> Int { f(x) }
+    pub fn main() -> Nil { let base = 4 echo run(fn(x) { echo x x+base },echo 3) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '3\n3\n7\n');
+});
+test('annotation provides lambda context and source shadowing does not change captures', () => {
+  const source = `pub fn main() -> Nil { let n=7 let f: fn(Int) -> Int = fn(x) { n+x } let n=100 echo f(2) echo n Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '9\n100\n');
+});
+test('multi-argument closure captures use the correct hidden descriptor offset', () => {
+  const source = `fn make(n: Int) -> fn(Int,Int) -> Int { fn(a,b) { n+a*10+b } }
+    pub fn main() -> Nil { let f=make(100) echo f(2,3) echo f(4,5) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '123\n145\n');
+});
+test('only free variables are captured; parameter shadowing does not capture the outer binding', () => {
+  const source = `pub fn main() -> Nil { let n=99 let f=fn(n: Int) { n+1 } echo f(1) echo n Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '2\n99\n');
+});
+test('typed closure records only actual lexical free variables', () => {
+  const source = 'pub fn main() -> Nil { let used=3 let unused=9 let f=fn(x: Int) { let local=x+1 used+local } Nil }';
+  const tokens = lex(new BitArray(Buffer.from(source)));
+  const ast = parse(tokens[0]);
+  const typed = checkModule(ast[0]);
+  assert.equal(typed.isOk(), true, typed[0]);
+  const statements = typed[0].toArray()[0].body.toArray();
+  const closure = statements[2][1].node;
+  assert.deepEqual(closure[2].toArray(), ['used']);
+});
+test('use continuation body is not executed when the callee skips it', () => {
+  const source = `fn skip(_next: fn() -> Int) -> Int { 7 }
+    pub fn main() -> Nil { let result={ use <- skip() echo 999 9 } echo result Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '7\n');
+});
+test('use continuation can be invoked more than once with intact captures', () => {
+  const source = `fn repeat(n: Int,next: fn(Int) -> Int) -> Int { next(n)+next(n+1) }
+    pub fn main() -> Nil { let offset=10 let value={ use x <- repeat(3) echo x x+offset } echo value Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '3\n4\n27\n');
 });
 test('checked fixed-width overflow exits rather than silently wrapping', () => {
   const result = run(main('let n = 2147483647 * 2147483647\necho n * 3'));
@@ -267,6 +332,19 @@ const rejected = [
   ['nonfunction shadows callable', 'fn f(x: Int) -> Int { x } pub fn main() -> Nil { let f = 1 let n = f(2) Nil }', /Value is not a function/],
   ['private type inside function signature', 'type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Private type used in public interface/],
   ['unbound local annotation', 'fn f(x: a) -> a { let y: b = x y } pub fn main() -> Nil { Nil }', /Unbound type parameter/],
+  ['lambda unknown parameter context', 'pub fn main() -> Nil { let f=fn(x) { x+1 } Nil }', /annotation or stronger type context/],
+  ['lambda callback return mismatch', 'fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }', /Type mismatch/],
+  ['lambda annotation mismatch', 'pub fn main() -> Nil { let f: fn(Int) -> Int=fn(x: Bool) { 1 } Nil }', /Type mismatch/],
+  ['lambda duplicate parameter', 'pub fn main() -> Nil { let f=fn(x: Int,x: Int) { x } Nil }', /Duplicate anonymous parameter/],
+  ['lambda wrong context arity', 'fn run(f: fn(Int) -> Int) -> Nil { Nil } pub fn main() -> Nil { run(fn(a: Int,b: Int) { a+b }) }', /parameter count mismatch/],
+  ['lambda unknown capture', 'pub fn main() -> Nil { let f=fn() { missing } Nil }', /Unknown name/],
+  ['lambda discarded value read', 'pub fn main() -> Nil { let f=fn(_x: Int) { _x } Nil }', /Discarded variable/],
+  ['discarded callable read', 'fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }', /Discarded variable/],
+  ['lambda unresolved function parameter cannot become unsoundly polymorphic', 'fn pass(f: fn(a) -> a) -> fn(a) -> a { f } pub fn main() -> Nil { let f=pass(fn(x) { x+1 }) Nil }', /annotation or stronger type context/],
+  ['lambda explicit parameter rejects wrong later call', 'fn pass(f: fn(a) -> a) -> fn(a) -> a { f } pub fn main() -> Nil { let f=pass(fn(x: Int) { x+1 }) echo f(True) Nil }', /Type mismatch/],
+  ['use wrong pattern shape', 'fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use #(a,b) <- run(1) a+b }', /Tuple pattern requires/],
+  ['use duplicate bound names', 'fn run(f: fn(Int,Int) -> Int) -> Int { f(1,2) } pub fn main() -> Int { use x,x <- run() x }', /Duplicate anonymous parameter/],
+  ['use refutable pattern', 'fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }', /Refutable let/],
 ];
 for (const [name, source, error] of rejected) {
   test(`rejects without fallback: ${name}`, () => {

@@ -23,17 +23,25 @@ program. GNU objdump is used only as a development inspection tool.
   C function ABI. Native foreign calls are not implemented.
 * Linux `syscall` destroys RCX/R11; print helpers preserve the language expression
   result in RAX. Live expression values stay on the stack across calls.
-* A named monomorphic function value is a RIP-relative code address in one word.
-  It has no environment and requires no allocation. Generic function parameters
-  and result types are checked/instantiated at compile time; there are no hidden
-  runtime type arguments in these calls.
-* An indirect call evaluates and pushes its target before evaluating/pushing its
-  arguments. It reloads that target at `[RSP + 8 * argument_count]`, rejects null,
-  then executes `call *RAX`. After return it reclaims the argument words **and**
-  the saved target word. Callee parameter offsets remain unchanged.
-* The raw-code-pointer convention is internal and not yet a closure ABI. Captured
-  environments will need explicit ownership, lifetime and calling-convention
-  support; they must not be smuggled in as raw pointers to stack locals.
+* First-class functions are pointers to arena-owned descriptors:
+  `[size:u64][tag=0:u64][code:pointer][capture0:u64]...`. A named monomorphic
+  function allocates a 24-byte descriptor without captures. Generic types are
+  checked/instantiated at compile time, with no runtime type arguments.
+* Closure creation copies free local value words into that descriptor. Pointer
+  values refer to other arena objects or static data, never a former stack slot.
+  Each helper has its own stack frame; nested helpers retain their own captures.
+  Arena ownership keeps returned captures alive until exit; collection is pending.
+* An indirect call evaluates and pushes its descriptor before evaluating/pushing
+  arguments. It reloads the descriptor at `[RSP + 8 * argument_count]`, rejects
+  null/wrong tag, loads and checks its code pointer at offset 16, then executes
+  `call *RAX`. It reclaims argument words **and** the saved descriptor word.
+  Explicit parameter offsets remain unchanged.
+* A closure helper reads the saved descriptor at
+  `[RBP + 16 + 8 * argument_count]` and copies capture fields (offset 24 onward)
+  into its own local slots. Named callees ignore that hidden descriptor word.
+  Code stays in the ELF's read/execute segment; descriptor memory is read/write,
+  non-executable. This is an internal ABI, not an FFI contract.
+* `use` is frontend callback lowering. It adds no separate runtime mechanism.
 
 ## Values and allocation
 
@@ -126,7 +134,7 @@ uses offset `0x18` (header plus the second word-sized field). Its 874-byte size
 is the complete example program, not the compiler. Numeric output `21,2,21,2`
 also confirms declaration-order evaluation despite reversed source labels.
 
-For function example SHA256
+For the historical raw-pointer function example SHA256
 `58c74b37a69a36b676c0719bb5c598c642f7da042205cd2434280babeded6d68`,
 `twice` reloads its saved target at `0x4000e6`, null-checks it and calls through
 RAX at `0x4000f7`. The cleanup at `0x4000f9` advances RSP by `0x10`: one argument
@@ -139,3 +147,22 @@ The runtime tests execute an exact-fit allocator probe and an over-end probe
 through these same Gleam emitter/ELF modules. Pure oracle tests compare actual
 native results to unmodified upstream-generated JavaScript results. Structural
 equality and printing of compound values remain rejected until implemented.
+
+## Closure milestone inspection
+
+For closure example SHA256
+`5189b1237e01dc24846d1c3ea8ea49e201c5098f9802fbc47a6912eaf959cca0`,
+`evidence/closures-disassembly.txt` shows the static helper address loaded at
+`0x4000ef`, stored in descriptor offset 16 at `0x4000f6`, and its captured value
+stored at offset 24 at `0x4000fb`. An indirect call checks tag 0 at `0x400130`,
+loads the code pointer at `0x40013b`, calls at `0x400148` and reclaims two words at
+`0x40014a`. The one-argument helper starts at `0x400289`: it reads its saved
+descriptor from `[rbp+24]` at `0x400294`, then reads the captured value from
+`[rax+24]` at `0x40029b`. Its explicit argument remains at `[rbp+16]`.
+
+The complete 1,021-byte native example prints `12,22,6`, including two distinct
+returned environments. Named-function descriptors deliberately change the earlier
+function example to 1,050 bytes; its current listing is
+`evidence/functions-descriptor-disassembly.txt`. The old raw-pointer listing
+above remains historical evidence, not the current ABI. Neither artifact size
+is compiler size or a performance benchmark.

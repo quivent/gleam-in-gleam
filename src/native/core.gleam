@@ -79,6 +79,13 @@ pub fn uppercase_name(name: String) -> Bool {
   }
 }
 
+pub fn discarded_name(name: String) -> Bool {
+  case name {
+    "_" <> _ -> True
+    _ -> False
+  }
+}
+
 fn count(xs: List(a), n: Int) -> Int {
   case xs {
     [] -> n

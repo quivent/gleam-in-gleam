@@ -32,9 +32,14 @@ pub type Expression {
   Binary(String, Expression, Expression)
   Call(String, List(Argument))
   Apply(Expression, List(Argument))
+  Lambda(List(LambdaParameter), Annotation, List(Statement))
   Block(List(Statement))
   Case(Expression, List(Arm))
   Echo(Expression)
+}
+
+pub type LambdaParameter {
+  LambdaParameter(pattern: Pattern, annotation: Annotation)
 }
 
 pub type Argument {

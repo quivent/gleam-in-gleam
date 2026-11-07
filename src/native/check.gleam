@@ -1,6 +1,7 @@
 import native/ast as a
 import native/core as c
 import native/definitions as d
+import native/free_names
 import native/labels
 import native/type_system as types
 
@@ -24,6 +25,7 @@ pub type Node {
   CallNode(String, List(Typed))
   FunctionNode(String)
   IndirectCallNode(Typed, List(Typed))
+  ClosureNode(List(#(String, a.Type)), List(Statement), List(String))
   BlockNode(List(Statement))
   CaseNode(Typed, List(Arm))
   EchoNode(Typed)
@@ -86,7 +88,13 @@ pub fn module(module: a.Module) -> Result(List(Function), String) {
   use globals <- c.then(d.collect(module))
   use main <- c.then(c.lookup(globals.functions, "main"))
   case main.parameters {
-    [] -> c.try_map(module.functions, fn(f) { function(f, globals) })
+    [] ->
+      c.try_map(module.functions, fn(f) {
+        case function(f, globals) {
+          Ok(value) -> Ok(value)
+          Error(e) -> Error("In function " <> f.name <> ": " <> e)
+        }
+      })
     _ -> Error("main must have no parameters")
   }
 }
@@ -114,11 +122,14 @@ fn unique_parameters(
 ) -> Result(Nil, String) {
   case parameters {
     [] -> Ok(Nil)
-    [#("_", _), ..rest] -> unique_parameters(rest, seen)
     [#(name, t), ..rest] ->
-      case c.lookup(seen, name) {
-        Ok(_) -> Error("Duplicate parameter: " <> name)
-        Error(_) -> unique_parameters(rest, [#(name, t), ..seen])
+      case c.discarded_name(name) {
+        True -> unique_parameters(rest, seen)
+        False ->
+          case c.lookup(seen, name) {
+            Ok(_) -> Error("Duplicate parameter: " <> name)
+            Error(_) -> unique_parameters(rest, [#(name, t), ..seen])
+          }
       }
   }
 }
@@ -136,6 +147,7 @@ fn function(f: a.Function, globals: Globals) -> Result(Function, String) {
     f.body,
     c.map(f.parameters, fn(p) { #(p.0, Local(p.1, 0)) }),
     globals,
+    f.result,
   ))
   use _ <- c.then(equal(result_type, f.result))
   Ok(Function(f.name, f.parameters, f.result, body))
@@ -145,11 +157,21 @@ fn statements(
   xs: List(a.Statement),
   env: Environment,
   globals: Globals,
+  expected: a.Type,
 ) -> Result(#(List(Statement), a.Type), String) {
   case xs {
     [] -> Ok(#([], a.Unit))
     [a.Bind(pat, annotation, value), ..rest] -> {
-      use typed <- c.then(expression(value, env, globals))
+      let expected_value = case annotation {
+        a.Inferred -> a.Unresolved
+        a.Annotated(t) -> t
+      }
+      use typed <- c.then(expression_expected(
+        value,
+        env,
+        globals,
+        expected_value,
+      ))
       use typed <- c.then(case annotation {
         a.Inferred -> Ok(typed)
         a.Annotated(t) -> {
@@ -178,17 +200,20 @@ fn statements(
         [] ->
           Error("A function/block must end in an expression, not an assignment")
         _ -> {
-          use #(tail, t) <- c.then(statements(rest, next_env, globals))
+          use #(tail, t) <- c.then(statements(rest, next_env, globals, expected))
           Ok(#([Bind(pat, typed), ..tail], t))
         }
       }
     }
     [a.Evaluate(value), ..rest] -> {
-      use typed <- c.then(expression(value, env, globals))
+      use typed <- c.then(case rest {
+        [] -> expression_expected(value, env, globals, expected)
+        _ -> expression(value, env, globals)
+      })
       case rest {
         [] -> Ok(#([Evaluate(typed)], typed.type_))
         _ -> {
-          use #(tail, t) <- c.then(statements(rest, env, globals))
+          use #(tail, t) <- c.then(statements(rest, env, globals, expected))
           Ok(#([Evaluate(typed), ..tail], t))
         }
       }
@@ -247,10 +272,13 @@ fn expression(
       use element <- c.then(list_element_type(elements, initial))
       Ok(plain(ListNode(elements, tail), a.ListType(element)))
     }
-    a.Variable("_") -> Error("Discarded variable cannot be read")
     a.Variable(name) -> {
+      use _ <- c.then(case c.discarded_name(name) {
+        True -> Error("Discarded variable cannot be read")
+        False -> Ok(Nil)
+      })
       case c.uppercase_name(name) {
-        True -> constructor(name, [], env, globals, False)
+        True -> constructor(name, [], env, globals, False, a.Unresolved)
         False -> {
           case c.lookup(env, name) {
             Ok(local) ->
@@ -286,59 +314,19 @@ fn expression(
       use result <- c.then(binary_type(op, left.type_, right.type_))
       Ok(plain(BinaryNode(op, left, right), result))
     }
-    a.Call(name, args) -> {
-      case c.uppercase_name(name) {
-        True -> constructor(name, args, env, globals, True)
-        False -> {
-          use args <- c.then(call_arguments(args, env, globals))
-          case c.lookup(env, name) {
-            Ok(local) ->
-              indirect_call(
-                Typed(VariableNode(name), local.type_, local.known_variant),
-                args,
-              )
-            Error(_) -> {
-              use f <- c.then(c.lookup(globals.functions, name))
-              use _ <- c.then(case c.length(args) == c.length(f.parameters) {
-                True -> Ok(Nil)
-                False -> Error("Function argument count mismatch")
-              })
-              case name == globals.current_function {
-                True -> {
-                  use _ <- c.then(arguments(args, f.parameters))
-                  Ok(plain(CallNode(name, args), f.result))
-                }
-                False -> {
-                  let variables =
-                    types.variables(
-                      c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]),
-                    )
-                  let initial = c.map(variables, fn(n) { #(n, a.Unresolved) })
-                  use bindings <- c.then(types.infer_many(
-                    c.map(f.parameters, fn(p) { p.1 }),
-                    c.map(args, fn(arg) { arg.type_ }),
-                    initial,
-                  ))
-                  use result <- c.then(types.substitute(f.result, bindings))
-                  Ok(plain(CallNode(name, args), result))
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    a.Call(name, args) -> named_call(name, args, env, globals)
     a.Apply(target, args) -> {
       use target <- c.then(expression(target, env, globals))
-      use args <- c.then(call_arguments(args, env, globals))
-      indirect_call(target, args)
+      indirect_source_call(target, args, env, globals)
     }
+    a.Lambda(params, annotation, body) ->
+      lambda(params, annotation, body, env, globals, a.Unresolved)
     a.FieldAccess(target, field) -> {
       use target <- c.then(expression(target, env, globals))
       field_access(target, field, globals)
     }
     a.Block(body) -> {
-      use #(body, t) <- c.then(statements(body, env, globals))
+      use #(body, t) <- c.then(statements(body, env, globals, a.Unresolved))
       Ok(plain(BlockNode(body), t))
     }
     a.Echo(inner) -> {
@@ -355,37 +343,301 @@ fn expression(
         _ -> Ok(plain(EchoNode(typed), typed.type_))
       }
     }
-    a.Case(subject, arms) -> {
-      use subject <- c.then(expression(subject, env, globals))
-      use arms <- c.then(
-        c.try_map(arms, fn(arm) {
-          use #(pat, branch_env) <- c.then(pattern(
-            arm.pattern,
-            subject.type_,
-            env,
-            globals,
-            subject.known_variant,
-          ))
-          use body <- c.then(expression(arm.body, branch_env, globals))
-          Ok(Arm(pat, body))
-        }),
-      )
-      use _ <- c.then(exhaustive(
-        arms,
+    a.Case(subject, arms) ->
+      case_expression(subject, arms, env, globals, a.Unresolved)
+  }
+}
+
+fn case_expression(
+  subject: a.Expression,
+  arms: List(a.Arm),
+  env: Environment,
+  globals: Globals,
+  expected: a.Type,
+) -> Result(Typed, String) {
+  use subject <- c.then(expression(subject, env, globals))
+  use arms <- c.then(
+    c.try_map(arms, fn(arm) {
+      use #(pat, branch_env) <- c.then(pattern(
+        arm.pattern,
         subject.type_,
-        False,
-        False,
+        env,
         globals,
         subject.known_variant,
       ))
-      case arms {
-        [] -> Error("Empty case")
-        [first, ..rest] -> {
-          use result <- c.then(branch_type(rest, first.body.type_))
-          Ok(plain(CaseNode(subject, arms), result))
-        }
-      }
+      use body <- c.then(expression_expected(
+        arm.body,
+        branch_env,
+        globals,
+        expected,
+      ))
+      Ok(Arm(pat, body))
+    }),
+  )
+  use _ <- c.then(exhaustive(
+    arms,
+    subject.type_,
+    False,
+    False,
+    globals,
+    subject.known_variant,
+  ))
+  case arms {
+    [] -> Error("Empty case")
+    [first, ..rest] -> {
+      use result <- c.then(branch_type(rest, first.body.type_))
+      Ok(plain(CaseNode(subject, arms), result))
     }
+  }
+}
+
+fn expression_expected(
+  e: a.Expression,
+  env: Environment,
+  globals: Globals,
+  expected: a.Type,
+) -> Result(Typed, String) {
+  case e {
+    a.Case(subject, arms) ->
+      case_expression(subject, arms, env, globals, expected)
+    a.Call(name, args) ->
+      case c.uppercase_name(name) {
+        True -> constructor(name, args, env, globals, True, expected)
+        False -> expression(e, env, globals)
+      }
+    a.Lambda(params, annotation, body) ->
+      lambda(params, annotation, body, env, globals, expected)
+    a.Block(body) -> {
+      use #(body, t) <- c.then(statements(body, env, globals, expected))
+      Ok(plain(BlockNode(body), t))
+    }
+    _ -> expression(e, env, globals)
+  }
+}
+
+type PreparedArgument {
+  Ready(Typed)
+  Pending(a.Expression, a.Type)
+}
+
+fn context_arguments(
+  args: List(a.Expression),
+  formals: List(a.Type),
+  initial: types.Bindings,
+  env: Environment,
+  globals: Globals,
+) -> Result(#(List(Typed), types.Bindings), String) {
+  use #(prepared, bindings) <- c.then(prepare_arguments(
+    args,
+    formals,
+    initial,
+    env,
+    globals,
+  ))
+  finish_arguments(prepared, bindings, env, globals)
+}
+
+fn prepare_arguments(
+  args: List(a.Expression),
+  formals: List(a.Type),
+  bindings: types.Bindings,
+  env: Environment,
+  globals: Globals,
+) -> Result(#(List(PreparedArgument), types.Bindings), String) {
+  case args, formals {
+    [], [] -> Ok(#([], bindings))
+    [arg, ..args], [formal, ..formals] -> {
+      use #(prepared, bindings) <- c.then(case arg {
+        a.Lambda(_, _, _) -> Ok(#(Pending(arg, formal), bindings))
+        _ -> {
+          use typed <- c.then(expression(arg, env, globals))
+          use bindings <- c.then(types.infer(formal, typed.type_, bindings))
+          Ok(#(Ready(typed), bindings))
+        }
+      })
+      use #(rest, bindings) <- c.then(prepare_arguments(
+        args,
+        formals,
+        bindings,
+        env,
+        globals,
+      ))
+      Ok(#([prepared, ..rest], bindings))
+    }
+    _, _ -> Error("Function argument count mismatch")
+  }
+}
+
+fn finish_arguments(
+  args: List(PreparedArgument),
+  bindings: types.Bindings,
+  env: Environment,
+  globals: Globals,
+) -> Result(#(List(Typed), types.Bindings), String) {
+  case args {
+    [] -> Ok(#([], bindings))
+    [arg, ..rest] -> {
+      use #(typed, bindings) <- c.then(case arg {
+        Ready(typed) -> Ok(#(typed, bindings))
+        Pending(source, formal) -> {
+          use expected <- c.then(types.substitute(formal, bindings))
+          use typed <- c.then(expression_expected(
+            source,
+            env,
+            globals,
+            expected,
+          ))
+          use bindings <- c.then(types.infer(formal, typed.type_, bindings))
+          Ok(#(typed, bindings))
+        }
+      })
+      use #(rest, bindings) <- c.then(finish_arguments(
+        rest,
+        bindings,
+        env,
+        globals,
+      ))
+      Ok(#([typed, ..rest], bindings))
+    }
+  }
+}
+
+fn lambda(
+  params: List(a.LambdaParameter),
+  annotation: a.Annotation,
+  body: List(a.Statement),
+  env: Environment,
+  globals: Globals,
+  expected: a.Type,
+) -> Result(Typed, String) {
+  use #(expected_params, expected_result) <- c.then(case expected {
+    a.FunctionType(params, result) -> Ok(#(params, result))
+    a.Unresolved -> Ok(#(c.map(params, fn(_) { a.Unresolved }), a.Unresolved))
+    _ -> Error("Anonymous function requires a function type context")
+  })
+  use parameter_types <- c.then(lambda_types(params, expected_params, globals))
+  let names = all_parameter_names(params)
+  use _ <- c.then(unique_lambda_names(names, []))
+  let #(parameters, bindings) = lower_parameters(params, parameter_types, 0)
+  let result_context = case annotation {
+    a.Inferred -> expected_result
+    a.Annotated(t) -> t
+  }
+  use _ <- c.then(case annotation {
+    a.Inferred -> Ok(Nil)
+    a.Annotated(t) -> d.validate_type(t, globals)
+  })
+  let parameter_env = c.map(parameters, fn(p) { #(p.0, Local(p.1, 0)) })
+  use #(typed_body, result) <- c.then(statements(
+    c.append(bindings, body),
+    c.append(parameter_env, env),
+    globals,
+    result_context,
+  ))
+  use result <- c.then(types.merge(result, result_context))
+  use _ <- c.then(equal(result, expected_result))
+  let captures = actual_captures(free_names.names(body, names), env)
+  Ok(plain(
+    ClosureNode(parameters, typed_body, captures),
+    a.FunctionType(parameter_types, result),
+  ))
+}
+
+fn lambda_types(
+  params: List(a.LambdaParameter),
+  expected: List(a.Type),
+  globals: Globals,
+) -> Result(List(a.Type), String) {
+  case params, expected {
+    [], [] -> Ok([])
+    [p, ..params], [t, ..expected] -> {
+      use type_ <- c.then(case p.annotation {
+        a.Annotated(type_) -> {
+          use _ <- c.then(d.validate_type(type_, globals))
+          use _ <- c.then(equal(type_, t))
+          Ok(type_)
+        }
+        a.Inferred ->
+          case resolved(t) {
+            True -> Ok(t)
+            False ->
+              Error(
+                "Anonymous parameter needs an annotation or stronger type context",
+              )
+          }
+      })
+      use rest <- c.then(lambda_types(params, expected, globals))
+      Ok([type_, ..rest])
+    }
+    _, _ -> Error("Anonymous function parameter count mismatch")
+  }
+}
+
+fn resolved(t: a.Type) -> Bool {
+  case t {
+    a.Unresolved -> False
+    a.ListType(t) -> resolved(t)
+    a.TupleType(ts) | a.AppliedType(_, ts) -> all_resolved(ts)
+    a.FunctionType(ps, r) -> all_resolved([r, ..ps])
+    _ -> True
+  }
+}
+
+fn all_resolved(ts: List(a.Type)) -> Bool {
+  case ts {
+    [] -> True
+    [t, ..rest] -> resolved(t) && all_resolved(rest)
+  }
+}
+
+fn all_parameter_names(params: List(a.LambdaParameter)) -> List(String) {
+  case params {
+    [] -> []
+    [p, ..rest] ->
+      c.append(free_names.pattern_names(p.pattern), all_parameter_names(rest))
+  }
+}
+
+fn unique_lambda_names(
+  names: List(String),
+  seen: List(#(String, Nil)),
+) -> Result(Nil, String) {
+  case names {
+    [] -> Ok(Nil)
+    [name, ..rest] ->
+      case c.lookup(seen, name) {
+        Ok(_) -> Error("Duplicate anonymous parameter: " <> name)
+        Error(_) -> unique_lambda_names(rest, [#(name, Nil), ..seen])
+      }
+  }
+}
+
+fn lower_parameters(
+  params: List(a.LambdaParameter),
+  types: List(a.Type),
+  index: Int,
+) -> #(List(#(String, a.Type)), List(a.Statement)) {
+  case params, types {
+    [p, ..params], [t, ..types] -> {
+      let name = "$arg:" <> c.decimal(index)
+      let #(tail, bindings) = lower_parameters(params, types, index + 1)
+      #([#(name, t), ..tail], [
+        a.Bind(p.pattern, a.Annotated(t), a.Variable(name)),
+        ..bindings
+      ])
+    }
+    _, _ -> #([], [])
+  }
+}
+
+fn actual_captures(names: List(String), env: Environment) -> List(String) {
+  case names {
+    [] -> []
+    [name, ..rest] ->
+      case c.lookup(env, name) {
+        Ok(_) -> [name, ..actual_captures(rest, env)]
+        Error(_) -> actual_captures(rest, env)
+      }
   }
 }
 
@@ -427,37 +679,71 @@ fn binary_type(
   }
 }
 
-fn arguments(
-  args: List(Typed),
-  params: List(#(String, a.Type)),
-) -> Result(Nil, String) {
-  case args, params {
-    [], [] -> Ok(Nil)
-    [a, ..args], [#(_, t), ..params] -> {
-      use _ <- c.then(equal(a.type_, t))
-      arguments(args, params)
-    }
-    _, _ -> Error("Function argument count mismatch")
-  }
-}
-
-fn call_arguments(
+fn source_arguments(
   args: List(a.Argument),
-  env: Environment,
-  globals: Globals,
-) -> Result(List(Typed), String) {
+) -> Result(List(a.Expression), String) {
   c.try_map(args, fn(arg) {
     case arg.label {
-      "" -> expression(arg.value, env, globals)
+      "" -> Ok(arg.value)
       _ -> Error("Labelled function calls are not implemented yet")
     }
   })
 }
 
-fn indirect_call(target: Typed, args: List(Typed)) -> Result(Typed, String) {
+fn named_call(
+  name: String,
+  source_args: List(a.Argument),
+  env: Environment,
+  globals: Globals,
+) -> Result(Typed, String) {
+  case c.uppercase_name(name) {
+    True -> constructor(name, source_args, env, globals, True, a.Unresolved)
+    False ->
+      case c.lookup(env, name) {
+        Ok(local) ->
+          case c.discarded_name(name) {
+            True -> Error("Discarded variable cannot be read")
+            False ->
+              indirect_source_call(
+                Typed(VariableNode(name), local.type_, local.known_variant),
+                source_args,
+                env,
+                globals,
+              )
+          }
+        Error(_) -> {
+          use f <- c.then(c.lookup(globals.functions, name))
+          use args <- c.then(source_arguments(source_args))
+          let formals = c.map(f.parameters, fn(p) { p.1 })
+          let variables = case name == globals.current_function {
+            True -> []
+            False -> types.variables(c.append(formals, [f.result]))
+          }
+          let initial = c.map(variables, fn(n) { #(n, a.Unresolved) })
+          use #(args, bindings) <- c.then(context_arguments(
+            args,
+            formals,
+            initial,
+            env,
+            globals,
+          ))
+          use result <- c.then(types.substitute(f.result, bindings))
+          Ok(plain(CallNode(name, args), result))
+        }
+      }
+  }
+}
+
+fn indirect_source_call(
+  target: Typed,
+  source_args: List(a.Argument),
+  env: Environment,
+  globals: Globals,
+) -> Result(Typed, String) {
   case target.type_ {
     a.FunctionType(params, result) -> {
-      use _ <- c.then(arguments(args, c.map(params, fn(t) { #("", t) })))
+      use args <- c.then(source_arguments(source_args))
+      use #(args, _) <- c.then(context_arguments(args, params, [], env, globals))
       Ok(plain(IndirectCallNode(target, args), result))
     }
     _ -> Error("Value is not a function")
@@ -486,6 +772,7 @@ fn constructor(
   env: Environment,
   globals: Globals,
   called: Bool,
+  expected: a.Type,
 ) -> Result(Typed, String) {
   use definition <- c.then(c.lookup(globals.constructors, name))
   use _ <- c.then(case definition.fields, called {
@@ -498,14 +785,17 @@ fn constructor(
     definition.labels,
     labels.RejectMissing,
   ))
-  use args <- c.then(
-    c.try_map(ordered, fn(arg) { expression(arg, env, globals) }),
-  )
-  let initial = c.map(definition.parameters, fn(n) { #(n, a.Unresolved) })
-  use bindings <- c.then(types.infer_many(
+  use initial <- c.then(case expected {
+    a.AppliedType(owner, args) if owner == definition.owner ->
+      types.bindings(definition.parameters, args)
+    _ -> Ok(c.map(definition.parameters, fn(n) { #(n, a.Unresolved) }))
+  })
+  use #(args, bindings) <- c.then(context_arguments(
+    ordered,
     definition.fields,
-    c.map(args, fn(arg) { arg.type_ }),
     initial,
+    env,
+    globals,
   ))
   use parameters <- c.then(
     c.try_map(definition.parameters, fn(n) { c.lookup(bindings, n) }),

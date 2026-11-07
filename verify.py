@@ -51,6 +51,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('custom_types', '5\n23\n0\n'),
         ('generics_records', '21\n2\n21\n2\n'),
         ('functions', '22\n3\n4\n'),
+        ('closures', '12\n22\n6\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -64,7 +65,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types', 'generics_records', 'functions') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -74,11 +75,12 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
             # Preserve a stable path in the listing, not a disposable temp name.
             listing = listing.replace(str(raw), f'{name}-code.bin')
             listing = '\n'.join(line.rstrip() for line in listing.splitlines()) + '\n'
+            listing_name = 'functions-descriptor' if name == 'functions' else name
             disassemblies.append(dict(tool=run(['objdump', '--version']).stdout.splitlines()[0],
                                entryAddress=hex(entry), rawCodeSHA256=sha(raw.read_bytes()),
                                includesTrailingStaticData=True,
-                               path=f'evidence/{name}-disassembly.txt'))
-            (evidence / f'{name}-disassembly.txt').write_text(listing)
+                               path=f'evidence/{listing_name}-disassembly.txt'))
+            (evidence / f'{listing_name}-disassembly.txt').write_text(listing)
         examples.append(dict(name=name, bytes=len(data), sha256=sha(data),
                              exitCode=result.returncode, stdout=result.stdout,
                              dynamicLoader=False, dynamicLibraries=[],
@@ -112,6 +114,15 @@ oracle_cases = [
     ('generic-self-recursion', 'fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }', False, ''),
     ('generic-mutual-recursion', 'fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }', True, ''),
     ('private-function-type', 'type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }', False, ''),
+    ('returned-closure-capture', 'fn make(n: Int) -> fn(Int) -> Int { fn(x) { n+x } } pub fn main() -> Nil { let f=make(7) echo f(3) Nil }', True, '10\n'),
+    ('nested-closure-capture', 'fn make(n: Int) -> fn(Int) -> fn(Int) -> Int { fn(x) { fn(y) { n+x+y } } } pub fn main() -> Nil { let outer=make(7) let inner=outer(2) echo inner(3) Nil }', True, '12\n'),
+    ('use-callback-scope', 'fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let offset=2 let value={ use x <- run(7) x+offset } echo value Nil }', True, '9\n'),
+    ('use-tuple-pattern', 'fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let value={ use #(x,y) <- run(#(2,3)) x+y } echo value Nil }', True, '5\n'),
+    ('use-lazy-continuation', 'fn skip(_next: fn() -> Int) -> Int { 7 } pub fn main() -> Nil { let value={ use <- skip() echo 999 9 } echo value Nil }', True, '7\n'),
+    ('closure-wrong-return', 'fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }', False, ''),
+    ('use-refutable-pattern', 'fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }', False, ''),
+    ('discarded-callable', 'fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }', False, ''),
+    ('closure-case-context', 'fn make(n: Int,b: Bool) -> fn(Int) -> Int { case b { True -> fn(x) { n+x } False -> fn(x) { n-x } } } pub fn main() -> Nil { let f=make(7,True) echo f(3) Nil }', True, '10\n'),
 ]
 oracle_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as tmp:
@@ -150,10 +161,10 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-(evidence / 'functions-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'closures-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 receipt = dict(
-    schema='gleam-in-gleam.functions-verification/1',
+    schema='gleam-in-gleam.closures-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -166,18 +177,20 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/functions-upstream-checks.json'),
+                                  path='evidence/closures-upstream-checks.json'),
+    functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
     compilerRunsNatively=False,
     selfHosting=False,
     fullGleamCompatibility=False,
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
     limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
-                 'No polymorphic named function values/labelled function calls/record updates/closures/module imports yet',
+                 'No polymorphic named function values/labelled function calls/record updates/module imports yet',
+                 'Anonymous parameters require annotations or a sufficiently resolved expected function type',
                  'Bounded arena only: no collection or native compiler file IO yet',
                  'Compound structural equality/printing and complex coverage are not implemented',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'functions-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'functions-test-output.tap').write_text(suite.stdout)
+(evidence / 'closures-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'closures-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

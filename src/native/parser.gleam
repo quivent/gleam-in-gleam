@@ -208,6 +208,24 @@ fn statements(
 ) -> Parsed(List(a.Statement)) {
   case tokens {
     [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
+    [l.Token(l.Word("use"), _), ..rest] -> {
+      use #(params, rest) <- c.then(use_parameters(rest))
+      use #(target, rest) <- c.then(expression(rest, 0))
+      use #(body, rest) <- c.then(statements(rest, []))
+      case body {
+        [] -> error(tokens, "use requires a following body expression")
+        _ -> {
+          let callback = a.Argument("", a.Lambda(params, a.Inferred, body))
+          let call = case target {
+            a.Call(name, args) -> a.Call(name, c.append(args, [callback]))
+            a.Apply(function, args) ->
+              a.Apply(function, c.append(args, [callback]))
+            _ -> a.Apply(target, [callback])
+          }
+          Ok(#(c.append(c.reverse(acc), [a.Evaluate(call)]), rest))
+        }
+      }
+    }
     [l.Token(l.Word("let"), _), ..rest] -> {
       use #(pat, rest) <- c.then(pattern(rest))
       use #(t, rest) <- c.then(annotation(rest))
@@ -298,6 +316,19 @@ fn infix(
 
 fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
+    [l.Token(l.Word("fn"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(params, rest) <- c.then(separated(rest, ")", lambda_parameter))
+      use #(result, rest) <- c.then(case rest {
+        [l.Token(l.Symbol("->"), _), ..rest] -> {
+          use #(t, rest) <- c.then(type_(rest))
+          Ok(#(a.Annotated(t), rest))
+        }
+        _ -> Ok(#(a.Inferred, rest))
+      })
+      use rest <- c.then(expect(rest, "{"))
+      use #(body, rest) <- c.then(statements(rest, []))
+      Ok(#(a.Lambda(params, result, body), rest))
+    }
     [l.Token(l.Number(n), _), ..rest] -> Ok(#(a.IntegerLiteral(n), rest))
     [l.Token(l.Text(s), _), ..rest] -> Ok(#(a.StringLiteral(s), rest))
     [l.Token(l.Symbol("#"), _), l.Token(l.Symbol("("), _), ..rest] -> {
@@ -402,11 +433,41 @@ fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
       Ok(#(a.BooleanPattern(False), rest))
     [l.Token(l.Word("_"), _), ..rest] -> Ok(#(a.DiscardPattern, rest))
     [l.Token(l.Word(id), _), ..rest] ->
-      case c.uppercase_name(id) {
-        True -> Ok(#(a.ConstructorPattern(id, [], False), rest))
-        False -> Ok(#(a.VariablePattern(id), rest))
+      case c.discarded_name(id), c.uppercase_name(id) {
+        True, _ -> Ok(#(a.DiscardPattern, rest))
+        _, True -> Ok(#(a.ConstructorPattern(id, [], False), rest))
+        _, False -> Ok(#(a.VariablePattern(id), rest))
       }
     _ -> error(tokens, "Pattern not implemented in native seed")
+  }
+}
+
+fn lambda_parameter(tokens: Tokens) -> Parsed(a.LambdaParameter) {
+  use #(id, rest) <- c.then(name(tokens))
+  use #(annotation, rest) <- c.then(annotation(rest))
+  let pat = case c.discarded_name(id) {
+    True -> a.DiscardPattern
+    False -> a.VariablePattern(id)
+  }
+  Ok(#(a.LambdaParameter(pat, annotation), rest))
+}
+
+fn use_parameters(tokens: Tokens) -> Parsed(List(a.LambdaParameter)) {
+  case tokens {
+    [l.Token(l.Symbol("<-"), _), ..rest] -> Ok(#([], rest))
+    _ -> {
+      use #(pat, rest) <- c.then(pattern(tokens))
+      use #(annotation, rest) <- c.then(annotation(rest))
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(tail, rest) <- c.then(use_parameters(rest))
+          Ok(#([a.LambdaParameter(pat, annotation), ..tail], rest))
+        }
+        [l.Token(l.Symbol("<-"), _), ..rest] ->
+          Ok(#([a.LambdaParameter(pat, annotation)], rest))
+        _ -> error(rest, "Expected ',' or '<-' after use patterns")
+      }
+    }
   }
 }
 

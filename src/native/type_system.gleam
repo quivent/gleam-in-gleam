@@ -77,9 +77,16 @@ pub fn infer(
 ) -> Result(Bindings, String) {
   case formal, actual {
     a.VariableType(n), t -> {
-      use old <- c.then(c.lookup(bindings, n))
-      use t <- c.then(merge(old, t))
-      Ok(c.put(bindings, n, t))
+      case c.lookup(bindings, n) {
+        Ok(old) -> {
+          use t <- c.then(merge(old, t))
+          Ok(c.put(bindings, n, t))
+        }
+        Error(_) -> {
+          use _ <- c.then(merge(formal, actual))
+          Ok(bindings)
+        }
+      }
     }
     _, a.Unresolved -> Ok(bindings)
     a.ListType(l), a.ListType(r) -> infer(l, r, bindings)
@@ -114,7 +121,11 @@ pub fn infer_many(
 
 pub fn substitute(t: a.Type, bindings: Bindings) -> Result(a.Type, String) {
   case t {
-    a.VariableType(n) -> c.lookup(bindings, n)
+    a.VariableType(n) ->
+      case c.lookup(bindings, n) {
+        Ok(t) -> Ok(t)
+        Error(_) -> Ok(t)
+      }
     a.ListType(t) -> {
       use t <- c.then(substitute(t, bindings))
       Ok(a.ListType(t))

@@ -83,6 +83,7 @@ BitArray representation. It performs no language compilation itself.
 | `native/check` | Typed expressions, constructor inference, scope and exhaustiveness |
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
 | `native/type_system` | Scoped constructor/function substitution and function types |
+| `native/free_names` | Lexically scoped free names for copied closure captures |
 | `native/labels` | Constructor labels, positional validation and declaration ordering |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
@@ -129,19 +130,31 @@ declared type across all possible variants, or for a known constructor.
 Generic functions with explicit signatures are checked using rigid body type
 variables and fresh bindings at direct global call sites. Direct self-recursion
 keeps the current signature rigid, matching the upstream acceptance checks.
-Function types, monomorphic named function values, aliases, returned function
-pointers, generic higher-order parameters and callbacks in records are supported.
-Indirect calls evaluate the target before their arguments and preserve it on the
-stack. No anonymous functions or captured environments are implemented yet.
+Function types, monomorphic named function values, aliases, returned functions,
+generic higher-order parameters and callbacks in records are supported.
+Anonymous functions copy their free local values into arena-owned descriptors;
+returned and nested closures retain their captures after the factory returns.
+`use` lowers to an appended callback, including tuple-pattern, zero-argument and
+multiple-argument callbacks. Parameter annotations or sufficiently resolved
+expected function types are required; this is not general type inference.
+Expected types flow through annotated bindings, function results, constructor
+fields and case branches. Callback argument checking can use type information
+from other arguments without changing runtime evaluation order.
+
+Every first-class function now uses `[size][tag=0][code pointer][captures...]`.
+Named functions also allocate descriptors; the earlier raw-pointer ABI is
+historical. Indirect calls save the descriptor before evaluating arguments,
+check its tag, and call its static code pointer. Captures hold copied value
+words, never pointers to a returned stack frame. See [ASM.md](ASM.md).
 
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, anonymous functions/closures, `use`, labelled function calls,
-  general type inference, constants, attributes and bit-array syntax are not
+* Imports, labelled function calls, general type inference, constants,
+  attributes and bit-array syntax are not
   implemented. The compiler uses several of those itself, so cannot self-compile.
 * Named polymorphic functions can be called directly, but cannot yet be taken as
-  polymorphic first-class values. Local function parameters/returned pointers
+  polymorphic first-class values. Local function parameters/returned functions
   have their checked function types; there is no general let-polymorphism or
   omitted-signature inference. Generic equality/printing remain rejected where
   the current erased representation cannot provide their semantics.
@@ -156,7 +169,7 @@ stack. No anonymous functions or captured environments are implemented yet.
   limitation, not Gleam's full cross-target integer semantics.
 * String literals retain their UTF-8 bytes; only a few escapes are supported.
   String structural equality and dynamic string allocation are not implemented.
-* Tuples/lists use a single 64 MiB read/write, non-executable mmap arena, only in
+* Compound objects and function descriptors use a single 64 MiB read/write, non-executable mmap arena, only in
   programs with compound allocation. Allocation is checked and exhaustion exits
   71. There is no collection or arena growth yet. This is not the final memory
   manager. Structural compound equality/printing remain rejected.
@@ -207,7 +220,7 @@ The generic-types/records milestone passes **146/146** checks plus **15/15** fre
 upstream accept/reject comparisons. Accepted cases also execute through the
 upstream toolchain to compare numeric/Bool/Nil output, including observable
 labelled-argument evaluation order. `evidence/generics-records-verification.json`
-contains current source/artifact hashes and `evidence/generics_records-disassembly.txt`
+contains that milestone's source/artifact hashes and `evidence/generics_records-disassembly.txt`
 contains actual field-access instructions. The four older native examples retain
 their exact previous hashes. A paired test also verifies identical machine code
 for Box(Int) holding 1 and Box(Bool) holding True; this demonstrates representation
@@ -218,23 +231,33 @@ accept/reject comparisons. It covers generic recursion, rigid type variables,
 higher-order calls, lexical shadowing, returned pointers, callback records and
 indirect evaluation order/stack cleanup. Accepted comparison cases execute their
 main entry; the mutually recursive nonterminating functions in one acceptance
-fixture are deliberately not invoked. Current hashes and native disassembly are
+fixture are deliberately not invoked. Historical hashes and native disassembly are
 in `evidence/functions-verification.json` and `evidence/functions-disassembly.txt`.
-All five older example binaries retain their exact previous hashes. See
-[SELF_HOSTING.md](SELF_HOSTING.md) for the remaining bootstrap criteria.
+At that milestone all five older examples retained their previous hashes.
+
+The closures/`use` milestone passes **210/210** checks plus **31/31** fresh
+upstream accept/reject comparisons. Tests cover returned/nested captures, shadowing,
+generic closures, callback records, contextual typing, parameter patterns,
+callback invocation order and rejected unsafe inference. Actual capture loads and
+indirect-call instructions are retained in `evidence/closures-disassembly.txt`.
+`evidence/closures-verification.json` records the exact source hashes and bootstrap
+state. The 1,021-byte closure example prints `12,22,6`; this is a program size,
+not compiler size or a speed measurement. The first five older examples remain
+byte-identical. The named-function example grows from 867 to 1,050 bytes because
+of the intentional descriptor ABI change; its old receipt/disassembly are
+preserved, and the current listing is `evidence/functions-descriptor-disassembly.txt`.
+See [SELF_HOSTING.md](SELF_HOSTING.md) for the remaining bootstrap criteria.
 
 Next actions, in dependency order:
 
-1. Add anonymous functions, captured closures and `use`. Preserve captured-value
-   lifetime and review the call ABI before extending today's raw-code pointers.
-2. Add record updates, byte arrays and
+1. Add record updates, bit arrays and
    module imports, testing each against upstream results and failures. Structural
    equality and owned collection also remain necessary work.
-3. Supply native file/argument/syscall IO in the owned runtime; remove the Node
+2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.
-4. Compile the compiler source natively, then rebuild that compiler with itself
+3. Compile the compiler source natively, then rebuild that compiler with itself
    and compare exact bytes. Record actual size and dependencies at each stage.
-5. Expand upstream compatibility and add a direct ARM64/Mach-O emitter. Verify
+4. Expand upstream compatibility and add a direct ARM64/Mach-O emitter. Verify
    architecture/OS semantics rather than assuming ELF code transfers unchanged.
 
 No time, final compiler size, compile-speed or language-wide runtime-performance

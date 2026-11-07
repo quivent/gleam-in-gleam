@@ -465,3 +465,166 @@ pub fn local_function_alias(n: Int) -> Int {
   let f = increment
   f(n)
 }
+
+fn make_adder(n: Int) -> fn(Int) -> Int {
+  fn(x) { x + n }
+}
+
+pub fn closure_returned(n: Int) -> Int {
+  let f = make_adder(n)
+  f(3)
+}
+
+fn make_nested(n: Int) -> fn(Int) -> fn(Int) -> Int {
+  fn(x) { fn(y) { n + x + y } }
+}
+
+pub fn closure_nested(n: Int) -> Int {
+  let outer = make_nested(n)
+  let inner = outer(2)
+  inner(3)
+}
+
+pub fn closure_shadow(n: Int) -> Int {
+  let f = fn() { n }
+  let n = n + 100
+  f() + n
+}
+
+pub fn closure_parameter_shadow(n: Int) -> Int {
+  let f = fn(n: Int) { n + 1 }
+  f(2) + n
+}
+
+fn remember(value: a) -> fn() -> a {
+  fn() { value }
+}
+
+pub fn closure_generic(n: Int) -> Int {
+  let f = remember(Just(n))
+  maybe_int(f(), 0)
+}
+
+fn make_handler(n: Int) -> Handler(Int, Int) {
+  Handler(fn(x) { x + n })
+}
+
+pub fn closure_in_record(n: Int) -> Int {
+  let handler = make_handler(n)
+  handler.run(4)
+}
+
+fn with_value(x: a, next: fn(a) -> b) -> b {
+  next(x)
+}
+
+pub fn use_nested(n: Int) -> Int {
+  use first <- with_value(n)
+  use second <- with_value(first + 1)
+  first + second
+}
+
+pub fn use_tuple(n: Int) -> Int {
+  use #(x, flag) <- with_value(#(n, True))
+  case flag {
+    True -> x + 1
+    False -> x - 1
+  }
+}
+
+fn with_two(n: Int, next: fn(Int, Bool) -> Int) -> Int {
+  next(n, n > 0)
+}
+
+pub fn use_two(n: Int) -> Int {
+  use x, flag <- with_two(n)
+  case flag {
+    True -> x
+    False -> -x
+  }
+}
+
+fn defer(next: fn() -> a) -> a {
+  next()
+}
+
+pub fn use_zero(n: Int) -> Int {
+  use <- defer()
+  n + 1
+}
+
+pub fn closure_case_scope(n: Int) -> Int {
+  let f = case n > 0 {
+    True -> {
+      let offset = n + 1
+      fn(x: Int) { x + offset }
+    }
+    False -> fn(x: Int) { x - n }
+  }
+  f(3)
+}
+
+pub fn closure_capture_data(n: Int) -> Int {
+  let pair = #(n, [n + 1, n + 2])
+  let f = fn() {
+    let #(first, tail) = pair
+    first + list_sum(tail)
+  }
+  f()
+}
+
+fn remember_list(n: Int) -> fn() -> Int {
+  let values = [n, n + 1]
+  fn() { list_sum(values) }
+}
+
+pub fn closure_returned_data(n: Int) -> Int {
+  let f = remember_list(n)
+  f()
+}
+
+fn wrap_adder(n: Int) -> fn(Int) -> Int {
+  let base = make_adder(n)
+  fn(x) { base(x) + 1 }
+}
+
+pub fn closure_captures_function(n: Int) -> Int {
+  let f = wrap_adder(n)
+  f(2)
+}
+
+fn choose_runner(offset: Int) -> fn(fn(Int) -> Int) -> Int {
+  fn(callback) { callback(offset) }
+}
+
+pub fn use_indirect(n: Int) -> Int {
+  let runner = choose_runner(n)
+  use x <- runner()
+  x + 1
+}
+
+fn repeat_callback(n: Int, next: fn(Int) -> Int) -> Int {
+  next(n) + next(n + 1)
+}
+
+pub fn use_repeated(n: Int) -> Int {
+  let offset = 10
+  use x <- repeat_callback(n)
+  x + offset
+}
+
+fn make_case(n: Int, add: Bool) -> fn(Int) -> Int {
+  case add {
+    True -> fn(x) { n + x }
+    False -> {
+      let offset = n + 1
+      fn(x) { offset - x }
+    }
+  }
+}
+
+pub fn closure_context_case(n: Int) -> Int {
+  let first = make_case(n, True)
+  let second = make_case(n, False)
+  first(3) + second(3)
+}
