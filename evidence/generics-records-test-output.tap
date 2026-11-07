@@ -1,0 +1,886 @@
+TAP version 13
+# Subtest: upstream semantic oracle: fibonacci(0)
+ok 1 - upstream semantic oracle: fibonacci(0)
+  ---
+  duration_ms: 177.714248
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(1)
+ok 2 - upstream semantic oracle: fibonacci(1)
+  ---
+  duration_ms: 94.055853
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(10)
+ok 3 - upstream semantic oracle: fibonacci(10)
+  ---
+  duration_ms: 136.603981
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(16)
+ok 4 - upstream semantic oracle: fibonacci(16)
+  ---
+  duration_ms: 55.417871
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: arithmetic(7,4,3)
+ok 5 - upstream semantic oracle: arithmetic(7,4,3)
+  ---
+  duration_ms: 56.789452
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: arithmetic(-7,-4,3)
+ok 6 - upstream semantic oracle: arithmetic(-7,-4,3)
+  ---
+  duration_ms: 64.700178
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(12,0)
+ok 7 - upstream semantic oracle: quotient(12,0)
+  ---
+  duration_ms: 78.293284
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(-17,5)
+ok 8 - upstream semantic oracle: quotient(-17,5)
+  ---
+  duration_ms: 80.26876
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(17,-5)
+ok 9 - upstream semantic oracle: quotient(17,-5)
+  ---
+  duration_ms: 113.42187
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(12,0)
+ok 10 - upstream semantic oracle: remainder(12,0)
+  ---
+  duration_ms: 60.548905
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(-17,5)
+ok 11 - upstream semantic oracle: remainder(-17,5)
+  ---
+  duration_ms: 57.259103
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(17,-5)
+ok 12 - upstream semantic oracle: remainder(17,-5)
+  ---
+  duration_ms: 64.961183
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(3,4)
+ok 13 - upstream semantic oracle: bool_case(3,4)
+  ---
+  duration_ms: 68.445559
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(4,4)
+ok 14 - upstream semantic oracle: bool_case(4,4)
+  ---
+  duration_ms: 46.831399
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(5,4)
+ok 15 - upstream semantic oracle: bool_case(5,4)
+  ---
+  duration_ms: 64.139577
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(-1)
+ok 16 - upstream semantic oracle: integer_case(-1)
+  ---
+  duration_ms: 47.866928
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(0)
+ok 17 - upstream semantic oracle: integer_case(0)
+  ---
+  duration_ms: 31.79594
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(1)
+ok 18 - upstream semantic oracle: integer_case(1)
+  ---
+  duration_ms: 36.646953
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(9)
+ok 19 - upstream semantic oracle: integer_case(9)
+  ---
+  duration_ms: 45.079686
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: shadow(7)
+ok 20 - upstream semantic oracle: shadow(7)
+  ---
+  duration_ms: 36.550926
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_string(0)
+ok 21 - upstream semantic oracle: chosen_string(0)
+  ---
+  duration_ms: 37.695611
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_string(1)
+ok 22 - upstream semantic oracle: chosen_string(1)
+  ---
+  duration_ms: 85.212
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: unit()
+ok 23 - upstream semantic oracle: unit()
+  ---
+  duration_ms: 26.850612
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: list_work(1)
+ok 24 - upstream semantic oracle: list_work(1)
+  ---
+  duration_ms: 46.18271
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: list_work(-2)
+ok 25 - upstream semantic oracle: list_work(-2)
+  ---
+  duration_ms: 34.463686
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: tuple_work(3)
+ok 26 - upstream semantic oracle: tuple_work(3)
+  ---
+  duration_ms: 32.702143
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: nested_pattern(7)
+ok 27 - upstream semantic oracle: nested_pattern(7)
+  ---
+  duration_ms: 40.20035
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_list_sum(0)
+ok 28 - upstream semantic oracle: chosen_list_sum(0)
+  ---
+  duration_ms: 29.41645
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_list_sum(5)
+ok 29 - upstream semantic oracle: chosen_list_sum(5)
+  ---
+  duration_ms: 30.036762
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_tree(1)
+ok 30 - upstream semantic oracle: custom_tree(1)
+  ---
+  duration_ms: 28.516762
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_tree(-3)
+ok 31 - upstream semantic oracle: custom_tree(-3)
+  ---
+  duration_ms: 46.460606
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_option(0)
+ok 32 - upstream semantic oracle: custom_option(0)
+  ---
+  duration_ms: 34.369195
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_option(6)
+ok 33 - upstream semantic oracle: custom_option(6)
+  ---
+  duration_ms: 41.59239
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_destructure(4)
+ok 34 - upstream semantic oracle: custom_destructure(4)
+  ---
+  duration_ms: 37.842533
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_nested(1)
+ok 35 - upstream semantic oracle: custom_nested(1)
+  ---
+  duration_ms: 25.373152
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_known(7)
+ok 36 - upstream semantic oracle: custom_known(7)
+  ---
+  duration_ms: 41.799573
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_result(0)
+ok 37 - upstream semantic oracle: custom_result(0)
+  ---
+  duration_ms: 41.877793
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_result(8)
+ok 38 - upstream semantic oracle: custom_result(8)
+  ---
+  duration_ms: 49.474244
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: custom_public(9)
+ok 39 - upstream semantic oracle: custom_public(9)
+  ---
+  duration_ms: 40.376477
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_maybe(0)
+ok 40 - upstream semantic oracle: generic_maybe(0)
+  ---
+  duration_ms: 37.625098
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_maybe(8)
+ok 41 - upstream semantic oracle: generic_maybe(8)
+  ---
+  duration_ms: 45.795752
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_bool(-1)
+ok 42 - upstream semantic oracle: generic_bool(-1)
+  ---
+  duration_ms: 47.829176
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_bool(2)
+ok 43 - upstream semantic oracle: generic_bool(2)
+  ---
+  duration_ms: 44.79958
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_duo(3)
+ok 44 - upstream semantic oracle: generic_duo(3)
+  ---
+  duration_ms: 41.433868
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_duo(-2)
+ok 45 - upstream semantic oracle: generic_duo(-2)
+  ---
+  duration_ms: 31.194455
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_same(5)
+ok 46 - upstream semantic oracle: generic_same(5)
+  ---
+  duration_ms: 39.603903
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_recursive(4)
+ok 47 - upstream semantic oracle: generic_recursive(4)
+  ---
+  duration_ms: 37.936271
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: generic_phantom(7)
+ok 48 - upstream semantic oracle: generic_phantom(7)
+  ---
+  duration_ms: 43.053718
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_generic(3)
+ok 49 - upstream semantic oracle: labelled_generic(3)
+  ---
+  duration_ms: 47.487325
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_pattern(4)
+ok 50 - upstream semantic oracle: labelled_pattern(4)
+  ---
+  duration_ms: 42.977329
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_spread(5)
+ok 51 - upstream semantic oracle: labelled_spread(5)
+  ---
+  duration_ms: 58.955289
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_shorthand(6)
+ok 52 - upstream semantic oracle: labelled_shorthand(6)
+  ---
+  duration_ms: 45.490002
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_common(7)
+ok 53 - upstream semantic oracle: labelled_common(7)
+  ---
+  duration_ms: 47.458106
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: labelled_known(8)
+ok 54 - upstream semantic oracle: labelled_known(8)
+  ---
+  duration_ms: 57.180852
+  type: 'test'
+  ...
+# Subtest: short-circuiting does not evaluate the right branch
+ok 55 - short-circuiting does not evaluate the right branch
+  ---
+  duration_ms: 57.700993
+  type: 'test'
+  ...
+# Subtest: argument evaluation order and native calling convention
+ok 56 - argument evaluation order and native calling convention
+  ---
+  duration_ms: 21.481805
+  type: 'test'
+  ...
+# Subtest: tuple/list fields evaluate left-to-right and list tails stay persistent
+ok 57 - tuple/list fields evaluate left-to-right and list tails stay persistent
+  ---
+  duration_ms: 54.977388
+  type: 'test'
+  ...
+# Subtest: empty list annotations and nested empty-list refinement
+ok 58 - empty list annotations and nested empty-list refinement
+  ---
+  duration_ms: 34.338895
+  type: 'test'
+  ...
+# Subtest: constructor fields preserve left-to-right evaluation and call results
+ok 59 - constructor fields preserve left-to-right evaluation and call results
+  ---
+  duration_ms: 5.618654
+  type: 'test'
+  ...
+# Subtest: forward-referenced and mutually recursive custom types
+ok 60 - forward-referenced and mutually recursive custom types
+  ---
+  duration_ms: 8.179895
+  type: 'test'
+  ...
+# Subtest: generic nullary values can instantiate independently without leaking bindings
+ok 61 - generic nullary values can instantiate independently without leaking bindings
+  ---
+  duration_ms: 5.49353
+  type: 'test'
+  ...
+# Subtest: generic arguments do not introduce native runtime type machinery
+ok 62 - generic arguments do not introduce native runtime type machinery
+  ---
+  duration_ms: 5.135845
+  type: 'test'
+  ...
+# Subtest: labelled constructor arguments evaluate in upstream declaration order
+ok 63 - labelled constructor arguments evaluate in upstream declaration order
+  ---
+  duration_ms: 7.635274
+  type: 'test'
+  ...
+# Subtest: checked fixed-width overflow exits rather than silently wrapping
+ok 64 - checked fixed-width overflow exits rather than silently wrapping
+  ---
+  duration_ms: 57.915165
+  type: 'test'
+  ...
+# Subtest: deterministic raw machine code with no interpreter or dynamic linkage
+ok 65 - deterministic raw machine code with no interpreter or dynamic linkage
+  ---
+  duration_ms: 1.884632
+  type: 'test'
+  ...
+# Subtest: native arena accepts an exact fit
+ok 66 - native arena accepts an exact fit
+  ---
+  duration_ms: 4.236971
+  type: 'test'
+  ...
+# Subtest: native arena rejects allocation beyond its end before writing
+ok 67 - native arena rejects allocation beyond its end before writing
+  ---
+  duration_ms: 5.28443
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: return mismatch
+ok 68 - rejects without fallback: return mismatch
+  ---
+  duration_ms: 0.77386
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: argument type
+ok 69 - rejects without fallback: argument type
+  ---
+  duration_ms: 0.392543
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: argument count
+ok 70 - rejects without fallback: argument count
+  ---
+  duration_ms: 0.315328
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: missing name
+ok 71 - rejects without fallback: missing name
+  ---
+  duration_ms: 0.238042
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate function
+ok 72 - rejects without fallback: duplicate function
+  ---
+  duration_ms: 0.489526
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate parameter
+ok 73 - rejects without fallback: duplicate parameter
+  ---
+  duration_ms: 0.270192
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nonexhaustive
+ok 74 - rejects without fallback: nonexhaustive
+  ---
+  duration_ms: 0.262651
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: branch mismatch
+ok 75 - rejects without fallback: branch mismatch
+  ---
+  duration_ms: 0.30558
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: pattern mismatch
+ok 76 - rejects without fallback: pattern mismatch
+  ---
+  duration_ms: 0.281472
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown import
+ok 77 - rejects without fallback: unknown import
+  ---
+  duration_ms: 0.282223
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic functions pending
+ok 78 - rejects without fallback: generic functions pending
+  ---
+  duration_ms: 0.455329
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unterminated string
+ok 79 - rejects without fallback: unterminated string
+  ---
+  duration_ms: 0.31708
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: missing entrypoint
+ok 80 - rejects without fallback: missing entrypoint
+  ---
+  duration_ms: 0.188353
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unimplemented literal range
+ok 81 - rejects without fallback: unimplemented literal range
+  ---
+  duration_ms: 0.164951
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unimplemented structural equality
+ok 82 - rejects without fallback: unimplemented structural equality
+  ---
+  duration_ms: 0.200046
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: heterogeneous list
+ok 83 - rejects without fallback: heterogeneous list
+  ---
+  duration_ms: 0.243311
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: bad list tail
+ok 84 - rejects without fallback: bad list tail
+  ---
+  duration_ms: 0.191097
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: bad nested list
+ok 85 - rejects without fallback: bad nested list
+  ---
+  duration_ms: 0.280075
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple index bounds
+ok 86 - rejects without fallback: tuple index bounds
+  ---
+  duration_ms: 0.235622
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple index shape
+ok 87 - rejects without fallback: tuple index shape
+  ---
+  duration_ms: 0.17176
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple pattern arity
+ok 88 - rejects without fallback: tuple pattern arity
+  ---
+  duration_ms: 0.43111
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate tuple binding
+ok 89 - rejects without fallback: duplicate tuple binding
+  ---
+  duration_ms: 0.346154
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: refutable let
+ok 90 - rejects without fallback: refutable let
+  ---
+  duration_ms: 0.415481
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: incomplete list case
+ok 91 - rejects without fallback: incomplete list case
+  ---
+  duration_ms: 0.292782
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: incomplete nonempty case
+ok 92 - rejects without fallback: incomplete nonempty case
+  ---
+  duration_ms: 0.554632
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: list element pattern type
+ok 93 - rejects without fallback: list element pattern type
+  ---
+  duration_ms: 0.321668
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: list equality pending
+ok 94 - rejects without fallback: list equality pending
+  ---
+  duration_ms: 0.278178
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: compound echo pending
+ok 95 - rejects without fallback: compound echo pending
+  ---
+  duration_ms: 0.233246
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nominal constructor argument
+ok 96 - rejects without fallback: nominal constructor argument
+  ---
+  duration_ms: 0.513135
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nominal pattern
+ok 97 - rejects without fallback: nominal pattern
+  ---
+  duration_ms: 0.441727
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor underarity
+ok 98 - rejects without fallback: constructor underarity
+  ---
+  duration_ms: 0.334517
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor overarity
+ok 99 - rejects without fallback: constructor overarity
+  ---
+  duration_ms: 0.304194
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor field mismatch
+ok 100 - rejects without fallback: constructor field mismatch
+  ---
+  duration_ms: 0.318358
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor pattern arity
+ok 101 - rejects without fallback: constructor pattern arity
+  ---
+  duration_ms: 0.331514
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor missing variant
+ok 102 - rejects without fallback: constructor missing variant
+  ---
+  duration_ms: 0.36517
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor partial field coverage
+ok 103 - rejects without fallback: constructor partial field coverage
+  ---
+  duration_ms: 0.48651
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate constructor
+ok 104 - rejects without fallback: duplicate constructor
+  ---
+  duration_ms: 0.250905
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate custom type
+ok 105 - rejects without fallback: duplicate custom type
+  ---
+  duration_ms: 0.268815
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown custom field type
+ok 106 - rejects without fallback: unknown custom field type
+  ---
+  duration_ms: 0.222177
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown function type
+ok 107 - rejects without fallback: unknown function type
+  ---
+  duration_ms: 0.301275
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown annotation inside empty list
+ok 108 - rejects without fallback: unknown annotation inside empty list
+  ---
+  duration_ms: 0.694314
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor duplicate field binding
+ok 109 - rejects without fallback: constructor duplicate field binding
+  ---
+  duration_ms: 0.418638
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor mixed list types
+ok 110 - rejects without fallback: constructor mixed list types
+  ---
+  duration_ms: 0.361345
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor equality pending
+ok 111 - rejects without fallback: constructor equality pending
+  ---
+  duration_ms: 0.26707
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: constructor echo pending
+ok 112 - rejects without fallback: constructor echo pending
+  ---
+  duration_ms: 0.417756
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: zero-field constructor called
+ok 113 - rejects without fallback: zero-field constructor called
+  ---
+  duration_ms: 0.249234
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: private type return
+ok 114 - rejects without fallback: private type return
+  ---
+  duration_ms: 0.219117
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: private type parameter
+ok 115 - rejects without fallback: private type parameter
+  ---
+  duration_ms: 0.326569
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: private type nested return
+ok 116 - rejects without fallback: private type nested return
+  ---
+  duration_ms: 0.24986
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: private type in public constructor
+ok 117 - rejects without fallback: private type in public constructor
+  ---
+  duration_ms: 0.29484
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown variant let
+ok 118 - rejects without fallback: unknown variant let
+  ---
+  duration_ms: 0.40821
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: known tag does not narrow fields
+ok 119 - rejects without fallback: known tag does not narrow fields
+  ---
+  duration_ms: 0.396446
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nested constructor not falsely narrowed
+ok 120 - rejects without fallback: nested constructor not falsely narrowed
+  ---
+  duration_ms: 5.577203
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: known tag cannot change nominal type
+ok 121 - rejects without fallback: known tag cannot change nominal type
+  ---
+  duration_ms: 0.383571
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate pub modifier
+ok 122 - rejects without fallback: duplicate pub modifier
+  ---
+  duration_ms: 0.256241
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic repeated parameter mismatch
+ok 123 - rejects without fallback: generic repeated parameter mismatch
+  ---
+  duration_ms: 0.47555
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic application mismatch
+ok 124 - rejects without fallback: generic application mismatch
+  ---
+  duration_ms: 0.491773
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic pattern mismatch
+ok 125 - rejects without fallback: generic pattern mismatch
+  ---
+  duration_ms: 0.488845
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic recursive argument mismatch
+ok 126 - rejects without fallback: generic recursive argument mismatch
+  ---
+  duration_ms: 4.584526
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic missing application argument
+ok 127 - rejects without fallback: generic missing application argument
+  ---
+  duration_ms: 0.349826
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: generic extra application argument
+ok 128 - rejects without fallback: generic extra application argument
+  ---
+  duration_ms: 0.284901
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nongeneric application argument
+ok 129 - rejects without fallback: nongeneric application argument
+  ---
+  duration_ms: 0.242959
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: undeclared generic field variable
+ok 130 - rejects without fallback: undeclared generic field variable
+  ---
+  duration_ms: 0.255935
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate generic parameter
+ok 131 - rejects without fallback: duplicate generic parameter
+  ---
+  duration_ms: 0.185722
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: private generic argument leak
+ok 132 - rejects without fallback: private generic argument leak
+  ---
+  duration_ms: 0.503214
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown constructor label
+ok 133 - rejects without fallback: unknown constructor label
+  ---
+  duration_ms: 0.343899
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate constructor label
+ok 134 - rejects without fallback: duplicate constructor label
+  ---
+  duration_ms: 3.444683
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate field declaration
+ok 135 - rejects without fallback: duplicate field declaration
+  ---
+  duration_ms: 0.273113
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: positional after labelled
+ok 136 - rejects without fallback: positional after labelled
+  ---
+  duration_ms: 7.062841
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: missing labelled field
+ok 137 - rejects without fallback: missing labelled field
+  ---
+  duration_ms: 0.402557
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown record field
+ok 138 - rejects without fallback: unknown record field
+  ---
+  duration_ms: 0.44497
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: record field on integer
+ok 139 - rejects without fallback: record field on integer
+  ---
+  duration_ms: 0.265172
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: record field different positions
+ok 140 - rejects without fallback: record field different positions
+  ---
+  duration_ms: 0.440446
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: record field different template types
+ok 141 - rejects without fallback: record field different template types
+  ---
+  duration_ms: 0.421355
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: record field missing in variant
+ok 142 - rejects without fallback: record field missing in variant
+  ---
+  duration_ms: 4.30502
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown pattern label
+ok 143 - rejects without fallback: unknown pattern label
+  ---
+  duration_ms: 0.43858
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate pattern label
+ok 144 - rejects without fallback: duplicate pattern label
+  ---
+  duration_ms: 0.484333
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: labelled function calls pending
+ok 145 - rejects without fallback: labelled function calls pending
+  ---
+  duration_ms: 0.291287
+  type: 'test'
+  ...
+# Subtest: no declared third-party packages
+ok 146 - no declared third-party packages
+  ---
+  duration_ms: 1.854121
+  type: 'test'
+  ...
+1..146
+# tests 146
+# suites 0
+# pass 146
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3551.805523

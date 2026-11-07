@@ -176,6 +176,20 @@ fn expression(e: t.Typed, state: State) -> Generated {
     }
     t.TupleNode(elements) -> object(elements, 1, state)
     t.ConstructorNode(tag, fields) -> object(fields, tag, state)
+    t.FieldNode(target, index, tags) -> {
+      use #(code, state) <- c.then(expression(target, state))
+      let #(found, state) = label(state)
+      let offset = 16 + index * 8
+      let inspect = [
+        raw(<<72, 133, 192>>),
+        branch(132, "rt:match"),
+        ..c.append(field_tags(tags, found), [
+          asm.Label(found),
+          raw(<<72, 139, 128, offset:32-little>>),
+        ])
+      ]
+      Ok(#(c.append(code, inspect), state))
+    }
     t.TupleIndexNode(tuple, index) -> {
       use #(code, state) <- c.then(expression(tuple, state))
       let offset = 16 + index * 8
@@ -371,10 +385,12 @@ fn case_arms(
 fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
   case type_ {
     // The type checker rejects compound echo until structural formatting lands.
-    a.TupleType(_) | a.ListType(_) | a.NamedType(_) | a.Unresolved -> #(
-      [jump("rt:match")],
-      state,
-    )
+    a.TupleType(_)
+    | a.ListType(_)
+    | a.NamedType(_)
+    | a.AppliedType(_, _)
+    | a.VariableType(_)
+    | a.Unresolved -> #([jump("rt:match")], state)
     a.Integer -> #([call("rt:print_int")], state)
     a.StringType -> #([call("rt:print_string")], state)
     a.Unit -> {
@@ -483,7 +499,7 @@ fn pattern_code(
   state: State,
 ) -> Generated {
   case pat {
-    a.ConstructorPattern(_, _) ->
+    a.ConstructorPattern(_, _, _) ->
       Error("Unresolved constructor in native code generation")
     a.CheckedConstructorPattern(tag, fields) -> {
       // Null/tag tests precede every constructor field load.
@@ -526,6 +542,17 @@ fn pattern_code(
       tuple_pattern(patterns, 0, subject, failure, state)
     a.ListPattern(patterns, tail) ->
       list_pattern(patterns, tail, subject, failure, state)
+  }
+}
+
+fn field_tags(tags: List(Int), found: String) -> List(asm.Part) {
+  case tags {
+    [] -> [jump("rt:match")]
+    [tag, ..rest] -> [
+      raw(<<72, 129, 120, 8, tag:32-little>>),
+      branch(132, found),
+      ..field_tags(rest, found)
+    ]
   }
 }
 

@@ -122,6 +122,21 @@ pub fn lookup(xs: List(#(String, a)), name: String) -> Result(a, String) {
   }
 }
 
+pub fn put(
+  xs: List(#(String, a)),
+  key: String,
+  value: a,
+) -> List(#(String, a)) {
+  case xs {
+    [] -> [#(key, value)]
+    [#(name, old), ..rest] ->
+      case name == key {
+        True -> [#(key, value), ..rest]
+        False -> [#(name, old), ..put(rest, key, value)]
+      }
+  }
+}
+
 pub fn decimal(n: Int) -> String {
   case n < 0 {
     True -> "-" <> decimal(0 - n)

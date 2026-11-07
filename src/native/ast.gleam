@@ -6,6 +6,8 @@ pub type Type {
   TupleType(List(Type))
   ListType(Type)
   NamedType(String)
+  AppliedType(String, List(Type))
+  VariableType(String)
   // Internal placeholder for an empty list; never a source type annotation.
   Unresolved
 }
@@ -23,13 +25,22 @@ pub type Expression {
   TupleLiteral(List(Expression))
   ListLiteral(List(Expression), ListRest)
   TupleIndex(Expression, Int)
+  FieldAccess(Expression, String)
   Variable(String)
   Unary(String, Expression)
   Binary(String, Expression, Expression)
-  Call(String, List(Expression))
+  Call(String, List(Argument))
   Block(List(Statement))
   Case(Expression, List(Arm))
   Echo(Expression)
+}
+
+pub type Argument {
+  Argument(label: String, value: Expression)
+}
+
+pub type PatternField {
+  PatternField(label: String, pattern: Pattern)
 }
 
 pub type ListRest {
@@ -49,7 +60,7 @@ pub type Pattern {
   VariablePattern(String)
   TuplePattern(List(Pattern))
   ListPattern(List(Pattern), PatternRest)
-  ConstructorPattern(String, List(Pattern))
+  ConstructorPattern(String, List(PatternField), Bool)
   // Checker-produced constructor identity and field types, never parser output.
   CheckedConstructorPattern(Int, List(#(Pattern, Type)))
 }
@@ -78,9 +89,18 @@ pub type Module {
 }
 
 pub type CustomType {
-  CustomType(name: String, variants: List(Variant), public_: Bool)
+  CustomType(
+    name: String,
+    variants: List(Variant),
+    public_: Bool,
+    parameters: List(String),
+  )
 }
 
 pub type Variant {
-  Variant(name: String, fields: List(Type))
+  Variant(name: String, fields: List(FieldDefinition))
+}
+
+pub type FieldDefinition {
+  FieldDefinition(label: String, type_: Type)
 }

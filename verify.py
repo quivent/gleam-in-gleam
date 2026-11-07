@@ -49,6 +49,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('control', '14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n'),
         ('collections', '6\n3\n6\n6\n'),
         ('custom_types', '5\n23\n0\n'),
+        ('generics_records', '21\n2\n21\n2\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -62,7 +63,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -96,6 +97,13 @@ oracle_cases = [
     ('missing-variant', 'type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }', False, ''),
     ('wrong-field-type', 'pub type A { One(Int) } pub fn main() -> A { One(True) }', False, ''),
     ('nested-constructor-not-refined', 'type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }', False, ''),
+    ('generic-repeated-parameter', 'type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }', False, ''),
+    ('generic-argument-mismatch', 'type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }', False, ''),
+    ('label-declaration-order', 'type Pair { Pair(first: Int,second: Int) } pub fn main() -> Nil { let p = Pair(second: echo 2,first: echo 1) echo p.first echo p.second Nil }', True, '1\n2\n1\n2\n'),
+    ('generic-record', 'type Box(a) { Box(value: a,count: Int) } pub fn main() -> Nil { let box = Box(count: 2,value: 7) let Box(value:,..) = box echo value echo box.count Nil }', True, '7\n2\n'),
+    ('record-offset-mismatch', 'type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }', False, ''),
+    ('record-template-mismatch', 'type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }', False, ''),
+    ('label-positional-order', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }', False, ''),
 ]
 oracle_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as tmp:
@@ -114,16 +122,29 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
         if accepted:
             observed = run([str(executable)])
             assert observed.stdout == expected
+            built = subprocess.run([gleam, 'build'], cwd=project,
+                                   capture_output=True, text=True, timeout=30)
+            assert built.returncode == 0, (name, built.stdout, built.stderr)
+            module = project / 'build/dev/javascript/grammar_oracle/grammar_oracle.mjs'
+            evaluated = subprocess.run(['node', '--input-type=module', '-e',
+                                        'import {main} from ' + json.dumps(module.as_uri()) + '; main();'],
+                                       capture_output=True, text=True, timeout=30)
+            assert evaluated.returncode == 0, (name, evaluated.stderr)
+            clean = re.sub(r'\x1b\[[0-9;]*m', '', evaluated.stderr)
+            values = [line for line in clean.splitlines()
+                      if re.fullmatch(r'-?\d+|True|False|Nil', line)]
+            assert '\n'.join(values) + '\n' == expected, (name, clean, expected)
         else:
             assert not executable.exists()
         oracle_results.append(dict(name=name, source=source, accepted=accepted,
+                                   upstreamRuntimeCompared=accepted,
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-(evidence / 'custom-types-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'generics-records-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 receipt = dict(
-    schema='gleam-in-gleam.custom-types-verification/1',
+    schema='gleam-in-gleam.generics-records-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -136,18 +157,18 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/custom-types-upstream-checks.json'),
+                                  path='evidence/generics-records-upstream-checks.json'),
     compilerRunsNatively=False,
     selfHosting=False,
     fullGleamCompatibility=False,
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
     limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
-                 'No generic ADTs/labelled fields/closures/module imports or polymorphic inference yet',
+                 'No generic functions/labelled function calls/record updates/closures/module imports yet',
                  'Bounded arena only: no collection or native compiler file IO yet',
                  'Compound structural equality/printing and complex coverage are not implemented',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'custom-types-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'custom-types-test-output.tap').write_text(suite.stdout)
+(evidence / 'generics-records-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'generics-records-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

@@ -8,9 +8,12 @@ program. GNU objdump is used only as a development inspection tool.
 
 * Each generated function uses `push rbp; mov rbp,rsp; sub rsp,frame_size`.
   The local frame size is rounded to 16 bytes. There is no tail-call elimination.
-* Call arguments are evaluated left to right and pushed in that order. The last
+* Unlabelled call arguments are evaluated left to right and pushed in that order. The last
   argument therefore lives at `[rbp+16]`; earlier arguments have higher offsets.
   The caller reclaims those argument slots. RAX contains the result.
+* Labelled constructor calls are rearranged into declaration order before
+  checking/lowering, which is also upstream Gleam's observable evaluation order.
+  There is no runtime label lookup, argument-shuffling helper or dynamic dispatch.
 * Locals and saved match subjects use negative offsets from RBP. Temporary pushes
   cannot change their addresses. Destructuring reads object fields into fresh
   slots before binding names; shadowed outer bindings remain intact.
@@ -35,6 +38,12 @@ program. GNU objdump is used only as a development inspection tool.
   still an allocated 16-byte object, not an immediate integer or a function.
   Tags identify constructors across the single compiled module. Nominal types
   are checked before lowering; similar object layouts do not make types equal.
+* Generic type applications reuse the constructor's tag and one-word field
+  representation. Substitution/inference happen only in the compiler. Int,
+  Bool and pointer fields all occupy one word in this subset, so no runtime
+  type dictionary, monomorphized constructor or per-instantiation layout is needed.
+  This contract currently applies to generated/type-checked calls; native FFI
+  and arbitrary external values are not implemented.
 * Tuple fields and list heads are evaluated left to right. Cons construction
   pops the evaluated heads right to left to create the list spine. Existing list
   tails are shared and never mutated.
@@ -62,6 +71,12 @@ program. GNU objdump is used only as a development inspection tool.
   at `[RAX+16]`. Nested constructors repeat that sequence independently.
   The disassembly retains those checks even when a constructor is statically
   known. No speculative field read or tag-check-elision pass is implemented.
+* Labelled patterns are resolved to declaration positions at compile time. A
+  spread pattern fills unspecified fields with discards; it does not alter the
+  native object layout. Field access checks null and membership in the possible
+  constructor-tag set, then reads the statically checked offset. Common fields
+  must have identical declaration positions and formal types across variants,
+  even when a particular generic instantiation could make unlike types coincide.
 * Known constructor facts are separate from the value's nominal type. They can
   flow through a simple local variable, but do not automatically refine its
   fields or function parameters. This prevents a known outer wrapper from
@@ -91,6 +106,14 @@ at `0x4000ec`, a mismatch branch at `0x4000f4`, then the first field read at
 `0x400101`. The Open-pattern comparison at `0x400397` branches away from its
 field read when the actual object is Closed, which has no fields. These addresses
 refer to this exact frozen example, not to future layouts.
+
+For generic-record example SHA256
+`dc7d2a6c6d337956c7eb57afe4b035a7692be212cf4e6aa91ffc0f9e44c2f1e4`,
+the `.count` access compares Envelope tag 5 at `0x40024b`, branches to the field
+load at `0x40025e` on equality, and otherwise jumps to the failure exit. The load
+uses offset `0x18` (header plus the second word-sized field). Its 874-byte size
+is the complete example program, not the compiler. Numeric output `21,2,21,2`
+also confirms declaration-order evaluation despite reversed source labels.
 
 The runtime tests execute an exact-fit allocator probe and an over-end probe
 through these same Gleam emitter/ELF modules. Pure oracle tests compare actual

@@ -1,6 +1,8 @@
 import native/ast as a
 import native/core as c
 import native/definitions as d
+import native/labels
+import native/type_system as types
 
 pub type Typed {
   Typed(node: Node, type_: a.Type, known_variant: Int)
@@ -15,6 +17,7 @@ pub type Node {
   ListNode(List(Typed), Tail)
   TupleIndexNode(Typed, Int)
   ConstructorNode(Int, List(Typed))
+  FieldNode(Typed, Int, List(Int))
   VariableNode(String)
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
@@ -69,56 +72,11 @@ fn equal(actual: a.Type, expected: a.Type) -> Result(Nil, String) {
 }
 
 fn merge_type(actual: a.Type, expected: a.Type) -> Result(a.Type, String) {
-  case actual, expected {
-    a.Unresolved, t | t, a.Unresolved -> Ok(t)
-    a.ListType(left), a.ListType(right) -> {
-      use t <- c.then(merge_type(left, right))
-      Ok(a.ListType(t))
-    }
-    a.TupleType(left), a.TupleType(right) -> {
-      use types <- c.then(merge_types(left, right))
-      Ok(a.TupleType(types))
-    }
-    _, _ ->
-      case actual == expected {
-        True -> Ok(actual)
-        False ->
-          Error(
-            "Type mismatch: expected "
-            <> type_name(expected)
-            <> ", found "
-            <> type_name(actual),
-          )
-      }
-  }
-}
-
-fn merge_types(
-  left: List(a.Type),
-  right: List(a.Type),
-) -> Result(List(a.Type), String) {
-  case left, right {
-    [], [] -> Ok([])
-    [l, ..left], [r, ..right] -> {
-      use t <- c.then(merge_type(l, r))
-      use tail <- c.then(merge_types(left, right))
-      Ok([t, ..tail])
-    }
-    _, _ -> Error("Tuple arity mismatch")
-  }
+  types.merge(actual, expected)
 }
 
 pub fn type_name(t: a.Type) -> String {
-  case t {
-    a.Integer -> "Int"
-    a.Boolean -> "Bool"
-    a.Unit -> "Nil"
-    a.StringType -> "String"
-    a.TupleType(types) -> "#(" <> c.join(c.map(types, type_name), ", ") <> ")"
-    a.ListType(element) -> "List(" <> type_name(element) <> ")"
-    a.NamedType(name) -> name
-    a.Unresolved -> "unresolved empty-list element"
-  }
+  types.name(t)
 }
 
 pub fn module(module: a.Module) -> Result(List(Function), String) {
@@ -282,7 +240,7 @@ fn expression(
     a.Variable("_") -> Error("Discarded variable cannot be read")
     a.Variable(name) -> {
       case c.uppercase_name(name) {
-        True -> constructor(name, [], globals, False)
+        True -> constructor(name, [], env, globals, False)
         False -> {
           use local <- c.then(c.lookup(env, name))
           Ok(Typed(VariableNode(name), local.type_, local.known_variant))
@@ -305,15 +263,26 @@ fn expression(
       Ok(plain(BinaryNode(op, left, right), result))
     }
     a.Call(name, args) -> {
-      use args <- c.then(c.try_map(args, fn(e) { expression(e, env, globals) }))
       case c.uppercase_name(name) {
-        True -> constructor(name, args, globals, True)
+        True -> constructor(name, args, env, globals, True)
         False -> {
+          use args <- c.then(
+            c.try_map(args, fn(arg) {
+              case arg.label {
+                "" -> expression(arg.value, env, globals)
+                _ -> Error("Labelled function calls are not implemented yet")
+              }
+            }),
+          )
           use f <- c.then(c.lookup(globals.functions, name))
           use _ <- c.then(arguments(args, f.parameters))
           Ok(plain(CallNode(name, args), f.result))
         }
       }
+    }
+    a.FieldAccess(target, field) -> {
+      use target <- c.then(expression(target, env, globals))
+      field_access(target, field, globals)
     }
     a.Block(body) -> {
       use #(body, t) <- c.then(statements(body, env, globals))
@@ -322,7 +291,12 @@ fn expression(
     a.Echo(inner) -> {
       use typed <- c.then(expression(inner, env, globals))
       case typed.type_ {
-        a.TupleType(_) | a.ListType(_) | a.NamedType(_) | a.Unresolved ->
+        a.TupleType(_)
+        | a.ListType(_)
+        | a.NamedType(_)
+        | a.AppliedType(_, _)
+        | a.VariableType(_)
+        | a.Unresolved ->
           Error("Compound-value echo formatting is not implemented yet")
         _ -> Ok(plain(EchoNode(typed), typed.type_))
       }
@@ -377,7 +351,12 @@ fn binary_type(
       case left {
         a.StringType ->
           Error("Structural String equality is not implemented yet")
-        a.ListType(_) | a.TupleType(_) | a.NamedType(_) | a.Unresolved ->
+        a.ListType(_)
+        | a.TupleType(_)
+        | a.NamedType(_)
+        | a.AppliedType(_, _)
+        | a.VariableType(_)
+        | a.Unresolved ->
           Error("Structural compound equality is not implemented yet")
         _ -> Ok(a.Boolean)
       }
@@ -425,7 +404,8 @@ fn pattern(
 
 fn constructor(
   name: String,
-  args: List(Typed),
+  args: List(a.Argument),
+  env: Environment,
   globals: Globals,
   called: Bool,
 ) -> Result(Typed, String) {
@@ -435,25 +415,117 @@ fn constructor(
       Error("Zero-field constructor is a value, not a function: " <> name)
     _, _ -> Ok(Nil)
   })
-  use _ <- c.then(constructor_arguments(args, definition.fields))
+  use ordered <- c.then(labels.order(
+    c.map(args, fn(arg) { #(arg.label, arg.value) }),
+    definition.labels,
+    labels.RejectMissing,
+  ))
+  use args <- c.then(
+    c.try_map(ordered, fn(arg) { expression(arg, env, globals) }),
+  )
+  let initial = c.map(definition.parameters, fn(n) { #(n, a.Unresolved) })
+  use bindings <- c.then(types.infer_many(
+    definition.fields,
+    c.map(args, fn(arg) { arg.type_ }),
+    initial,
+  ))
+  use parameters <- c.then(
+    c.try_map(definition.parameters, fn(n) { c.lookup(bindings, n) }),
+  )
   Ok(Typed(
     ConstructorNode(definition.tag, args),
-    a.NamedType(definition.owner),
+    types.apply(definition.owner, parameters),
     definition.tag,
   ))
 }
 
-fn constructor_arguments(
-  args: List(Typed),
-  fields: List(a.Type),
-) -> Result(Nil, String) {
-  case args, fields {
-    [], [] -> Ok(Nil)
-    [arg, ..args], [t, ..fields] -> {
-      use _ <- c.then(equal(arg.type_, t))
-      constructor_arguments(args, fields)
+fn constructor_type_arguments(
+  definition: d.Constructor,
+  t: a.Type,
+) -> Result(List(a.Type), String) {
+  case t {
+    a.NamedType(n) if n == definition.owner -> Ok([])
+    a.AppliedType(n, args) if n == definition.owner -> Ok(args)
+    a.Unresolved -> Ok(c.map(definition.parameters, fn(_) { a.Unresolved }))
+    _ ->
+      Error(
+        "Type mismatch: expected "
+        <> definition.owner
+        <> ", found "
+        <> types.name(t),
+      )
+  }
+}
+
+fn field_access(
+  target: Typed,
+  field: String,
+  globals: Globals,
+) -> Result(Typed, String) {
+  use owner <- c.then(case target.type_ {
+    a.NamedType(name) | a.AppliedType(name, _) -> Ok(name)
+    _ -> Error("Record field access requires a custom type")
+  })
+  use definition <- c.then(c.lookup(globals.custom_types, owner))
+  use constructors <- c.then(field_constructors(
+    definition.variants,
+    target.known_variant,
+    globals,
+  ))
+  case constructors {
+    [] -> Error("No possible constructor for record field")
+    [first, ..rest] -> {
+      use index <- c.then(labels.index(first.labels, field))
+      use formal <- c.then(c.nth(first.fields, index))
+      use _ <- c.then(consistent_fields(rest, index, formal, field))
+      use args <- c.then(constructor_type_arguments(first, target.type_))
+      use bindings <- c.then(types.bindings(first.parameters, args))
+      use type_ <- c.then(types.substitute(formal, bindings))
+      Ok(plain(
+        FieldNode(target, index, c.map(constructors, fn(ctor) { ctor.tag })),
+        type_,
+      ))
     }
-    _, _ -> Error("Constructor argument count mismatch")
+  }
+}
+
+fn field_constructors(
+  variants: List(a.Variant),
+  known: Int,
+  globals: Globals,
+) -> Result(List(d.Constructor), String) {
+  case variants {
+    [] -> Ok([])
+    [variant, ..rest] -> {
+      use ctor <- c.then(c.lookup(globals.constructors, variant.name))
+      use tail <- c.then(field_constructors(rest, known, globals))
+      case known == 0 || ctor.tag == known {
+        True -> Ok([ctor, ..tail])
+        False -> Ok(tail)
+      }
+    }
+  }
+}
+
+fn consistent_fields(
+  constructors: List(d.Constructor),
+  index: Int,
+  formal: a.Type,
+  field: String,
+) -> Result(Nil, String) {
+  case constructors {
+    [] -> Ok(Nil)
+    [ctor, ..rest] -> {
+      use other <- c.then(labels.index(ctor.labels, field))
+      use type_ <- c.then(c.nth(ctor.fields, other))
+      case other == index && type_ == formal {
+        True -> consistent_fields(rest, index, formal, field)
+        False ->
+          Error(
+            "Record field must have the same position and declared type across variants",
+          )
+      }
+    }
   }
 }
 
@@ -463,10 +535,29 @@ fn resolve_pattern(
   globals: Globals,
 ) -> Result(a.Pattern, String) {
   case p {
-    a.ConstructorPattern(name, fields) -> {
+    a.ConstructorPattern(name, fields, spread) -> {
       use definition <- c.then(c.lookup(globals.constructors, name))
-      use _ <- c.then(equal(a.NamedType(definition.owner), t))
-      use fields <- c.then(resolve_fields(fields, definition.fields, globals))
+      use _ <- c.then(
+        case !spread && c.length(fields) != c.length(definition.fields) {
+          True -> Error("Constructor pattern arity mismatch")
+          False -> Ok(Nil)
+        },
+      )
+      let missing = case spread {
+        True -> labels.FillMissing(a.DiscardPattern)
+        False -> labels.RejectMissing
+      }
+      use fields <- c.then(labels.order(
+        c.map(fields, fn(field) { #(field.label, field.pattern) }),
+        definition.labels,
+        missing,
+      ))
+      use args <- c.then(constructor_type_arguments(definition, t))
+      use bindings <- c.then(types.bindings(definition.parameters, args))
+      use field_types <- c.then(
+        c.try_map(definition.fields, fn(t) { types.substitute(t, bindings) }),
+      )
+      use fields <- c.then(resolve_fields(fields, field_types, globals))
       Ok(a.CheckedConstructorPattern(definition.tag, fields))
     }
     a.CheckedConstructorPattern(_, _) ->
@@ -522,7 +613,7 @@ fn pattern_bindings(
   bindings: Environment,
 ) -> Result(Environment, String) {
   case p {
-    a.ConstructorPattern(_, _) -> Error("Unresolved constructor pattern")
+    a.ConstructorPattern(_, _, _) -> Error("Unresolved constructor pattern")
     a.CheckedConstructorPattern(_, fields) ->
       checked_field_bindings(fields, bindings)
     a.DiscardPattern -> Ok(bindings)
@@ -629,9 +720,11 @@ fn covers(p: a.Pattern, t: a.Type, globals: Globals) -> Bool {
     a.TuplePattern(patterns), a.TupleType(types) ->
       tuple_covers(patterns, types, globals)
     a.ListPattern([], a.RestPattern(tail)), _ -> covers(tail, t, globals)
-    a.CheckedConstructorPattern(_, fields), a.NamedType(name) ->
+    a.CheckedConstructorPattern(_, fields), a.NamedType(name)
+    | a.CheckedConstructorPattern(_, fields), a.AppliedType(name, _)
+    ->
       case c.lookup(globals.custom_types, name) {
-        Ok(a.CustomType(_, [_], _)) -> fields_cover(fields, globals)
+        Ok(a.CustomType(_, [_], _, _)) -> fields_cover(fields, globals)
         _ -> False
       }
     _, _ -> False
@@ -668,7 +761,7 @@ fn exhaustive(
   known: Int,
 ) -> Result(Nil, String) {
   case t {
-    a.NamedType(name) -> {
+    a.NamedType(name) | a.AppliedType(name, _) -> {
       use definition <- c.then(c.lookup(globals.custom_types, name))
       case
         any_cover(arms, t, globals)

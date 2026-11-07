@@ -80,8 +80,10 @@ BitArray representation. It performs no language compilation itself.
 | `native/lexer` | Tokens, comments, decimal literals, UTF-8 string bytes |
 | `native/ast` | Language seed syntax types |
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
-| `native/check` | Monomorphic checking, signatures, scope and exhaustiveness |
+| `native/check` | Typed expressions, constructor inference, scope and exhaustiveness |
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
+| `native/type_system` | Scoped constructor substitution, type application and merging |
+| `native/labels` | Constructor labels, positional validation and declaration ordering |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
 | `native/assembler` | Internal labels and signed relative relocations |
@@ -99,13 +101,15 @@ Implemented seed features: explicitly typed functions and parameters,
 forward/recursive calls, local bindings and shadowing, Int/Bool/Nil/static
 String values, integer operations, comparisons, short-circuit booleans,
 single-subject case matching, exhaustiveness checks for this subset and primitive
-value printing. Typed tuples, tuple indexing/destructuring, monomorphic lists,
-list spreads and nested tuple/list patterns are supported. Calls and compound
-fields preserve left-to-right evaluation order. Division/remainder by
+value printing. Typed tuples, tuple indexing/destructuring, lists,
+list spreads and nested tuple/list patterns are supported. Unlabelled calls,
+tuple fields and list heads preserve left-to-right evaluation order. Labelled
+constructor arguments are arranged and evaluated in declaration order, matching
+the upstream compiler's actual behavior. Division/remainder by
 zero return zero. Unsupported constructs produce diagnostics rather than
 delegating compilation elsewhere.
 
-Monomorphic custom types now support positional constructors, zero-field values,
+Custom types now support positional/labelled constructors, zero-field values,
 recursive/mutually recursive definitions and nested constructor matching inside
 lists/tuples. Constructor fields are checked against their declared nominal
 types, not just their memory shape. Public interfaces cannot expose private
@@ -114,16 +118,24 @@ Known top-level constructor identity is retained across simple local bindings,
 including annotations, for let-pattern/case checking. Runtime tag checks remain
 in the emitted code; this is semantic checking, not a tag-check optimization.
 
+Generic custom types support scoped type parameters, nested/recursive type
+applications, repeated-parameter consistency and constructor argument inference.
+Type arguments are checked at compile time and do not add runtime type objects
+or change the one-word field layout. Generic functions/general polymorphic
+inference are still pending. Labelled constructor calls/patterns support shorthand
+and pattern spread; duplicate/unknown labels and positional arguments after
+labels are rejected. Record access works for fields common in name, position and
+declared type across all possible variants, or for a known constructor.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, closures, generics, `use`, labelled
-  arguments, type inference, constants, attributes and bit-array syntax are not
+* Imports, closures, generic functions, `use`, labelled function calls,
+  general type inference, constants, attributes and bit-array syntax are not
   implemented. The compiler uses several of those itself, so cannot self-compile.
-* Custom types are monomorphic and positional. Generic/opaque types, labelled
-  fields/calls, record access/updates and empty custom types are not implemented.
+* Opaque types, record updates and empty custom types are not implemented.
   Shadowing built-in Int/Bool/Nil/String/List types or True/False/Nil constructors
-  is explicitly rejected for now. Monomorphic user-defined Result/Ok/Error names
+  is explicitly rejected for now. User-defined Result/Ok/Error names
   are supported. Private-type checking covers public function signatures and
   public constructor fields within the current single-module implementation.
 * Integer literals are restricted to nonnegative decimal magnitudes up to
@@ -173,19 +185,29 @@ object layout and guarded failure paths.
 
 The custom-type milestone passes **105/105** checks plus **8/8** fresh upstream
 accept/reject comparisons, including constructor callability, known variants,
-private type visibility and wrong field types. Its current source/artifact hashes
+private type visibility and wrong field types. Its historical source/artifact hashes
 and native examples are in `evidence/custom-types-verification.json`; the earlier
 seed/collections receipts remain historical. Inspect
 `evidence/custom_types-disassembly.txt` for actual null/tag checks before field
 loads. No compiler speed or output-speed claim follows from those checks.
 
+The generic-types/records milestone passes **146/146** checks plus **15/15** fresh
+upstream accept/reject comparisons. Accepted cases also execute through the
+upstream toolchain to compare numeric/Bool/Nil output, including observable
+labelled-argument evaluation order. `evidence/generics-records-verification.json`
+contains current source/artifact hashes and `evidence/generics_records-disassembly.txt`
+contains actual field-access instructions. The four older native examples retain
+their exact previous hashes. A paired test also verifies identical machine code
+for Box(Int) holding 1 and Box(Bool) holding True; this demonstrates representation
+erasure for that case, not a performance benchmark or a general compatibility proof.
+
 Next actions, in dependency order:
 
-1. Extend custom-type support with generic types and labelled fields/access.
-   Monomorphic constructors, recursive types and nested matching are implemented.
-   Structural equality and owned collection remain necessary follow-up work.
-2. Add polymorphic inference, closures/first-class functions, `use`, byte arrays
-   and module imports, testing each against upstream results and failures.
+1. Add generic functions, function types and polymorphic inference. Generic
+   custom types and labelled constructor fields/access are implemented.
+2. Add closures/first-class functions, `use`, record updates, byte arrays and
+   module imports, testing each against upstream results and failures. Structural
+   equality and owned collection also remain necessary work.
 3. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.
 4. Compile the compiler source natively, then rebuild that compiler with itself

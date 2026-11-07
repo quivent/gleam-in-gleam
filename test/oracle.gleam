@@ -216,3 +216,139 @@ pub fn custom_public(n: Int) -> Int {
   let PublicValue(value) = public_make(n)
   value
 }
+
+type Maybe(a) {
+  None
+  Just(a)
+}
+
+fn maybe_int(value: Maybe(Int), fallback: Int) -> Int {
+  case value {
+    None -> fallback
+    Just(n) -> n
+  }
+}
+
+pub fn generic_maybe(n: Int) -> Int {
+  let value: Maybe(Int) = case n == 0 {
+    True -> None
+    False -> Just(n)
+  }
+  maybe_int(value, 17)
+}
+
+pub fn generic_bool(n: Int) -> Bool {
+  let value = Just(n > 0)
+  case value {
+    Just(b) -> b
+  }
+}
+
+type Duo(a, b) {
+  Duo(a, b)
+}
+
+pub fn generic_duo(n: Int) -> Int {
+  let Duo(number, flag) = Duo(n, n > 0)
+  case flag {
+    True -> number + 1
+    False -> number - 1
+  }
+}
+
+type Same(a) {
+  Same(a, a)
+}
+
+pub fn generic_same(n: Int) -> Int {
+  let Same(first, second) = Same([], [n])
+  list_sum(first) + list_sum(second)
+}
+
+type Rose(a) {
+  Bud(a)
+  Branch(List(Rose(a)))
+}
+
+fn rose_sum(tree: Rose(Int)) -> Int {
+  case tree {
+    Bud(n) -> n
+    Branch(children) -> rose_list_sum(children)
+  }
+}
+
+fn rose_list_sum(children: List(Rose(Int))) -> Int {
+  case children {
+    [] -> 0
+    [head, ..tail] -> rose_sum(head) + rose_list_sum(tail)
+  }
+}
+
+pub fn generic_recursive(n: Int) -> Int {
+  rose_sum(Branch([Bud(n), Branch([Bud(n + 1), Bud(n + 2)])]))
+}
+
+type Phantom(a) {
+  Marker(Int)
+}
+
+pub fn generic_phantom(n: Int) -> Int {
+  let marker: Phantom(String) = Marker(n)
+  let Marker(value) = marker
+  value
+}
+
+type LabelBox(a) {
+  LabelBox(value: a, count: Int)
+}
+
+pub fn labelled_generic(n: Int) -> Int {
+  let box = LabelBox(count: n + 1, value: n)
+  box.value + box.count
+}
+
+pub fn labelled_pattern(n: Int) -> Int {
+  let box = LabelBox(value: n, count: n + 1)
+  let LabelBox(count: b, value: a) = box
+  a * 10 + b
+}
+
+pub fn labelled_spread(n: Int) -> Int {
+  labelled_spread_value(LabelBox(value: n, count: n + 1))
+}
+
+fn labelled_spread_value(box: LabelBox(Int)) -> Int {
+  case box {
+    LabelBox(count: result, ..) -> result
+  }
+}
+
+pub fn labelled_shorthand(n: Int) -> Int {
+  let value = n
+  let count = n + 1
+  let LabelBox(value:, count:) = LabelBox(count:, value:)
+  value + count
+}
+
+type Message(a) {
+  First(value: a, flag: Bool)
+  Second(value: a, marker: Int)
+}
+
+fn message_value(message: Message(Int)) -> Int {
+  message.value
+}
+
+pub fn labelled_common(n: Int) -> Int {
+  message_value(First(n, True)) + message_value(Second(marker: 3, value: n + 1))
+}
+
+pub type VariantValue {
+  WithValue(value: Int)
+  NoValue
+}
+
+pub fn labelled_known(n: Int) -> Int {
+  let value = WithValue(n)
+  value.value
+}

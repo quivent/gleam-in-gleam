@@ -43,6 +43,11 @@ const cases = [
   ['custom_tree', [1]], ['custom_tree', [-3]], ['custom_option', [0]],
   ['custom_option', [6]], ['custom_destructure', [4]], ['custom_nested', [1]],
   ['custom_known', [7]], ['custom_result', [0]], ['custom_result', [8]], ['custom_public', [9]],
+  ['generic_maybe', [0]], ['generic_maybe', [8]], ['generic_bool', [-1]], ['generic_bool', [2]],
+  ['generic_duo', [3]], ['generic_duo', [-2]], ['generic_same', [5]],
+  ['generic_recursive', [4]], ['generic_phantom', [7]],
+  ['labelled_generic', [3]], ['labelled_pattern', [4]], ['labelled_spread', [5]],
+  ['labelled_shorthand', [6]], ['labelled_common', [7]], ['labelled_known', [8]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -108,6 +113,27 @@ test('forward-referenced and mutually recursive custom types', () => {
   assert.equal(result.status, 0);
   assert.equal(result.stdout, '2\n');
 });
+test('generic nullary values can instantiate independently without leaking bindings', () => {
+  const source = `type Maybe(a) { None Just(a) }
+    fn int_default(x: Maybe(Int)) -> Int { case x { None -> 1 Just(n) -> n } }
+    fn bool_default(x: Maybe(Bool)) -> Bool { case x { None -> True Just(b) -> b } }
+    pub fn main() -> Nil { let empty = None echo int_default(empty) echo bool_default(empty) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\nTrue\n');
+});
+test('generic arguments do not introduce native runtime type machinery', () => {
+  const first = compileResult('type Box(a) { Box(a) } pub fn main() -> Nil { let box: Box(Int) = Box(1) Nil }');
+  const second = compileResult('type Box(a) { Box(a) } pub fn main() -> Nil { let box: Box(Bool) = Box(True) Nil }');
+  assert.equal(first.isOk(), true, first[0]);
+  assert.equal(second.isOk(), true, second[0]);
+  assert.deepEqual(first[0].rawBuffer, second[0].rawBuffer);
+});
+test('labelled constructor arguments evaluate in upstream declaration order', () => {
+  const result = run('type Pair { Pair(first: Int, second: Int) } pub fn main() -> Nil { let pair = Pair(second: echo 2, first: echo 1) echo pair.first echo pair.second Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n2\n1\n2\n');
+});
 test('checked fixed-width overflow exits rather than silently wrapping', () => {
   const result = run(main('let n = 2147483647 * 2147483647\necho n * 3'));
   assert.equal(result.status, 70);
@@ -149,7 +175,7 @@ const rejected = [
   ['branch mismatch', 'pub fn main() -> Int { case True { True -> 1 False -> False } }', /Type mismatch/],
   ['pattern mismatch', 'pub fn main() -> Int { case 1 { True -> 1 _ -> 0 } }', /Type mismatch/],
   ['unknown import', 'import gleam/io pub fn main() -> Nil { Nil }', /not implemented/],
-  ['generic type pending', 'type Value(a) { Value(a) } pub fn main() -> Nil { Nil }', /Expected/],
+  ['generic functions pending', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { Nil }', /generic function signatures are not implemented/],
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
   ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
@@ -194,6 +220,29 @@ const rejected = [
   ['nested constructor not falsely narrowed', 'type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }', /Refutable let/],
   ['known tag cannot change nominal type', 'type A { First } type B { Second } pub fn main() -> Int { let Second = First 0 }', /Type mismatch/],
   ['duplicate pub modifier', 'pub pub fn main() -> Nil { Nil }', /Declaration not implemented/],
+  ['generic repeated parameter mismatch', 'type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }', /Type mismatch/],
+  ['generic application mismatch', 'type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }', /Type mismatch/],
+  ['generic pattern mismatch', 'type Box(a) { Box(a) } pub fn main() -> Bool { case Box(1) { Box(n) -> n } }', /Type mismatch/],
+  ['generic recursive argument mismatch', 'type Tree(a) { Leaf(a) Fork(Tree(a),Tree(a)) } pub fn main() -> Nil { let tree = Fork(Leaf(1),Leaf(True)) Nil }', /Type mismatch/],
+  ['generic missing application argument', 'pub type Box(a) { Box(a) } fn take(x: Box) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Type argument count/],
+  ['generic extra application argument', 'type Box(a) { Box(a) } fn take(x: Box(Int,Bool)) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Type argument count/],
+  ['nongeneric application argument', 'type Box { Box } fn take(x: Box(Int)) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Type argument count/],
+  ['undeclared generic field variable', 'type Box(a) { Box(b) } pub fn main() -> Nil { Nil }', /Unbound type parameter/],
+  ['duplicate generic parameter', 'type Box(a,a) { Box(a) } pub fn main() -> Nil { Nil }', /Duplicate type parameter/],
+  ['private generic argument leak', 'type Private { Private } pub type Box(a) { Box(a) } pub fn expose() -> Box(Private) { Box(Private) } pub fn main() -> Nil { Nil }', /Private type used in public interface/],
+  ['unknown constructor label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(z: 1,y: 2) Nil }', /Unknown constructor label/],
+  ['duplicate constructor label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(x: 1,x: 2) Nil }', /Duplicate constructor/],
+  ['duplicate field declaration', 'type Pair { Pair(x: Int,x: Bool) } pub fn main() -> Nil { Nil }', /Duplicate field label/],
+  ['positional after labelled', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }', /Positional argument after labelled/],
+  ['missing labelled field', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(x: 1) Nil }', /missing field/],
+  ['unknown record field', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(1,2) echo p.z Nil }', /Unknown constructor label/],
+  ['record field on integer', 'pub fn main() -> Nil { echo 1.value Nil }', /Record field access requires a custom type/],
+  ['record field different positions', 'type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }', /same position and declared type/],
+  ['record field different template types', 'type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }', /same position and declared type/],
+  ['record field missing in variant', 'type V { A(x: Int) B } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }', /Unknown constructor label/],
+  ['unknown pattern label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Int { let Pair(z: n,..) = Pair(1,2) n }', /Unknown constructor label/],
+  ['duplicate pattern label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Int { let Pair(x: a,x: b) = Pair(1,2) a+b }', /Duplicate constructor/],
+  ['labelled function calls pending', 'fn f(x: Int) -> Int { x } pub fn main() -> Int { f(x: 1) }', /Labelled function calls are not implemented/],
 ];
 for (const [name, source, error] of rejected) {
   test(`rejects without fallback: ${name}`, () => {

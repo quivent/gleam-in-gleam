@@ -44,10 +44,21 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
       use #(types, rest) <- c.then(separated(rest, ")", type_))
       Ok(#(a.TupleType(types), rest))
     }
+    [l.Token(l.Word(id), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(args, rest) <- c.then(separated(rest, ")", type_))
+      case c.uppercase_name(id), args {
+        True, [_, ..] -> Ok(#(a.AppliedType(id, args), rest))
+        _, _ ->
+          error(
+            tokens,
+            "Type application requires an uppercase name and nonempty arguments",
+          )
+      }
+    }
     [l.Token(l.Word(id), _), ..rest] ->
       case c.uppercase_name(id) {
         True -> Ok(#(a.NamedType(id), rest))
-        False -> error(tokens, "Generic type variables are not implemented yet")
+        False -> Ok(#(a.VariableType(id), rest))
       }
     _ ->
       error(
@@ -82,9 +93,13 @@ fn declaration(
   case tokens {
     [l.Token(l.Word("type"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
+      use #(params, rest) <- c.then(type_parameters(rest))
       use rest <- c.then(expect(rest, "{"))
       use #(variants, rest) <- c.then(variants(rest, []))
-      functions(rest, acc, [a.CustomType(id, variants, public_), ..types])
+      functions(rest, acc, [
+        a.CustomType(id, variants, public_, params),
+        ..types
+      ])
     }
     [l.Token(l.Word("fn"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
@@ -108,6 +123,19 @@ fn declaration(
   }
 }
 
+fn type_parameters(tokens: Tokens) -> Parsed(List(String)) {
+  case tokens {
+    [l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(params, rest) <- c.then(separated(rest, ")", name))
+      case params {
+        [] -> error(tokens, "Type parameter list cannot be empty")
+        _ -> Ok(#(params, rest))
+      }
+    }
+    _ -> Ok(#([], tokens))
+  }
+}
+
 fn variants(tokens: Tokens, acc: List(a.Variant)) -> Parsed(List(a.Variant)) {
   case tokens {
     [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
@@ -115,11 +143,24 @@ fn variants(tokens: Tokens, acc: List(a.Variant)) -> Parsed(List(a.Variant)) {
       use #(id, rest) <- c.then(name(tokens))
       case rest {
         [l.Token(l.Symbol("("), _), ..rest] -> {
-          use #(fields, rest) <- c.then(separated(rest, ")", type_))
+          use #(fields, rest) <- c.then(separated(rest, ")", field_definition))
           variants(rest, [a.Variant(id, fields), ..acc])
         }
         _ -> variants(rest, [a.Variant(id, []), ..acc])
       }
+    }
+  }
+}
+
+fn field_definition(tokens: Tokens) -> Parsed(a.FieldDefinition) {
+  case tokens {
+    [l.Token(l.Word(label), _), l.Token(l.Symbol(":"), _), ..rest] -> {
+      use #(type_, rest) <- c.then(type_(rest))
+      Ok(#(a.FieldDefinition(label, type_), rest))
+    }
+    _ -> {
+      use #(type_, rest) <- c.then(type_(tokens))
+      Ok(#(a.FieldDefinition("", type_), rest))
     }
   }
 }
@@ -185,6 +226,8 @@ fn postfix(left: a.Expression, tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
     [l.Token(l.Symbol("."), _), l.Token(l.Number(index), _), ..rest] ->
       postfix(a.TupleIndex(left, index), rest)
+    [l.Token(l.Symbol("."), _), l.Token(l.Word(field), _), ..rest] ->
+      postfix(a.FieldAccess(left, field), rest)
     _ -> Ok(#(left, tokens))
   }
 }
@@ -290,12 +333,12 @@ fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
 
 fn arguments(
   tokens: Tokens,
-  acc: List(a.Expression),
-) -> Parsed(List(a.Expression)) {
+  acc: List(a.Argument),
+) -> Parsed(List(a.Argument)) {
   case tokens {
     [l.Token(l.Symbol(")"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
     _ -> {
-      use #(arg, rest) <- c.then(expression(tokens, 0))
+      use #(arg, rest) <- c.then(argument(tokens))
       case rest {
         [l.Token(l.Symbol(","), _), ..rest] -> arguments(rest, [arg, ..acc])
         [l.Token(l.Symbol(")"), _), ..rest] ->
@@ -306,12 +349,30 @@ fn arguments(
   }
 }
 
+fn argument(tokens: Tokens) -> Parsed(a.Argument) {
+  case tokens {
+    [l.Token(l.Word(label), _), l.Token(l.Symbol(":"), _), ..rest] ->
+      case rest {
+        [l.Token(l.Symbol(","), _), ..] | [l.Token(l.Symbol(")"), _), ..] ->
+          Ok(#(a.Argument(label, a.Variable(label)), rest))
+        _ -> {
+          use #(value, rest) <- c.then(expression(rest, 0))
+          Ok(#(a.Argument(label, value), rest))
+        }
+      }
+    _ -> {
+      use #(value, rest) <- c.then(expression(tokens, 0))
+      Ok(#(a.Argument("", value), rest))
+    }
+  }
+}
+
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
     [l.Token(l.Word(id), _), l.Token(l.Symbol("("), _), ..rest] -> {
-      use #(fields, rest) <- c.then(separated(rest, ")", pattern))
+      use #(fields, spread, rest) <- c.then(constructor_patterns(rest))
       case c.uppercase_name(id) {
-        True -> Ok(#(a.ConstructorPattern(id, fields), rest))
+        True -> Ok(#(a.ConstructorPattern(id, fields, spread), rest))
         False -> error(tokens, "Constructor patterns must start with uppercase")
       }
     }
@@ -332,10 +393,49 @@ fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
     [l.Token(l.Word("_"), _), ..rest] -> Ok(#(a.DiscardPattern, rest))
     [l.Token(l.Word(id), _), ..rest] ->
       case c.uppercase_name(id) {
-        True -> Ok(#(a.ConstructorPattern(id, []), rest))
+        True -> Ok(#(a.ConstructorPattern(id, [], False), rest))
         False -> Ok(#(a.VariablePattern(id), rest))
       }
     _ -> error(tokens, "Pattern not implemented in native seed")
+  }
+}
+
+fn constructor_patterns(
+  tokens: Tokens,
+) -> Result(#(List(a.PatternField), Bool, Tokens), String) {
+  case tokens {
+    [l.Token(l.Symbol(")"), _), ..rest] -> Ok(#([], False, rest))
+    [l.Token(l.Symbol(".."), _), l.Token(l.Symbol(")"), _), ..rest] ->
+      Ok(#([], True, rest))
+    _ -> {
+      use #(field, rest) <- c.then(pattern_field(tokens))
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(tail, spread, rest) <- c.then(constructor_patterns(rest))
+          Ok(#([field, ..tail], spread, rest))
+        }
+        [l.Token(l.Symbol(")"), _), ..rest] -> Ok(#([field], False, rest))
+        _ -> error(rest, "Expected ',' or ')' in constructor pattern")
+      }
+    }
+  }
+}
+
+fn pattern_field(tokens: Tokens) -> Parsed(a.PatternField) {
+  case tokens {
+    [l.Token(l.Word(label), _), l.Token(l.Symbol(":"), _), ..rest] ->
+      case rest {
+        [l.Token(l.Symbol(","), _), ..] | [l.Token(l.Symbol(")"), _), ..] ->
+          Ok(#(a.PatternField(label, a.VariablePattern(label)), rest))
+        _ -> {
+          use #(pat, rest) <- c.then(pattern(rest))
+          Ok(#(a.PatternField(label, pat), rest))
+        }
+      }
+    _ -> {
+      use #(pat, rest) <- c.then(pattern(tokens))
+      Ok(#(a.PatternField("", pat), rest))
+    }
   }
 }
 
