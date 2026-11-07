@@ -1,0 +1,59 @@
+{
+  "schema": "gleam-in-gleam.seed-verification/1",
+  "observedAt": "2026-11-07T01:11:49.012705+00:00",
+  "bootstrapCompiler": "gleam 1.19.2",
+  "bootstrapNode": "v22.23.3",
+  "compilerSourceLanguage": "Gleam",
+  "compilerModules": 9,
+  "compilerSourceLines": 1575,
+  "declaredPackageDependencies": [],
+  "tests": {
+    "total": 43,
+    "passed": 43,
+    "failed": 0
+  },
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "0d8c9cdef254c4f1d75235cdf9241bec5b562c99fcf48619627a44fcd91b472e",
+    "src/native/ast.gleam": "5288ddd510556e9113906e64588b2f2d5d6ae610a5fce82f74c7d2bb925aac51",
+    "src/native/check.gleam": "6d4b33f5ea11f4b8cfd1e5dbe63b626c23f5cffc15d70372d086d1c5d9e328ff",
+    "src/native/compiler.gleam": "3149a7014f88824942800029baf6eb207b606ad51cba5e61104ba5ca287dc1a5",
+    "src/native/core.gleam": "40f578ab483096714b3c343b6aec6999f1c9e9d3778fa92f5acb28f462990111",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/lexer.gleam": "3d8f8860456d7311d52d7777d36436b790b0f8eafaed9b0e0956ea892139f634",
+    "src/native/parser.gleam": "55d7ded97527395bf96ea8c8a684930fa2d72eeb77c5e6edf2dc69b8b4cc6e69",
+    "src/native/x64.gleam": "f760af8781f240dce3fab87b5dcb1a9ca07594a93fee35bfaafa336815d5bc30"
+  },
+  "examples": [
+    {
+      "name": "fibonacci",
+      "bytes": 601,
+      "sha256": "59f55018de253f2d8f9d5b35cb9ba900c54aed87558d4a9f2f99342844bea815",
+      "exitCode": 0,
+      "stdout": "55\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "control",
+      "bytes": 1078,
+      "sha256": "e9857046e97210ff7b3130d72236ffd38acbf835dc74b45377f2d61902a5b1d2",
+      "exitCode": 0,
+      "stdout": "14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    }
+  ],
+  "compilerRunsNatively": false,
+  "selfHosting": false,
+  "fullGleamCompatibility": false,
+  "nativeTarget": "linux-x86_64",
+  "externalCodegenTools": [],
+  "limitations": [
+    "Subset compiler; bootstrap still uses upstream Gleam and Node",
+    "No lists/ADTs/closures/module imports or polymorphic inference yet",
+    "No native compiler file IO or automatic memory management yet",
+    "Fixed-width integer and diagnostic formatting limitations documented in README"
+  ]
+}

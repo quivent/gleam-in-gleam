@@ -1,0 +1,182 @@
+// Compiler-owned utilities. No standard-library or third-party imports.
+pub fn then(
+  value: Result(a, String),
+  f: fn(a) -> Result(b, String),
+) -> Result(b, String) {
+  case value {
+    Ok(x) -> f(x)
+    Error(e) -> Error(e)
+  }
+}
+
+pub fn reverse(xs: List(a)) -> List(a) {
+  reverse_into(xs, [])
+}
+
+fn reverse_into(xs: List(a), acc: List(a)) -> List(a) {
+  case xs {
+    [] -> acc
+    [x, ..rest] -> reverse_into(rest, [x, ..acc])
+  }
+}
+
+pub fn append(xs: List(a), ys: List(a)) -> List(a) {
+  case xs {
+    [] -> ys
+    [x, ..rest] -> [x, ..append(rest, ys)]
+  }
+}
+
+pub fn length(xs: List(a)) -> Int {
+  count(xs, 0)
+}
+
+fn count(xs: List(a), n: Int) -> Int {
+  case xs {
+    [] -> n
+    [_, ..rest] -> count(rest, n + 1)
+  }
+}
+
+pub fn map(xs: List(a), f: fn(a) -> b) -> List(b) {
+  case xs {
+    [] -> []
+    [x, ..rest] -> [f(x), ..map(rest, f)]
+  }
+}
+
+pub fn try_map(
+  xs: List(a),
+  f: fn(a) -> Result(b, String),
+) -> Result(List(b), String) {
+  case xs {
+    [] -> Ok([])
+    [x, ..rest] ->
+      case f(x) {
+        Error(e) -> Error(e)
+        Ok(value) ->
+          case try_map(rest, f) {
+            Error(e) -> Error(e)
+            Ok(values) -> Ok([value, ..values])
+          }
+      }
+  }
+}
+
+pub fn lookup(xs: List(#(String, a)), name: String) -> Result(a, String) {
+  case xs {
+    [] -> Error("Unknown name: " <> name)
+    [#(key, value), ..rest] ->
+      case key == name {
+        True -> Ok(value)
+        False -> lookup(rest, name)
+      }
+  }
+}
+
+pub fn decimal(n: Int) -> String {
+  case n < 0 {
+    True -> "-" <> decimal(0 - n)
+    False ->
+      case n < 10 {
+        True -> character(n + 48)
+        False -> decimal(n / 10) <> character(n % 10 + 48)
+      }
+  }
+}
+
+pub fn character(n: Int) -> String {
+  case n {
+    48 -> "0"
+    49 -> "1"
+    50 -> "2"
+    51 -> "3"
+    52 -> "4"
+    53 -> "5"
+    54 -> "6"
+    55 -> "7"
+    56 -> "8"
+    57 -> "9"
+    65 -> "A"
+    66 -> "B"
+    67 -> "C"
+    68 -> "D"
+    69 -> "E"
+    70 -> "F"
+    71 -> "G"
+    72 -> "H"
+    73 -> "I"
+    74 -> "J"
+    75 -> "K"
+    76 -> "L"
+    77 -> "M"
+    78 -> "N"
+    79 -> "O"
+    80 -> "P"
+    81 -> "Q"
+    82 -> "R"
+    83 -> "S"
+    84 -> "T"
+    85 -> "U"
+    86 -> "V"
+    87 -> "W"
+    88 -> "X"
+    89 -> "Y"
+    90 -> "Z"
+    97 -> "a"
+    98 -> "b"
+    99 -> "c"
+    100 -> "d"
+    101 -> "e"
+    102 -> "f"
+    103 -> "g"
+    104 -> "h"
+    105 -> "i"
+    106 -> "j"
+    107 -> "k"
+    108 -> "l"
+    109 -> "m"
+    110 -> "n"
+    111 -> "o"
+    112 -> "p"
+    113 -> "q"
+    114 -> "r"
+    115 -> "s"
+    116 -> "t"
+    117 -> "u"
+    118 -> "v"
+    119 -> "w"
+    120 -> "x"
+    121 -> "y"
+    122 -> "z"
+    95 -> "_"
+    _ -> "?"
+  }
+}
+
+pub fn concat(xs: List(BitArray)) -> BitArray {
+  // Balanced concatenation can replace this when the native list runtime lands.
+  concat_into(xs, <<>>)
+}
+
+fn concat_into(xs: List(BitArray), acc: BitArray) -> BitArray {
+  case xs {
+    [] -> acc
+    [x, ..rest] -> concat_into(rest, <<acc:bits, x:bits>>)
+  }
+}
+
+pub fn bytes(xs: List(Int)) -> BitArray {
+  concat(map(xs, fn(x) { <<x:8>> }))
+}
+
+pub fn byte_length(value: BitArray) -> Int {
+  byte_count(value, 0)
+}
+
+fn byte_count(value: BitArray, n: Int) -> Int {
+  case value {
+    <<_, rest:bits>> -> byte_count(rest, n + 1)
+    _ -> n
+  }
+}
