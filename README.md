@@ -82,6 +82,7 @@ BitArray representation. It performs no language compilation itself.
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
 | `native/check` | Monomorphic checking, signatures, scope and exhaustiveness |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
+| `native/heap` | Bounded arena allocation through direct Linux mmap |
 | `native/assembler` | Internal labels and signed relative relocations |
 | `native/elf` | ELF64 image and program headers, non-executable stack |
 | `native/compiler` | Compile pipeline |
@@ -96,15 +97,17 @@ management can be omitted.
 Implemented seed features: explicitly typed functions and parameters,
 forward/recursive calls, local bindings and shadowing, Int/Bool/Nil/static
 String values, integer operations, comparisons, short-circuit booleans,
-single-subject case matching, exhaustiveness checks for this subset and value
-printing. Calls preserve left-to-right evaluation order. Division/remainder by
+single-subject case matching, exhaustiveness checks for this subset and primitive
+value printing. Typed tuples, tuple indexing/destructuring, monomorphic lists,
+list spreads and nested tuple/list patterns are supported. Calls and compound
+fields preserve left-to-right evaluation order. Division/remainder by
 zero return zero. Unsupported constructs produce diagnostics rather than
 delegating compilation elsewhere.
 
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, custom types, tuples, lists, closures, generics, `use`, labelled
+* Imports, custom types, closures, generics, `use`, labelled
   arguments, type inference, constants, attributes and bit-array syntax are not
   implemented. The compiler uses several of those itself, so cannot self-compile.
 * Integer literals are restricted to nonnegative decimal magnitudes up to
@@ -113,6 +116,14 @@ delegating compilation elsewhere.
   limitation, not Gleam's full cross-target integer semantics.
 * String literals retain their UTF-8 bytes; only a few escapes are supported.
   String structural equality and dynamic string allocation are not implemented.
+* Tuples/lists use a single 64 MiB read/write, non-executable mmap arena, only in
+  programs with compound allocation. Allocation is checked and exhaustion exits
+  71. There is no collection or arena growth yet. This is not the final memory
+  manager. Structural compound equality/printing remain rejected.
+* Case coverage is conservative. Empty/nonempty lists with irrefutable head/tail,
+  fully irrefutable tuples, Bool alternatives and catch-alls are understood;
+  more complex coverage may require an explicit catch-all. Refutable lets are
+  rejected until let-assert is supported.
 * `echo` prints a value and newline to stdout without upstream's source-location
   diagnostics. That is a seed diagnostic convention, not completed `echo`
   compatibility. Oracle tests compare returned pure values and render them
@@ -131,14 +142,19 @@ and lexical scope. Other tests cover side effects/short-circuiting, argument
 order, fixed-width overflow, deterministic ELF output, absent interpreter/dynamic
 segments, stack permissions, invalid programs and the empty dependency list.
 
-The first run passed 43/43 checks. These are seed checks, not upstream compiler
-conformance. `evidence/seed-verification.json` contains source/artifact hashes,
-measured example sizes and explicit bootstrap state.
+The first seed run passed 43/43 checks and is preserved in
+`evidence/seed-verification.json`. The collections milestone passes 66/66,
+including upstream oracle comparisons and actual exact-fit/over-end arena probes.
+These are subset checks, not upstream compiler conformance.
+`evidence/collections-verification.json` contains current source/artifact hashes,
+measured example sizes, a native disassembly reference and explicit bootstrap
+state. [ASM.md](ASM.md) documents the emitted calling convention, registers,
+object layout and guarded failure paths.
 
 Next actions, in dependency order:
 
-1. Add typed tuples/lists/custom types and their pattern matching, with owned
-   allocation/collection and structural equality.
+1. Extend tuple/list support with custom types, structural equality and owned
+   collection. Bounded tuple/list allocation and nested matching are implemented.
 2. Add polymorphic inference, closures/first-class functions, `use`, byte arrays
    and module imports, testing each against upstream results and failures.
 3. Supply native file/argument/syscall IO in the owned runtime; remove the Node

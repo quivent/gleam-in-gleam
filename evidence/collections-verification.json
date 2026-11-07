@@ -1,0 +1,78 @@
+{
+  "schema": "gleam-in-gleam.collections-verification/1",
+  "observedAt": "2026-11-07T01:23:14.004443+00:00",
+  "bootstrapCompiler": "gleam 1.19.2",
+  "bootstrapNode": "v22.23.3",
+  "compilerSourceLanguage": "Gleam",
+  "compilerModules": 10,
+  "compilerSourceLines": 2196,
+  "declaredPackageDependencies": [],
+  "tests": {
+    "total": 66,
+    "passed": 66,
+    "failed": 0
+  },
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "0d8c9cdef254c4f1d75235cdf9241bec5b562c99fcf48619627a44fcd91b472e",
+    "src/native/ast.gleam": "9ebed4eca5c79bc8dec2e4f7f97f9da50c9aeb381e6e2db530268bcbe38e8ec5",
+    "src/native/check.gleam": "8a0f39398ebfe588efc5093a43e2512ecc5ceab16e1685db2dde223a03ebe887",
+    "src/native/compiler.gleam": "3149a7014f88824942800029baf6eb207b606ad51cba5e61104ba5ca287dc1a5",
+    "src/native/core.gleam": "f9259988544316659547f4b3d492204ec10e57158a60f8e76f89f40ce3654251",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/heap.gleam": "81cc1ec923c97f7f8e523e53de16b0598f29fb0ac1e1d52c33f4b9dfda7f7d46",
+    "src/native/lexer.gleam": "b90996b86b15a6d81c5c21ca845394efdc4f34693bdeaf652ce3d42c4e2e315b",
+    "src/native/parser.gleam": "de7f613f94ff9944d613023c3a3e8b69d60b145ea99265579303f7c321caf115",
+    "src/native/x64.gleam": "702eb5fdeda814ebd42a59285709fae3e0ddc7346abfaca37a9813145863f24b"
+  },
+  "examples": [
+    {
+      "name": "fibonacci",
+      "bytes": 601,
+      "sha256": "59f55018de253f2d8f9d5b35cb9ba900c54aed87558d4a9f2f99342844bea815",
+      "exitCode": 0,
+      "stdout": "55\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "control",
+      "bytes": 1078,
+      "sha256": "e9857046e97210ff7b3130d72236ffd38acbf835dc74b45377f2d61902a5b1d2",
+      "exitCode": 0,
+      "stdout": "14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "collections",
+      "bytes": 1280,
+      "sha256": "87dd6d74d7904b1fd6134fa72acd634218ae4fdd196cfe8ca828ec45649b7692",
+      "exitCode": 0,
+      "stdout": "6\n3\n6\n6\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    }
+  ],
+  "disassembly": {
+    "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+    "entryAddress": "0x4000b0",
+    "rawCodeSHA256": "43aa152361f88a4ac969deda7238498c38badd36a4b417fa37c1352b79c4c4be",
+    "includesTrailingStaticData": true,
+    "path": "evidence/collections-disassembly.txt"
+  },
+  "compilerRunsNatively": false,
+  "selfHosting": false,
+  "fullGleamCompatibility": false,
+  "nativeTarget": "linux-x86_64",
+  "externalCodegenTools": [],
+  "limitations": [
+    "Subset compiler; bootstrap still uses upstream Gleam and Node",
+    "No ADTs/closures/module imports or polymorphic inference yet",
+    "Bounded arena only: no collection or native compiler file IO yet",
+    "Compound structural equality/printing and complex coverage are not implemented",
+    "Fixed-width integer and diagnostic formatting limitations documented in README"
+  ]
+}

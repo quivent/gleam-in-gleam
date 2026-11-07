@@ -62,3 +62,53 @@ pub fn constant() -> Int {
 pub fn unit() -> Nil {
   Nil
 }
+
+pub fn list_sum(xs: List(Int)) -> Int {
+  case xs {
+    [] -> 0
+    [head, ..tail] -> head + list_sum(tail)
+  }
+}
+
+pub fn reverse_list(xs: List(Int), acc: List(Int)) -> List(Int) {
+  case xs {
+    [] -> acc
+    [head, ..tail] -> reverse_list(tail, [head, ..acc])
+  }
+}
+
+pub fn list_work(n: Int) -> Int {
+  let original = [n, n + 1, n + 2]
+  let reversed = reverse_list(original, [])
+  case reversed {
+    [first, second, third] ->
+      first * 100 + second * 10 + third + list_sum(original)
+    _ -> -1
+  }
+}
+
+pub fn tuple_work(n: Int) -> Int {
+  let pair = #(n, #(n + 1, n + 2))
+  let #(a, #(b, c)) = pair
+  a + b * 10 + c * 100 + pair.1.0
+}
+
+pub fn nested_pattern(n: Int) -> Int {
+  let items = [#(True, [n]), #(False, [])]
+  case items {
+    [#(False, _), ..] -> -1
+    [#(True, [value]), #(False, [])] -> value
+    _ -> -2
+  }
+}
+
+pub fn choose_list(n: Int) -> List(Int) {
+  case n {
+    0 -> []
+    _ -> [n, n + 1]
+  }
+}
+
+pub fn chosen_list_sum(n: Int) -> Int {
+  list_sum(choose_list(n))
+}

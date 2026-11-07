@@ -3,6 +3,10 @@ pub type Type {
   Boolean
   Unit
   StringType
+  TupleType(List(Type))
+  ListType(Type)
+  // Internal placeholder for an empty list; never a source type annotation.
+  Unresolved
 }
 
 pub type Annotation {
@@ -15,6 +19,9 @@ pub type Expression {
   BooleanLiteral(Bool)
   UnitLiteral
   StringLiteral(BitArray)
+  TupleLiteral(List(Expression))
+  ListLiteral(List(Expression), ListRest)
+  TupleIndex(Expression, Int)
   Variable(String)
   Unary(String, Expression)
   Binary(String, Expression, Expression)
@@ -24,8 +31,13 @@ pub type Expression {
   Echo(Expression)
 }
 
+pub type ListRest {
+  NoRest
+  Rest(Expression)
+}
+
 pub type Statement {
-  Bind(String, Annotation, Expression)
+  Bind(Pattern, Annotation, Expression)
   Evaluate(Expression)
 }
 
@@ -34,6 +46,13 @@ pub type Pattern {
   BooleanPattern(Bool)
   DiscardPattern
   VariablePattern(String)
+  TuplePattern(List(Pattern))
+  ListPattern(List(Pattern), PatternRest)
+}
+
+pub type PatternRest {
+  NoPatternRest
+  RestPattern(Pattern)
 }
 
 pub type Arm {

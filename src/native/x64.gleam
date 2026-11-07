@@ -2,6 +2,7 @@ import native/assembler as asm
 import native/ast as a
 import native/check as t
 import native/core as c
+import native/heap
 
 type State {
   State(
@@ -9,6 +10,7 @@ type State {
     slots: Int,
     env: List(#(String, Int)),
     data: List(asm.Part),
+    needs_heap: Bool,
   )
 }
 
@@ -66,12 +68,27 @@ fn add_string(bytes: BitArray, state: State) -> #(String, State) {
 }
 
 pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
-  use #(bodies, state) <- c.then(function_list(functions, State(0, 0, [], [])))
-  let entry = [call("fn:main"), raw(<<49, 255, 184, 60, 0, 0, 0, 15, 5>>)]
+  use #(bodies, state) <- c.then(function_list(
+    functions,
+    State(0, 0, [], [], False),
+  ))
+  let init = case state.needs_heap {
+    True -> [call("rt:heap_init")]
+    False -> []
+  }
+  let heap_runtime = case state.needs_heap {
+    True -> heap.runtime()
+    False -> []
+  }
+  let entry =
+    c.append(init, [call("fn:main"), raw(<<49, 255, 184, 60, 0, 0, 0, 15, 5>>)])
   let parts =
     c.append(
       entry,
-      c.append(bodies, c.append(runtime(), c.reverse(state.data))),
+      c.append(
+        bodies,
+        c.append(runtime(), c.append(heap_runtime, c.reverse(state.data))),
+      ),
     )
   asm.assemble(parts)
 }
@@ -124,12 +141,17 @@ fn statements(xs: List(t.Statement), state: State) -> Generated {
       use #(tail, state) <- c.then(statements(rest, state))
       Ok(#(c.append(code, tail), state))
     }
-    [t.Bind(name, e), ..rest] -> {
+    [t.Bind(pat, e), ..rest] -> {
       use #(code, state) <- c.then(expression(e, state))
       let #(offset, state) = slot(state)
-      let state = State(..state, env: [#(name, offset), ..state.env])
+      use #(bindings, state) <- c.then(pattern_code(
+        pat,
+        offset,
+        "rt:match",
+        state,
+      ))
       use #(tail, state) <- c.then(statements(rest, state))
-      Ok(#(c.append(code, [store(offset), ..tail]), state))
+      Ok(#(c.append(code, [store(offset), ..c.append(bindings, tail)]), state))
     }
   }
 }
@@ -151,6 +173,37 @@ fn expression(e: t.Typed, state: State) -> Generated {
     t.StringNode(s) -> {
       let #(name, state) = add_string(s, state)
       Ok(#([asm.Relative(<<72, 141, 5>>, name)], state))
+    }
+    t.TupleNode(elements) -> {
+      use #(code, state) <- c.then(arguments(elements, state))
+      let n = c.length(elements)
+      let size = 16 + n * 8
+      let allocation = [
+        raw(<<191, size:32-little>>),
+        call("rt:allocate"),
+        raw(<<72, 199, 0, size:32-little, 72, 199, 64, 8, 1, 0, 0, 0>>),
+      ]
+      Ok(#(
+        c.append(code, c.append(allocation, tuple_fields(n - 1))),
+        State(..state, needs_heap: True),
+      ))
+    }
+    t.TupleIndexNode(tuple, index) -> {
+      use #(code, state) <- c.then(expression(tuple, state))
+      let offset = 16 + index * 8
+      Ok(#(c.append(code, [raw(<<72, 139, 128, offset:32-little>>)]), state))
+    }
+    t.ListNode(elements, tail) -> {
+      use #(code, state) <- c.then(arguments(elements, state))
+      use #(tail_code, state) <- c.then(case tail {
+        t.EmptyTail -> Ok(#([immediate(0)], state))
+        t.ListTail(tail) -> expression(tail, state)
+      })
+      let n = c.length(elements)
+      Ok(#(
+        c.append(code, c.append(tail_code, cons_cells(n))),
+        State(..state, needs_heap: state.needs_heap || n > 0),
+      ))
     }
     t.VariableNode(name) -> {
       use offset <- c.then(c.lookup(state.env, name))
@@ -307,27 +360,12 @@ fn case_arms(
     [arm, ..rest] -> {
       let env = state.env
       let #(next, state) = label(state)
-      let #(condition_code, state) = case arm.pattern {
-        a.DiscardPattern -> #([], state)
-        a.VariablePattern(name) -> #(
-          [],
-          State(..state, env: [#(name, subject), ..state.env]),
-        )
-        a.IntegerPattern(n) -> #(
-          [load(subject), raw(<<72, 61, n:32-little>>), branch(133, next)],
-          state,
-        )
-        a.BooleanPattern(b) -> {
-          let value = case b {
-            True -> 1
-            False -> 0
-          }
-          #(
-            [load(subject), raw(<<72, 61, value:32-little>>), branch(133, next)],
-            state,
-          )
-        }
-      }
+      use #(condition_code, state) <- c.then(pattern_code(
+        arm.pattern,
+        subject,
+        next,
+        state,
+      ))
       use #(body, state) <- c.then(expression(arm.body, state))
       let state = State(..state, env: env)
       use #(tail, state) <- c.then(case_arms(rest, subject, finish, state))
@@ -344,6 +382,11 @@ fn case_arms(
 
 fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
   case type_ {
+    // The type checker rejects compound echo until structural formatting lands.
+    a.TupleType(_) | a.ListType(_) | a.Unresolved -> #(
+      [jump("rt:match")],
+      state,
+    )
     a.Integer -> #([call("rt:print_int")], state)
     a.StringType -> #([call("rt:print_string")], state)
     a.Unit -> {
@@ -377,6 +420,167 @@ fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
         ],
         state,
       )
+    }
+  }
+}
+
+fn tuple_fields(index: Int) -> List(asm.Part) {
+  case index < 0 {
+    True -> []
+    False -> {
+      let offset = 16 + index * 8
+      [raw(<<89, 72, 137, 136, offset:32-little>>), ..tuple_fields(index - 1)]
+    }
+  }
+}
+
+fn cons_cells(remaining: Int) -> List(asm.Part) {
+  case remaining {
+    0 -> []
+    _ -> [
+      // Heads were evaluated left-to-right; build the linked spine right-to-left.
+      raw(<<80, 191, 32, 0, 0, 0>>),
+      call("rt:allocate"),
+      raw(<<
+        90,
+        89,
+        72,
+        199,
+        0,
+        32,
+        0,
+        0,
+        0,
+        72,
+        199,
+        64,
+        8,
+        2,
+        0,
+        0,
+        0,
+        72,
+        137,
+        72,
+        16,
+        72,
+        137,
+        80,
+        24,
+      >>),
+      ..cons_cells(remaining - 1)
+    ]
+  }
+}
+
+fn pattern_code(
+  pat: a.Pattern,
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  case pat {
+    a.DiscardPattern -> Ok(#([], state))
+    a.VariablePattern(name) ->
+      Ok(#([], State(..state, env: [#(name, subject), ..state.env])))
+    a.IntegerPattern(n) ->
+      Ok(#(
+        [load(subject), raw(<<72, 61, n:32-little>>), branch(133, failure)],
+        state,
+      ))
+    a.BooleanPattern(b) -> {
+      let n = case b {
+        True -> 1
+        False -> 0
+      }
+      Ok(#(
+        [load(subject), raw(<<72, 61, n:32-little>>), branch(133, failure)],
+        state,
+      ))
+    }
+    a.TuplePattern(patterns) ->
+      tuple_pattern(patterns, 0, subject, failure, state)
+    a.ListPattern(patterns, tail) ->
+      list_pattern(patterns, tail, subject, failure, state)
+  }
+}
+
+fn tuple_pattern(
+  patterns: List(a.Pattern),
+  index: Int,
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  case patterns {
+    [] -> Ok(#([], state))
+    [pat, ..rest] -> {
+      let #(field, state) = slot(state)
+      let displacement = 16 + index * 8
+      use #(inner, state) <- c.then(pattern_code(pat, field, failure, state))
+      use #(tail, state) <- c.then(tuple_pattern(
+        rest,
+        index + 1,
+        subject,
+        failure,
+        state,
+      ))
+      Ok(#(
+        [
+          load(subject),
+          raw(<<72, 139, 128, displacement:32-little>>),
+          store(field),
+          ..c.append(inner, tail)
+        ],
+        state,
+      ))
+    }
+  }
+}
+
+fn list_pattern(
+  patterns: List(a.Pattern),
+  tail: a.PatternRest,
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  case patterns {
+    [] ->
+      case tail {
+        a.NoPatternRest ->
+          Ok(#(
+            [load(subject), raw(<<72, 133, 192>>), branch(133, failure)],
+            state,
+          ))
+        a.RestPattern(pat) -> pattern_code(pat, subject, failure, state)
+      }
+    [head, ..rest] -> {
+      let #(head_slot, state) = slot(state)
+      let #(tail_slot, state) = slot(state)
+      let extract = [
+        load(subject),
+        raw(<<72, 133, 192>>),
+        branch(132, failure),
+        raw(<<72, 139, 72, 16, 72, 139, 64, 24>>),
+        store(tail_slot),
+        raw(<<72, 137, 200>>),
+        store(head_slot),
+      ]
+      use #(head_code, state) <- c.then(pattern_code(
+        head,
+        head_slot,
+        failure,
+        state,
+      ))
+      use #(tail_code, state) <- c.then(list_pattern(
+        rest,
+        tail,
+        tail_slot,
+        failure,
+        state,
+      ))
+      Ok(#(c.append(extract, c.append(head_code, tail_code)), state))
     }
   }
 }

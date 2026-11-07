@@ -35,10 +35,19 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
     [l.Token(l.Word("Bool"), _), ..rest] -> Ok(#(a.Boolean, rest))
     [l.Token(l.Word("Nil"), _), ..rest] -> Ok(#(a.Unit, rest))
     [l.Token(l.Word("String"), _), ..rest] -> Ok(#(a.StringType, rest))
+    [l.Token(l.Word("List"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(element, rest) <- c.then(type_(rest))
+      use rest <- c.then(expect(rest, ")"))
+      Ok(#(a.ListType(element), rest))
+    }
+    [l.Token(l.Symbol("#"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(types, rest) <- c.then(separated(rest, ")", type_))
+      Ok(#(a.TupleType(types), rest))
+    }
     _ ->
       error(
         tokens,
-        "Type not implemented in native seed (supported: Int, Bool, Nil, String)",
+        "Type not implemented in native seed (supported: Int, Bool, Nil, String, List, tuples)",
       )
   }
 }
@@ -110,11 +119,11 @@ fn statements(
   case tokens {
     [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
     [l.Token(l.Word("let"), _), ..rest] -> {
-      use #(id, rest) <- c.then(name(rest))
+      use #(pat, rest) <- c.then(pattern(rest))
       use #(t, rest) <- c.then(annotation(rest))
       use rest <- c.then(expect(rest, "="))
       use #(value, rest) <- c.then(expression(rest, 0))
-      statements(rest, [a.Bind(id, t, value), ..acc])
+      statements(rest, [a.Bind(pat, t, value), ..acc])
     }
     _ -> {
       use #(value, rest) <- c.then(expression(tokens, 0))
@@ -125,7 +134,38 @@ fn statements(
 
 fn expression(tokens: Tokens, minimum: Int) -> Parsed(a.Expression) {
   use #(left, rest) <- c.then(prefix(tokens))
+  use #(left, rest) <- c.then(postfix(left, rest))
   infix(left, rest, minimum)
+}
+
+fn postfix(left: a.Expression, tokens: Tokens) -> Parsed(a.Expression) {
+  case tokens {
+    [l.Token(l.Symbol("."), _), l.Token(l.Number(index), _), ..rest] ->
+      postfix(a.TupleIndex(left, index), rest)
+    _ -> Ok(#(left, tokens))
+  }
+}
+
+fn separated(
+  tokens: Tokens,
+  end: String,
+  item: fn(Tokens) -> Parsed(t),
+) -> Parsed(List(t)) {
+  case tokens {
+    [l.Token(l.Symbol(symbol), _), ..rest] if symbol == end -> Ok(#([], rest))
+    _ -> {
+      use #(value, rest) <- c.then(item(tokens))
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(tail, rest) <- c.then(separated(rest, end, item))
+          Ok(#([value, ..tail], rest))
+        }
+        [l.Token(l.Symbol(symbol), _), ..rest] if symbol == end ->
+          Ok(#([value], rest))
+        _ -> error(rest, "Expected ',' or '" <> end <> "'")
+      }
+    }
+  }
 }
 
 fn precedence(op: String) -> Int {
@@ -164,6 +204,16 @@ fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
     [l.Token(l.Number(n), _), ..rest] -> Ok(#(a.IntegerLiteral(n), rest))
     [l.Token(l.Text(s), _), ..rest] -> Ok(#(a.StringLiteral(s), rest))
+    [l.Token(l.Symbol("#"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(elements, rest) <- c.then(
+        separated(rest, ")", fn(ts) { expression(ts, 0) }),
+      )
+      Ok(#(a.TupleLiteral(elements), rest))
+    }
+    [l.Token(l.Symbol("["), _), ..rest] -> {
+      use #(items, tail, rest) <- c.then(list_expression(rest))
+      Ok(#(a.ListLiteral(items, tail), rest))
+    }
     [l.Token(l.Word("True"), _), ..rest] -> Ok(#(a.BooleanLiteral(True), rest))
     [l.Token(l.Word("False"), _), ..rest] ->
       Ok(#(a.BooleanLiteral(False), rest))
@@ -215,6 +265,14 @@ fn arguments(
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
+    [l.Token(l.Symbol("#"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(elements, rest) <- c.then(separated(rest, ")", pattern))
+      Ok(#(a.TuplePattern(elements), rest))
+    }
+    [l.Token(l.Symbol("["), _), ..rest] -> {
+      use #(elements, tail, rest) <- c.then(list_pattern(rest))
+      Ok(#(a.ListPattern(elements, tail), rest))
+    }
     [l.Token(l.Number(n), _), ..rest] -> Ok(#(a.IntegerPattern(n), rest))
     [l.Token(l.Symbol("-"), _), l.Token(l.Number(n), _), ..rest] ->
       Ok(#(a.IntegerPattern(0 - n), rest))
@@ -224,6 +282,57 @@ fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
     [l.Token(l.Word("_"), _), ..rest] -> Ok(#(a.DiscardPattern, rest))
     [l.Token(l.Word(id), _), ..rest] -> Ok(#(a.VariablePattern(id), rest))
     _ -> error(tokens, "Pattern not implemented in native seed")
+  }
+}
+
+fn list_expression(
+  tokens: Tokens,
+) -> Result(#(List(a.Expression), a.ListRest, Tokens), String) {
+  case tokens {
+    [l.Token(l.Symbol("]"), _), ..rest] -> Ok(#([], a.NoRest, rest))
+    [l.Token(l.Symbol(".."), _), ..rest] -> {
+      use #(tail, rest) <- c.then(expression(rest, 0))
+      use rest <- c.then(expect(rest, "]"))
+      Ok(#([], a.Rest(tail), rest))
+    }
+    _ -> {
+      use #(head, rest) <- c.then(expression(tokens, 0))
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(items, tail, rest) <- c.then(list_expression(rest))
+          Ok(#([head, ..items], tail, rest))
+        }
+        [l.Token(l.Symbol("]"), _), ..rest] -> Ok(#([head], a.NoRest, rest))
+        _ -> error(rest, "Expected ',' or ']' in list")
+      }
+    }
+  }
+}
+
+fn list_pattern(
+  tokens: Tokens,
+) -> Result(#(List(a.Pattern), a.PatternRest, Tokens), String) {
+  case tokens {
+    [l.Token(l.Symbol(".."), _), l.Token(l.Symbol("]"), _), ..rest] ->
+      Ok(#([], a.RestPattern(a.DiscardPattern), rest))
+    [l.Token(l.Symbol("]"), _), ..rest] -> Ok(#([], a.NoPatternRest, rest))
+    [l.Token(l.Symbol(".."), _), ..rest] -> {
+      use #(tail, rest) <- c.then(pattern(rest))
+      use rest <- c.then(expect(rest, "]"))
+      Ok(#([], a.RestPattern(tail), rest))
+    }
+    _ -> {
+      use #(head, rest) <- c.then(pattern(tokens))
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(items, tail, rest) <- c.then(list_pattern(rest))
+          Ok(#([head, ..items], tail, rest))
+        }
+        [l.Token(l.Symbol("]"), _), ..rest] ->
+          Ok(#([head], a.NoPatternRest, rest))
+        _ -> error(rest, "Expected ',' or ']' in list pattern")
+      }
+    }
   }
 }
 

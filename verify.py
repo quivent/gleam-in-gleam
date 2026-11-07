@@ -28,7 +28,7 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
-run([gleam, 'format', '--check', 'src', 'test/oracle.gleam', 'examples'])
+run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
 suite = run(['node', '--test', 'test/native.test.mjs'])
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
@@ -40,10 +40,14 @@ assert re.search(r'packages = \[\s*\]', manifest)
 sources = {str(p.relative_to(ROOT)): sha(p.read_bytes())
            for p in sorted((ROOT / 'src').rglob('*.gleam'))}
 examples = []
+disassembly = None
+evidence = ROOT / 'evidence'
+evidence.mkdir(exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
     for name, expected in [
         ('fibonacci', '55\n'),
         ('control', '14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n'),
+        ('collections', '6\n3\n6\n6\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -57,6 +61,21 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
+        if name == 'collections' and shutil.which('objdump'):
+            entry = struct.unpack_from('<Q', data, 24)[0]
+            load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
+            raw = Path(tmp) / 'collections-code.bin'
+            raw.write_bytes(data[entry - load_base:])
+            listing = run(['objdump', '-D', '-b', 'binary', '-m', 'i386:x86-64',
+                           f'--adjust-vma={entry}', str(raw)]).stdout
+            # Preserve a stable path in the listing, not a disposable temp name.
+            listing = listing.replace(str(raw), 'collections-code.bin')
+            listing = '\n'.join(line.rstrip() for line in listing.splitlines()) + '\n'
+            disassembly = dict(tool=run(['objdump', '--version']).stdout.splitlines()[0],
+                               entryAddress=hex(entry), rawCodeSHA256=sha(raw.read_bytes()),
+                               includesTrailingStaticData=True,
+                               path='evidence/collections-disassembly.txt')
+            (evidence / 'collections-disassembly.txt').write_text(listing)
         examples.append(dict(name=name, bytes=len(data), sha256=sha(data),
                              exitCode=result.returncode, stdout=result.stdout,
                              dynamicLoader=False, dynamicLibraries=[],
@@ -68,7 +87,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         assert refused.returncode != 0 and output.read_bytes() == before
 
 receipt = dict(
-    schema='gleam-in-gleam.seed-verification/1',
+    schema='gleam-in-gleam.collections-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -79,18 +98,18 @@ receipt = dict(
     tests=dict(total=tests, passed=passed, failed=failed),
     sourceSHA256=sources,
     examples=examples,
+    disassembly=disassembly,
     compilerRunsNatively=False,
     selfHosting=False,
     fullGleamCompatibility=False,
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
     limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
-                 'No lists/ADTs/closures/module imports or polymorphic inference yet',
-                 'No native compiler file IO or automatic memory management yet',
+                 'No ADTs/closures/module imports or polymorphic inference yet',
+                 'Bounded arena only: no collection or native compiler file IO yet',
+                 'Compound structural equality/printing and complex coverage are not implemented',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-evidence = ROOT / 'evidence'
-evidence.mkdir(exist_ok=True)
-(evidence / 'seed-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'seed-test-output.tap').write_text(suite.stdout)
+(evidence / 'collections-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'collections-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

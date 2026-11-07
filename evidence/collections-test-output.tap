@@ -1,0 +1,406 @@
+TAP version 13
+# Subtest: upstream semantic oracle: fibonacci(0)
+ok 1 - upstream semantic oracle: fibonacci(0)
+  ---
+  duration_ms: 87.692091
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(1)
+ok 2 - upstream semantic oracle: fibonacci(1)
+  ---
+  duration_ms: 41.894624
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(10)
+ok 3 - upstream semantic oracle: fibonacci(10)
+  ---
+  duration_ms: 33.864957
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: fibonacci(16)
+ok 4 - upstream semantic oracle: fibonacci(16)
+  ---
+  duration_ms: 21.725063
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: arithmetic(7,4,3)
+ok 5 - upstream semantic oracle: arithmetic(7,4,3)
+  ---
+  duration_ms: 30.173358
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: arithmetic(-7,-4,3)
+ok 6 - upstream semantic oracle: arithmetic(-7,-4,3)
+  ---
+  duration_ms: 45.2006
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(12,0)
+ok 7 - upstream semantic oracle: quotient(12,0)
+  ---
+  duration_ms: 31.572065
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(-17,5)
+ok 8 - upstream semantic oracle: quotient(-17,5)
+  ---
+  duration_ms: 27.393621
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: quotient(17,-5)
+ok 9 - upstream semantic oracle: quotient(17,-5)
+  ---
+  duration_ms: 21.191691
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(12,0)
+ok 10 - upstream semantic oracle: remainder(12,0)
+  ---
+  duration_ms: 17.577762
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(-17,5)
+ok 11 - upstream semantic oracle: remainder(-17,5)
+  ---
+  duration_ms: 21.219096
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: remainder(17,-5)
+ok 12 - upstream semantic oracle: remainder(17,-5)
+  ---
+  duration_ms: 22.871196
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(3,4)
+ok 13 - upstream semantic oracle: bool_case(3,4)
+  ---
+  duration_ms: 12.555741
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(4,4)
+ok 14 - upstream semantic oracle: bool_case(4,4)
+  ---
+  duration_ms: 13.739069
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: bool_case(5,4)
+ok 15 - upstream semantic oracle: bool_case(5,4)
+  ---
+  duration_ms: 12.908869
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(-1)
+ok 16 - upstream semantic oracle: integer_case(-1)
+  ---
+  duration_ms: 20.447346
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(0)
+ok 17 - upstream semantic oracle: integer_case(0)
+  ---
+  duration_ms: 15.463664
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(1)
+ok 18 - upstream semantic oracle: integer_case(1)
+  ---
+  duration_ms: 23.032554
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: integer_case(9)
+ok 19 - upstream semantic oracle: integer_case(9)
+  ---
+  duration_ms: 14.570583
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: shadow(7)
+ok 20 - upstream semantic oracle: shadow(7)
+  ---
+  duration_ms: 17.423298
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_string(0)
+ok 21 - upstream semantic oracle: chosen_string(0)
+  ---
+  duration_ms: 15.372812
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_string(1)
+ok 22 - upstream semantic oracle: chosen_string(1)
+  ---
+  duration_ms: 15.368248
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: unit()
+ok 23 - upstream semantic oracle: unit()
+  ---
+  duration_ms: 57.300513
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: list_work(1)
+ok 24 - upstream semantic oracle: list_work(1)
+  ---
+  duration_ms: 27.255535
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: list_work(-2)
+ok 25 - upstream semantic oracle: list_work(-2)
+  ---
+  duration_ms: 29.319918
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: tuple_work(3)
+ok 26 - upstream semantic oracle: tuple_work(3)
+  ---
+  duration_ms: 25.490631
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: nested_pattern(7)
+ok 27 - upstream semantic oracle: nested_pattern(7)
+  ---
+  duration_ms: 30.142509
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_list_sum(0)
+ok 28 - upstream semantic oracle: chosen_list_sum(0)
+  ---
+  duration_ms: 13.642725
+  type: 'test'
+  ...
+# Subtest: upstream semantic oracle: chosen_list_sum(5)
+ok 29 - upstream semantic oracle: chosen_list_sum(5)
+  ---
+  duration_ms: 32.459348
+  type: 'test'
+  ...
+# Subtest: short-circuiting does not evaluate the right branch
+ok 30 - short-circuiting does not evaluate the right branch
+  ---
+  duration_ms: 56.391224
+  type: 'test'
+  ...
+# Subtest: argument evaluation order and native calling convention
+ok 31 - argument evaluation order and native calling convention
+  ---
+  duration_ms: 9.220996
+  type: 'test'
+  ...
+# Subtest: tuple/list fields evaluate left-to-right and list tails stay persistent
+ok 32 - tuple/list fields evaluate left-to-right and list tails stay persistent
+  ---
+  duration_ms: 20.25323
+  type: 'test'
+  ...
+# Subtest: empty list annotations and nested empty-list refinement
+ok 33 - empty list annotations and nested empty-list refinement
+  ---
+  duration_ms: 50.386716
+  type: 'test'
+  ...
+# Subtest: checked fixed-width overflow exits rather than silently wrapping
+ok 34 - checked fixed-width overflow exits rather than silently wrapping
+  ---
+  duration_ms: 38.265223
+  type: 'test'
+  ...
+# Subtest: deterministic raw machine code with no interpreter or dynamic linkage
+ok 35 - deterministic raw machine code with no interpreter or dynamic linkage
+  ---
+  duration_ms: 4.32067
+  type: 'test'
+  ...
+# Subtest: native arena accepts an exact fit
+ok 36 - native arena accepts an exact fit
+  ---
+  duration_ms: 7.381805
+  type: 'test'
+  ...
+# Subtest: native arena rejects allocation beyond its end before writing
+ok 37 - native arena rejects allocation beyond its end before writing
+  ---
+  duration_ms: 3.958715
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: return mismatch
+ok 38 - rejects without fallback: return mismatch
+  ---
+  duration_ms: 1.045963
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: argument type
+ok 39 - rejects without fallback: argument type
+  ---
+  duration_ms: 0.85861
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: argument count
+ok 40 - rejects without fallback: argument count
+  ---
+  duration_ms: 0.345858
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: missing name
+ok 41 - rejects without fallback: missing name
+  ---
+  duration_ms: 0.248752
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate function
+ok 42 - rejects without fallback: duplicate function
+  ---
+  duration_ms: 2.997257
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate parameter
+ok 43 - rejects without fallback: duplicate parameter
+  ---
+  duration_ms: 0.639368
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: nonexhaustive
+ok 44 - rejects without fallback: nonexhaustive
+  ---
+  duration_ms: 0.621562
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: branch mismatch
+ok 45 - rejects without fallback: branch mismatch
+  ---
+  duration_ms: 0.373855
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: pattern mismatch
+ok 46 - rejects without fallback: pattern mismatch
+  ---
+  duration_ms: 0.68696
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unknown import
+ok 47 - rejects without fallback: unknown import
+  ---
+  duration_ms: 0.423617
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unimplemented ADT
+ok 48 - rejects without fallback: unimplemented ADT
+  ---
+  duration_ms: 0.247897
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unterminated string
+ok 49 - rejects without fallback: unterminated string
+  ---
+  duration_ms: 0.292549
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: missing entrypoint
+ok 50 - rejects without fallback: missing entrypoint
+  ---
+  duration_ms: 0.255253
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unimplemented literal range
+ok 51 - rejects without fallback: unimplemented literal range
+  ---
+  duration_ms: 0.185864
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: unimplemented structural equality
+ok 52 - rejects without fallback: unimplemented structural equality
+  ---
+  duration_ms: 0.307693
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: heterogeneous list
+ok 53 - rejects without fallback: heterogeneous list
+  ---
+  duration_ms: 0.343552
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: bad list tail
+ok 54 - rejects without fallback: bad list tail
+  ---
+  duration_ms: 0.30114
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: bad nested list
+ok 55 - rejects without fallback: bad nested list
+  ---
+  duration_ms: 0.404428
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple index bounds
+ok 56 - rejects without fallback: tuple index bounds
+  ---
+  duration_ms: 0.584806
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple index shape
+ok 57 - rejects without fallback: tuple index shape
+  ---
+  duration_ms: 0.260372
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: tuple pattern arity
+ok 58 - rejects without fallback: tuple pattern arity
+  ---
+  duration_ms: 0.450211
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: duplicate tuple binding
+ok 59 - rejects without fallback: duplicate tuple binding
+  ---
+  duration_ms: 3.016861
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: refutable let
+ok 60 - rejects without fallback: refutable let
+  ---
+  duration_ms: 0.191754
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: incomplete list case
+ok 61 - rejects without fallback: incomplete list case
+  ---
+  duration_ms: 0.15453
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: incomplete nonempty case
+ok 62 - rejects without fallback: incomplete nonempty case
+  ---
+  duration_ms: 0.302673
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: list element pattern type
+ok 63 - rejects without fallback: list element pattern type
+  ---
+  duration_ms: 0.205772
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: list equality pending
+ok 64 - rejects without fallback: list equality pending
+  ---
+  duration_ms: 0.148785
+  type: 'test'
+  ...
+# Subtest: rejects without fallback: compound echo pending
+ok 65 - rejects without fallback: compound echo pending
+  ---
+  duration_ms: 0.131764
+  type: 'test'
+  ...
+# Subtest: no declared third-party packages
+ok 66 - no declared third-party packages
+  ---
+  duration_ms: 0.335471
+  type: 'test'
+  ...
+1..66
+# tests 66
+# suites 0
+# pass 66
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1418.509435

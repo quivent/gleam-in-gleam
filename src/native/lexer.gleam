@@ -49,6 +49,8 @@ fn scan(
       let #(name, rest, at) = identifier(source, offset, "")
       scan(rest, at, [Token(Word(name), offset), ..acc])
     }
+    <<46, 46, rest:bits>> ->
+      scan(rest, offset + 2, [Token(Symbol(".."), offset), ..acc])
     <<45, 62, rest:bits>> ->
       scan(rest, offset + 2, [Token(Symbol("->"), offset), ..acc])
     <<61, 61, rest:bits>> ->

@@ -7,13 +7,16 @@ import {spawnSync} from 'node:child_process';
 import {BitArray} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
 import * as oracle from '../build/dev/javascript/gleam_native/oracle.mjs';
+import {probe} from '../build/dev/javascript/gleam_native/allocator_probe.mjs';
 
 const base = readFileSync(new URL('./oracle.gleam', import.meta.url), 'utf8');
 function compileResult(source) {
   return compile(new BitArray(Buffer.from(source)));
 }
 function run(source) {
-  const result = compileResult(source);
+  return runBinary(compileResult(source));
+}
+function runBinary(result) {
   assert.equal(result.isOk(), true, result[0]);
   const dir = mkdtempSync(join(tmpdir(), 'gleam-native-proof-'));
   try {
@@ -35,6 +38,8 @@ const cases = [
   ['bool_case', [3, 4]], ['bool_case', [4, 4]], ['bool_case', [5, 4]],
   ['integer_case', [-1]], ['integer_case', [0]], ['integer_case', [1]], ['integer_case', [9]],
   ['shadow', [7]], ['chosen_string', [0]], ['chosen_string', [1]], ['unit', []],
+  ['list_work', [1]], ['list_work', [-2]], ['tuple_work', [3]],
+  ['nested_pattern', [7]], ['chosen_list_sum', [0]], ['chosen_list_sum', [5]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -55,6 +60,32 @@ test('argument evaluation order and native calling convention', () => {
   assert.equal(result.status, 0);
   assert.equal(result.stdout, '1\n2\n3\n123\n');
 });
+test('tuple/list fields evaluate left-to-right and list tails stay persistent', () => {
+  const result = run(main(`
+    let tail = [3]
+    let xs = [echo 1, echo 2, ..{ echo 4 tail }]
+    let pair = #(echo 5, echo 6)
+    let #(first, second) = pair
+    echo first + second
+    echo list_sum(xs)
+    echo list_sum(tail)
+  `));
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n2\n4\n5\n6\n11\n6\n3\n');
+});
+test('empty list annotations and nested empty-list refinement', () => {
+  const result = run(main(`
+    let empty: List(Int) = []
+    echo list_sum(empty)
+    let nested = [[], [7]]
+    echo case nested {
+      [[], [n]] -> n
+      _ -> -1
+    }
+  `));
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '0\n7\n');
+});
 test('checked fixed-width overflow exits rather than silently wrapping', () => {
   const result = run(main('let n = 2147483647 * 2147483647\necho n * 3'));
   assert.equal(result.status, 70);
@@ -74,6 +105,17 @@ test('deterministic raw machine code with no interpreter or dynamic linkage', ()
   assert.equal(headers.some(h => h.type === 2 || h.type === 3), false); // DYNAMIC or INTERP
   assert.deepEqual(headers.find(h => h.type === 0x6474e551), {type: 0x6474e551, flags: 6});
 });
+test('native arena accepts an exact fit', () => {
+  const result = runBinary(probe(false));
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '');
+});
+test('native arena rejects allocation beyond its end before writing', () => {
+  const result = runBinary(probe(true));
+  assert.equal(result.status, 71);
+  assert.equal(result.signal, null);
+  assert.equal(result.stdout, '');
+});
 const rejected = [
   ['return mismatch', 'pub fn main() -> Int { True }', /Type mismatch/],
   ['argument type', 'fn f(a: Int) -> Int { a } pub fn main() -> Int { f(True) }', /Type mismatch/],
@@ -90,6 +132,19 @@ const rejected = [
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
   ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
   ['unimplemented structural equality', 'pub fn main() -> Bool { "a" == "a" }', /not implemented/],
+  ['heterogeneous list', 'pub fn main() -> Nil { let xs = [1, True] Nil }', /Type mismatch/],
+  ['bad list tail', 'pub fn main() -> Nil { let xs = [1, ..True] Nil }', /tail must be a list/],
+  ['bad nested list', 'pub fn main() -> Nil { let xs = [[1], [True]] Nil }', /Type mismatch/],
+  ['tuple index bounds', 'pub fn main() -> Int { #(1, 2).2 }', /out of bounds/],
+  ['tuple index shape', 'pub fn main() -> Int { 1.0 }', /requires a tuple/],
+  ['tuple pattern arity', 'pub fn main() -> Nil { case #(1, 2) { #(a, b, c) -> Nil _ -> Nil } }', /arity mismatch/],
+  ['duplicate tuple binding', 'pub fn main() -> Nil { let #(x, x) = #(1, 2) Nil }', /Duplicate variable/],
+  ['refutable let', 'pub fn main() -> Nil { let [x] = [1] Nil }', /Refutable let/],
+  ['incomplete list case', 'pub fn main() -> Int { case [1] { [] -> 0 } }', /Non-exhaustive/],
+  ['incomplete nonempty case', 'pub fn main() -> Int { case [1] { [] -> 0 [1, .._] -> 1 } }', /Non-exhaustive/],
+  ['list element pattern type', 'pub fn main() -> Int { case [1] { [True] -> 1 _ -> 0 } }', /Type mismatch/],
+  ['list equality pending', 'pub fn main() -> Bool { [1] == [1] }', /Structural compound equality/],
+  ['compound echo pending', 'pub fn main() -> Nil { echo [1] Nil }', /Compound-value echo/],
 ];
 for (const [name, source, error] of rejected) {
   test(`rejects without fallback: ${name}`, () => {

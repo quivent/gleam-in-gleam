@@ -10,6 +10,9 @@ pub type Node {
   BooleanNode(Bool)
   UnitNode
   StringNode(BitArray)
+  TupleNode(List(Typed))
+  ListNode(List(Typed), Tail)
+  TupleIndexNode(Typed, Int)
   VariableNode(String)
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
@@ -19,8 +22,13 @@ pub type Node {
   EchoNode(Typed)
 }
 
+pub type Tail {
+  EmptyTail
+  ListTail(Typed)
+}
+
 pub type Statement {
-  Bind(String, Typed)
+  Bind(a.Pattern, Typed)
   Evaluate(Typed)
 }
 
@@ -44,15 +52,49 @@ type Globals =
   List(#(String, a.Function))
 
 fn equal(actual: a.Type, expected: a.Type) -> Result(Nil, String) {
-  case actual == expected {
-    True -> Ok(Nil)
-    False ->
-      Error(
-        "Type mismatch: expected "
-        <> type_name(expected)
-        <> ", found "
-        <> type_name(actual),
-      )
+  case merge_type(actual, expected) {
+    Ok(_) -> Ok(Nil)
+    Error(e) -> Error(e)
+  }
+}
+
+fn merge_type(actual: a.Type, expected: a.Type) -> Result(a.Type, String) {
+  case actual, expected {
+    a.Unresolved, t | t, a.Unresolved -> Ok(t)
+    a.ListType(left), a.ListType(right) -> {
+      use t <- c.then(merge_type(left, right))
+      Ok(a.ListType(t))
+    }
+    a.TupleType(left), a.TupleType(right) -> {
+      use types <- c.then(merge_types(left, right))
+      Ok(a.TupleType(types))
+    }
+    _, _ ->
+      case actual == expected {
+        True -> Ok(actual)
+        False ->
+          Error(
+            "Type mismatch: expected "
+            <> type_name(expected)
+            <> ", found "
+            <> type_name(actual),
+          )
+      }
+  }
+}
+
+fn merge_types(
+  left: List(a.Type),
+  right: List(a.Type),
+) -> Result(List(a.Type), String) {
+  case left, right {
+    [], [] -> Ok([])
+    [l, ..left], [r, ..right] -> {
+      use t <- c.then(merge_type(l, r))
+      use tail <- c.then(merge_types(left, right))
+      Ok([t, ..tail])
+    }
+    _, _ -> Error("Tuple arity mismatch")
   }
 }
 
@@ -62,6 +104,9 @@ pub fn type_name(t: a.Type) -> String {
     a.Boolean -> "Bool"
     a.Unit -> "Nil"
     a.StringType -> "String"
+    a.TupleType(types) -> "#(" <> c.join(c.map(types, type_name), ", ") <> ")"
+    a.ListType(element) -> "List(" <> type_name(element) <> ")"
+    a.Unresolved -> "unresolved empty-list element"
   }
 }
 
@@ -119,22 +164,29 @@ fn statements(
 ) -> Result(#(List(Statement), a.Type), String) {
   case xs {
     [] -> Ok(#([], a.Unit))
-    [a.Bind(name, annotation, value), ..rest] -> {
+    [a.Bind(pat, annotation, value), ..rest] -> {
       use typed <- c.then(expression(value, env, globals))
-      use _ <- c.then(case annotation {
-        a.Inferred -> Ok(Nil)
-        a.Annotated(t) -> equal(typed.type_, t)
+      use typed <- c.then(case annotation {
+        a.Inferred -> Ok(typed)
+        a.Annotated(t) -> {
+          use _ <- c.then(equal(typed.type_, t))
+          Ok(Typed(..typed, type_: t))
+        }
       })
+      use _ <- c.then(case covers(pat, typed.type_) {
+        True -> Ok(Nil)
+        False ->
+          Error(
+            "Refutable let pattern: use case (let assert is not implemented)",
+          )
+      })
+      use next_env <- c.then(pattern(pat, typed.type_, env))
       case rest {
         [] ->
           Error("A function/block must end in an expression, not an assignment")
         _ -> {
-          use #(tail, t) <- c.then(statements(
-            rest,
-            [#(name, typed.type_), ..env],
-            globals,
-          ))
-          Ok(#([Bind(name, typed), ..tail], t))
+          use #(tail, t) <- c.then(statements(rest, next_env, globals))
+          Ok(#([Bind(pat, typed), ..tail], t))
         }
       }
     }
@@ -161,6 +213,47 @@ fn expression(
     a.BooleanLiteral(b) -> Ok(Typed(BooleanNode(b), a.Boolean))
     a.UnitLiteral -> Ok(Typed(UnitNode, a.Unit))
     a.StringLiteral(s) -> Ok(Typed(StringNode(s), a.StringType))
+    a.TupleLiteral(elements) -> {
+      use typed <- c.then(
+        c.try_map(elements, fn(e) { expression(e, env, globals) }),
+      )
+      Ok(Typed(TupleNode(typed), a.TupleType(c.map(typed, fn(e) { e.type_ }))))
+    }
+    a.TupleIndex(tuple, index) -> {
+      use tuple <- c.then(expression(tuple, env, globals))
+      case tuple.type_ {
+        a.TupleType(elements) -> {
+          use type_ <- c.then(c.nth(elements, index))
+          Ok(Typed(TupleIndexNode(tuple, index), type_))
+        }
+        _ -> Error("Tuple index requires a tuple")
+      }
+    }
+    a.ListLiteral(elements, rest) -> {
+      use elements <- c.then(
+        c.try_map(elements, fn(e) { expression(e, env, globals) }),
+      )
+      use tail <- c.then(case rest {
+        a.NoRest -> Ok(EmptyTail)
+        a.Rest(e) -> {
+          use typed <- c.then(expression(e, env, globals))
+          case typed.type_ {
+            a.ListType(_) -> Ok(ListTail(typed))
+            _ -> Error("List spread tail must be a list")
+          }
+        }
+      })
+      let initial = case tail {
+        EmptyTail -> a.Unresolved
+        ListTail(t) ->
+          case t.type_ {
+            a.ListType(t) -> t
+            _ -> a.Unresolved
+          }
+      }
+      use element <- c.then(list_element_type(elements, initial))
+      Ok(Typed(ListNode(elements, tail), a.ListType(element)))
+    }
     a.Variable("_") -> Error("Discarded variable cannot be read")
     a.Variable(name) -> {
       use t <- c.then(c.lookup(env, name))
@@ -193,7 +286,11 @@ fn expression(
     }
     a.Echo(inner) -> {
       use typed <- c.then(expression(inner, env, globals))
-      Ok(Typed(EchoNode(typed), typed.type_))
+      case typed.type_ {
+        a.TupleType(_) | a.ListType(_) | a.Unresolved ->
+          Error("Compound-value echo formatting is not implemented yet")
+        _ -> Ok(Typed(EchoNode(typed), typed.type_))
+      }
     }
     a.Case(subject, arms) -> {
       use subject <- c.then(expression(subject, env, globals))
@@ -208,10 +305,8 @@ fn expression(
       case arms {
         [] -> Error("Empty case")
         [first, ..rest] -> {
-          use _ <- c.then(
-            c.try_map(rest, fn(arm) { equal(arm.body.type_, first.body.type_) }),
-          )
-          Ok(Typed(CaseNode(subject, arms), first.body.type_))
+          use result <- c.then(branch_type(rest, first.body.type_))
+          Ok(Typed(CaseNode(subject, arms), result))
         }
       }
     }
@@ -234,6 +329,8 @@ fn binary_type(
       case left {
         a.StringType ->
           Error("Structural String equality is not implemented yet")
+        a.ListType(_) | a.TupleType(_) | a.Unresolved ->
+          Error("Structural compound equality is not implemented yet")
         _ -> Ok(a.Boolean)
       }
     }
@@ -264,17 +361,117 @@ fn pattern(
   t: a.Type,
   env: Environment,
 ) -> Result(Environment, String) {
+  use bindings <- c.then(pattern_bindings(p, t, []))
+  Ok(c.append(bindings, env))
+}
+
+fn pattern_bindings(
+  p: a.Pattern,
+  t: a.Type,
+  bindings: Environment,
+) -> Result(Environment, String) {
   case p {
-    a.DiscardPattern -> Ok(env)
-    a.VariablePattern(name) -> Ok([#(name, t), ..env])
+    a.DiscardPattern -> Ok(bindings)
+    a.VariablePattern(name) ->
+      case c.lookup(bindings, name) {
+        Ok(_) -> Error("Duplicate variable in pattern: " <> name)
+        Error(_) -> Ok([#(name, t), ..bindings])
+      }
     a.IntegerPattern(_) -> {
       use _ <- c.then(equal(t, a.Integer))
-      Ok(env)
+      Ok(bindings)
     }
     a.BooleanPattern(_) -> {
       use _ <- c.then(equal(t, a.Boolean))
-      Ok(env)
+      Ok(bindings)
     }
+    a.TuplePattern(patterns) ->
+      case t {
+        a.TupleType(types) -> tuple_bindings(patterns, types, bindings)
+        _ -> Error("Tuple pattern requires a tuple")
+      }
+    a.ListPattern(patterns, tail) ->
+      case t {
+        a.ListType(element) -> {
+          use bindings <- c.then(list_bindings(patterns, element, bindings))
+          case tail {
+            a.NoPatternRest -> Ok(bindings)
+            a.RestPattern(p) -> pattern_bindings(p, t, bindings)
+          }
+        }
+        _ -> Error("List pattern requires a list")
+      }
+  }
+}
+
+fn tuple_bindings(
+  patterns: List(a.Pattern),
+  types: List(a.Type),
+  bindings: Environment,
+) -> Result(Environment, String) {
+  case patterns, types {
+    [], [] -> Ok(bindings)
+    [p, ..patterns], [t, ..types] -> {
+      use bindings <- c.then(pattern_bindings(p, t, bindings))
+      tuple_bindings(patterns, types, bindings)
+    }
+    _, _ -> Error("Tuple arity mismatch in pattern")
+  }
+}
+
+fn list_bindings(
+  patterns: List(a.Pattern),
+  type_: a.Type,
+  bindings: Environment,
+) -> Result(Environment, String) {
+  case patterns {
+    [] -> Ok(bindings)
+    [p, ..rest] -> {
+      use bindings <- c.then(pattern_bindings(p, type_, bindings))
+      list_bindings(rest, type_, bindings)
+    }
+  }
+}
+
+fn list_element_type(
+  elements: List(Typed),
+  type_: a.Type,
+) -> Result(a.Type, String) {
+  case elements {
+    [] -> Ok(type_)
+    [e, ..rest] -> {
+      use next <- c.then(merge_type(e.type_, type_))
+      list_element_type(rest, next)
+    }
+  }
+}
+
+fn branch_type(arms: List(Arm), type_: a.Type) -> Result(a.Type, String) {
+  case arms {
+    [] -> Ok(type_)
+    [arm, ..rest] -> {
+      use next <- c.then(merge_type(arm.body.type_, type_))
+      branch_type(rest, next)
+    }
+  }
+}
+
+fn covers(p: a.Pattern, t: a.Type) -> Bool {
+  case p, t {
+    a.VariablePattern(_), _ | a.DiscardPattern, _ -> True
+    a.TuplePattern(patterns), a.TupleType(types) ->
+      tuple_covers(patterns, types)
+    a.ListPattern([], a.RestPattern(tail)), _ -> covers(tail, t)
+    _, _ -> False
+  }
+}
+
+fn tuple_covers(patterns: List(a.Pattern), types: List(a.Type)) -> Bool {
+  case patterns, types {
+    [], [] -> True
+    [p, ..patterns], [t, ..types] ->
+      covers(p, t) && tuple_covers(patterns, types)
+    _, _ -> False
   }
 }
 
@@ -286,15 +483,28 @@ fn exhaustive(
 ) -> Result(Nil, String) {
   case arms {
     [] ->
-      case t == a.Boolean && yes && no {
+      case yes && no {
         True -> Ok(Nil)
         False -> Error("Non-exhaustive case: add a catch-all pattern")
       }
-    [a.Arm(a.DiscardPattern, _), ..] | [a.Arm(a.VariablePattern(_), _), ..] ->
-      Ok(Nil)
-    [a.Arm(a.BooleanPattern(True), _), ..rest] -> exhaustive(rest, t, True, no)
-    [a.Arm(a.BooleanPattern(False), _), ..rest] ->
-      exhaustive(rest, t, yes, True)
-    [_, ..rest] -> exhaustive(rest, t, yes, no)
+    [arm, ..rest] ->
+      case covers(arm.pattern, t) {
+        True -> Ok(Nil)
+        False ->
+          case arm.pattern, t {
+            a.BooleanPattern(True), a.Boolean -> exhaustive(rest, t, True, no)
+            a.BooleanPattern(False), a.Boolean -> exhaustive(rest, t, yes, True)
+            a.ListPattern([], a.NoPatternRest), a.ListType(_) ->
+              exhaustive(rest, t, True, no)
+            a.ListPattern([head], a.RestPattern(tail)), a.ListType(element) ->
+              exhaustive(
+                rest,
+                t,
+                yes,
+                no || { covers(head, element) && covers(tail, t) },
+              )
+            _, _ -> exhaustive(rest, t, yes, no)
+          }
+      }
   }
 }

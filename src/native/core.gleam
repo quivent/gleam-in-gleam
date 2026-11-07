@@ -31,6 +31,22 @@ pub fn length(xs: List(a)) -> Int {
   count(xs, 0)
 }
 
+pub fn nth(xs: List(a), index: Int) -> Result(a, String) {
+  case xs, index {
+    [x, ..], 0 -> Ok(x)
+    [_, ..rest], n if n > 0 -> nth(rest, n - 1)
+    _, _ -> Error("Tuple index out of bounds")
+  }
+}
+
+pub fn join(xs: List(String), separator: String) -> String {
+  case xs {
+    [] -> ""
+    [s] -> s
+    [s, ..rest] -> s <> separator <> join(rest, separator)
+  }
+}
+
 fn count(xs: List(a), n: Int) -> Int {
   case xs {
     [] -> n
