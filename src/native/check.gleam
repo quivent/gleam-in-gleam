@@ -1,8 +1,9 @@
 import native/ast as a
 import native/core as c
+import native/definitions as d
 
 pub type Typed {
-  Typed(node: Node, type_: a.Type)
+  Typed(node: Node, type_: a.Type, known_variant: Int)
 }
 
 pub type Node {
@@ -13,6 +14,7 @@ pub type Node {
   TupleNode(List(Typed))
   ListNode(List(Typed), Tail)
   TupleIndexNode(Typed, Int)
+  ConstructorNode(Int, List(Typed))
   VariableNode(String)
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
@@ -46,10 +48,18 @@ pub type Function {
 }
 
 type Environment =
-  List(#(String, a.Type))
+  List(#(String, Local))
+
+type Local {
+  Local(type_: a.Type, known_variant: Int)
+}
+
+fn plain(node: Node, type_: a.Type) -> Typed {
+  Typed(node, type_, 0)
+}
 
 type Globals =
-  List(#(String, a.Function))
+  d.Context
 
 fn equal(actual: a.Type, expected: a.Type) -> Result(Nil, String) {
   case merge_type(actual, expected) {
@@ -106,13 +116,15 @@ pub fn type_name(t: a.Type) -> String {
     a.StringType -> "String"
     a.TupleType(types) -> "#(" <> c.join(c.map(types, type_name), ", ") <> ")"
     a.ListType(element) -> "List(" <> type_name(element) <> ")"
+    a.NamedType(name) -> name
     a.Unresolved -> "unresolved empty-list element"
   }
 }
 
 pub fn module(module: a.Module) -> Result(List(Function), String) {
-  use globals <- c.then(signatures(module.functions, []))
-  use main <- c.then(c.lookup(globals, "main"))
+  use _ <- c.then(signatures(module.functions, []))
+  use globals <- c.then(d.collect(module))
+  use main <- c.then(c.lookup(globals.functions, "main"))
   case main.parameters {
     [] -> c.try_map(module.functions, fn(f) { function(f, globals) })
     _ -> Error("main must have no parameters")
@@ -121,8 +133,8 @@ pub fn module(module: a.Module) -> Result(List(Function), String) {
 
 fn signatures(
   functions: List(a.Function),
-  acc: Globals,
-) -> Result(Globals, String) {
+  acc: List(#(String, a.Function)),
+) -> Result(List(#(String, a.Function)), String) {
   case functions {
     [] -> Ok(acc)
     [f, ..rest] ->
@@ -137,8 +149,8 @@ fn signatures(
 }
 
 fn unique_parameters(
-  parameters: Environment,
-  seen: Environment,
+  parameters: List(#(String, a.Type)),
+  seen: List(#(String, a.Type)),
 ) -> Result(Nil, String) {
   case parameters {
     [] -> Ok(Nil)
@@ -152,7 +164,11 @@ fn unique_parameters(
 }
 
 fn function(f: a.Function, globals: Globals) -> Result(Function, String) {
-  use #(body, result_type) <- c.then(statements(f.body, f.parameters, globals))
+  use #(body, result_type) <- c.then(statements(
+    f.body,
+    c.map(f.parameters, fn(p) { #(p.0, Local(p.1, 0)) }),
+    globals,
+  ))
   use _ <- c.then(equal(result_type, f.result))
   Ok(Function(f.name, f.parameters, f.result, body))
 }
@@ -169,18 +185,27 @@ fn statements(
       use typed <- c.then(case annotation {
         a.Inferred -> Ok(typed)
         a.Annotated(t) -> {
+          use _ <- c.then(d.validate_type(t, globals))
           use _ <- c.then(equal(typed.type_, t))
           Ok(Typed(..typed, type_: t))
         }
       })
-      use _ <- c.then(case covers(pat, typed.type_) {
-        True -> Ok(Nil)
-        False ->
-          Error(
-            "Refutable let pattern: use case (let assert is not implemented)",
-          )
-      })
-      use next_env <- c.then(pattern(pat, typed.type_, env))
+      use #(pat, next_env) <- c.then(pattern(
+        pat,
+        typed.type_,
+        env,
+        globals,
+        typed.known_variant,
+      ))
+      use _ <- c.then(
+        case covers_known(pat, typed.type_, typed.known_variant, globals) {
+          True -> Ok(Nil)
+          False ->
+            Error(
+              "Refutable let pattern: use case (let assert is not implemented)",
+            )
+        },
+      )
       case rest {
         [] ->
           Error("A function/block must end in an expression, not an assignment")
@@ -209,22 +234,22 @@ fn expression(
   globals: Globals,
 ) -> Result(Typed, String) {
   case e {
-    a.IntegerLiteral(n) -> Ok(Typed(IntegerNode(n), a.Integer))
-    a.BooleanLiteral(b) -> Ok(Typed(BooleanNode(b), a.Boolean))
-    a.UnitLiteral -> Ok(Typed(UnitNode, a.Unit))
-    a.StringLiteral(s) -> Ok(Typed(StringNode(s), a.StringType))
+    a.IntegerLiteral(n) -> Ok(plain(IntegerNode(n), a.Integer))
+    a.BooleanLiteral(b) -> Ok(plain(BooleanNode(b), a.Boolean))
+    a.UnitLiteral -> Ok(plain(UnitNode, a.Unit))
+    a.StringLiteral(s) -> Ok(plain(StringNode(s), a.StringType))
     a.TupleLiteral(elements) -> {
       use typed <- c.then(
         c.try_map(elements, fn(e) { expression(e, env, globals) }),
       )
-      Ok(Typed(TupleNode(typed), a.TupleType(c.map(typed, fn(e) { e.type_ }))))
+      Ok(plain(TupleNode(typed), a.TupleType(c.map(typed, fn(e) { e.type_ }))))
     }
     a.TupleIndex(tuple, index) -> {
       use tuple <- c.then(expression(tuple, env, globals))
       case tuple.type_ {
         a.TupleType(elements) -> {
           use type_ <- c.then(c.nth(elements, index))
-          Ok(Typed(TupleIndexNode(tuple, index), type_))
+          Ok(plain(TupleIndexNode(tuple, index), type_))
         }
         _ -> Error("Tuple index requires a tuple")
       }
@@ -252,12 +277,17 @@ fn expression(
           }
       }
       use element <- c.then(list_element_type(elements, initial))
-      Ok(Typed(ListNode(elements, tail), a.ListType(element)))
+      Ok(plain(ListNode(elements, tail), a.ListType(element)))
     }
     a.Variable("_") -> Error("Discarded variable cannot be read")
     a.Variable(name) -> {
-      use t <- c.then(c.lookup(env, name))
-      Ok(Typed(VariableNode(name), t))
+      case c.uppercase_name(name) {
+        True -> constructor(name, [], globals, False)
+        False -> {
+          use local <- c.then(c.lookup(env, name))
+          Ok(Typed(VariableNode(name), local.type_, local.known_variant))
+        }
+      }
     }
     a.Unary(op, inner) -> {
       use typed <- c.then(expression(inner, env, globals))
@@ -266,47 +296,65 @@ fn expression(
         _ -> a.Boolean
       }
       use _ <- c.then(equal(typed.type_, t))
-      Ok(Typed(UnaryNode(op, typed), t))
+      Ok(plain(UnaryNode(op, typed), t))
     }
     a.Binary(op, left, right) -> {
       use left <- c.then(expression(left, env, globals))
       use right <- c.then(expression(right, env, globals))
       use result <- c.then(binary_type(op, left.type_, right.type_))
-      Ok(Typed(BinaryNode(op, left, right), result))
+      Ok(plain(BinaryNode(op, left, right), result))
     }
     a.Call(name, args) -> {
-      use f <- c.then(c.lookup(globals, name))
       use args <- c.then(c.try_map(args, fn(e) { expression(e, env, globals) }))
-      use _ <- c.then(arguments(args, f.parameters))
-      Ok(Typed(CallNode(name, args), f.result))
+      case c.uppercase_name(name) {
+        True -> constructor(name, args, globals, True)
+        False -> {
+          use f <- c.then(c.lookup(globals.functions, name))
+          use _ <- c.then(arguments(args, f.parameters))
+          Ok(plain(CallNode(name, args), f.result))
+        }
+      }
     }
     a.Block(body) -> {
       use #(body, t) <- c.then(statements(body, env, globals))
-      Ok(Typed(BlockNode(body), t))
+      Ok(plain(BlockNode(body), t))
     }
     a.Echo(inner) -> {
       use typed <- c.then(expression(inner, env, globals))
       case typed.type_ {
-        a.TupleType(_) | a.ListType(_) | a.Unresolved ->
+        a.TupleType(_) | a.ListType(_) | a.NamedType(_) | a.Unresolved ->
           Error("Compound-value echo formatting is not implemented yet")
-        _ -> Ok(Typed(EchoNode(typed), typed.type_))
+        _ -> Ok(plain(EchoNode(typed), typed.type_))
       }
     }
     a.Case(subject, arms) -> {
       use subject <- c.then(expression(subject, env, globals))
-      use _ <- c.then(exhaustive(arms, subject.type_, False, False))
       use arms <- c.then(
         c.try_map(arms, fn(arm) {
-          use branch_env <- c.then(pattern(arm.pattern, subject.type_, env))
+          use #(pat, branch_env) <- c.then(pattern(
+            arm.pattern,
+            subject.type_,
+            env,
+            globals,
+            subject.known_variant,
+          ))
           use body <- c.then(expression(arm.body, branch_env, globals))
-          Ok(Arm(arm.pattern, body))
+          Ok(Arm(pat, body))
         }),
       )
+      use _ <- c.then(exhaustive(
+        arms,
+        subject.type_,
+        False,
+        False,
+        globals,
+        subject.known_variant,
+      ))
       case arms {
         [] -> Error("Empty case")
         [first, ..rest] -> {
           use result <- c.then(branch_type(rest, first.body.type_))
-          Ok(Typed(CaseNode(subject, arms), result))
+          Ok(plain(CaseNode(subject, arms), result))
         }
       }
     }
@@ -329,7 +377,7 @@ fn binary_type(
       case left {
         a.StringType ->
           Error("Structural String equality is not implemented yet")
-        a.ListType(_) | a.TupleType(_) | a.Unresolved ->
+        a.ListType(_) | a.TupleType(_) | a.NamedType(_) | a.Unresolved ->
           Error("Structural compound equality is not implemented yet")
         _ -> Ok(a.Boolean)
       }
@@ -345,7 +393,10 @@ fn binary_type(
   }
 }
 
-fn arguments(args: List(Typed), params: Environment) -> Result(Nil, String) {
+fn arguments(
+  args: List(Typed),
+  params: List(#(String, a.Type)),
+) -> Result(Nil, String) {
   case args, params {
     [], [] -> Ok(Nil)
     [a, ..args], [#(_, t), ..params] -> {
@@ -360,9 +411,109 @@ fn pattern(
   p: a.Pattern,
   t: a.Type,
   env: Environment,
-) -> Result(Environment, String) {
-  use bindings <- c.then(pattern_bindings(p, t, []))
-  Ok(c.append(bindings, env))
+  globals: Globals,
+  known: Int,
+) -> Result(#(a.Pattern, Environment), String) {
+  use resolved <- c.then(resolve_pattern(p, t, globals))
+  use bindings <- c.then(pattern_bindings(resolved, t, []))
+  case resolved {
+    a.VariablePattern(name) ->
+      Ok(#(resolved, [#(name, Local(t, known)), ..env]))
+    _ -> Ok(#(resolved, c.append(bindings, env)))
+  }
+}
+
+fn constructor(
+  name: String,
+  args: List(Typed),
+  globals: Globals,
+  called: Bool,
+) -> Result(Typed, String) {
+  use definition <- c.then(c.lookup(globals.constructors, name))
+  use _ <- c.then(case definition.fields, called {
+    [], True ->
+      Error("Zero-field constructor is a value, not a function: " <> name)
+    _, _ -> Ok(Nil)
+  })
+  use _ <- c.then(constructor_arguments(args, definition.fields))
+  Ok(Typed(
+    ConstructorNode(definition.tag, args),
+    a.NamedType(definition.owner),
+    definition.tag,
+  ))
+}
+
+fn constructor_arguments(
+  args: List(Typed),
+  fields: List(a.Type),
+) -> Result(Nil, String) {
+  case args, fields {
+    [], [] -> Ok(Nil)
+    [arg, ..args], [t, ..fields] -> {
+      use _ <- c.then(equal(arg.type_, t))
+      constructor_arguments(args, fields)
+    }
+    _, _ -> Error("Constructor argument count mismatch")
+  }
+}
+
+fn resolve_pattern(
+  p: a.Pattern,
+  t: a.Type,
+  globals: Globals,
+) -> Result(a.Pattern, String) {
+  case p {
+    a.ConstructorPattern(name, fields) -> {
+      use definition <- c.then(c.lookup(globals.constructors, name))
+      use _ <- c.then(equal(a.NamedType(definition.owner), t))
+      use fields <- c.then(resolve_fields(fields, definition.fields, globals))
+      Ok(a.CheckedConstructorPattern(definition.tag, fields))
+    }
+    a.CheckedConstructorPattern(_, _) ->
+      Error("Internal checked pattern in source AST")
+    a.TuplePattern(patterns) ->
+      case t {
+        a.TupleType(types) -> {
+          use fields <- c.then(resolve_fields(patterns, types, globals))
+          Ok(a.TuplePattern(c.map(fields, fn(field) { field.0 })))
+        }
+        _ -> Error("Tuple pattern requires a tuple")
+      }
+    a.ListPattern(patterns, tail) ->
+      case t {
+        a.ListType(element) -> {
+          use patterns <- c.then(
+            c.try_map(patterns, fn(p) { resolve_pattern(p, element, globals) }),
+          )
+          use tail <- c.then(case tail {
+            a.NoPatternRest -> Ok(a.NoPatternRest)
+            a.RestPattern(p) -> {
+              use p <- c.then(resolve_pattern(p, t, globals))
+              Ok(a.RestPattern(p))
+            }
+          })
+          Ok(a.ListPattern(patterns, tail))
+        }
+        _ -> Error("List pattern requires a list")
+      }
+    _ -> Ok(p)
+  }
+}
+
+fn resolve_fields(
+  patterns: List(a.Pattern),
+  types: List(a.Type),
+  globals: Globals,
+) -> Result(List(#(a.Pattern, a.Type)), String) {
+  case patterns, types {
+    [], [] -> Ok([])
+    [p, ..patterns], [t, ..types] -> {
+      use p <- c.then(resolve_pattern(p, t, globals))
+      use rest <- c.then(resolve_fields(patterns, types, globals))
+      Ok([#(p, t), ..rest])
+    }
+    _, _ -> Error("Tuple/constructor arity mismatch in pattern")
+  }
 }
 
 fn pattern_bindings(
@@ -371,11 +522,14 @@ fn pattern_bindings(
   bindings: Environment,
 ) -> Result(Environment, String) {
   case p {
+    a.ConstructorPattern(_, _) -> Error("Unresolved constructor pattern")
+    a.CheckedConstructorPattern(_, fields) ->
+      checked_field_bindings(fields, bindings)
     a.DiscardPattern -> Ok(bindings)
     a.VariablePattern(name) ->
       case c.lookup(bindings, name) {
         Ok(_) -> Error("Duplicate variable in pattern: " <> name)
-        Error(_) -> Ok([#(name, t), ..bindings])
+        Error(_) -> Ok([#(name, Local(t, 0)), ..bindings])
       }
     a.IntegerPattern(_) -> {
       use _ <- c.then(equal(t, a.Integer))
@@ -401,6 +555,19 @@ fn pattern_bindings(
         }
         _ -> Error("List pattern requires a list")
       }
+  }
+}
+
+fn checked_field_bindings(
+  fields: List(#(a.Pattern, a.Type)),
+  bindings: Environment,
+) -> Result(Environment, String) {
+  case fields {
+    [] -> Ok(bindings)
+    [#(p, t), ..rest] -> {
+      use bindings <- c.then(pattern_bindings(p, t, bindings))
+      checked_field_bindings(rest, bindings)
+    }
   }
 }
 
@@ -456,30 +623,77 @@ fn branch_type(arms: List(Arm), type_: a.Type) -> Result(a.Type, String) {
   }
 }
 
-fn covers(p: a.Pattern, t: a.Type) -> Bool {
+fn covers(p: a.Pattern, t: a.Type, globals: Globals) -> Bool {
   case p, t {
     a.VariablePattern(_), _ | a.DiscardPattern, _ -> True
     a.TuplePattern(patterns), a.TupleType(types) ->
-      tuple_covers(patterns, types)
-    a.ListPattern([], a.RestPattern(tail)), _ -> covers(tail, t)
+      tuple_covers(patterns, types, globals)
+    a.ListPattern([], a.RestPattern(tail)), _ -> covers(tail, t, globals)
+    a.CheckedConstructorPattern(_, fields), a.NamedType(name) ->
+      case c.lookup(globals.custom_types, name) {
+        Ok(a.CustomType(_, [_], _)) -> fields_cover(fields, globals)
+        _ -> False
+      }
     _, _ -> False
   }
 }
 
-fn tuple_covers(patterns: List(a.Pattern), types: List(a.Type)) -> Bool {
+fn covers_known(p: a.Pattern, t: a.Type, known: Int, globals: Globals) -> Bool {
+  case p {
+    a.CheckedConstructorPattern(tag, fields) if known != 0 && tag == known ->
+      fields_cover(fields, globals)
+    _ -> covers(p, t, globals)
+  }
+}
+
+fn tuple_covers(
+  patterns: List(a.Pattern),
+  types: List(a.Type),
+  globals: Globals,
+) -> Bool {
   case patterns, types {
     [], [] -> True
     [p, ..patterns], [t, ..types] ->
-      covers(p, t) && tuple_covers(patterns, types)
+      covers(p, t, globals) && tuple_covers(patterns, types, globals)
     _, _ -> False
   }
 }
 
 fn exhaustive(
-  arms: List(a.Arm),
+  arms: List(Arm),
   t: a.Type,
   yes: Bool,
   no: Bool,
+  globals: Globals,
+  known: Int,
+) -> Result(Nil, String) {
+  case t {
+    a.NamedType(name) -> {
+      use definition <- c.then(c.lookup(globals.custom_types, name))
+      case
+        any_cover(arms, t, globals)
+        || case known {
+          0 -> variants_cover(definition.variants, arms, globals)
+          _ -> tag_cover(arms, known, globals)
+        }
+      {
+        True -> Ok(Nil)
+        False ->
+          Error(
+            "Non-exhaustive custom-type case: add missing variants or a catch-all",
+          )
+      }
+    }
+    _ -> exhaustive_primitive(arms, t, yes, no, globals)
+  }
+}
+
+fn exhaustive_primitive(
+  arms: List(Arm),
+  t: a.Type,
+  yes: Bool,
+  no: Bool,
+  globals: Globals,
 ) -> Result(Nil, String) {
   case arms {
     [] ->
@@ -488,23 +702,72 @@ fn exhaustive(
         False -> Error("Non-exhaustive case: add a catch-all pattern")
       }
     [arm, ..rest] ->
-      case covers(arm.pattern, t) {
+      case covers(arm.pattern, t, globals) {
         True -> Ok(Nil)
         False ->
           case arm.pattern, t {
-            a.BooleanPattern(True), a.Boolean -> exhaustive(rest, t, True, no)
-            a.BooleanPattern(False), a.Boolean -> exhaustive(rest, t, yes, True)
+            a.BooleanPattern(True), a.Boolean ->
+              exhaustive(rest, t, True, no, globals, 0)
+            a.BooleanPattern(False), a.Boolean ->
+              exhaustive(rest, t, yes, True, globals, 0)
             a.ListPattern([], a.NoPatternRest), a.ListType(_) ->
-              exhaustive(rest, t, True, no)
+              exhaustive(rest, t, True, no, globals, 0)
             a.ListPattern([head], a.RestPattern(tail)), a.ListType(element) ->
               exhaustive(
                 rest,
                 t,
                 yes,
-                no || { covers(head, element) && covers(tail, t) },
+                no
+                  || {
+                  covers(head, element, globals) && covers(tail, t, globals)
+                },
+                globals,
+                0,
               )
-            _, _ -> exhaustive(rest, t, yes, no)
+            _, _ -> exhaustive(rest, t, yes, no, globals, 0)
           }
       }
+  }
+}
+
+fn fields_cover(fields: List(#(a.Pattern, a.Type)), globals: Globals) -> Bool {
+  case fields {
+    [] -> True
+    [#(p, t), ..rest] -> covers(p, t, globals) && fields_cover(rest, globals)
+  }
+}
+
+fn any_cover(arms: List(Arm), t: a.Type, globals: Globals) -> Bool {
+  case arms {
+    [] -> False
+    [arm, ..rest] ->
+      covers(arm.pattern, t, globals) || any_cover(rest, t, globals)
+  }
+}
+
+fn variants_cover(
+  variants: List(a.Variant),
+  arms: List(Arm),
+  globals: Globals,
+) -> Bool {
+  case variants {
+    [] -> True
+    [variant, ..rest] ->
+      case c.lookup(globals.constructors, variant.name) {
+        Error(_) -> False
+        Ok(definition) ->
+          tag_cover(arms, definition.tag, globals)
+          && variants_cover(rest, arms, globals)
+      }
+  }
+}
+
+fn tag_cover(arms: List(Arm), tag: Int, globals: Globals) -> Bool {
+  case arms {
+    [] -> False
+    [Arm(a.CheckedConstructorPattern(id, fields), _), ..rest] ->
+      { id == tag && fields_cover(fields, globals) }
+      || tag_cover(rest, tag, globals)
+    [_, ..rest] -> tag_cover(rest, tag, globals)
   }
 }

@@ -44,6 +44,11 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
       use #(types, rest) <- c.then(separated(rest, ")", type_))
       Ok(#(a.TupleType(types), rest))
     }
+    [l.Token(l.Word(id), _), ..rest] ->
+      case c.uppercase_name(id) {
+        True -> Ok(#(a.NamedType(id), rest))
+        False -> error(tokens, "Generic type variables are not implemented yet")
+      }
     _ ->
       error(
         tokens,
@@ -53,16 +58,34 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
 }
 
 pub fn parse(tokens: Tokens) -> Result(a.Module, String) {
-  functions(tokens, [])
+  functions(tokens, [], [])
 }
 
 fn functions(
   tokens: Tokens,
   acc: List(a.Function),
+  types: List(a.CustomType),
 ) -> Result(a.Module, String) {
   case tokens {
-    [l.Token(l.End, _)] -> Ok(a.Module(c.reverse(acc)))
-    [l.Token(l.Word("pub"), _), ..rest] -> functions(rest, acc)
+    [l.Token(l.End, _)] -> Ok(a.Module(c.reverse(acc), c.reverse(types)))
+    [l.Token(l.Word("pub"), _), ..rest] -> declaration(rest, acc, types, True)
+    _ -> declaration(tokens, acc, types, False)
+  }
+}
+
+fn declaration(
+  tokens: Tokens,
+  acc: List(a.Function),
+  types: List(a.CustomType),
+  public_: Bool,
+) -> Result(a.Module, String) {
+  case tokens {
+    [l.Token(l.Word("type"), _), ..rest] -> {
+      use #(id, rest) <- c.then(name(rest))
+      use rest <- c.then(expect(rest, "{"))
+      use #(variants, rest) <- c.then(variants(rest, []))
+      functions(rest, acc, [a.CustomType(id, variants, public_), ..types])
+    }
     [l.Token(l.Word("fn"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
       use rest <- c.then(expect(rest, "("))
@@ -71,13 +94,33 @@ fn functions(
       use #(return_type, rest) <- c.then(type_(rest))
       use rest <- c.then(expect(rest, "{"))
       use #(body, rest) <- c.then(statements(rest, []))
-      functions(rest, [a.Function(id, params, return_type, body), ..acc])
+      functions(
+        rest,
+        [a.Function(id, params, return_type, body, public_), ..acc],
+        types,
+      )
     }
     _ ->
       error(
         tokens,
         "Declaration not implemented in native seed; expected a function with explicit parameter/return types",
       )
+  }
+}
+
+fn variants(tokens: Tokens, acc: List(a.Variant)) -> Parsed(List(a.Variant)) {
+  case tokens {
+    [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
+    _ -> {
+      use #(id, rest) <- c.then(name(tokens))
+      case rest {
+        [l.Token(l.Symbol("("), _), ..rest] -> {
+          use #(fields, rest) <- c.then(separated(rest, ")", type_))
+          variants(rest, [a.Variant(id, fields), ..acc])
+        }
+        _ -> variants(rest, [a.Variant(id, []), ..acc])
+      }
+    }
   }
 }
 
@@ -265,6 +308,13 @@ fn arguments(
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
+    [l.Token(l.Word(id), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(fields, rest) <- c.then(separated(rest, ")", pattern))
+      case c.uppercase_name(id) {
+        True -> Ok(#(a.ConstructorPattern(id, fields), rest))
+        False -> error(tokens, "Constructor patterns must start with uppercase")
+      }
+    }
     [l.Token(l.Symbol("#"), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(elements, rest) <- c.then(separated(rest, ")", pattern))
       Ok(#(a.TuplePattern(elements), rest))
@@ -280,7 +330,11 @@ fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
     [l.Token(l.Word("False"), _), ..rest] ->
       Ok(#(a.BooleanPattern(False), rest))
     [l.Token(l.Word("_"), _), ..rest] -> Ok(#(a.DiscardPattern, rest))
-    [l.Token(l.Word(id), _), ..rest] -> Ok(#(a.VariablePattern(id), rest))
+    [l.Token(l.Word(id), _), ..rest] ->
+      case c.uppercase_name(id) {
+        True -> Ok(#(a.ConstructorPattern(id, []), rest))
+        False -> Ok(#(a.VariablePattern(id), rest))
+      }
     _ -> error(tokens, "Pattern not implemented in native seed")
   }
 }

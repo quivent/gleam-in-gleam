@@ -81,6 +81,7 @@ BitArray representation. It performs no language compilation itself.
 | `native/ast` | Language seed syntax types |
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
 | `native/check` | Monomorphic checking, signatures, scope and exhaustiveness |
+| `native/definitions` | Nominal types, constructor identities and public interfaces |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
 | `native/assembler` | Internal labels and signed relative relocations |
@@ -104,12 +105,27 @@ fields preserve left-to-right evaluation order. Division/remainder by
 zero return zero. Unsupported constructs produce diagnostics rather than
 delegating compilation elsewhere.
 
+Monomorphic custom types now support positional constructors, zero-field values,
+recursive/mutually recursive definitions and nested constructor matching inside
+lists/tuples. Constructor fields are checked against their declared nominal
+types, not just their memory shape. Public interfaces cannot expose private
+types. A zero-field constructor is a value rather than a callable function.
+Known top-level constructor identity is retained across simple local bindings,
+including annotations, for let-pattern/case checking. Runtime tag checks remain
+in the emitted code; this is semantic checking, not a tag-check optimization.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, custom types, closures, generics, `use`, labelled
+* Imports, closures, generics, `use`, labelled
   arguments, type inference, constants, attributes and bit-array syntax are not
   implemented. The compiler uses several of those itself, so cannot self-compile.
+* Custom types are monomorphic and positional. Generic/opaque types, labelled
+  fields/calls, record access/updates and empty custom types are not implemented.
+  Shadowing built-in Int/Bool/Nil/String/List types or True/False/Nil constructors
+  is explicitly rejected for now. Monomorphic user-defined Result/Ok/Error names
+  are supported. Private-type checking covers public function signatures and
+  public constructor fields within the current single-module implementation.
 * Integer literals are restricted to nonnegative decimal magnitudes up to
   2,147,483,647 (with unary negation supported). Generated arithmetic is checked
   signed 64-bit arithmetic; overflow exits 70. This is an explicit seed
@@ -123,7 +139,11 @@ delegating compilation elsewhere.
 * Case coverage is conservative. Empty/nonempty lists with irrefutable head/tail,
   fully irrefutable tuples, Bool alternatives and catch-alls are understood;
   more complex coverage may require an explicit catch-all. Refutable lets are
-  rejected until let-assert is supported.
+  rejected until let-assert is supported. A custom-type case must cover every
+  possible constructor with irrefutable fields, or use a catch-all. Direct/simple
+  local known-constructor values can narrow that constructor set, as upstream
+  does; this knowledge is not propagated into nested fields or across function
+  calls. Other valid refinement/coverage combinations may still be rejected.
 * `echo` prints a value and newline to stdout without upstream's source-location
   diagnostics. That is a seed diagnostic convention, not completed `echo`
   compatibility. Oracle tests compare returned pure values and render them
@@ -146,15 +166,24 @@ The first seed run passed 43/43 checks and is preserved in
 `evidence/seed-verification.json`. The collections milestone passes 66/66,
 including upstream oracle comparisons and actual exact-fit/over-end arena probes.
 These are subset checks, not upstream compiler conformance.
-`evidence/collections-verification.json` contains current source/artifact hashes,
+`evidence/collections-verification.json` contains that milestone's source/artifact hashes,
 measured example sizes, a native disassembly reference and explicit bootstrap
 state. [ASM.md](ASM.md) documents the emitted calling convention, registers,
 object layout and guarded failure paths.
 
+The custom-type milestone passes **105/105** checks plus **8/8** fresh upstream
+accept/reject comparisons, including constructor callability, known variants,
+private type visibility and wrong field types. Its current source/artifact hashes
+and native examples are in `evidence/custom-types-verification.json`; the earlier
+seed/collections receipts remain historical. Inspect
+`evidence/custom_types-disassembly.txt` for actual null/tag checks before field
+loads. No compiler speed or output-speed claim follows from those checks.
+
 Next actions, in dependency order:
 
-1. Extend tuple/list support with custom types, structural equality and owned
-   collection. Bounded tuple/list allocation and nested matching are implemented.
+1. Extend custom-type support with generic types and labelled fields/access.
+   Monomorphic constructors, recursive types and nested matching are implemented.
+   Structural equality and owned collection remain necessary follow-up work.
 2. Add polymorphic inference, closures/first-class functions, `use`, byte arrays
    and module imports, testing each against upstream results and failures.
 3. Supply native file/argument/syscall IO in the owned runtime; remove the Node

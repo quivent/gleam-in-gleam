@@ -174,20 +174,8 @@ fn expression(e: t.Typed, state: State) -> Generated {
       let #(name, state) = add_string(s, state)
       Ok(#([asm.Relative(<<72, 141, 5>>, name)], state))
     }
-    t.TupleNode(elements) -> {
-      use #(code, state) <- c.then(arguments(elements, state))
-      let n = c.length(elements)
-      let size = 16 + n * 8
-      let allocation = [
-        raw(<<191, size:32-little>>),
-        call("rt:allocate"),
-        raw(<<72, 199, 0, size:32-little, 72, 199, 64, 8, 1, 0, 0, 0>>),
-      ]
-      Ok(#(
-        c.append(code, c.append(allocation, tuple_fields(n - 1))),
-        State(..state, needs_heap: True),
-      ))
-    }
+    t.TupleNode(elements) -> object(elements, 1, state)
+    t.ConstructorNode(tag, fields) -> object(fields, tag, state)
     t.TupleIndexNode(tuple, index) -> {
       use #(code, state) <- c.then(expression(tuple, state))
       let offset = 16 + index * 8
@@ -383,7 +371,7 @@ fn case_arms(
 fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
   case type_ {
     // The type checker rejects compound echo until structural formatting lands.
-    a.TupleType(_) | a.ListType(_) | a.Unresolved -> #(
+    a.TupleType(_) | a.ListType(_) | a.NamedType(_) | a.Unresolved -> #(
       [jump("rt:match")],
       state,
     )
@@ -434,6 +422,21 @@ fn tuple_fields(index: Int) -> List(asm.Part) {
   }
 }
 
+fn object(elements: List(t.Typed), tag: Int, state: State) -> Generated {
+  use #(code, state) <- c.then(arguments(elements, state))
+  let n = c.length(elements)
+  let size = 16 + n * 8
+  let allocation = [
+    raw(<<191, size:32-little>>),
+    call("rt:allocate"),
+    raw(<<72, 199, 0, size:32-little, 72, 199, 64, 8, tag:32-little>>),
+  ]
+  Ok(#(
+    c.append(code, c.append(allocation, tuple_fields(n - 1))),
+    State(..state, needs_heap: True),
+  ))
+}
+
 fn cons_cells(remaining: Int) -> List(asm.Part) {
   case remaining {
     0 -> []
@@ -480,6 +483,27 @@ fn pattern_code(
   state: State,
 ) -> Generated {
   case pat {
+    a.ConstructorPattern(_, _) ->
+      Error("Unresolved constructor in native code generation")
+    a.CheckedConstructorPattern(tag, fields) -> {
+      // Null/tag tests precede every constructor field load.
+      let inspect = [
+        load(subject),
+        raw(<<72, 133, 192>>),
+        branch(132, failure),
+        raw(<<72, 129, 120, 8, tag:32-little>>),
+        branch(133, failure),
+      ]
+      let patterns = c.map(fields, fn(field) { field.0 })
+      use #(body, state) <- c.then(tuple_pattern(
+        patterns,
+        0,
+        subject,
+        failure,
+        state,
+      ))
+      Ok(#(c.append(inspect, body), state))
+    }
     a.DiscardPattern -> Ok(#([], state))
     a.VariablePattern(name) ->
       Ok(#([], State(..state, env: [#(name, subject), ..state.env])))

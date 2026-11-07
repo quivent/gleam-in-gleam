@@ -47,6 +47,38 @@ pub fn join(xs: List(String), separator: String) -> String {
   }
 }
 
+pub fn uppercase_name(name: String) -> Bool {
+  case name {
+    "A" <> _
+    | "B" <> _
+    | "C" <> _
+    | "D" <> _
+    | "E" <> _
+    | "F" <> _
+    | "G" <> _
+    | "H" <> _
+    | "I" <> _
+    | "J" <> _
+    | "K" <> _
+    | "L" <> _
+    | "M" <> _
+    | "N" <> _
+    | "O" <> _
+    | "P" <> _
+    | "Q" <> _
+    | "R" <> _
+    | "S" <> _
+    | "T" <> _
+    | "U" <> _
+    | "V" <> _
+    | "W" <> _
+    | "X" <> _
+    | "Y" <> _
+    | "Z" <> _ -> True
+    _ -> False
+  }
+}
+
 fn count(xs: List(a), n: Int) -> Int {
   case xs {
     [] -> n

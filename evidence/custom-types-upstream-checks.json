@@ -1,0 +1,74 @@
+[
+  {
+    "name": "known-local-variant",
+    "source": "type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }",
+    "accepted": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "zero-field-is-not-callable",
+    "source": "pub type A { Zero } pub fn main() -> A { Zero() }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:42\n  \u2502\n1 \u2502 pub type A { Zero } pub fn main() -> A { Zero() }\n  \u2502                                          ^^^^\n\nThis value is being called as a function but its type is:\n\n    A\n\n",
+    "nativeDiagnostic": "Zero-field constructor is a value, not a function: Zero\n"
+  },
+  {
+    "name": "private-type-in-public-api",
+    "source": "type A { Zero } pub fn main() -> A { Zero }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Private type used in public interface\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:17\n  \u2502\n1 \u2502 type A { Zero } pub fn main() -> A { Zero }\n  \u2502                 ^^^^^^^^^^^^^^^^^^\n\nThe following type is private, but is being used by this public export.\n\n    A\n\nPrivate types can only be used within the module that defines them.\n\n",
+    "nativeDiagnostic": "Private type used in public interface: A\n"
+  },
+  {
+    "name": "unknown-variant-let",
+    "source": "type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:15\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502               ^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:26\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502                          ^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive pattern\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:49\n  \u2502\n1 \u2502 type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }\n  \u2502                                                 ^^^^^^^^^^^^^^\n\nThis assignment uses a pattern that does not match all possible values. If\none of the other values is used then the assignment will crash.\n\nThe missing patterns are:\n\n    Zero\n\nHint: Use a more general pattern or use `let assert` instead.\n\n",
+    "nativeDiagnostic": "Refutable let pattern: use case (let assert is not implemented)\n"
+  },
+  {
+    "name": "custom-result-names",
+    "source": "type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }",
+    "accepted": true,
+    "upstreamExit": 0,
+    "nativeExit": 0,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:23\n  \u2502\n1 \u2502 type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }\n  \u2502                       ^^^^^^^^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.00s\n",
+    "nativeDiagnostic": ""
+  },
+  {
+    "name": "missing-variant",
+    "source": "type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private type\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:1\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502 ^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502          ^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:16\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                ^^^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private function\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:25\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                         ^^^^^^^^^^^^^^^^^^^^ This private function is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive patterns\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:48\n  \u2502\n1 \u2502 type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }\n  \u2502                                                ^^^^^^^^^^^^^^^^^^^^^\n\nThis case expression does not have a pattern for all possible values. If it\nis run on one of the values without a pattern then it will crash.\n\nThe missing patterns are:\n\n    Second\n\n",
+    "nativeDiagnostic": "Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+  },
+  {
+    "name": "wrong-field-type",
+    "source": "pub type A { One(Int) } pub fn main() -> A { One(True) }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nerror: Type mismatch\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:50\n  \u2502\n1 \u2502 pub type A { One(Int) } pub fn main() -> A { One(True) }\n  \u2502                                                  ^^^^\n\nExpected type:\n\n    Int\n\nFound type:\n\n    Bool\n\n",
+    "nativeDiagnostic": "Type mismatch: expected Int, found Bool\n"
+  },
+  {
+    "name": "nested-constructor-not-refined",
+    "source": "type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }",
+    "accepted": false,
+    "upstreamExit": 1,
+    "nativeExit": 1,
+    "upstreamDiagnostic": "  Resolving versions\n   Checking grammar_oracle\nwarning: Unused private constructor\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:10\n  \u2502\n1 \u2502 type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }\n  \u2502          ^^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nerror: Inexhaustive pattern\n  \u250c\u2500 <oracle>/src/grammar_oracle.gleam:1:65\n  \u2502\n1 \u2502 type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }\n  \u2502                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^\n\nThis assignment uses a pattern that does not match all possible values. If\none of the other values is used then the assignment will crash.\n\nThe missing patterns are:\n\n    B(Zero)\n\nHint: Use a more general pattern or use `let assert` instead.\n\n",
+    "nativeDiagnostic": "Refutable let pattern: use case (let assert is not implemented)\n"
+  }
+]

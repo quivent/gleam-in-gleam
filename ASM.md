@@ -30,6 +30,11 @@ program. GNU objdump is used only as a development inspection tool.
   `[size=32:u64][tag=2:u64][head:u64][tail:pointer]`.
 * A tuple is `[size:u64][tag=1:u64][field0:u64]...`. Empty tuples still allocate
   a header. Tuple arity/indexing and field types are checked before emission.
+* Custom constructors use that same header/field layout, with deterministic
+  tags starting at 3 in source declaration order. A zero-field constructor is
+  still an allocated 16-byte object, not an immediate integer or a function.
+  Tags identify constructors across the single compiled module. Nominal types
+  are checked before lowering; similar object layouts do not make types equal.
 * Tuple fields and list heads are evaluated left to right. Cons construction
   pops the evaluated heads right to left to create the list spine. Existing list
   tails are shared and never mutated.
@@ -52,6 +57,15 @@ program. GNU objdump is used only as a development inspection tool.
 * Exact-length patterns also check that the remaining tail is null. A spread
   pattern binds/shares the remaining tail. Irrefutable tuple let-patterns are
   checked statically; refutable lets are rejected until let-assert is supported.
+* Constructor matches first test for null, then compare `[RAX+8]` with their
+  checked tag and branch on mismatch. Only then can they load fields starting
+  at `[RAX+16]`. Nested constructors repeat that sequence independently.
+  The disassembly retains those checks even when a constructor is statically
+  known. No speculative field read or tag-check-elision pass is implemented.
+* Known constructor facts are separate from the value's nominal type. They can
+  flow through a simple local variable, but do not automatically refine its
+  fields or function parameters. This prevents a known outer wrapper from
+  incorrectly proving that its nested value has only one possible variant.
 * Case exhaustiveness is conservative: Bool alternatives, irrefutable tuples,
   empty/nonempty lists with irrefutable head/tail, and catch-all patterns are
   understood. Complex coverage may be rejected rather than accepted unsafely.
@@ -65,6 +79,18 @@ available. The ELF intentionally has no section table, so the verifier extracts
 bytes starting at its entry point and uses binary disassembly with the actual
 virtual address. Trailing static data can appear as meaningless instructions;
 it is not executed and must not be mistaken for generated control flow.
+The custom-type example also has a recorded raw disassembly. Its recursive-tree
+and nested-pattern paths exhibit the null test, tag comparison, conditional
+branch, then field load sequence. Both examples execute without a loader or
+shared libraries; their recorded byte sizes are example sizes, not compiler size.
+
+For custom-type milestone artifact SHA256
+`7a45a359782b385ad041969a0d02411f99c12fab07742b4512a1888c11d26d82`,
+the recorded disassembly shows a null test at `0x4000e3`, a Leaf tag comparison
+at `0x4000ec`, a mismatch branch at `0x4000f4`, then the first field read at
+`0x400101`. The Open-pattern comparison at `0x400397` branches away from its
+field read when the actual object is Closed, which has no fields. These addresses
+refer to this exact frozen example, not to future layouts.
 
 The runtime tests execute an exact-fit allocator probe and an over-end probe
 through these same Gleam emitter/ELF modules. Pure oracle tests compare actual

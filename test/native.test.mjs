@@ -40,6 +40,9 @@ const cases = [
   ['shadow', [7]], ['chosen_string', [0]], ['chosen_string', [1]], ['unit', []],
   ['list_work', [1]], ['list_work', [-2]], ['tuple_work', [3]],
   ['nested_pattern', [7]], ['chosen_list_sum', [0]], ['chosen_list_sum', [5]],
+  ['custom_tree', [1]], ['custom_tree', [-3]], ['custom_option', [0]],
+  ['custom_option', [6]], ['custom_destructure', [4]], ['custom_nested', [1]],
+  ['custom_known', [7]], ['custom_result', [0]], ['custom_result', [8]], ['custom_public', [9]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -86,6 +89,25 @@ test('empty list annotations and nested empty-list refinement', () => {
   assert.equal(result.status, 0);
   assert.equal(result.stdout, '0\n7\n');
 });
+test('constructor fields preserve left-to-right evaluation and call results', () => {
+  const source = `type Triple { Triple(Int, Int, Int) }
+    fn get(t: Triple) -> Int { let Triple(a,b,c) = t a * 100 + b * 10 + c }
+    pub fn main() -> Nil { echo get(Triple(echo 1, echo 2, echo 3)) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n2\n3\n123\n');
+});
+test('forward-referenced and mutually recursive custom types', () => {
+  const source = `type A { End AValue(B) }
+    type B { BValue(A) }
+    fn count(a: A) -> Int {
+      case a { End -> 0 AValue(BValue(tail)) -> 1 + count(tail) }
+    }
+    pub fn main() -> Nil { echo count(AValue(BValue(AValue(BValue(End))))) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '2\n');
+});
 test('checked fixed-width overflow exits rather than silently wrapping', () => {
   const result = run(main('let n = 2147483647 * 2147483647\necho n * 3'));
   assert.equal(result.status, 70);
@@ -127,7 +149,7 @@ const rejected = [
   ['branch mismatch', 'pub fn main() -> Int { case True { True -> 1 False -> False } }', /Type mismatch/],
   ['pattern mismatch', 'pub fn main() -> Int { case 1 { True -> 1 _ -> 0 } }', /Type mismatch/],
   ['unknown import', 'import gleam/io pub fn main() -> Nil { Nil }', /not implemented/],
-  ['unimplemented ADT', 'type Value { Value } pub fn main() -> Nil { Nil }', /not implemented/],
+  ['generic type pending', 'type Value(a) { Value(a) } pub fn main() -> Nil { Nil }', /Expected/],
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
   ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
@@ -145,6 +167,33 @@ const rejected = [
   ['list element pattern type', 'pub fn main() -> Int { case [1] { [True] -> 1 _ -> 0 } }', /Type mismatch/],
   ['list equality pending', 'pub fn main() -> Bool { [1] == [1] }', /Structural compound equality/],
   ['compound echo pending', 'pub fn main() -> Nil { echo [1] Nil }', /Compound-value echo/],
+  ['nominal constructor argument', 'type A { AValue(Int) } type B { BValue(Int) } fn f(a: A) -> Nil { Nil } pub fn main() -> Nil { f(BValue(1)) }', /Type mismatch/],
+  ['nominal pattern', 'type A { AValue(Int) } type B { BValue(Int) } pub fn main() -> Int { case AValue(1) { BValue(x) -> x } }', /Type mismatch/],
+  ['constructor underarity', 'pub type A { AValue(Int) } pub fn main() -> A { AValue }', /Constructor argument count/],
+  ['constructor overarity', 'pub type A { AValue(Int) } pub fn main() -> A { AValue(1,2) }', /Constructor argument count/],
+  ['constructor field mismatch', 'pub type A { AValue(Int) } pub fn main() -> A { AValue(True) }', /Type mismatch/],
+  ['constructor pattern arity', 'type A { AValue(Int) } pub fn main() -> Int { case AValue(1) { AValue(x,y) -> x } }', /arity mismatch/],
+  ['constructor missing variant', 'type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }', /Non-exhaustive custom-type/],
+  ['constructor partial field coverage', 'type A { First(Int) Second } pub fn main() -> Int { case First(1) { First(0) -> 1 Second -> 2 } }', /Non-exhaustive custom-type/],
+  ['duplicate constructor', 'type A { Same } type B { Same } pub fn main() -> Nil { Nil }', /Duplicate constructor/],
+  ['duplicate custom type', 'type A { First } type A { Second } pub fn main() -> Nil { Nil }', /Duplicate type/],
+  ['unknown custom field type', 'type A { First(Unknown) } pub fn main() -> Nil { Nil }', /Unknown type/],
+  ['unknown function type', 'pub fn main() -> Unknown { Nil }', /Unknown type/],
+  ['unknown annotation inside empty list', 'pub fn main() -> Nil { let xs: List(Unknown) = [] Nil }', /Unknown type/],
+  ['constructor duplicate field binding', 'type A { Pair(Int, Int) } pub fn main() -> Int { let Pair(x,x) = Pair(1,2) x }', /Duplicate variable/],
+  ['constructor mixed list types', 'type A { AValue } type B { BValue } pub fn main() -> Nil { let xs = [AValue, BValue] Nil }', /Type mismatch/],
+  ['constructor equality pending', 'type A { AValue } pub fn main() -> Bool { AValue == AValue }', /Structural compound equality/],
+  ['constructor echo pending', 'type A { AValue } pub fn main() -> Nil { echo AValue Nil }', /Compound-value echo/],
+  ['zero-field constructor called', 'pub type A { AValue } pub fn main() -> A { AValue() }', /Zero-field constructor is a value/],
+  ['private type return', 'type A { AValue } pub fn main() -> A { AValue }', /Private type used in public interface/],
+  ['private type parameter', 'type A { AValue } pub fn expose(x: A) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Private type used in public interface/],
+  ['private type nested return', 'type A { AValue } pub fn main() -> List(A) { [] }', /Private type used in public interface/],
+  ['private type in public constructor', 'type Private { Private } pub type Public { Public(Private) } pub fn main() -> Nil { Nil }', /Private type used in public interface/],
+  ['unknown variant let', 'type A { First Second(Int) } fn read(x: A) -> Int { let Second(n) = x n } pub fn main() -> Nil { Nil }', /Refutable let/],
+  ['known tag does not narrow fields', 'type A { First Second(Int) } pub fn main() -> Int { let Second(1) = Second(1) 1 }', /Refutable let/],
+  ['nested constructor not falsely narrowed', 'type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }', /Refutable let/],
+  ['known tag cannot change nominal type', 'type A { First } type B { Second } pub fn main() -> Int { let Second = First 0 }', /Type mismatch/],
+  ['duplicate pub modifier', 'pub pub fn main() -> Nil { Nil }', /Declaration not implemented/],
 ];
 for (const [name, source, error] of rejected) {
   test(`rejects without fallback: ${name}`, () => {

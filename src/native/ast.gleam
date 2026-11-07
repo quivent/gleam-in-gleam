@@ -5,6 +5,7 @@ pub type Type {
   StringType
   TupleType(List(Type))
   ListType(Type)
+  NamedType(String)
   // Internal placeholder for an empty list; never a source type annotation.
   Unresolved
 }
@@ -48,6 +49,9 @@ pub type Pattern {
   VariablePattern(String)
   TuplePattern(List(Pattern))
   ListPattern(List(Pattern), PatternRest)
+  ConstructorPattern(String, List(Pattern))
+  // Checker-produced constructor identity and field types, never parser output.
+  CheckedConstructorPattern(Int, List(#(Pattern, Type)))
 }
 
 pub type PatternRest {
@@ -65,9 +69,18 @@ pub type Function {
     parameters: List(#(String, Type)),
     result: Type,
     body: List(Statement),
+    public_: Bool,
   )
 }
 
 pub type Module {
-  Module(functions: List(Function))
+  Module(functions: List(Function), custom_types: List(CustomType))
+}
+
+pub type CustomType {
+  CustomType(name: String, variants: List(Variant), public_: Bool)
+}
+
+pub type Variant {
+  Variant(name: String, fields: List(Type))
 }
