@@ -48,6 +48,10 @@ const cases = [
   ['generic_recursive', [4]], ['generic_phantom', [7]],
   ['labelled_generic', [3]], ['labelled_pattern', [4]], ['labelled_spread', [5]],
   ['labelled_shorthand', [6]], ['labelled_common', [7]], ['labelled_known', [8]],
+  ['generic_functions', [3]], ['generic_functions', [-3]], ['generic_function_reverse', [2]],
+  ['generic_variable_names', [7]], ['higher_order', [3]], ['higher_order', [-3]],
+  ['returned_function', [8]], ['returned_generic_function', [9]], ['callback_record', [10]],
+  ['function_shadowing', [1]], ['local_function_alias', [11]],
 ];
 for (const [name, args] of cases) {
   test(`upstream semantic oracle: ${name}(${args.join(',')})`, () => {
@@ -134,6 +138,14 @@ test('labelled constructor arguments evaluate in upstream declaration order', ()
   assert.equal(result.status, 0);
   assert.equal(result.stdout, '1\n2\n1\n2\n');
 });
+test('indirect call evaluates target before arguments and cleans up its saved pointer', () => {
+  const source = `fn add(a: Int,b: Int) -> Int { a+b }
+    fn target() -> fn(Int,Int) -> Int { echo 1 add }
+    pub fn main() -> Nil { echo target()(echo 2,echo 3) echo target()(4,5) Nil }`;
+  const result = run(source);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n2\n3\n5\n1\n9\n');
+});
 test('checked fixed-width overflow exits rather than silently wrapping', () => {
   const result = run(main('let n = 2147483647 * 2147483647\necho n * 3'));
   assert.equal(result.status, 70);
@@ -175,7 +187,7 @@ const rejected = [
   ['branch mismatch', 'pub fn main() -> Int { case True { True -> 1 False -> False } }', /Type mismatch/],
   ['pattern mismatch', 'pub fn main() -> Int { case 1 { True -> 1 _ -> 0 } }', /Type mismatch/],
   ['unknown import', 'import gleam/io pub fn main() -> Nil { Nil }', /not implemented/],
-  ['generic functions pending', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { Nil }', /generic function signatures are not implemented/],
+  ['polymorphic named values pending', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { let f = identity Nil }', /Polymorphic named function values are not implemented/],
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
   ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
@@ -243,6 +255,18 @@ const rejected = [
   ['unknown pattern label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Int { let Pair(z: n,..) = Pair(1,2) n }', /Unknown constructor label/],
   ['duplicate pattern label', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Int { let Pair(x: a,x: b) = Pair(1,2) a+b }', /Duplicate constructor/],
   ['labelled function calls pending', 'fn f(x: Int) -> Int { x } pub fn main() -> Int { f(x: 1) }', /Labelled function calls are not implemented/],
+  ['rigid generic return', 'fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }', /Type mismatch/],
+  ['rigid generic arithmetic', 'fn f(x: a) -> Int { x + 1 } pub fn main() -> Nil { Nil }', /Type mismatch/],
+  ['rigid distinct variables', 'fn f(x: a,y: b) -> a { y } pub fn main() -> Nil { Nil }', /Type mismatch/],
+  ['generic repeated call argument', 'fn f(x: a,y: a) -> a { x } pub fn main() -> Nil { let n = f(1,True) Nil }', /Type mismatch/],
+  ['self polymorphic recursion', 'fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }', /Type mismatch/],
+  ['rigid callback parameter', 'fn f(g: fn(a) -> a) -> Int { g(1) } pub fn main() -> Nil { Nil }', /Type mismatch/],
+  ['wrong callback arguments', 'fn inc(x: Int) -> Int { x+1 } pub fn main() -> Nil { let f = inc let n = f(True) Nil }', /Type mismatch/],
+  ['wrong callback count', 'fn inc(x: Int) -> Int { x+1 } pub fn main() -> Nil { let f = inc let n = f() Nil }', /Function argument count/],
+  ['callback generic inconsistency', 'fn invert(x: Bool) -> Bool { !x } fn apply(f: fn(a) -> a,x: a) -> a { f(x) } pub fn main() -> Nil { let n = apply(invert,1) Nil }', /Type mismatch/],
+  ['nonfunction shadows callable', 'fn f(x: Int) -> Int { x } pub fn main() -> Nil { let f = 1 let n = f(2) Nil }', /Value is not a function/],
+  ['private type inside function signature', 'type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }', /Private type used in public interface/],
+  ['unbound local annotation', 'fn f(x: a) -> a { let y: b = x y } pub fn main() -> Nil { Nil }', /Unbound type parameter/],
 ];
 for (const [name, source, error] of rejected) {
   test(`rejects without fallback: ${name}`, () => {

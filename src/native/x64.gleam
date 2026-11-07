@@ -231,6 +231,23 @@ fn expression(e: t.Typed, state: State) -> Generated {
         state,
       ))
     }
+    t.FunctionNode(name) ->
+      Ok(#([asm.Relative(<<72, 141, 5>>, "fn:" <> name)], state))
+    t.IndirectCallNode(target, args) -> {
+      use #(target_code, state) <- c.then(expression(target, state))
+      use #(argument_code, state) <- c.then(arguments(args, state))
+      let offset = c.length(args) * 8
+      let cleanup = offset + 8
+      let invoke = [
+        raw(<<72, 139, 132, 36, offset:32-little, 72, 133, 192>>),
+        branch(132, "rt:match"),
+        raw(<<255, 208, 72, 129, 196, cleanup:32-little>>),
+      ]
+      Ok(#(
+        c.append(target_code, [raw(<<80>>), ..c.append(argument_code, invoke)]),
+        state,
+      ))
+    }
     t.BlockNode(body) -> {
       let env = state.env
       use #(code, state) <- c.then(statements(body, state))
@@ -390,6 +407,7 @@ fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
     | a.NamedType(_)
     | a.AppliedType(_, _)
     | a.VariableType(_)
+    | a.FunctionType(_, _)
     | a.Unresolved -> #([jump("rt:match")], state)
     a.Integer -> #([call("rt:print_int")], state)
     a.StringType -> #([call("rt:print_string")], state)

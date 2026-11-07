@@ -82,7 +82,7 @@ BitArray representation. It performs no language compilation itself.
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
 | `native/check` | Typed expressions, constructor inference, scope and exhaustiveness |
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
-| `native/type_system` | Scoped constructor substitution, type application and merging |
+| `native/type_system` | Scoped constructor/function substitution and function types |
 | `native/labels` | Constructor labels, positional validation and declaration ordering |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
@@ -121,18 +121,30 @@ in the emitted code; this is semantic checking, not a tag-check optimization.
 Generic custom types support scoped type parameters, nested/recursive type
 applications, repeated-parameter consistency and constructor argument inference.
 Type arguments are checked at compile time and do not add runtime type objects
-or change the one-word field layout. Generic functions/general polymorphic
-inference are still pending. Labelled constructor calls/patterns support shorthand
+or change the one-word field layout. Labelled constructor calls/patterns support shorthand
 and pattern spread; duplicate/unknown labels and positional arguments after
 labels are rejected. Record access works for fields common in name, position and
 declared type across all possible variants, or for a known constructor.
 
+Generic functions with explicit signatures are checked using rigid body type
+variables and fresh bindings at direct global call sites. Direct self-recursion
+keeps the current signature rigid, matching the upstream acceptance checks.
+Function types, monomorphic named function values, aliases, returned function
+pointers, generic higher-order parameters and callbacks in records are supported.
+Indirect calls evaluate the target before their arguments and preserve it on the
+stack. No anonymous functions or captured environments are implemented yet.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, closures, generic functions, `use`, labelled function calls,
+* Imports, anonymous functions/closures, `use`, labelled function calls,
   general type inference, constants, attributes and bit-array syntax are not
   implemented. The compiler uses several of those itself, so cannot self-compile.
+* Named polymorphic functions can be called directly, but cannot yet be taken as
+  polymorphic first-class values. Local function parameters/returned pointers
+  have their checked function types; there is no general let-polymorphism or
+  omitted-signature inference. Generic equality/printing remain rejected where
+  the current erased representation cannot provide their semantics.
 * Opaque types, record updates and empty custom types are not implemented.
   Shadowing built-in Int/Bool/Nil/String/List types or True/False/Nil constructors
   is explicitly rejected for now. User-defined Result/Ok/Error names
@@ -201,11 +213,21 @@ their exact previous hashes. A paired test also verifies identical machine code
 for Box(Int) holding 1 and Box(Bool) holding True; this demonstrates representation
 erasure for that case, not a performance benchmark or a general compatibility proof.
 
+The functions milestone passes **170/170** checks plus **22/22** upstream
+accept/reject comparisons. It covers generic recursion, rigid type variables,
+higher-order calls, lexical shadowing, returned pointers, callback records and
+indirect evaluation order/stack cleanup. Accepted comparison cases execute their
+main entry; the mutually recursive nonterminating functions in one acceptance
+fixture are deliberately not invoked. Current hashes and native disassembly are
+in `evidence/functions-verification.json` and `evidence/functions-disassembly.txt`.
+All five older example binaries retain their exact previous hashes. See
+[SELF_HOSTING.md](SELF_HOSTING.md) for the remaining bootstrap criteria.
+
 Next actions, in dependency order:
 
-1. Add generic functions, function types and polymorphic inference. Generic
-   custom types and labelled constructor fields/access are implemented.
-2. Add closures/first-class functions, `use`, record updates, byte arrays and
+1. Add anonymous functions, captured closures and `use`. Preserve captured-value
+   lifetime and review the call ABI before extending today's raw-code pointers.
+2. Add record updates, byte arrays and
    module imports, testing each against upstream results and failures. Structural
    equality and owned collection also remain necessary work.
 3. Supply native file/argument/syscall IO in the owned runtime; remove the Node

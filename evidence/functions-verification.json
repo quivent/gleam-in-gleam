@@ -1,0 +1,139 @@
+{
+  "schema": "gleam-in-gleam.functions-verification/1",
+  "observedAt": "2026-11-07T02:12:09.158409+00:00",
+  "bootstrapCompiler": "gleam 1.19.2",
+  "bootstrapNode": "v22.23.3",
+  "compilerSourceLanguage": "Gleam",
+  "compilerModules": 13,
+  "compilerSourceLines": 3510,
+  "declaredPackageDependencies": [],
+  "tests": {
+    "total": 170,
+    "passed": 170,
+    "failed": 0
+  },
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "0d8c9cdef254c4f1d75235cdf9241bec5b562c99fcf48619627a44fcd91b472e",
+    "src/native/ast.gleam": "ca10e23c9957a5700fa69351666677496fb5ce76143aa17ee7a71c0f51defd88",
+    "src/native/check.gleam": "5006b902ef5542a89789e7e528debf6af1412049e1c707f9ab38a80f42c71c1a",
+    "src/native/compiler.gleam": "3149a7014f88824942800029baf6eb207b606ad51cba5e61104ba5ca287dc1a5",
+    "src/native/core.gleam": "2c65cfe9fb1d8a552916093f88f8acefa7ab1ae22a7d35750c2d870914bb543a",
+    "src/native/definitions.gleam": "c40c65cfae6fa5be525797dda32a6362387da078ff9789e4830cd8252c1aa3f1",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/heap.gleam": "81cc1ec923c97f7f8e523e53de16b0598f29fb0ac1e1d52c33f4b9dfda7f7d46",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "b90996b86b15a6d81c5c21ca845394efdc4f34693bdeaf652ce3d42c4e2e315b",
+    "src/native/parser.gleam": "f63f1160c507e5ffa6406ce490dac8c95b7741bdff6498b3b8aa2b568147bf5c",
+    "src/native/type_system.gleam": "fa2ab018b6d85de0bdb1641d8e1088536416fdec30cdcec7f18a577159733b4e",
+    "src/native/x64.gleam": "f02468b3fab8a5f8379b2e10438c573f94d818e95e0f4710d57144a823edfb78"
+  },
+  "examples": [
+    {
+      "name": "fibonacci",
+      "bytes": 601,
+      "sha256": "59f55018de253f2d8f9d5b35cb9ba900c54aed87558d4a9f2f99342844bea815",
+      "exitCode": 0,
+      "stdout": "55\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "control",
+      "bytes": 1078,
+      "sha256": "e9857046e97210ff7b3130d72236ffd38acbf835dc74b45377f2d61902a5b1d2",
+      "exitCode": 0,
+      "stdout": "14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "collections",
+      "bytes": 1280,
+      "sha256": "87dd6d74d7904b1fd6134fa72acd634218ae4fdd196cfe8ca828ec45649b7692",
+      "exitCode": 0,
+      "stdout": "6\n3\n6\n6\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "custom_types",
+      "bytes": 1277,
+      "sha256": "7a45a359782b385ad041969a0d02411f99c12fab07742b4512a1888c11d26d82",
+      "exitCode": 0,
+      "stdout": "5\n23\n0\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "generics_records",
+      "bytes": 874,
+      "sha256": "dc7d2a6c6d337956c7eb57afe4b035a7692be212cf4e6aa91ffc0f9e44c2f1e4",
+      "exitCode": 0,
+      "stdout": "21\n2\n21\n2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "functions",
+      "bytes": 867,
+      "sha256": "58c74b37a69a36b676c0719bb5c598c642f7da042205cd2434280babeded6d68",
+      "exitCode": 0,
+      "stdout": "22\n3\n4\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    }
+  ],
+  "disassemblies": [
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "43aa152361f88a4ac969deda7238498c38badd36a4b417fa37c1352b79c4c4be",
+      "includesTrailingStaticData": true,
+      "path": "evidence/collections-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "91d5be58c13770adc2e02386cc34612352d582768572016dd9b080045e8e1fd0",
+      "includesTrailingStaticData": true,
+      "path": "evidence/custom_types-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "2ee530bc54b035198b51a45eb857d27e79b464d91933bb5958f467c41b7eddcc",
+      "includesTrailingStaticData": true,
+      "path": "evidence/generics_records-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "123d9a798b7cd101d58705eec201a7307385ca59bdd9ac9a32cba481f5d5926a",
+      "includesTrailingStaticData": true,
+      "path": "evidence/functions-disassembly.txt"
+    }
+  ],
+  "upstreamAcceptanceChecks": {
+    "total": 22,
+    "agreed": 22,
+    "path": "evidence/functions-upstream-checks.json"
+  },
+  "compilerRunsNatively": false,
+  "selfHosting": false,
+  "fullGleamCompatibility": false,
+  "nativeTarget": "linux-x86_64",
+  "externalCodegenTools": [],
+  "limitations": [
+    "Subset compiler; bootstrap still uses upstream Gleam and Node",
+    "No polymorphic named function values/labelled function calls/record updates/closures/module imports yet",
+    "Bounded arena only: no collection or native compiler file IO yet",
+    "Compound structural equality/printing and complex coverage are not implemented",
+    "Fixed-width integer and diagnostic formatting limitations documented in README"
+  ]
+}

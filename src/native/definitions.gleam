@@ -1,5 +1,6 @@
 import native/ast as a
 import native/core as c
+import native/type_system as types
 
 pub type Constructor {
   Constructor(
@@ -17,6 +18,8 @@ pub type Context {
     functions: List(#(String, a.Function)),
     custom_types: List(#(String, a.CustomType)),
     constructors: List(#(String, Constructor)),
+    function_parameters: List(String),
+    current_function: String,
   )
 }
 
@@ -28,6 +31,8 @@ pub fn collect(module: a.Module) -> Result(Context, String) {
       c.map(module.functions, fn(f) { #(f.name, f) }),
       types,
       constructors,
+      [],
+      "",
     )
   use _ <- c.then(
     c.try_map(constructors, fn(entry) {
@@ -43,10 +48,14 @@ pub fn collect(module: a.Module) -> Result(Context, String) {
   )
   use _ <- c.then(
     c.try_map(module.functions, fn(f) {
+      let scope =
+        types.variables(
+          c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]),
+        )
       use _ <- c.then(
-        c.try_map(f.parameters, fn(p) { validate_type(p.1, context) }),
+        c.try_map(f.parameters, fn(p) { validate_type_in(p.1, context, scope) }),
       )
-      use _ <- c.then(validate_type(f.result, context))
+      use _ <- c.then(validate_type_in(f.result, context, scope))
       use _ <- c.then(case f.public_ {
         True -> {
           use _ <- c.then(
@@ -172,7 +181,7 @@ fn field_labels(
 }
 
 pub fn validate_type(type_: a.Type, context: Context) -> Result(Nil, String) {
-  validate_type_in(type_, context, [])
+  validate_type_in(type_, context, context.function_parameters)
 }
 
 fn validate_type_in(
@@ -187,11 +196,7 @@ fn validate_type_in(
     a.VariableType(name) ->
       case c.lookup(c.map(params, fn(p) { #(p, Nil) }), name) {
         Ok(_) -> Ok(Nil)
-        Error(_) ->
-          Error(
-            "Unbound type parameter (generic function signatures are not implemented): "
-            <> name,
-          )
+        Error(_) -> Error("Unbound type parameter: " <> name)
       }
     a.ListType(element) -> validate_type_in(element, context, params)
     a.TupleType(elements) -> {
@@ -199,6 +204,12 @@ fn validate_type_in(
         c.try_map(elements, fn(t) { validate_type_in(t, context, params) }),
       )
       Ok(Nil)
+    }
+    a.FunctionType(arguments, result) -> {
+      use _ <- c.then(
+        c.try_map(arguments, fn(t) { validate_type_in(t, context, params) }),
+      )
+      validate_type_in(result, context, params)
     }
     a.Unresolved -> Error("Internal unresolved type is not a source annotation")
     _ -> Ok(Nil)
@@ -246,6 +257,10 @@ fn parameter_names(
 
 fn public_type(type_: a.Type, context: Context) -> Result(Nil, String) {
   case type_ {
+    a.FunctionType(params, result) -> {
+      use _ <- c.then(c.try_map(params, fn(t) { public_type(t, context) }))
+      public_type(result, context)
+    }
     a.AppliedType(name, args) -> {
       use _ <- c.then(public_type(a.NamedType(name), context))
       use _ <- c.then(c.try_map(args, fn(t) { public_type(t, context) }))

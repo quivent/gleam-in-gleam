@@ -22,6 +22,8 @@ pub type Node {
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
   CallNode(String, List(Typed))
+  FunctionNode(String)
+  IndirectCallNode(Typed, List(Typed))
   BlockNode(List(Statement))
   CaseNode(Typed, List(Arm))
   EchoNode(Typed)
@@ -122,6 +124,14 @@ fn unique_parameters(
 }
 
 fn function(f: a.Function, globals: Globals) -> Result(Function, String) {
+  let variables =
+    types.variables(c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]))
+  let globals =
+    d.Context(
+      ..globals,
+      function_parameters: variables,
+      current_function: f.name,
+    )
   use #(body, result_type) <- c.then(statements(
     f.body,
     c.map(f.parameters, fn(p) { #(p.0, Local(p.1, 0)) }),
@@ -242,8 +252,22 @@ fn expression(
       case c.uppercase_name(name) {
         True -> constructor(name, [], env, globals, False)
         False -> {
-          use local <- c.then(c.lookup(env, name))
-          Ok(Typed(VariableNode(name), local.type_, local.known_variant))
+          case c.lookup(env, name) {
+            Ok(local) ->
+              Ok(Typed(VariableNode(name), local.type_, local.known_variant))
+            Error(_) -> {
+              use f <- c.then(c.lookup(globals.functions, name))
+              let signature =
+                a.FunctionType(c.map(f.parameters, fn(p) { p.1 }), f.result)
+              case types.variables([signature]) {
+                [] -> Ok(plain(FunctionNode(name), signature))
+                _ ->
+                  Error(
+                    "Polymorphic named function values are not implemented; use a direct call",
+                  )
+              }
+            }
+          }
         }
       }
     }
@@ -266,19 +290,48 @@ fn expression(
       case c.uppercase_name(name) {
         True -> constructor(name, args, env, globals, True)
         False -> {
-          use args <- c.then(
-            c.try_map(args, fn(arg) {
-              case arg.label {
-                "" -> expression(arg.value, env, globals)
-                _ -> Error("Labelled function calls are not implemented yet")
+          use args <- c.then(call_arguments(args, env, globals))
+          case c.lookup(env, name) {
+            Ok(local) ->
+              indirect_call(
+                Typed(VariableNode(name), local.type_, local.known_variant),
+                args,
+              )
+            Error(_) -> {
+              use f <- c.then(c.lookup(globals.functions, name))
+              use _ <- c.then(case c.length(args) == c.length(f.parameters) {
+                True -> Ok(Nil)
+                False -> Error("Function argument count mismatch")
+              })
+              case name == globals.current_function {
+                True -> {
+                  use _ <- c.then(arguments(args, f.parameters))
+                  Ok(plain(CallNode(name, args), f.result))
+                }
+                False -> {
+                  let variables =
+                    types.variables(
+                      c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]),
+                    )
+                  let initial = c.map(variables, fn(n) { #(n, a.Unresolved) })
+                  use bindings <- c.then(types.infer_many(
+                    c.map(f.parameters, fn(p) { p.1 }),
+                    c.map(args, fn(arg) { arg.type_ }),
+                    initial,
+                  ))
+                  use result <- c.then(types.substitute(f.result, bindings))
+                  Ok(plain(CallNode(name, args), result))
+                }
               }
-            }),
-          )
-          use f <- c.then(c.lookup(globals.functions, name))
-          use _ <- c.then(arguments(args, f.parameters))
-          Ok(plain(CallNode(name, args), f.result))
+            }
+          }
         }
       }
+    }
+    a.Apply(target, args) -> {
+      use target <- c.then(expression(target, env, globals))
+      use args <- c.then(call_arguments(args, env, globals))
+      indirect_call(target, args)
     }
     a.FieldAccess(target, field) -> {
       use target <- c.then(expression(target, env, globals))
@@ -296,6 +349,7 @@ fn expression(
         | a.NamedType(_)
         | a.AppliedType(_, _)
         | a.VariableType(_)
+        | a.FunctionType(_, _)
         | a.Unresolved ->
           Error("Compound-value echo formatting is not implemented yet")
         _ -> Ok(plain(EchoNode(typed), typed.type_))
@@ -356,6 +410,7 @@ fn binary_type(
         | a.NamedType(_)
         | a.AppliedType(_, _)
         | a.VariableType(_)
+        | a.FunctionType(_, _)
         | a.Unresolved ->
           Error("Structural compound equality is not implemented yet")
         _ -> Ok(a.Boolean)
@@ -383,6 +438,29 @@ fn arguments(
       arguments(args, params)
     }
     _, _ -> Error("Function argument count mismatch")
+  }
+}
+
+fn call_arguments(
+  args: List(a.Argument),
+  env: Environment,
+  globals: Globals,
+) -> Result(List(Typed), String) {
+  c.try_map(args, fn(arg) {
+    case arg.label {
+      "" -> expression(arg.value, env, globals)
+      _ -> Error("Labelled function calls are not implemented yet")
+    }
+  })
+}
+
+fn indirect_call(target: Typed, args: List(Typed)) -> Result(Typed, String) {
+  case target.type_ {
+    a.FunctionType(params, result) -> {
+      use _ <- c.then(arguments(args, c.map(params, fn(t) { #("", t) })))
+      Ok(plain(IndirectCallNode(target, args), result))
+    }
+    _ -> Error("Value is not a function")
   }
 }
 

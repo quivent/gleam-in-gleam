@@ -352,3 +352,116 @@ pub fn labelled_known(n: Int) -> Int {
   let value = WithValue(n)
   value.value
 }
+
+pub fn function_identity(x: a) -> a {
+  x
+}
+
+pub fn generic_functions(n: Int) -> Int {
+  let value = function_identity(n)
+  let flag = function_identity(n > 0)
+  case flag {
+    True -> value
+    False -> -value
+  }
+}
+
+fn reverse_generic(xs: List(a), acc: List(a)) -> List(a) {
+  case xs {
+    [] -> acc
+    [head, ..tail] -> reverse_generic(tail, [head, ..acc])
+  }
+}
+
+pub fn generic_function_reverse(n: Int) -> Int {
+  case reverse_generic([n, n + 1, n + 2], []) {
+    [a, b, c] -> a * 100 + b * 10 + c
+    _ -> -1
+  }
+}
+
+fn generic_local(x: a) -> a {
+  let y: a = x
+  y
+}
+
+fn wrap_once(x: a) -> List(a) {
+  [x]
+}
+
+fn wrap_twice(x: a) -> List(List(a)) {
+  wrap_once([generic_local(x)])
+}
+
+pub fn generic_variable_names(n: Int) -> Int {
+  case wrap_twice(n) {
+    [[value]] -> value
+    _ -> -1
+  }
+}
+
+fn increment(n: Int) -> Int {
+  n + 1
+}
+
+fn is_positive(n: Int) -> Bool {
+  n > 0
+}
+
+fn flip_bool(b: Bool) -> Bool {
+  !b
+}
+
+fn apply_once(f: fn(a) -> b, x: a) -> b {
+  f(x)
+}
+
+pub fn higher_order(n: Int) -> Int {
+  let value = apply_once(increment, n)
+  case apply_once(is_positive, value) {
+    True -> value
+    False -> 0
+  }
+}
+
+fn select_function() -> fn(Int) -> Int {
+  increment
+}
+
+pub fn returned_function(n: Int) -> Int {
+  select_function()(n)
+}
+
+fn pass_function(f: fn(a) -> a) -> fn(a) -> a {
+  f
+}
+
+pub fn returned_generic_function(n: Int) -> Int {
+  pass_function(increment)(n)
+}
+
+type Handler(a, b) {
+  Handler(run: fn(a) -> b)
+}
+
+fn invoke(handler: Handler(a, b), x: a) -> b {
+  handler.run(x)
+}
+
+pub fn callback_record(n: Int) -> Int {
+  let handler = Handler(increment)
+  invoke(handler, n)
+}
+
+fn shadow_function(increment: fn(Bool) -> Bool, x: Bool) -> Bool {
+  increment(x)
+}
+
+pub fn function_shadowing(n: Int) -> Bool {
+  shadow_function(flip_bool, n > 0)
+}
+
+pub fn local_function_alias(n: Int) -> Int {
+  let f = increment
+  f(n)
+}

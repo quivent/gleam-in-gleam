@@ -23,6 +23,17 @@ program. GNU objdump is used only as a development inspection tool.
   C function ABI. Native foreign calls are not implemented.
 * Linux `syscall` destroys RCX/R11; print helpers preserve the language expression
   result in RAX. Live expression values stay on the stack across calls.
+* A named monomorphic function value is a RIP-relative code address in one word.
+  It has no environment and requires no allocation. Generic function parameters
+  and result types are checked/instantiated at compile time; there are no hidden
+  runtime type arguments in these calls.
+* An indirect call evaluates and pushes its target before evaluating/pushing its
+  arguments. It reloads that target at `[RSP + 8 * argument_count]`, rejects null,
+  then executes `call *RAX`. After return it reclaims the argument words **and**
+  the saved target word. Callee parameter offsets remain unchanged.
+* The raw-code-pointer convention is internal and not yet a closure ABI. Captured
+  environments will need explicit ownership, lifetime and calling-convention
+  support; they must not be smuggled in as raw pointers to stack locals.
 
 ## Values and allocation
 
@@ -114,6 +125,15 @@ load at `0x40025e` on equality, and otherwise jumps to the failure exit. The loa
 uses offset `0x18` (header plus the second word-sized field). Its 874-byte size
 is the complete example program, not the compiler. Numeric output `21,2,21,2`
 also confirms declaration-order evaluation despite reversed source labels.
+
+For function example SHA256
+`58c74b37a69a36b676c0719bb5c598c642f7da042205cd2434280babeded6d68`,
+`twice` reloads its saved target at `0x4000e6`, null-checks it and calls through
+RAX at `0x4000f7`. The cleanup at `0x4000f9` advances RSP by `0x10`: one argument
+word and one target word. The outer call then repeats that sequence at
+`0x400101`–`0x400114`. Named `increment` references use RIP-relative LEA, such as
+`0x4001ab`, targeting its actual entry at `0x40011d`. The 867-byte artifact is the
+example executable, not a measured compiler binary or a speed benchmark.
 
 The runtime tests execute an exact-fit allocator probe and an over-end probe
 through these same Gleam emitter/ELF modules. Pure oracle tests compare actual

@@ -31,6 +31,12 @@ fn name(tokens: Tokens) -> Parsed(String) {
 
 fn type_(tokens: Tokens) -> Parsed(a.Type) {
   case tokens {
+    [l.Token(l.Word("fn"), _), l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(params, rest) <- c.then(separated(rest, ")", type_))
+      use rest <- c.then(expect(rest, "->"))
+      use #(return_type, rest) <- c.then(type_(rest))
+      Ok(#(a.FunctionType(params, return_type), rest))
+    }
     [l.Token(l.Word("Int"), _), ..rest] -> Ok(#(a.Integer, rest))
     [l.Token(l.Word("Bool"), _), ..rest] -> Ok(#(a.Boolean, rest))
     [l.Token(l.Word("Nil"), _), ..rest] -> Ok(#(a.Unit, rest))
@@ -224,6 +230,10 @@ fn expression(tokens: Tokens, minimum: Int) -> Parsed(a.Expression) {
 
 fn postfix(left: a.Expression, tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
+    [l.Token(l.Symbol("("), _), ..rest] -> {
+      use #(args, rest) <- c.then(arguments(rest, []))
+      postfix(a.Apply(left, args), rest)
+    }
     [l.Token(l.Symbol("."), _), l.Token(l.Number(index), _), ..rest] ->
       postfix(a.TupleIndex(left, index), rest)
     [l.Token(l.Symbol("."), _), l.Token(l.Word(field), _), ..rest] ->

@@ -8,6 +8,7 @@ pub type Type {
   NamedType(String)
   AppliedType(String, List(Type))
   VariableType(String)
+  FunctionType(List(Type), Type)
   // Internal placeholder for an empty list; never a source type annotation.
   Unresolved
 }
@@ -30,6 +31,7 @@ pub type Expression {
   Unary(String, Expression)
   Binary(String, Expression, Expression)
   Call(String, List(Argument))
+  Apply(Expression, List(Argument))
   Block(List(Statement))
   Case(Expression, List(Arm))
   Echo(Expression)
