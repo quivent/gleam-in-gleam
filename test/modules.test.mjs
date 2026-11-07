@@ -4,17 +4,18 @@ import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,symlinkSync} fro
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
-import {BitArray,toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
+import {BitArray,toList,Ok,Error as ResultError} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile as compileSingle,compile_project} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
+import * as coreOracle from '../build/dev/javascript/gleam_native/native/core.mjs';
 import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
-const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8'))];
+const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
 function compile(files,entry='main') {return compile_project(entry,sources(files));}
 function run(result) {
  assert.equal(result.isOk(),true,result[0]);
  const dir=mkdtempSync(join(tmpdir(),'gleam-modules-'));
- try {const path=join(dir,'app');writeFileSync(path,result[0].rawBuffer,{mode:0o755});return spawnSync(path,{encoding:'utf8'});}
+ try {const path=join(dir,'app');writeFileSync(path,result[0].rawBuffer,{mode:0o755});return spawnSync(path,{encoding:'utf8',timeout:5000});}
  finally {rmSync(dir,{recursive:true,force:true});}
 }
 for (const f of fixtures) {
@@ -100,4 +101,31 @@ test('type aliases erase completely into the underlying machine code',()=>{
 test('guard short-circuiting skips overflow in an unreachable operand',()=>{
  const result=compile({main:'pub fn main() -> Nil {echo case 0 {n if False && {2147483647*2147483647*3>0} -> 0 _ -> 1} Nil}'});
  const actual=run(result);assert.equal(actual.status,0);assert.equal(actual.stdout,'1\n');
+});
+
+test('the actual compiler-owned core module compiles and runs natively',()=>{
+ const own=readFileSync(new URL('../src/native/core.gleam',import.meta.url),'utf8');
+ const driver=readFileSync(new URL('./owned-core-driver.source',import.meta.url),'utf8');
+ const actual=run(compileSingle(new BitArray(Buffer.from(own+'\n'+driver))));
+ assert.equal(actual.status,0);assert.equal(actual.stderr,'');
+ const nums=toList([1,2,3]);
+ const values=[coreOracle.length(coreOracle.reverse(nums)),coreOracle.decimal(1234),coreOracle.uppercase_name('Zebra'),coreOracle.discarded_name('_x'),coreOracle.lookup(toList([['x',7]]),'x')[0],coreOracle.byte_length(coreOracle.bytes(nums)),coreOracle.nth(coreOracle.map(nums,n=>n*2),1)[0],coreOracle.lookup(coreOracle.put(toList([['x',1]]),'x',9),'x')[0],coreOracle.lookup(toList([]),'missing')[0]==='Unknown name: missing',coreOracle.try_map(nums,n=>n===2?new ResultError('stop'):new Ok(n+1))[0]==='stop'];
+ assert.equal(actual.stdout,values.map(v=>v===true?'True':v===false?'False':String(v)).join('\n')+'\n');
+});
+
+test('Boolean product coverage agrees with an independent finite truth table',()=>{
+ for(let mask=0;mask<16;mask++) {
+  const rows=[];for(let assignment=0;assignment<4;assignment++)if(mask&(1<<assignment))rows.push([!!(assignment&2),!!(assignment&1)]);
+  const text=rows.map(row=>row.map(v=>v?'True':'False').join(',')+' -> 1').join(' ');
+  const result=compile({main:`fn choose(a:Bool,b:Bool) -> Int {case a,b {${text}}} pub fn main() -> Nil {Nil}`});
+  assert.equal(result.isOk(),mask===15,`concrete mask ${mask}`);
+ }
+ let seed=971;
+ for(let trial=0;trial<48;trial++) {
+  const rows=[];for(let i=0;i<5;i++){const row=[];for(let j=0;j<3;j++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;row.push(seed%3);}rows.push(row);}
+  const complete=Array.from({length:8},(_,bits)=>rows.some(row=>row.every((p,j)=>p===2||p===((bits>>j)&1)))).every(Boolean);
+  const body=rows.map(row=>row.map(p=>p===2?'_':p===1?'True':'False').join(',')+' -> 1').join(' ');
+  const result=compile({main:`fn choose(a:Bool,b:Bool,c:Bool) -> Int {case a,b,c {${body}}} pub fn main() -> Nil {Nil}`});
+  assert.equal(result.isOk(),complete,`wildcard trial ${trial}`);
+ }
 });

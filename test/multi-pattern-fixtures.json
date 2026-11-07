@@ -1,0 +1,377 @@
+[
+  {
+    "name": "multi-subject-evaluation-order",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(a:Int,b:Int) -> Int {case a,b {n,0 | 0,n -> n _,_ -> 99}} pub fn main() -> Nil {echo pick({echo 1 0},{echo 2 7}) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n7\n"
+  },
+  {
+    "name": "multi-four-bool-combinations",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(a:Bool,b:Bool) -> Int {case a,b {True,True -> 1 True,False -> 2 False,True -> 3 False,False -> 4}} pub fn main() -> Nil {echo pick(True,True) echo pick(True,False) echo pick(False,True) echo pick(False,False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n3\n4\n"
+  },
+  {
+    "name": "multi-three-bool-columns",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(a:Bool,b:Bool,c:Bool) -> Int {case a,b,c {True,_,_ -> 1 False,True,_ -> 2 False,False,True -> 3 False,False,False -> 4}} pub fn main() -> Nil {echo pick(False,False,True) echo pick(False,False,False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n4\n"
+  },
+  {
+    "name": "multi-guard-retries-alternatives",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(a:Int,b:Int) -> Int {case a,b {n,_ | _,n if n>5 -> n _,_ -> 0}} pub fn main() -> Nil {echo pick(1,9) echo pick(7,9) echo pick(1,2) Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n7\n0\n"
+  },
+  {
+    "name": "or-tuple-binding-order",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(1,2) {#(a,b) | #(b,a) -> a*10+b} Nil}"
+    },
+    "accepted": true,
+    "stdout": "12\n"
+  },
+  {
+    "name": "or-guard-retries-tuple",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(1,9) {#(n,_) | #(_,n) if n>5 -> n _ -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "or-guard-both-fail",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(1,2) {#(n,_) | #(_,n) if n>5 -> n _ -> 9} Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "or-string-prefix-classifier",
+    "entry": "main",
+    "files": {
+      "main": "fn upper(s:String) -> Bool {case s {\"A\" <> _ | \"B\" <> _ | \"Z\" <> _ -> True _ -> False}} pub fn main() -> Nil {echo upper(\"Alpha\") echo upper(\"Zebra\") echo upper(\"low\") Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nFalse\n"
+  },
+  {
+    "name": "or-prefix-binding-values",
+    "entry": "main",
+    "files": {
+      "main": "fn tail(s:String) -> Bool {case s {\"ab\" <> tail | \"xy\" <> tail -> tail==\"\u03bb\" _ -> False}} pub fn main() -> Nil {echo tail(\"ab\u03bb\") echo tail(\"xy\u03bb\") echo tail(\"xx\u03bb\") Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nFalse\n"
+  },
+  {
+    "name": "or-prefix-overlap-guard-retry",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"ab\" {\"a\" <> tail | \"\" <> tail if tail==\"ab\" -> True _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "or-constructor-alternatives",
+    "entry": "main",
+    "files": {
+      "main": "type C {A(Int) B(Int)} fn read(c:C) -> Int {case c {A(n) | B(n) -> n}} pub fn main() -> Nil {echo read(A(3)) echo read(B(4)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n4\n"
+  },
+  {
+    "name": "multi-correlated-constructors",
+    "entry": "main",
+    "files": {
+      "main": "type C {A(Int) B} fn read(c:C,b:Bool) -> Int {case c,b {A(n),True -> n A(_),False -> 1 B,_ -> 0}} pub fn main() -> Nil {echo read(A(4),True) echo read(A(4),False) echo read(B,True) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n1\n0\n"
+  },
+  {
+    "name": "multi-list-and-bool",
+    "entry": "main",
+    "files": {
+      "main": "fn read(xs:List(Int),b:Bool) -> Int {case xs,b {[],_ -> 0 [n,.._],True -> n [_,.._],False -> 1}} pub fn main() -> Nil {echo read([],True) echo read([7],True) echo read([7],False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "0\n7\n1\n"
+  },
+  {
+    "name": "multi-two-lists",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:List(Int),b:List(Int)) -> Int {case a,b {[],[] -> 0 [x,.._],[] | [],[x,.._] -> x [x,.._],[y,.._] -> x+y}} pub fn main() -> Nil {echo read([],[]) echo read([3],[]) echo read([],[4]) echo read([3],[4]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "0\n3\n4\n7\n"
+  },
+  {
+    "name": "multi-generic-result-product",
+    "entry": "main",
+    "files": {
+      "main": "fn read(r:Result(Int,String),b:Bool) -> Int {case r,b {Ok(n),True -> n Ok(_),False -> 1 Error(_),_ -> 0}} pub fn main() -> Nil {echo read(Ok(7),True) echo read(Ok(7),False) echo read(Error(\"x\"),True) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n1\n0\n"
+  },
+  {
+    "name": "multi-nested-tuple-bool",
+    "entry": "main",
+    "files": {
+      "main": "fn read(p:#(Bool,Bool),n:Int) -> Int {case p,n {#(True,True),_ -> 1 #(True,False),_ -> 2 #(False,True),_ -> 3 #(False,False),_ -> 4}} pub fn main() -> Nil {echo read(#(False,True),7) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "multi-known-constructor-per-subject",
+    "entry": "main",
+    "files": {
+      "main": "type C {A(Int) B} pub fn main() -> Nil {echo case A(7),B {A(n),B -> n} Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "multi-zero-tuple-column",
+    "entry": "main",
+    "files": {
+      "main": "fn read(p:#(),b:Bool) -> Int {case p,b {#(),True -> 1 #(),False -> 2}} pub fn main() -> Nil {echo read(#(),True) echo read(#(),False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n"
+  },
+  {
+    "name": "multi-outer-shadow-restored",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let n=9 echo case 1,2 {n,_ | _,n if n>5 -> 0 _,_ -> n} echo n Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n9\n"
+  },
+  {
+    "name": "multi-captures-and-returned-callback",
+    "entry": "main",
+    "files": {
+      "main": "fn make(cut:Int) -> fn(Int,Int)->Int {fn(a,b){case a,b {n,_ | _,n if n>cut -> n _,_ -> 0}}} pub fn main() -> Nil {let f=make(5) echo f(1,9) echo f(1,2) Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n0\n"
+  },
+  {
+    "name": "multi-context-returned-lambda",
+    "entry": "main",
+    "files": {
+      "main": "fn make(a:Bool,b:Bool) -> fn(Int)->Int {case a,b {True,_ | _,True -> fn(n){n+1} False,False -> fn(n){n+2}}} pub fn main() -> Nil {let f=make(False,False) echo f(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "multi-qualified-constructors",
+    "entry": "main",
+    "files": {
+      "main": "import model as m fn read(a:m.C,b:Bool) -> Int {case a,b {m.A(n),True | m.A(n),False -> n m.B,_ -> 0}} pub fn main() -> Nil {echo read(m.A(7),False) Nil}",
+      "model": "pub type C {A(Int) B}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "multi-alias-types",
+    "entry": "main",
+    "files": {
+      "main": "type Flag=Bool type Pair(a)=#(a,a) fn read(p:Pair(Flag),b:Flag) -> Int {case p,b {#(True,_),_ -> 1 #(False,True),_ -> 2 #(False,False),True -> 3 #(False,False),False -> 4}} pub fn main() -> Nil {echo read(#(False,False),False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n"
+  },
+  {
+    "name": "multi-bit-pattern-and-alias",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:BitArray,b:Bool) -> Int {case a,b {<<n,_:bits>>,True | <<n,_:bits>>,False -> n _,_ -> 0}} pub fn main() -> Nil {echo read(<<7>>,False) echo read(<<>>,True) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n0\n"
+  },
+  {
+    "name": "multi-marginals-not-exhaustive",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:Bool,b:Bool) -> Int {case a,b {True,True -> 1 False,False -> 2}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "multi-list-hole",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:List(Int),b:Bool) -> Int {case a,b {[],_ -> 0 [_,.._],True -> 1}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "multi-guard-does-not-cover",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:Bool,b:Bool) -> Int {case a,b {True,_ if True -> 1 False,_ -> 2}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "multi-catchall-row-arity",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1,2 {_ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "pattern count"
+  },
+  {
+    "name": "multi-extra-row-pattern",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1 {_,_ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "pattern count"
+  },
+  {
+    "name": "multi-alternative-row-arity",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1,2 {n,0 | n -> n _,_ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "pattern count"
+  },
+  {
+    "name": "or-missing-variable",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1 {n | _ -> n} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "same variables"
+  },
+  {
+    "name": "or-extra-variable",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1 {_ | n -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "same variables"
+  },
+  {
+    "name": "or-different-variable-names",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1 {a | b -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "same variables"
+  },
+  {
+    "name": "or-inconsistent-binding-type",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(1,True) {#(n,_) | #(_,n) -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "multi-duplicate-binding-across-subjects",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1,2 {n,n -> n} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate variable"
+  },
+  {
+    "name": "multi-unsafe-known-variant-merge",
+    "entry": "main",
+    "files": {
+      "main": "type C {A(a:Int) B(b:Int)} pub fn main() -> Nil {echo case A(1),B(2) {x,_ | _,x -> x.a} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown constructor label"
+  },
+  {
+    "name": "or-nested-pattern-syntax",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case [1] {[1 | 2] -> 1 _ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "multi-branch-result-types",
+    "entry": "main",
+    "files": {
+      "main": "fn read(a:Bool,b:Bool) -> Int {case a,b {True,_ -> 1 False,_ -> False}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "multi-pattern-subject-type",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case 1,True {True,_ -> 1 _,_ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "multi-returned-closure-captures-selected-binding",
+    "entry": "main",
+    "files": {
+      "main": "fn make(a:Int,b:Int) -> fn()->Int {case a,b {n,_ | _,n if n>5 -> fn(){n} _,_ -> fn(){0}}} pub fn main() -> Nil {let f=make(1,9) let g=make(7,9) echo f() echo g() Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n7\n"
+  }
+]

@@ -621,6 +621,35 @@ fn expression(
       use body <- c.then(statements(body, c.append(names, bound), scope))
       Ok(a.Lambda(params, result, body))
     }
+    a.CaseSubjects(subjects, arms) -> {
+      use subjects <- c.then(
+        c.try_map(subjects, fn(e) { expression(e, bound, scope) }),
+      )
+      use arms <- c.then(
+        c.try_map(arms, fn(arm) {
+          use alternatives <- c.then(
+            c.try_map(arm.alternatives, fn(row) {
+              c.try_map(row, fn(p) { pattern(p, scope) })
+            }),
+          )
+          let names = case alternatives {
+            [first, ..] -> flatten(c.map(first, free_names.pattern_names))
+            _ -> []
+          }
+          let branch_bound = c.append(names, bound)
+          use body <- c.then(expression(arm.body, branch_bound, scope))
+          use guard <- c.then(case arm.guard {
+            a.NoGuard -> Ok(a.NoGuard)
+            a.Guard(e) -> {
+              use e <- c.then(expression(e, branch_bound, scope))
+              Ok(a.Guard(e))
+            }
+          })
+          Ok(a.MultiArm(alternatives, guard, body))
+        }),
+      )
+      Ok(a.CaseSubjects(subjects, arms))
+    }
     a.Case(subject, arms) -> {
       use subject <- c.then(expression(subject, bound, scope))
       use arms <- c.then(

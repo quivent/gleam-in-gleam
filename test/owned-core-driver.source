@@ -1,0 +1,30 @@
+pub fn main() -> Nil {
+  echo length(reverse([1, 2, 3]))
+  echo decimal(1234)
+  echo uppercase_name("Zebra")
+  echo discarded_name("_x")
+  case lookup([#("x", 7)], "x") {
+    Ok(n) -> { echo n Nil }
+    Error(e) -> { echo e Nil }
+  }
+  echo byte_length(bytes([1, 2, 3]))
+  case nth(map([1, 2, 3], fn(n: Int) { n * 2 }), 1) {
+    Ok(n) -> { echo n Nil }
+    Error(e) -> { echo e Nil }
+  }
+  echo case lookup(put([#("x", 1)], "x", 9), "x") {
+    Ok(n) -> n
+    Error(_) -> 0
+  }
+  echo case lookup([], "missing") {
+    Ok(_) -> False
+    Error(e) -> e == "Unknown name: missing"
+  }
+  echo case try_map([1, 2, 3], fn(n: Int) {
+    case n { 2 -> Error("stop") _ -> Ok(n + 1) }
+  }) {
+    Ok(_) -> False
+    Error(e) -> e == "stop"
+  }
+  Nil
+}

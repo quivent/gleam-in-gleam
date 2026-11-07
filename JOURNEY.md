@@ -199,3 +199,41 @@ older binaries retain their hashes, and repeated concat exhausts the arena safel
 Float/UtfCodepoint, remaining pattern forms, non-string structural equality,
 inference, native IO and memory collection remain necessary work. The compiler is
 still explicitly bootstrapped through Gleam/Node; no installed tool was replaced.
+
+## Multiple subjects, alternatives and native core — 2026-11-07
+
+An upstream execution probe settled the critical alternative/guard rule: matching
+`#(1,9)` against `#(n,_) | #(_,n) if n>5` returns 9. Guard failure must retry the
+next alternative with its different bindings. We kept one shared body and copied
+each matched row's bindings into canonical frame slots before evaluating its
+guard. Subjects are saved once left-to-right on the stack, without an implicit
+runtime tuple. Existing simple single-subject IR/bytes remain unchanged.
+
+Alternatives must have the same variable names/types. Known-variant facts are
+intersected across them, preventing a first alternative's constructor knowledge
+from wrongly authorizing a field access on a later variant. Guard-only captures
+and callbacks returned from a selected alternative retain the chosen values after
+the factory returns. Names are scoped independently for each later arm.
+
+The new coverage matrix preserves correlations across constructor products instead
+of checking each subject independently. It specializes finite Bool/tuple/list/ADT
+constructors and removes unconstrained recursive columns. Guarded rows never count.
+Negative fixtures include diagonal-only Boolean coverage, list holes and invalid
+row arity; independent checks enumerate all 16 subsets of concrete two-Bool rows
+and 48 deterministic wildcard matrices over three Bool subjects. Infinite domains
+and the legacy single-case coverage path remain explicitly conservative.
+
+All 437 preexisting tests passed before adding the new fixtures. Final evidence:
+479 tests and 213 fresh upstream comparisons, with all twelve earlier executable
+hashes unchanged. The new stack-only example has recorded guard-retry ASM and is
+1,146 bytes; no timing claim follows from its size.
+
+A meaningful owned-source step now works: the entire actual core.gleam module
+compiles natively, including previously blocked multi-subject nth and alternative
+string-prefix classification. The tracked driver exercises representative list,
+string, byte, lookup/map/nth/put and error behavior. Native outputs are compared
+with the current upstream-compiled core functions. Source/driver/executable hashes
+and the 12,064-byte core-plus-driver result are preserved separately. This is not
+the whole compiler or proof of stage-1/stage-2 self-hosting. Structural equality
+for the compiler's data types is the next language barrier; native IO, remaining
+semantics and owned memory/runtime work remain necessary afterward.

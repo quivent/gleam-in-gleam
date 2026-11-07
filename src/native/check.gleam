@@ -1,6 +1,7 @@
 import native/ast as a
 import native/bit_options
 import native/core as c
+import native/coverage
 import native/definitions as d
 import native/free_names
 import native/labels
@@ -30,6 +31,7 @@ pub type Node {
   ClosureNode(List(#(String, a.Type)), List(Statement), List(String))
   BlockNode(List(Statement))
   CaseNode(Typed, List(Arm))
+  MultiCaseNode(List(Typed), List(MultiArm))
   EchoNode(Typed)
 }
 
@@ -41,6 +43,15 @@ pub type Tail {
 pub type Statement {
   Bind(a.Pattern, Typed)
   Evaluate(Typed)
+}
+
+pub type MultiArm {
+  MultiArm(
+    alternatives: List(List(a.Pattern)),
+    bindings: List(String),
+    guard: a.Guard(Typed),
+    body: Typed,
+  )
 }
 
 pub type Arm {
@@ -369,6 +380,8 @@ fn expression(
         _ -> Ok(plain(EchoNode(typed), typed.type_))
       }
     }
+    a.CaseSubjects(subjects, arms) ->
+      multi_case(subjects, arms, env, globals, a.Unresolved)
     a.Case(subject, arms) ->
       case_expression(subject, arms, env, globals, a.Unresolved)
   }
@@ -433,6 +446,8 @@ fn expression_expected(
   expected: a.Type,
 ) -> Result(Typed, String) {
   case e {
+    a.CaseSubjects(subjects, arms) ->
+      multi_case(subjects, arms, env, globals, expected)
     a.Case(subject, arms) ->
       case_expression(subject, arms, env, globals, expected)
     a.Call(name, args) ->
@@ -1522,5 +1537,169 @@ fn unguarded(arms: List(Arm)) -> List(Arm) {
         a.NoGuard -> [arm, ..unguarded(rest)]
         a.Guard(_) -> unguarded(rest)
       }
+  }
+}
+
+fn multi_case(
+  subjects: List(a.Expression),
+  arms: List(a.MultiArm),
+  env: Environment,
+  globals: Globals,
+  expected: a.Type,
+) -> Result(Typed, String) {
+  use subjects <- c.then(
+    c.try_map(subjects, fn(e) { expression(e, env, globals) }),
+  )
+  use _ <- c.then(case subjects {
+    [] -> Error("Empty case subject list")
+    _ -> Ok(Nil)
+  })
+  use typed <- c.then(
+    c.try_map(arms, fn(arm) {
+      use rows <- c.then(
+        c.try_map(arm.alternatives, fn(row) {
+          check_row(row, subjects, globals)
+        }),
+      )
+      use bindings <- c.then(common_bindings(rows))
+      let branch_env = c.append(bindings, env)
+      use body <- c.then(expression_expected(
+        arm.body,
+        branch_env,
+        globals,
+        expected,
+      ))
+      use guard <- c.then(case arm.guard {
+        a.NoGuard -> Ok(a.NoGuard)
+        a.Guard(e) -> {
+          use _ <- c.then(guard_source(e))
+          use value <- c.then(expression(e, branch_env, globals))
+          use _ <- c.then(equal(value.type_, a.Boolean))
+          Ok(a.Guard(value))
+        }
+      })
+      Ok(MultiArm(
+        c.map(rows, fn(r) { r.0 }),
+        c.map(bindings, fn(b) { b.0 }),
+        guard,
+        body,
+      ))
+    }),
+  )
+  use _ <- c.then(coverage.complete(
+    coverage_rows(typed),
+    c.map(subjects, fn(s) { coverage.Column(s.type_, s.known_variant) }),
+    globals,
+  ))
+  case typed {
+    [] -> Error("Empty case")
+    [first, ..rest] -> {
+      use result <- c.then(multi_branch_type(rest, first.body.type_))
+      Ok(plain(MultiCaseNode(subjects, typed), result))
+    }
+  }
+}
+
+fn check_row(
+  patterns: List(a.Pattern),
+  subjects: List(Typed),
+  globals: Globals,
+) -> Result(#(List(a.Pattern), Environment), String) {
+  use _ <- c.then(case c.length(patterns) == c.length(subjects) {
+    True -> Ok(Nil)
+    False -> Error("Case pattern count does not match subject count")
+  })
+  use fields <- c.then(resolve_fields(
+    patterns,
+    c.map(subjects, fn(s) { s.type_ }),
+    globals,
+  ))
+  use bindings <- c.then(checked_field_bindings(fields, []))
+  let patterns = c.map(fields, fn(f) { f.0 })
+  let bindings = row_known(patterns, subjects, bindings)
+  Ok(#(patterns, bindings))
+}
+
+fn row_known(
+  patterns: List(a.Pattern),
+  subjects: List(Typed),
+  bindings: Environment,
+) -> Environment {
+  case patterns, subjects {
+    [], [] -> bindings
+    [a.VariablePattern(name), ..ps], [subject, ..ss] ->
+      row_known(
+        ps,
+        ss,
+        c.put(bindings, name, Local(subject.type_, subject.known_variant)),
+      )
+    [_, ..ps], [_, ..ss] -> row_known(ps, ss, bindings)
+    _, _ -> bindings
+  }
+}
+
+fn common_bindings(
+  rows: List(#(List(a.Pattern), Environment)),
+) -> Result(Environment, String) {
+  case rows {
+    [] -> Error("Empty alternative list")
+    [first, ..rest] -> merge_environments(rest, first.1)
+  }
+}
+
+fn merge_environments(
+  rows: List(#(List(a.Pattern), Environment)),
+  current: Environment,
+) -> Result(Environment, String) {
+  case rows {
+    [] -> Ok(current)
+    [row, ..rest] -> {
+      use _ <- c.then(case c.length(current) == c.length(row.1) {
+        True -> Ok(Nil)
+        False -> Error("Alternative patterns must bind the same variables")
+      })
+      use merged <- c.then(
+        c.try_map(current, fn(entry) {
+          use other <- c.then(case c.lookup(row.1, entry.0) {
+            Ok(other) -> Ok(other)
+            Error(_) ->
+              Error(
+                "Alternative patterns must bind the same variables: " <> entry.0,
+              )
+          })
+          use t <- c.then(merge_type(entry.1.type_, other.type_))
+          let known = case entry.1.known_variant == other.known_variant {
+            True -> entry.1.known_variant
+            False -> 0
+          }
+          Ok(#(entry.0, Local(t, known)))
+        }),
+      )
+      merge_environments(rest, merged)
+    }
+  }
+}
+
+fn coverage_rows(arms: List(MultiArm)) -> List(List(a.Pattern)) {
+  case arms {
+    [] -> []
+    [arm, ..rest] ->
+      case arm.guard {
+        a.NoGuard -> c.append(arm.alternatives, coverage_rows(rest))
+        a.Guard(_) -> coverage_rows(rest)
+      }
+  }
+}
+
+fn multi_branch_type(
+  arms: List(MultiArm),
+  current: a.Type,
+) -> Result(a.Type, String) {
+  case arms {
+    [] -> Ok(current)
+    [arm, ..rest] -> {
+      use current <- c.then(merge_type(current, arm.body.type_))
+      multi_branch_type(rest, current)
+    }
   }
 }

@@ -104,6 +104,7 @@ code generation remain in Gleam; the bridge performs no language compilation.
 | `native/lexer` | Tokens, comments, decimal literals, UTF-8 string bytes |
 | `native/ast` | Language seed syntax types |
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
+| `native/coverage` | Constructor-product coverage for multiple subjects and alternatives |
 | `native/check` | Typed expressions, constructor inference, scope and exhaustiveness |
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
 | `native/type_system` | Scoped constructor/function substitution and function types |
@@ -126,7 +127,7 @@ management can be omitted.
 
 Implemented seed features: explicitly typed functions and parameters,
 forward/recursive calls, local bindings and shadowing, Int/Bool/Nil/String values, integer operations, comparisons, short-circuit booleans,
-single-subject case matching, exhaustiveness checks for this subset and primitive
+case matching, exhaustiveness checks for this subset and primitive
 value printing. Typed tuples, tuple indexing/destructuring, lists,
 list spreads and nested tuple/list patterns are supported. Unlabelled calls,
 tuple fields and list heads preserve left-to-right evaluation order. Labelled
@@ -252,6 +253,25 @@ implicit prelude members. Prelude constructors use the existing generic ADT layo
 and positional arguments. Unused prelude definitions add no target code or change
 existing constructor tags. Float and UtfCodepoint are not implemented yet.
 
+Cases support multiple subjects and alternative pattern rows, for example
+`case xs, index { [x, ..], 0 -> ... }` and
+`"A" <> _ | "B" <> _ -> ...`. Each row must have one pattern per subject.
+Alternatives bind exactly the same names with compatible types; facts about known
+variants are intersected rather than borrowed unsafely from the first alternative.
+Subjects evaluate once from left to right into frame slots, with no synthetic
+runtime tuple. Pattern alternatives share canonical binding slots and one body.
+If a matched alternative's guard fails, matching retries the next alternative
+before moving to the next arm, matching upstream behavior.
+
+A constructor-product coverage pass handles correlated Bool, tuple, list and
+nominal constructor columns, including known top-level variants. Guarded rows
+contribute no coverage. Infinite domains still need defaults; unconstrained
+recursive columns are removed without endlessly expanding their constructors.
+Independent truth-table checks cover concrete and wildcard Boolean products.
+Nested `|` inside an individual pattern is rejected, as upstream requires complete
+alternative rows instead. Ordinary single-subject/non-alternative cases retain
+their historical IR and conservative coverage checks.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
@@ -281,7 +301,9 @@ existing constructor tags. Float and UtfCodepoint are not implemented yet.
   programs with compound allocation. Allocation is checked and exhaustion exits
   71. There is no collection or arena growth yet. This is not the final memory
   manager. Structural compound equality/printing remain rejected.
-* Case coverage is conservative. Empty/nonempty lists with irrefutable head/tail,
+* Legacy single-subject/non-alternative case coverage remains conservative.
+  Multi-pattern cases use the constructor-product matrix described above.
+  Empty/nonempty lists with irrefutable head/tail,
   fully irrefutable tuples, Bool alternatives and catch-alls are understood;
   more complex coverage may require an explicit catch-all. Refutable lets are
   rejected until let-assert is supported. A custom-type case must cover every
@@ -414,11 +436,27 @@ The 1,852-byte example prints two True values, `λ😀`, then UTF-8 bytes `206,1
 All eleven earlier example binaries remain byte-identical. Repeated string growth
 also verifies guarded arena exhaustion before copying; reclamation remains open.
 
+The multi-subject/alternative milestone passes **479/479** checks and **213/213**
+fresh upstream comparisons (64 single-file plus 149 project fixtures). Tests cover
+guard retry with different binding values, consistent name/type sets, shared bodies,
+returned closures, correlated coverage holes and subject evaluation order.
+`evidence/multi-patterns-verification.json` records source/artifact hashes;
+`evidence/multi_patterns-disassembly.txt` records actual retry branches. The
+1,146-byte example prints `7,9,3` without a heap initializer. All twelve earlier
+example binaries remain byte-identical.
+
+The actual `src/native/core.gleam` module also compiles natively, with all its
+functions included. `test/owned-core-driver.source` exercises lists, decimal
+strings, prefix classification, lookup, byte construction, map/nth/put and errors.
+Native results are compared with actual upstream-compiled core function results.
+`evidence/owned-core-native-verification.json` records source/driver hashes and the
+12,064-byte executable's output/hash. That size includes core plus its test driver;
+it is not the size of the complete compiler, nor a full self-hosting result.
+
 Next actions, in dependency order:
 
-1. Add the remaining syntax and semantics needed by this compiler: multiple
-   case subjects, alternative patterns, non-string structural equality, remaining
-   inference and bit-array forms. Extend import forms with upstream comparisons. Structural
+1. Add non-string structural equality required by the compiler's own data types,
+   then remaining inference, pattern and bit-array forms. Extend import forms with upstream comparisons. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.

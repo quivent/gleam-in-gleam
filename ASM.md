@@ -332,3 +332,32 @@ never treats implicit constructors as an imported module's exports.
 The complete example is 1,852 bytes and all eleven previous example hashes remain
 unchanged. Actual outputs and raw instructions establish correctness for the tested
 cases, not compiler speed, a final ABI or full self-hosting.
+
+## Multiple subjects and alternative rows
+
+Each case subject is evaluated once in source order and stored in its own frame
+slot. The control-flow lowering allocates no artificial tuple or other heap object.
+Subject expressions and patterns can still allocate their ordinary values.
+
+Each arm allocates canonical frame slots for its common binding names. Alternative
+matchers may find a name in different positions; after an entire row succeeds,
+word copies move the selected bindings into those canonical slots. The shared
+guard/body therefore sees consistent addresses. Guards are emitted per alternative:
+false branches retry the next alternative, while success reaches the single shared
+body. This matters when overlapping alternatives bind different values. Failed
+rows/guards never carry their temporary name mapping into later arms.
+
+For artifact SHA256
+`cc9b4d05453194a056ba6b6a9589aca5b30888e5199f5f4f04927ec92ff1d44c`,
+`evidence/multi_patterns-disassembly.txt` shows the first subject saved at
+`0x4000d0` and the second at `0x4000de`. In the guarded function, the first candidate
+is copied to the canonical binding slot at `0x400190`. Its false guard branch at
+`0x4001b7` reaches the second matcher at `0x4001c2`, which reloads the second saved
+subject and copies it to the same canonical slot at `0x4001c9`. A true condition
+from either alternative reaches the shared body at `0x400200`.
+
+The complete 1,146-byte executable prints `7,9,3`. Entry calls main directly at
+`0x4000b0`; no heap initializer or synthetic subject tuple is emitted. All twelve
+previous artifacts retain their exact hashes. The separate core-plus-driver native
+receipt measures 12,064 bytes and validates actual owned source on bounded inputs;
+neither number is a complete compiler size or a speed benchmark.

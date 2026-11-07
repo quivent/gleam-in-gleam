@@ -425,10 +425,11 @@ fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
       Ok(#(a.Echo(e), rest))
     }
     [l.Token(l.Word("case"), _), ..rest] -> {
-      use #(subject, rest) <- c.then(expression(rest, 0))
+      use #(subjects, rest) <- c.then(case_subjects(rest))
       use rest <- c.then(expect(rest, "{"))
-      use #(arms, rest) <- c.then(arms(rest, []))
-      Ok(#(a.Case(subject, arms), rest))
+      use #(arms, rest) <- c.then(multi_arms(rest, []))
+      use value <- c.then(simple_case(subjects, arms))
+      Ok(#(value, rest))
     }
     [
       l.Token(l.Word(id), _),
@@ -683,11 +684,47 @@ fn list_pattern(
   }
 }
 
-fn arms(tokens: Tokens, acc: List(a.Arm)) -> Parsed(List(a.Arm)) {
+fn case_subjects(tokens: Tokens) -> Parsed(List(a.Expression)) {
+  use #(subject, rest) <- c.then(expression(tokens, 0))
+  case rest {
+    [l.Token(l.Symbol(","), _), ..rest] -> {
+      use #(tail, rest) <- c.then(case_subjects(rest))
+      Ok(#([subject, ..tail], rest))
+    }
+    _ -> Ok(#([subject], rest))
+  }
+}
+
+fn pattern_row(tokens: Tokens) -> Parsed(List(a.Pattern)) {
+  use #(p, rest) <- c.then(pattern(tokens))
+  case rest {
+    [l.Token(l.Symbol(","), _), ..rest] -> {
+      use #(tail, rest) <- c.then(pattern_row(rest))
+      Ok(#([p, ..tail], rest))
+    }
+    _ -> Ok(#([p], rest))
+  }
+}
+
+fn alternative_rows(tokens: Tokens) -> Parsed(List(List(a.Pattern))) {
+  use #(row, rest) <- c.then(pattern_row(tokens))
+  case rest {
+    [l.Token(l.Symbol("|"), _), ..rest] -> {
+      use #(tail, rest) <- c.then(alternative_rows(rest))
+      Ok(#([row, ..tail], rest))
+    }
+    _ -> Ok(#([row], rest))
+  }
+}
+
+fn multi_arms(
+  tokens: Tokens,
+  acc: List(a.MultiArm),
+) -> Parsed(List(a.MultiArm)) {
   case tokens {
     [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
     _ -> {
-      use #(pat, rest) <- c.then(pattern(tokens))
+      use #(alternatives, rest) <- c.then(alternative_rows(tokens))
       use #(guard, rest) <- c.then(case rest {
         [l.Token(l.Word("if"), _), ..rest] -> {
           use #(guard, rest) <- c.then(expression(rest, 0))
@@ -697,8 +734,29 @@ fn arms(tokens: Tokens, acc: List(a.Arm)) -> Parsed(List(a.Arm)) {
       })
       use rest <- c.then(expect(rest, "->"))
       use #(body, rest) <- c.then(expression(rest, 0))
-      arms(rest, [a.Arm(pat, guard, body), ..acc])
+      multi_arms(rest, [a.MultiArm(alternatives, guard, body), ..acc])
     }
+  }
+}
+
+fn simple_case(
+  subjects: List(a.Expression),
+  arms: List(a.MultiArm),
+) -> Result(a.Expression, String) {
+  case subjects, simple_arms(arms) {
+    [subject], Ok(arms) -> Ok(a.Case(subject, arms))
+    _, _ -> Ok(a.CaseSubjects(subjects, arms))
+  }
+}
+
+fn simple_arms(arms: List(a.MultiArm)) -> Result(List(a.Arm), String) {
+  case arms {
+    [] -> Ok([])
+    [a.MultiArm([[p]], guard, body), ..rest] -> {
+      use tail <- c.then(simple_arms(rest))
+      Ok([a.Arm(p, guard, body), ..tail])
+    }
+    _ -> Error("Multiple patterns or alternatives")
   }
 }
 

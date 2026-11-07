@@ -271,6 +271,7 @@ fn expression(e: t.Typed, state: State) -> Generated {
       use #(code, state) <- c.then(statements(body, state))
       Ok(#(code, State(..state, env: env)))
     }
+    t.MultiCaseNode(subjects, arms) -> multi_case(subjects, arms, state)
     t.CaseNode(subject, arms) -> {
       use #(code, state) <- c.then(expression(subject, state))
       let #(offset, state) = slot(state)
@@ -1330,4 +1331,177 @@ fn string_prefix(
     }
   })
   Ok(#(c.append(inspect, c.append(head, rest)), state))
+}
+
+fn multi_case(
+  subjects: List(t.Typed),
+  arms: List(t.MultiArm),
+  state: State,
+) -> Generated {
+  use #(evaluate, saved, state) <- c.then(save_subjects(subjects, state))
+  let #(finish, state) = label(state)
+  use #(body, state) <- c.then(multi_arms(arms, saved, finish, state))
+  Ok(#(c.append(evaluate, c.append(body, [asm.Label(finish)])), state))
+}
+
+fn save_subjects(
+  subjects: List(t.Typed),
+  state: State,
+) -> Result(#(List(asm.Part), List(Int), State), String) {
+  case subjects {
+    [] -> Ok(#([], [], state))
+    [value, ..rest] -> {
+      use #(code, state) <- c.then(expression(value, state))
+      let #(saved, state) = slot(state)
+      use #(tail, slots, state) <- c.then(save_subjects(rest, state))
+      Ok(#(c.append(code, [store(saved), ..tail]), [saved, ..slots], state))
+    }
+  }
+}
+
+fn binding_slots(
+  names: List(String),
+  state: State,
+) -> #(List(#(String, Int)), State) {
+  case names {
+    [] -> #([], state)
+    [name, ..rest] -> {
+      let #(saved, state) = slot(state)
+      let #(tail, state) = binding_slots(rest, state)
+      #([#(name, saved), ..tail], state)
+    }
+  }
+}
+
+fn multi_arms(
+  arms: List(t.MultiArm),
+  subjects: List(Int),
+  finish: String,
+  state: State,
+) -> Generated {
+  case arms {
+    [] -> Ok(#([jump("rt:match")], state))
+    [arm, ..rest] -> {
+      let outer = state.env
+      let #(canonical, state) = binding_slots(arm.bindings, state)
+      let #(body_label, state) = label(state)
+      let #(next_arm, state) = label(state)
+      use #(matching, state) <- c.then(alternative_code(
+        arm.alternatives,
+        subjects,
+        canonical,
+        outer,
+        arm.guard,
+        body_label,
+        next_arm,
+        state,
+      ))
+      use #(body, state) <- c.then(expression(
+        arm.body,
+        State(..state, env: c.append(canonical, outer)),
+      ))
+      use #(tail, state) <- c.then(multi_arms(
+        rest,
+        subjects,
+        finish,
+        State(..state, env: outer),
+      ))
+      Ok(#(
+        c.append(matching, [
+          asm.Label(body_label),
+          ..c.append(body, [jump(finish), asm.Label(next_arm), ..tail])
+        ]),
+        state,
+      ))
+    }
+  }
+}
+
+fn alternative_code(
+  rows: List(List(a.Pattern)),
+  subjects: List(Int),
+  canonical: List(#(String, Int)),
+  outer: List(#(String, Int)),
+  guard: a.Guard(t.Typed),
+  success: String,
+  failure: String,
+  state: State,
+) -> Generated {
+  case rows {
+    [] -> Ok(#([jump(failure)], State(..state, env: outer)))
+    [row, ..rest] -> {
+      let #(next, state) = label(state)
+      use #(matching, state) <- c.then(row_code(
+        row,
+        subjects,
+        next,
+        State(..state, env: outer),
+      ))
+      use copies <- c.then(copy_bindings(canonical, state.env))
+      use #(condition, state) <- c.then(case guard {
+        a.NoGuard -> Ok(#([], State(..state, env: c.append(canonical, outer))))
+        a.Guard(value) -> {
+          use #(code, state) <- c.then(expression(
+            value,
+            State(..state, env: c.append(canonical, outer)),
+          ))
+          Ok(#(
+            c.append(code, [raw(<<72, 133, 192>>), branch(132, next)]),
+            state,
+          ))
+        }
+      })
+      use #(tail, state) <- c.then(alternative_code(
+        rest,
+        subjects,
+        canonical,
+        outer,
+        guard,
+        success,
+        failure,
+        State(..state, env: outer),
+      ))
+      Ok(#(
+        c.append(
+          matching,
+          c.append(
+            copies,
+            c.append(condition, [jump(success), asm.Label(next), ..tail]),
+          ),
+        ),
+        state,
+      ))
+    }
+  }
+}
+
+fn row_code(
+  patterns: List(a.Pattern),
+  subjects: List(Int),
+  failure: String,
+  state: State,
+) -> Generated {
+  case patterns, subjects {
+    [], [] -> Ok(#([], state))
+    [p, ..patterns], [saved, ..subjects] -> {
+      use #(code, state) <- c.then(pattern_code(p, saved, failure, state))
+      use #(tail, state) <- c.then(row_code(patterns, subjects, failure, state))
+      Ok(#(c.append(code, tail), state))
+    }
+    _, _ -> Error("Case pattern count does not match subject count")
+  }
+}
+
+fn copy_bindings(
+  canonical: List(#(String, Int)),
+  env: List(#(String, Int)),
+) -> Result(List(asm.Part), String) {
+  case canonical {
+    [] -> Ok([])
+    [#(name, target), ..rest] -> {
+      use source <- c.then(c.lookup(env, name))
+      use tail <- c.then(copy_bindings(rest, env))
+      Ok([load(source), store(target), ..tail])
+    }
+  }
 }

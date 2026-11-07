@@ -40,6 +40,7 @@ pub type Expression {
   Lambda(List(LambdaParameter), Annotation, List(Statement))
   Block(List(Statement))
   Case(Expression, List(Arm))
+  CaseSubjects(List(Expression), List(MultiArm))
   Echo(Expression)
 }
 
@@ -154,4 +155,12 @@ pub type TypeAlias {
 pub type Guard(t) {
   NoGuard
   Guard(t)
+}
+
+pub type MultiArm {
+  MultiArm(
+    alternatives: List(List(Pattern)),
+    guard: Guard(Expression),
+    body: Expression,
+  )
 }

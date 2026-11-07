@@ -104,6 +104,8 @@ fn expression(
       let names = patterns(c.map(params, fn(p) { p.pattern }))
       statements(body, c.append(names, bound), free)
     }
+    a.CaseSubjects(subjects, arms) ->
+      multi_arms(arms, bound, expressions(subjects, bound, free))
     a.Case(subject, arms) ->
       case_arms(arms, bound, expression(subject, bound, free))
     _ -> free
@@ -124,6 +126,28 @@ fn case_arms(
         a.Guard(e) -> expression(e, arm_bound, free)
       }
       case_arms(rest, bound, expression(arm.body, arm_bound, free))
+    }
+  }
+}
+
+fn multi_arms(
+  arms: List(a.MultiArm),
+  bound: List(String),
+  free: List(String),
+) -> List(String) {
+  case arms {
+    [] -> free
+    [arm, ..rest] -> {
+      let names = case arm.alternatives {
+        [first, ..] -> patterns(first)
+        _ -> []
+      }
+      let branch_bound = c.append(names, bound)
+      let free = case arm.guard {
+        a.NoGuard -> free
+        a.Guard(e) -> expression(e, branch_bound, free)
+      }
+      multi_arms(rest, bound, expression(arm.body, branch_bound, free))
     }
   }
 }

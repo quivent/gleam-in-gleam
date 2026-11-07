@@ -6,7 +6,7 @@ count or test count is not a defensible completion percentage.
 
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards and patterns | Multiple case subjects, alternative patterns, remaining bit-array forms and more syntax |
+| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards, multiple subjects and alternative rows | Remaining pattern/bit-array forms and more syntax |
 | Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Non-string structural equality, full inference/coverage and remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
@@ -14,7 +14,7 @@ count or test count is not a defensible completion percentage.
 | Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current strings/prelude milestone has 437 passing checks and 173 agreeing upstream
+The current multi-pattern milestone has 479 passing checks and 213 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,8 +26,8 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add remaining source features (multiple subjects, alternative patterns,
-   structural equality, inference and bit-array forms) and import forms with upstream differential tests.
+1. Add remaining source features (structural equality, remaining patterns,
+   inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
 3. Compile the complete compiler source into a native stage-1 compiler. Use that
@@ -73,5 +73,14 @@ now execute natively. Implicit Result/Ok/Error work across modules with local
 shadowing. The compiler-owned UTF-8 validator itself has been compiled and executed
 by this compiler, while independent host-oracle comparisons cover more input cases.
 This establishes one component, not the complete native compiler. Float/codepoints,
-multiple subjects/alternative patterns, structural equality and native IO/collection
+remaining pattern forms, structural equality and native IO/collection
 remain open; no stage-1/stage-2 claim is made.
+
+Multiple subjects and top-level pattern alternatives now compile to stack-based
+matching, including guard retries and consistent shared bindings. The complete
+actual core utilities module compiles into native code; a bounded driver executes
+representative functions and compares their results with upstream-compiled core.
+This is a second concrete owned-source compilation step beyond UTF-8 validation,
+not the complete compiler. Non-string structural equality, remaining language
+semantics, tail-call/runtime work, native IO and collection still stand before an
+actual stage-1 compiler rebuilding itself for stage 2.
