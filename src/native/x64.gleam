@@ -691,6 +691,13 @@ fn pattern_code(
   state: State,
 ) -> Generated {
   case pat {
+    a.AliasPattern(inner, name) ->
+      pattern_code(
+        inner,
+        subject,
+        failure,
+        State(..state, env: [#(name, subject), ..state.env]),
+      )
     a.StringPattern(text) -> {
       let #(name, state) = add_string(text, state)
       Ok(#(

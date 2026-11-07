@@ -68,6 +68,7 @@ pub type Statement {
 }
 
 pub type Pattern {
+  AliasPattern(Pattern, String)
   BitArrayPattern(List(BitSegment(Pattern)))
   CheckedBitArrayPattern(List(#(Pattern, BitMode)))
   StringPattern(BitArray)
@@ -164,4 +165,12 @@ pub type MultiArm {
     guard: Guard(Expression),
     body: Expression,
   )
+}
+
+// Outer aliases bind values but do not change matching or coverage.
+pub fn without_alias(pattern: Pattern) -> Pattern {
+  case pattern {
+    AliasPattern(inner, _) -> without_alias(inner)
+    _ -> pattern
+  }
 }

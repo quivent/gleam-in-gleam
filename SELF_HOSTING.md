@@ -14,7 +14,7 @@ count or test count is not a defensible completion percentage.
 | Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current structural-equality milestone has 516 passing checks and 246 agreeing upstream
+The current pattern-alias milestone has 546 passing checks and 276 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,7 +26,7 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add remaining source features (nested `as` patterns, remaining patterns,
+1. Extend integer literals, then remaining source features (patterns,
    inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
@@ -91,8 +91,16 @@ equality planner compile and execute natively, with outputs compared against the
 upstream-compiled counterparts. Their 24,916-byte and 48,175-byte executables each
 include dependencies and a test driver; these are owned-component proofs.
 
-The complete compiler API probe now reaches a specific syntax rejection in
-`check.gleam` at line 1437: `ReplaceField(a.Lambda(_, _, _) as e)`. Nested pattern
-aliases are the next concrete frontend gap, recorded with source hashes in
+At the structural-equality checkpoint, the complete compiler API probe reached a
+syntax rejection in `check.gleam` at line 1437: `ReplaceField(a.Lambda(_, _, _) as e)`. That historical gap is recorded with source hashes in
 `evidence/complete-api-equality-probe.json`. No native compiler rebuilding itself
 has been observed. The bootstrap still uses official Gleam and Node.
+
+Nested `pattern as name` now binds the original whole value without copying it.
+Coverage strips aliases while retaining the underlying matcher; guards,
+alternatives, closure capture and duplicate/type checks retain ordinary binding
+semantics. The repeatable `node test/probe-compiler-api.mjs` now lexes/parses every
+compiler module except the assembler, where `-2_147_483_648` exceeds the current
+literal magnitude limit. This clears the earlier alias syntax blocker, without
+claiming all modules typecheck or run natively. The source-hashed diagnostic is in
+`evidence/complete-api-pattern-aliases-probe.json`.

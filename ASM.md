@@ -386,3 +386,24 @@ list-head call at `0x400706` reaches the Tree helper at `0x4005a7`; the tail
 back-jump at `0x400714` reaches `0x4006b2`. A separate 10,000-cell equality test
 checks that tail traversal does not recurse. All thirteen older examples retain
 their exact hashes. No runtime-speed claim is inferred from these instructions.
+
+## Pattern aliases reuse subject slots
+
+An alias adds a name-to-slot mapping to lowering state, then lowers its inner
+pattern against that same subject. No runtime object copy, heap allocation or
+additional alias store is emitted. Pattern extraction and later variable reads
+still emit ordinary instructions.
+
+In `evidence/pattern_aliases-disassembly.txt`, total's subject pointer is saved at
+`0x4000d5` in RBP-8. The nested integer is stored separately at `0x400108` in
+RBP-16. Reading `whole.value` reloads the original subject at `0x400117`; its
+checked field read is at `0x40013a`. There is no allocator call in total. In main,
+the tuple is saved at `0x40020c`; reading `pair.0` reloads that same slot at
+`0x400257`. The two allocator calls construct the original Value and tuple, not
+alias copies. This is actual instruction inspection, not a timing benchmark.
+
+The alias example is 884 bytes, SHA256
+`d78b45bc9744a36045a3d4047f426bc4843265ee562117acc74dcddaf3a2b174`,
+prints `14,10`, and needs no dynamic loader/shared libraries. All fourteen earlier
+example hashes are unchanged. The final alias suite passes 546 checks and 276
+fresh upstream comparisons; this remains subset evidence, not full conformance.

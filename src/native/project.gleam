@@ -690,6 +690,10 @@ fn expression(
 
 fn pattern(p: a.Pattern, scope: Scope) -> Result(a.Pattern, String) {
   case p {
+    a.AliasPattern(inner, name) -> {
+      use inner <- c.then(pattern(inner, scope))
+      Ok(a.AliasPattern(inner, name))
+    }
     a.ConstructorPattern(name, fields, spread) -> {
       use name <- c.then(value_in(name, scope.current, False, scope.entry))
       use fields <- c.then(pattern_fields(fields, scope))

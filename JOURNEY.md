@@ -276,3 +276,36 @@ accept nested `as` patterns. The exact error and source hashes are preserved in
 followed by whatever actual whole-source probes expose. Native IO, runtime memory
 work and a genuine stage-1/stage-2 rebuild remain unproven; no installed compiler
 or crew process was changed.
+
+## Nested aliases clear the next whole-source blocker — 2026-11-08
+
+The complete compiler probe identified a real source need rather than a guessed
+feature list: `ReplaceField(a.Lambda(_, _, _) as e)` in the checker. We added an
+explicit AliasPattern through parsing, resolution, checking, coverage, capture
+analysis and lowering. The whole binding reuses its existing subject slot; the
+inner matcher still checks tags and extracts fields. Constructor facts belong to
+the alias only when proved, and common alternative facts are still intersected.
+
+Thirty new fixtures exercise nested values, lets,
+qualified constructors, guard retries, multicolumn coverage, returned captures,
+string/prefix/whole-bit-array aliases and error paths. Independent upstream probes
+confirmed that discard alias names and chained aliases are syntax errors, while
+`"ab" as prefix <> tail as whole` binds both prefix and complete subject. A first
+verification attempt caught my use of the symbol-only expect helper for the word
+`as`; the parser was corrected before qualification. Another oracle check showed
+that upstream considers an unguarded literal-True case exhaustive; the negative
+coverage fixture now uses an unknown Bool parameter to test its intended rule
+instead of relying on that unsupported constant specialization.
+
+The repeatable whole-source probe now identifies only the assembler as a frontend
+failure: its negative displacement boundary uses magnitude 2_147_483_648, beyond
+our current positive literal limit. Every other compiler module lexes/parses;
+this does not yet prove whole-project typechecking, native execution, native IO
+or a compiler rebuilding itself. The new probe retains source/driver hashes and
+its actual diagnostic separately from the previous alias rejection.
+
+Final alias qualification: 546/546 tests and 276/276 fresh upstream comparisons.
+The example is 884 bytes with inspected whole-value slot reuse, no dynamic loader
+or shared libraries, and fourteen earlier examples remain byte-identical. All
+three owned core/type-system/equality-planner native checks pass again; their new
+receipts retain current source hashes separately from the prior milestone.

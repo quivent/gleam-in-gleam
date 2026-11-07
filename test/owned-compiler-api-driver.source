@@ -1,0 +1,13 @@
+pub fn main() -> Nil {
+  case compile(<<"pub fn main() -> Nil { echo 7 Nil }":utf8>>) {
+    Ok(binary) -> {
+      echo core.byte_length(binary)
+      Nil
+    }
+    Error(error) -> {
+      echo error
+      Nil
+    }
+  }
+  Nil
+}

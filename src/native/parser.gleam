@@ -499,24 +499,49 @@ fn argument(tokens: Tokens) -> Parsed(a.Argument) {
 }
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
+  use #(inner, rest) <- c.then(pattern_atom(tokens))
+  case rest {
+    [l.Token(l.Word("as"), _), ..rest] -> {
+      use #(id, rest) <- c.then(alias_name(rest))
+      Ok(#(a.AliasPattern(inner, id), rest))
+    }
+    _ -> Ok(#(inner, rest))
+  }
+}
+
+fn alias_name(tokens: Tokens) -> Parsed(String) {
+  use #(id, rest) <- c.then(name(tokens))
+  case c.uppercase_name(id), c.discarded_name(id) {
+    False, False -> Ok(#(id, rest))
+    _, _ -> error(tokens, "Pattern alias requires a named variable")
+  }
+}
+
+fn pattern_atom(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
     [l.Token(l.Text(text), _), ..rest] -> {
-      use #(binding, rest) <- c.then(case rest {
-        [l.Token(l.Word("as"), _), ..rest] -> string_binding(rest)
-        _ -> Ok(#(a.DiscardPattern, rest))
-      })
       case rest {
+        [
+          l.Token(l.Word("as"), _),
+          l.Token(l.Word(id), _),
+          l.Token(l.Symbol("<>"), _),
+          ..rest
+        ] -> {
+          use _ <- c.then(case c.uppercase_name(id), c.discarded_name(id) {
+            False, False -> Ok(Nil)
+            _, _ -> error(rest, "Pattern alias requires a named variable")
+          })
+          use #(tail, rest) <- c.then(string_binding(rest))
+          Ok(#(a.StringPrefixPattern(text, a.VariablePattern(id), tail), rest))
+        }
         [l.Token(l.Symbol("<>"), _), ..rest] -> {
           use #(tail, rest) <- c.then(string_binding(rest))
-          Ok(#(a.StringPrefixPattern(text, binding, tail), rest))
+          Ok(#(a.StringPrefixPattern(text, a.DiscardPattern, tail), rest))
         }
-        _ ->
-          case binding {
-            a.DiscardPattern -> Ok(#(a.StringPattern(text), rest))
-            _ -> error(rest, "String prefix binding requires '<>'")
-          }
+        _ -> Ok(#(a.StringPattern(text), rest))
       }
     }
+
     [
       l.Token(l.Word(alias), _),
       l.Token(l.Symbol("."), _),

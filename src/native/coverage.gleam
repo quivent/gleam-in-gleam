@@ -59,7 +59,7 @@ fn matrix(
 }
 
 fn wild(p: a.Pattern) -> Bool {
-  case p {
+  case a.without_alias(p) {
     a.VariablePattern(_) | a.DiscardPattern -> True
     a.ListPattern([], a.RestPattern(p)) -> wild(p)
     a.CheckedBitArrayPattern([#(p, a.BitsSegment)]) -> wild(p)
@@ -187,7 +187,7 @@ fn select(p: a.Pattern, choice: Choice) -> Result(Selection, String) {
   case wild(p) {
     True -> Ok(Hit(c.map(choice.fields, fn(_) { a.DiscardPattern })))
     False ->
-      case p {
+      case a.without_alias(p) {
         a.BooleanPattern(b) ->
           case
             choice.kind == 0

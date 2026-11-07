@@ -835,10 +835,31 @@ fn pattern(
 ) -> Result(#(a.Pattern, Environment), String) {
   use resolved <- c.then(resolve_pattern(p, t, globals))
   use bindings <- c.then(pattern_bindings(resolved, t, []))
-  case resolved {
-    a.VariablePattern(name) ->
-      Ok(#(resolved, [#(name, Local(t, known)), ..env]))
-    _ -> Ok(#(resolved, c.append(bindings, env)))
+  Ok(#(resolved, c.append(known_bindings(resolved, t, known, bindings), env)))
+}
+
+fn pattern_variant(p: a.Pattern, fallback: Int) -> Int {
+  case a.without_alias(p) {
+    a.CheckedConstructorPattern(tag, _) -> tag
+    _ -> fallback
+  }
+}
+
+fn known_bindings(
+  p: a.Pattern,
+  t: a.Type,
+  known: Int,
+  bindings: Environment,
+) -> Environment {
+  case p {
+    a.VariablePattern(name) -> c.put(bindings, name, Local(t, known))
+    a.AliasPattern(inner, name) ->
+      c.put(
+        known_bindings(inner, t, known, bindings),
+        name,
+        Local(t, pattern_variant(inner, known)),
+      )
+    _ -> bindings
   }
 }
 
@@ -979,6 +1000,10 @@ fn resolve_pattern(
   globals: Globals,
 ) -> Result(a.Pattern, String) {
   case p {
+    a.AliasPattern(inner, name) -> {
+      use inner <- c.then(resolve_pattern(inner, t, globals))
+      Ok(a.AliasPattern(inner, name))
+    }
     a.BitArrayPattern(segments) -> {
       use _ <- c.then(equal(t, a.BitArrayType))
       use segments <- c.then(bit_patterns(segments, globals))
@@ -1066,6 +1091,15 @@ fn pattern_bindings(
   bindings: Environment,
 ) -> Result(Environment, String) {
   case p {
+    a.AliasPattern(inner, name) -> {
+      use bindings <- c.then(pattern_bindings(inner, t, bindings))
+      use bindings <- c.then(pattern_bindings(
+        a.VariablePattern(name),
+        t,
+        bindings,
+      ))
+      Ok(c.put(bindings, name, Local(t, pattern_variant(inner, 0))))
+    }
     a.StringPattern(_) -> {
       use _ <- c.then(equal(t, a.StringType))
       Ok(bindings)
@@ -1185,7 +1219,7 @@ fn branch_type(arms: List(Arm), type_: a.Type) -> Result(a.Type, String) {
 }
 
 fn covers(p: a.Pattern, t: a.Type, globals: Globals) -> Bool {
-  case p, t {
+  case a.without_alias(p), t {
     a.VariablePattern(_), _ | a.DiscardPattern, _ -> True
     a.CheckedBitArrayPattern([#(tail, a.BitsSegment)]), a.BitArrayType ->
       covers(tail, t, globals)
@@ -1204,7 +1238,7 @@ fn covers(p: a.Pattern, t: a.Type, globals: Globals) -> Bool {
 }
 
 fn covers_known(p: a.Pattern, t: a.Type, known: Int, globals: Globals) -> Bool {
-  case p {
+  case a.without_alias(p) {
     a.CheckedConstructorPattern(tag, fields) if known != 0 && tag == known ->
       fields_cover(fields, globals)
     _ -> covers(p, t, globals)
@@ -1270,7 +1304,7 @@ fn exhaustive_primitive(
       case covers(arm.pattern, t, globals) {
         True -> Ok(Nil)
         False ->
-          case arm.pattern, t {
+          case a.without_alias(arm.pattern), t {
             a.BooleanPattern(True), a.Boolean ->
               exhaustive(rest, t, True, no, globals, 0)
             a.BooleanPattern(False), a.Boolean ->
@@ -1330,10 +1364,13 @@ fn variants_cover(
 fn tag_cover(arms: List(Arm), tag: Int, globals: Globals) -> Bool {
   case arms {
     [] -> False
-    [Arm(a.CheckedConstructorPattern(id, fields), _, _), ..rest] ->
-      { id == tag && fields_cover(fields, globals) }
-      || tag_cover(rest, tag, globals)
-    [_, ..rest] -> tag_cover(rest, tag, globals)
+    [arm, ..rest] ->
+      case a.without_alias(arm.pattern) {
+        a.CheckedConstructorPattern(id, fields) ->
+          { id == tag && fields_cover(fields, globals) }
+          || tag_cover(rest, tag, globals)
+        _ -> tag_cover(rest, tag, globals)
+      }
   }
 }
 
@@ -1651,13 +1688,12 @@ fn row_known(
 ) -> Environment {
   case patterns, subjects {
     [], [] -> bindings
-    [a.VariablePattern(name), ..ps], [subject, ..ss] ->
+    [p, ..ps], [subject, ..ss] ->
       row_known(
         ps,
         ss,
-        c.put(bindings, name, Local(subject.type_, subject.known_variant)),
+        known_bindings(p, subject.type_, subject.known_variant, bindings),
       )
-    [_, ..ps], [_, ..ss] -> row_known(ps, ss, bindings)
     _, _ -> bindings
   }
 }

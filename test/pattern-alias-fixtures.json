@@ -1,0 +1,279 @@
+[
+  {
+    "name": "pattern-alias-nested-constructor",
+    "entry": "main",
+    "files": {
+      "main": "type Inner {A(Int) B} type Outer {Outer(Inner)} pub fn main() -> Nil {case Outer(A(7)) {Outer(A(n) as inner) as outer -> {echo n echo inner==A(7) echo outer==Outer(inner) Nil} _ -> Nil} Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\nTrue\nTrue\n"
+  },
+  {
+    "name": "pattern-alias-tuple-list-let",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(x,ys) as both = #(7,[2,3]) let [..rest] as all = ys echo x echo both==#(7,all) echo rest==ys Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\nTrue\nTrue\n"
+  },
+  {
+    "name": "pattern-alias-bool-coverage",
+    "entry": "main",
+    "files": {
+      "main": "fn number(b: Bool) -> Int {case b {True as yes -> {echo yes 1} False as no -> {echo no 2}}} pub fn main() -> Nil {echo number(True) echo number(False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n1\nFalse\n2\n"
+  },
+  {
+    "name": "pattern-alias-list-coverage",
+    "entry": "main",
+    "files": {
+      "main": "fn size(xs: List(Int)) -> Int {case xs {[] as empty -> {echo empty==[] 0} [n,..tail] as all -> {echo all==[n,..tail] n}}} pub fn main() -> Nil {echo size([]) echo size([9,8]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n0\nTrue\n9\n"
+  },
+  {
+    "name": "pattern-alias-tag-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type T {A(Int) B} fn f(t: T) -> Int {case t {A(n) as a -> {echo a==A(n) n} B as b -> {echo b==B 0}}} pub fn main() -> Nil {echo f(A(4)) echo f(B) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n4\nTrue\n0\n"
+  },
+  {
+    "name": "pattern-alias-guard-retry",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(1,9) {#(n,_) as whole | #(_,n) as whole if n>5 -> {echo whole==#(1,9) n} _ -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n9\n"
+  },
+  {
+    "name": "pattern-alias-multi-coverage",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a: Bool,b: Bool) -> Int {case a,b {True as x, _ as y -> {echo x echo y 1} False as x, True as y -> {echo x echo y 2} False as x, False as y -> {echo x echo y 3}}} pub fn main() -> Nil {echo f(False,False) Nil}"
+    },
+    "accepted": true,
+    "stdout": "False\nFalse\n3\n"
+  },
+  {
+    "name": "pattern-alias-returned-capture",
+    "entry": "main",
+    "files": {
+      "main": "fn f(xs: List(Int)) -> fn() -> Bool {case xs {[x,..tail] as all -> fn() {all==[x,..tail]} [] as all -> fn() {all==[]}}} pub fn main() -> Nil {let check=f([4,5]) echo check() Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "pattern-alias-lexical-shadow",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let all=99 let f=fn(xs: List(Int)) {case xs {[] as all -> all==[] [_,..] as all -> all==xs}} echo f([1]) echo all Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n99\n"
+  },
+  {
+    "name": "pattern-alias-known-variant",
+    "entry": "main",
+    "files": {
+      "main": "type T {A(value: Int) B} pub fn main() -> Nil {case A(8) {A(_) as whole -> echo whole.value B -> echo 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "pattern-alias-nested-known-variant",
+    "entry": "main",
+    "files": {
+      "main": "type T {A(value: Int) B} pub fn main() -> Nil {case #(A(8),True) {#(A(_) as whole,_) -> echo whole.value _ -> echo 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "pattern-alias-string-literal",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"ok\" {\"ok\" as whole -> whole==\"ok\" _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "pattern-alias-string-prefix",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"abcd\" {\"ab\" as prefix <> tail as whole -> whole==prefix<>tail _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "pattern-alias-whole-bit-array",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case <<7,9>> {<<n,rest:bits>> as whole -> whole==<<n,rest:bits>> _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "pattern-alias-module-constructor",
+    "entry": "main",
+    "files": {
+      "main": "import box pub fn main() -> Nil {case box.Box(7) {box.Box(n) as whole -> {echo n echo whole==box.Box(n) Nil}} Nil}",
+      "box": "pub type Box {Box(Int)}"
+    },
+    "accepted": true,
+    "stdout": "7\nTrue\n"
+  },
+  {
+    "name": "pattern-alias-evaluated-once",
+    "entry": "main",
+    "files": {
+      "main": "fn source() -> #(Int,Int) {echo 1 #(2,3)} pub fn main() -> Nil {let #(x,y) as whole=source() echo x+y echo whole==#(2,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n5\nTrue\n"
+  },
+  {
+    "name": "pattern-alias-duplicate-inner",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(x,_) as x = #(1,2) echo x Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate variable"
+  },
+  {
+    "name": "pattern-alias-duplicate-across-columns",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case 1,2 {_ as same,_ as same -> echo same} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate variable"
+  },
+  {
+    "name": "pattern-alias-alternative-name-mismatch",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case True {True as a | False as b -> echo a} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "same variables"
+  },
+  {
+    "name": "pattern-alias-alternative-type-mismatch",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case #(1,True) {#(_ as same,True) | #(1,_ as same) -> echo same _ -> echo 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-refutable-let",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let [x] as all=[1,2] echo x echo all==[1] Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Refutable"
+  },
+  {
+    "name": "pattern-alias-guard-not-coverage",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case True {True as b if b -> echo 1 False as b -> echo b} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "pattern-alias-alias-does-not-widen",
+    "entry": "main",
+    "files": {
+      "main": "fn f(value: Bool) -> Nil {case value {True as b -> echo b} Nil} pub fn main() -> Nil {f(True) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "pattern-alias-incompatible-use",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(n,_) as whole = #(1,2) echo whole+n Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-discard",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(x,y) as _ = #(1,2) echo x+y Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-underscore",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(x,y) as _all = #(1,2) echo x+y Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-chain",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let #(x,y) as a as b = #(1,2) echo x+y echo a==b Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-string-discard",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case \"x\" {\"x\" as _ -> echo 1 _ -> echo 2} Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-string-chain",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case \"x\" {\"x\" as a as b -> echo a==b _ -> echo False} Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "pattern-alias-variable",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let x as y=4 echo x+y Nil}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  }
+]

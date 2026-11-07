@@ -274,6 +274,22 @@ Nested `|` inside an individual pattern is rejected, as upstream requires comple
 alternative rows instead. Ordinary single-subject/non-alternative cases retain
 their historical IR and conservative coverage checks.
 
+## Pattern aliases
+
+`pattern as name` binds the entire matched value alongside nested bindings. This
+works in lets, case rows and alternatives, including nested constructor/tuple/list
+patterns, qualified constructors, whole BitArrays, string literals and string
+prefixes. Alias bindings carry the whole value's type and known constructor where
+proved, so a matched variant's record fields remain available. Names participate
+in duplicate detection, alternative binding consistency, guard scope and closure
+capture. Aliases do not widen coverage or make a refutable let irrefutable.
+
+Lowering maps the alias to the existing subject stack slot. It introduces no object
+copy or arena allocation. Nested matching still emits its ordinary tests/loads.
+Discard alias names and chained `as` forms are rejected, matching upstream syntax.
+Aliases inside individual bit-array segments remain outside the supported subset;
+aliases around the entire bit array work.
+
 ## Structural equality
 
 `==` and `!=` compare tuples, lists, byte-aligned BitArrays and concrete nominal
@@ -317,8 +333,8 @@ local-field semantics.
   signed 64-bit arithmetic; overflow exits 70. This is an explicit seed
   limitation, not Gleam's full cross-target integer semantics.
 * Strings retain valid scalar UTF-8 bytes; only a few source escapes are supported.
-  Unicode escape syntax, grapheme operations and general pattern aliases remain
-  unsupported. String prefixes/concatenation/equality are byte-based and do not
+  Unicode escape syntax and grapheme operations remain unsupported.
+  General pattern aliases are supported as described below. String prefixes/concatenation/equality are byte-based and do not
   normalize equivalent Unicode spellings.
 * Compound objects and function descriptors use a single 64 MiB read/write, non-executable mmap arena, only in
   programs with compound allocation. Allocation is checked and exhaustion exits
@@ -489,14 +505,25 @@ planner also runs natively with its definition collector and dependencies (48,17
 bytes including its driver), producing the expected recursive three-node plan.
 Their separate `owned-*-native-verification.json` receipts compare outputs against
 upstream-compiled owned modules. Neither size is the complete compiler size.
-The complete compiler API probe remains rejected at a nested `as` pattern; see
-`evidence/complete-api-equality-probe.json`. No stage-1/stage-2 result is claimed.
+The historical complete compiler API probe stopped at a nested `as` pattern; see
+`evidence/complete-api-equality-probe.json`. That syntax is now supported. The
+repeatable current probe, `node test/probe-compiler-api.mjs`, instead reaches an
+integer-literal limit in the assembler; its receipt is
+`evidence/complete-api-pattern-aliases-probe.json`. No stage-1/stage-2 result is claimed.
+
+The pattern-alias milestone passes **546/546** checks and **276/276** fresh
+upstream comparisons (64 single-file plus 212 project fixtures). Its 884-byte
+example prints `14,10`, with no alias allocation/copy in the inspected ASM. All
+fourteen earlier example hashes remain unchanged, and the owned compiler-component
+native checks still pass. Source/artifact hashes and fresh oracle diagnostics are
+in `evidence/pattern-aliases-verification.json` and its linked receipts.
 
 Next actions, in dependency order:
 
-1. Implement nested `as` patterns: the full compiler API probe currently rejects
-   `ReplaceField(a.Lambda(_, _, _) as e)` in its own checker. Continue remaining
-   inference, pattern, bit-array and import forms with upstream comparisons.
+1. Extend integer literal handling: after pattern aliases the complete compiler
+   API probe reaches its assembler's `-2_147_483_648` displacement check, beyond
+   the current literal magnitude limit. Continue remaining inference, pattern,
+   bit-array and import forms with upstream comparisons.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.
 3. Compile the compiler source natively, then rebuild that compiler with itself

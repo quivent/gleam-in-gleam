@@ -5,6 +5,7 @@ import native/core as c
 
 pub fn pattern_names(p: a.Pattern) -> List(String) {
   case p {
+    a.AliasPattern(inner, name) -> [name, ..pattern_names(inner)]
     a.VariablePattern(n) -> [n]
     a.StringPrefixPattern(_, binding, tail) -> patterns([binding, tail])
     a.TuplePattern(ps) -> patterns(ps)
