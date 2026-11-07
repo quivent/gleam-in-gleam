@@ -12,6 +12,7 @@ import {lex} from '../build/dev/javascript/gleam_native/native/lexer.mjs';
 import {parse} from '../build/dev/javascript/gleam_native/native/parser.mjs';
 import {module as checkModule} from '../build/dev/javascript/gleam_native/native/check.mjs';
 import * as oracle from '../build/dev/javascript/gleam_native/oracle.mjs';
+import * as bitOracle from '../build/dev/javascript/gleam_native/bit_oracle.mjs';
 import {probe} from '../build/dev/javascript/gleam_native/allocator_probe.mjs';
 
 const base = readFileSync(new URL('./oracle.gleam', import.meta.url), 'utf8');
@@ -405,4 +406,101 @@ test('relocation emission handles a large instruction stream without host recurs
   assert.equal(bytes[12004], 0x90);
   const missing = assemble(toList([new Relative(new BitArray(Uint8Array.of(0xe9)), 'missing')]));
   assert.equal(missing.isOk(), false);
+});
+
+const bitSource = readFileSync(new URL('./bit_oracle.gleam', import.meta.url), 'utf8');
+
+for (const [name, args] of [
+  ['bit_empty', []], ['bit_default', [2]], ['bit_default', [-2]], ['bit_default', [257]],
+  ['bit_little', [4660]], ['bit_big', [4660]], ['bit_endian', [4660]],
+  ['bit_48', [1000000]], ['bit_signed', [-2]], ['bit_signed', [-128]],
+  ['bit_concat', [7]], ['bit_tail_return', [8]], ['bit_capture', [9]],
+  ['bit_zero', [99]], ['bit_options', [4660]],
+  ['bit_literal', [1]], ['bit_literal', [2]], ['bit_literal', [3]],
+  ['bit_lengths', [7]], ['bit_full_tail', [8]], ['bit_record', [9]],
+]) {
+  test(`upstream bit-array oracle: ${name}(${args.join(',')})`, () => {
+    const result = run(`${bitSource}\npub fn main() -> Nil { echo ${name}(${args.join(',')}) Nil }`);
+    assert.equal(result.status, 0);
+    assert.equal(result.stdout, rendered(bitOracle[name](...args)) + '\n');
+    assert.equal(result.stderr, '');
+  });
+}
+
+test('bit-array nonzero segments evaluate left-to-right and static zero width skips evaluation', () => {
+  const result = run(`${bitSource} pub fn main() -> Nil { let data=<<{echo 1 7}, {echo 2 <<8,9>>}:bits, {echo 3 99}:0>> echo byte_sum(data) Nil }`);
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n2\n24\n');
+});
+test('bit-array alternatives check exact lengths before any byte load', () => {
+  const result = run('fn read(data: BitArray) -> Int { case data { <<_,_,_,_>> -> 4 <<1,2>> -> 2 <<255,rest:bits>> -> 9 <<>> -> 0 _ -> 8 } } pub fn main() -> Nil { echo read(<<>>) echo read(<<1>>) echo read(<<1,2>>) echo read(<<255>>) echo read(<<1,2,3,4,5>>) Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '0\n8\n2\n9\n8\n');
+});
+test('unsigned 64-bit extraction respects documented signed native Int limit', () => {
+  const result = run('pub fn main() -> Nil { case <<-1:64>> { <<n:64>> -> {echo n Nil} _ -> Nil } }');
+  assert.equal(result.status, 70);
+  assert.equal(result.stdout, '');
+});
+
+for (const [name, source, error] of [
+  ['wrong integer segment type', 'pub fn main() -> Nil { let a=<<True>> Nil }', /Type mismatch/],
+  ['wrong bits segment type', 'pub fn main() -> Nil { let a=<<1:bits>> Nil }', /Type mismatch/],
+  ['pattern on wrong subject', 'pub fn main() -> Nil { case 1 { <<>> -> Nil _ -> Nil } }', /Type mismatch/],
+  ['unsized tail not last', 'fn f(a: BitArray) -> Int { case a { <<r:bits,x>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', /tail must be last/],
+  ['duplicate pattern names', 'fn f(a: BitArray) -> Int { case a { <<x,x>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', /Duplicate variable/],
+  ['conflicting sizes', 'pub fn main() -> Nil { let a=<<1:8-16>> Nil }', /Duplicate\/conflicting/],
+  ['conflicting endianness', 'pub fn main() -> Nil { let a=<<1:big-little>> Nil }', /Duplicate\/conflicting/],
+  ['zero-width pattern', 'fn f(a: BitArray) -> Int { case a { <<x:0>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', /byte-aligned/],
+  ['signed construction option', 'pub fn main() -> Nil { let a=<<1:signed>> Nil }', /only valid in patterns/],
+  ['bytes construction option', 'pub fn main() -> Nil { let a=<<<<1>>:bytes>> Nil }', /only valid in patterns/],
+  ['unaligned segment pending', 'pub fn main() -> Nil { let a=<<1:3>> Nil }', /byte-aligned/],
+  ['oversized segment pending', 'pub fn main() -> Nil { let a=<<1:72>> Nil }', /byte-aligned/],
+  ['float option pending', 'pub fn main() -> Nil { let a=<<1:float>> Nil }', /option not implemented/],
+  ['dynamic size pending', 'fn f(n: Int) -> BitArray { <<1:size(n)>> } pub fn main() -> Nil { Nil }', /Expected ','|option|Expression/],
+  ['compound bit-array printing pending', 'pub fn main() -> Nil { echo <<1>> Nil }', /Compound-value echo/],
+  ['structural bit-array equality pending', 'pub fn main() -> Nil { echo <<1>> == <<1>> Nil }', /Structural compound equality/],
+  ['builtin BitArray shadowing', 'type BitArray { A } pub fn main() -> Nil { Nil }', /Builtin type shadowing/],
+]) {
+  test(`bit arrays reject without fallback: ${name}`, () => {
+    const result=compileResult(source);
+    assert.equal(result.isOk(), false);
+    assert.match(result[0], error);
+  });
+}
+
+test('64-bit extraction supports signed negatives and unsigned values in native range', () => {
+  const result = run('pub fn main() -> Nil { case <<-2:64-little,1000000:64>> { <<a:64-little-signed,b:64>> -> { echo a echo b Nil } _ -> Nil } }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '-2\n1000000\n');
+});
+test('unsigned 64-bit discard/literal matching does not misinterpret its high bit', () => {
+  const result = run('pub fn main() -> Nil { let a=<<-1:64>> echo case a { <<-1:64>> -> 9 <<_:64>> -> 1 _ -> 0 } Nil }');
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, '1\n');
+});
+for (const [name, source] of [
+ ['unaligned completeness remains conservative', 'fn f(a: BitArray) -> Int { case a { <<>> -> 0 <<_,rest:bits>> -> 1 } } pub fn main() -> Nil { Nil }'],
+ ['bytes tail is refutable without assertion', 'fn f(a: BitArray) -> BitArray { let <<tail:bytes>>=a tail } pub fn main() -> Nil { Nil }'],
+ ['unbraced segment arithmetic', 'pub fn main() -> Nil { let a=<<1+2>> Nil }'],
+]) {
+ test(`bit-array source checking: ${name}`, () => { assert.equal(compileResult(source).isOk(), false); });
+}
+
+for (const width of [8,16,24,32,40,48,56,64]) {
+ for (const endian of ['big','little']) {
+  test(`exact bytes and independent signed decoding: ${width}-${endian}`, () => {
+   const bytes=Array(width/8).fill(255);
+   bytes[endian==='little' ? 0 : bytes.length-1]=254;
+   const literal=bytes.join(',');
+   const result=run(`pub fn main() -> Nil { echo case <<-2:${width}-${endian}>> { <<${literal}>> -> 1 _ -> 0 } case <<${literal}>> { <<n:${width}-${endian}-signed>> -> {echo n Nil} _ -> Nil } Nil }`);
+   assert.equal(result.status,0);
+   assert.equal(result.stdout,'1\n-2\n');
+  });
+ }
+}
+test('bit-array construction fails before copying beyond the bounded arena', () => {
+ const result=run('fn grow(a: BitArray,n: Int) -> BitArray { case n { 0 -> a _ -> grow(<<a:bits,a:bits>>,n-1) } } pub fn main() -> Nil { let _a=grow(<<1>>,25) echo 99 Nil }');
+ assert.equal(result.status,71);
+ assert.equal(result.stdout,'');
 });

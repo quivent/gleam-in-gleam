@@ -53,6 +53,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('functions', '22\n3\n4\n'),
         ('closures', '12\n22\n6\n'),
         ('record_updates', '3\n7\nTrue\n'),
+        ('bit_arrays', '5\n9\n-2\n4660\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -66,7 +67,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates', 'bit_arrays') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -135,6 +136,28 @@ oracle_cases = [
     ('update-zero-field-invalid', 'pub type R { R } pub fn main() -> R { let r=R R(..r) }', False, ''),
     ('update-phantom-type-change', 'type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }', True, '3\n'),
     ('update-lambda-retained-context', 'type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }', True, '5\n'),
+    ('bits-signed-and-truncation', 'pub fn main() -> Nil { case <<257,-1,65537:16-little>> { <<a,b,c:16-little>> -> {echo a echo b echo c Nil} _ -> Nil } }', True, '1\n255\n1\n'),
+    ('bits-signed-pattern', 'pub fn main() -> Nil { case <<255>> { <<n:signed>> -> {echo n Nil} _ -> Nil } }', True, '-1\n'),
+    ('bits-concat-order', 'pub fn main() -> Nil { let a=<<{echo 1 7},{echo 2 <<8,9>>}:bits,{echo 3 99}:0>> case a { <<x,y,z>> -> {echo x echo y echo z Nil} _ -> Nil } }', True, '1\n2\n7\n8\n9\n'),
+    ('bits-full-tail', 'pub fn main() -> Nil { let <<tail:bits>>=<<1,2>> case tail { <<x,y>> -> {echo x echo y Nil} _ -> Nil } }', True, '1\n2\n'),
+    ('bits-exact-length-guard', 'fn f(a: BitArray) -> Int { case a { <<_,_,_>> -> 3 <<1,2>> -> 2 <<>> -> 0 _ -> 9 } } pub fn main() -> Nil { echo f(<<>>) echo f(<<1>>) echo f(<<1,2>>) echo f(<<1,2,3,4>>) Nil }', True, '0\n9\n2\n9\n'),
+    ('bits-64-safe-range', 'pub fn main() -> Nil { case <<-2:64-little,1000000:64>> { <<a:64-little-signed,b:64>> -> {echo a echo b Nil} _ -> Nil } }', True, '-2\n1000000\n'),
+    ('bits-64-literal-discard', 'pub fn main() -> Nil { let a=<<-1:64>> echo case a { <<-1:64>> -> 9 <<_:64>> -> 1 _ -> 0 } Nil }', True, '1\n'),
+    ('bits-mismatching-literals', 'pub fn main() -> Nil { echo case <<255>> { <<256>> -> 9 <<-1>> -> 8 <<255:signed>> -> 7 <<-1:signed>> -> 1 _ -> 0 } Nil }', True, '1\n'),
+    ('bits-unsigned-pattern', 'pub fn main() -> Nil { case <<255>> { <<n:unsigned>> -> {echo n Nil} _ -> Nil } }', True, '255\n'),
+    ('bits-options-size', 'pub fn main() -> Nil { case <<4660:int-size(16)-little>> { <<n:unsigned-int-little-size(16)>> -> {echo n Nil} _ -> Nil } }', True, '4660\n'),
+    ('bits-empty', 'pub fn main() -> Nil { echo case <<>> { <<>> -> 1 _ -> 0 } Nil }', True, '1\n'),
+    ('bits-wrong-segment-type', 'pub fn main() -> Nil { let _a=<<True>> Nil }', False, ''),
+    ('bits-wrong-concat-type', 'pub fn main() -> Nil { let _a=<<1:bits>> Nil }', False, ''),
+    ('bits-pattern-only-sign', 'pub fn main() -> Nil { let _a=<<1:signed>> Nil }', False, ''),
+    ('bits-pattern-only-bytes', 'pub fn main() -> Nil { let _a=<<<<1>>:bytes>> Nil }', False, ''),
+    ('bits-duplicate-size', 'pub fn main() -> Nil { let _a=<<1:8-16>> Nil }', False, ''),
+    ('bits-duplicate-endian', 'pub fn main() -> Nil { let _a=<<1:big-little>> Nil }', False, ''),
+    ('bits-zero-pattern-size', 'fn f(a: BitArray) -> Int { case a { <<x:0>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', False, ''),
+    ('bits-unsized-tail-last', 'fn f(a: BitArray) -> Int { case a { <<r:bits,x>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', False, ''),
+    ('bits-nonexhaustive', 'fn f(a: BitArray) -> Int { case a { <<>> -> 0 <<_,rest:bits>> -> 1 } } pub fn main() -> Nil { Nil }', False, ''),
+    ('bits-refutable-bytes-tail', 'fn f(a: BitArray) -> BitArray { let <<tail:bytes>>=a tail } pub fn main() -> Nil { Nil }', False, ''),
+    ('bits-unbraced-expression', 'pub fn main() -> Nil { let _a=<<1+2>> Nil }', False, ''),
 ]
 oracle_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as tmp:
@@ -173,10 +196,10 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-(evidence / 'record-updates-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'bit-arrays-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 receipt = dict(
-    schema='gleam-in-gleam.record-updates-verification/1',
+    schema='gleam-in-gleam.bit-arrays-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -189,7 +212,9 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/record-updates-upstream-checks.json'),
+                                  path='evidence/bit-arrays-upstream-checks.json'),
+    bitArrayRepresentation='arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice',
+    bitArraySubset='byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails',
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
     compilerRunsNatively=False,
     selfHosting=False,
@@ -201,8 +226,9 @@ receipt = dict(
                  'Anonymous parameters require annotations or a sufficiently resolved expected function type',
                  'Bounded arena only: no collection or native compiler file IO yet',
                  'Compound structural equality/printing and complex coverage are not implemented',
+                 'Unaligned/dynamic-size/float/UTF8 bit-array segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'record-updates-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'record-updates-test-output.tap').write_text(suite.stdout)
+(evidence / 'bit-arrays-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'bit-arrays-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

@@ -84,6 +84,7 @@ BitArray representation. It performs no language compilation itself.
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
 | `native/type_system` | Scoped constructor/function substitution and function types |
 | `native/free_names` | Lexically scoped free names for copied closure captures |
+| `native/bit_options` | Static byte-segment options and pattern/construction validation |
 | `native/labels` | Constructor labels, positional validation and declaration ordering |
 | `native/x64` | Direct instruction selection, stack frames and syscall helpers |
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
@@ -155,12 +156,28 @@ use declaration order, including label shorthand. Multi-variant updates require
 the original's constructor to be statically known and match the named constructor;
 unknown/wrong variants and zero-field update constructors are rejected.
 
+The first bit-array subset supports byte-aligned integer construction (0..64 bits),
+concatenation with `:bits`, endian options and signed/unsigned integer extraction
+(8..64 bits). Sizes can be numeric or static `size(N)`. Integer construction
+keeps the low requested bits. Nonzero segments evaluate left to right; a statically
+zero-width segment is checked but its value is not evaluated, matching upstream.
+Patterns check exact/minimum lengths before loading bytes and may bind a final
+unsized `rest:bits` or `rest:bytes`. Only `:bits` is irrefutable; the upstream
+exhaustiveness distinction is preserved even though this seed only constructs
+byte-aligned data. Pattern-only options are rejected in construction.
+
+Arrays own arena payloads; returned slices share bytes and retain an explicit root
+owner pointer, preparing for future collection. No collection exists yet. Signed
+native Int limits apply: unsigned 64-bit extraction above 2^63-1 exits 70; wildcard
+and literal matching still handle such bytes without treating them as negative
+unsigned numbers. Non-byte-aligned segments, dynamic/sized-array segments, floats,
+UTF-8 segments and structural BitArray equality/printing remain unsupported.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
 * Imports, labelled function calls, general type inference, constants,
-  attributes and bit-array syntax are not
-  implemented. The compiler uses several of those itself, so cannot self-compile.
+  attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
 * Named polymorphic functions can be called directly, but cannot yet be taken as
   polymorphic first-class values. Local function parameters/returned functions
   have their checked function types; there is no general let-polymorphism or
@@ -267,10 +284,21 @@ exposed bootstrap recursion in relocation emission; the pass now accumulates
 chunks iteratively, with a 12,000-instruction relocation regression test. This
 changes host traversal, not emitted bytes. [JOURNEY.md](JOURNEY.md) records findings.
 
+The byte-aligned bit-array milestone passes **293/293** checks and **64/64**
+upstream comparisons. Tests independently check actual bytes and signed extraction
+at every supported width and byte order, as well as immutable concatenation,
+returned/captured slices, option rules, length guards and bounded-arena exhaustion.
+The initial zero-width evaluation mismatch is preserved in
+`evidence/bit-arrays-zero-width-failure.txt`, and the correction is described in
+[JOURNEY.md](JOURNEY.md). Current source/artifact hashes are in
+`evidence/bit-arrays-verification.json`; the 1,825-byte example prints `5,9,-2,4660`.
+All eight prior examples retain their exact hashes. This measures example size,
+not compiler size or speed.
+
 Next actions, in dependency order:
 
-1. Add bit arrays and
-   module imports, testing each against upstream results and failures. Structural
+1. Add module imports and the remaining bit-array operations, testing each
+   against upstream results and failures. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.

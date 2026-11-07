@@ -82,7 +82,7 @@ fn type_index(
     [] -> Ok(acc)
     [t, ..rest] -> {
       use _ <- c.then(case t.name {
-        "Int" | "Bool" | "Nil" | "String" | "List" ->
+        "Int" | "Bool" | "Nil" | "String" | "List" | "BitArray" ->
           Error("Builtin type shadowing is not implemented: " <> t.name)
         _ ->
           case c.uppercase_name(t.name) {

@@ -1,4 +1,5 @@
 import native/ast as a
+import native/bit_options
 import native/core as c
 import native/definitions as d
 import native/free_names
@@ -15,6 +16,7 @@ pub type Node {
   UnitNode
   StringNode(BitArray)
   TupleNode(List(Typed))
+  BitArrayNode(List(#(Typed, a.BitMode)))
   ListNode(List(Typed), Tail)
   TupleIndexNode(Typed, Int)
   ConstructorNode(Int, List(Typed))
@@ -231,6 +233,17 @@ fn expression(
     a.BooleanLiteral(b) -> Ok(plain(BooleanNode(b), a.Boolean))
     a.UnitLiteral -> Ok(plain(UnitNode, a.Unit))
     a.StringLiteral(s) -> Ok(plain(StringNode(s), a.StringType))
+    a.BitArrayLiteral(segments) -> {
+      use segments <- c.then(
+        c.try_map(segments, fn(segment) {
+          use mode <- c.then(bit_options.mode(segment.options, False))
+          use value <- c.then(expression(segment.value, env, globals))
+          use _ <- c.then(equal(value.type_, bit_segment_type(mode)))
+          Ok(#(value, mode))
+        }),
+      )
+      Ok(plain(BitArrayNode(segments), a.BitArrayType))
+    }
     a.TupleLiteral(elements) -> {
       use typed <- c.then(
         c.try_map(elements, fn(e) { expression(e, env, globals) }),
@@ -334,7 +347,8 @@ fn expression(
     a.Echo(inner) -> {
       use typed <- c.then(expression(inner, env, globals))
       case typed.type_ {
-        a.TupleType(_)
+        a.BitArrayType
+        | a.TupleType(_)
         | a.ListType(_)
         | a.NamedType(_)
         | a.AppliedType(_, _)
@@ -659,7 +673,8 @@ fn binary_type(
       case left {
         a.StringType ->
           Error("Structural String equality is not implemented yet")
-        a.ListType(_)
+        a.BitArrayType
+        | a.ListType(_)
         | a.TupleType(_)
         | a.NamedType(_)
         | a.AppliedType(_, _)
@@ -905,6 +920,13 @@ fn resolve_pattern(
   globals: Globals,
 ) -> Result(a.Pattern, String) {
   case p {
+    a.BitArrayPattern(segments) -> {
+      use _ <- c.then(equal(t, a.BitArrayType))
+      use segments <- c.then(bit_patterns(segments, globals))
+      Ok(a.CheckedBitArrayPattern(segments))
+    }
+    a.CheckedBitArrayPattern(_) ->
+      Error("Internal checked bit-array pattern in source AST")
     a.ConstructorPattern(name, fields, spread) -> {
       use definition <- c.then(c.lookup(globals.constructors, name))
       use _ <- c.then(
@@ -983,6 +1005,12 @@ fn pattern_bindings(
   bindings: Environment,
 ) -> Result(Environment, String) {
   case p {
+    a.BitArrayPattern(_) -> Error("Unresolved bit-array pattern")
+    a.CheckedBitArrayPattern(fields) ->
+      checked_field_bindings(
+        c.map(fields, fn(f) { #(f.0, bit_segment_type(f.1)) }),
+        bindings,
+      )
     a.ConstructorPattern(_, _, _) -> Error("Unresolved constructor pattern")
     a.CheckedConstructorPattern(_, fields) ->
       checked_field_bindings(fields, bindings)
@@ -1087,6 +1115,8 @@ fn branch_type(arms: List(Arm), type_: a.Type) -> Result(a.Type, String) {
 fn covers(p: a.Pattern, t: a.Type, globals: Globals) -> Bool {
   case p, t {
     a.VariablePattern(_), _ | a.DiscardPattern, _ -> True
+    a.CheckedBitArrayPattern([#(tail, a.BitsSegment)]), a.BitArrayType ->
+      covers(tail, t, globals)
     a.TuplePattern(patterns), a.TupleType(types) ->
       tuple_covers(patterns, types, globals)
     a.ListPattern([], a.RestPattern(tail)), _ -> covers(tail, t, globals)
@@ -1377,5 +1407,50 @@ fn infer_ready(
       infer_ready(args, formal, bindings)
     }
     _, _ -> Error("Record update field count mismatch")
+  }
+}
+
+fn bit_segment_type(mode: a.BitMode) -> a.Type {
+  case mode {
+    a.IntegerSegment(_, _, _) -> a.Integer
+    a.BitsSegment | a.BytesSegment -> a.BitArrayType
+  }
+}
+
+fn bit_patterns(
+  segments: List(a.BitSegment(a.Pattern)),
+  globals: Globals,
+) -> Result(List(#(a.Pattern, a.BitMode)), String) {
+  case segments {
+    [] -> Ok([])
+    [segment, ..rest] -> {
+      use mode <- c.then(bit_options.mode(segment.options, True))
+      use _ <- c.then(case mode {
+        a.BitsSegment | a.BytesSegment ->
+          case rest, segment.value {
+            [], a.VariablePattern(_) | [], a.DiscardPattern -> Ok(Nil)
+            _, _ ->
+              Error(
+                "Unsized bit-array pattern tail must be last and bind a variable or discard",
+              )
+          }
+        _ ->
+          case segment.value {
+            a.IntegerPattern(_) | a.VariablePattern(_) | a.DiscardPattern ->
+              Ok(Nil)
+            _ ->
+              Error(
+                "Integer bit-array segment pattern requires an integer, variable or discard",
+              )
+          }
+      })
+      use p <- c.then(resolve_pattern(
+        segment.value,
+        bit_segment_type(mode),
+        globals,
+      ))
+      use tail <- c.then(bit_patterns(rest, globals))
+      Ok([#(p, mode), ..tail])
+    }
   }
 }

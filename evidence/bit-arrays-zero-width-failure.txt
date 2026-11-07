@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/oscillihue/gleam-in-gleam/verify.py", line 191, in <module>
+    assert rendered == expected, (name, clean, expected)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('bits-concat-order', 'src/grammar_oracle.gleam:1\n1\nsrc/grammar_oracle.gleam:1\n2\nsrc/grammar_oracle.gleam:1\n7\nsrc/grammar_oracle.gleam:1\n8\nsrc/grammar_oracle.gleam:1\n9\n', '1\n2\n3\n7\n8\n9\n')

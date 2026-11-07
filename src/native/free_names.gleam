@@ -7,6 +7,8 @@ pub fn pattern_names(p: a.Pattern) -> List(String) {
   case p {
     a.VariablePattern(n) -> [n]
     a.TuplePattern(ps) -> patterns(ps)
+    a.BitArrayPattern(segments) -> patterns(c.map(segments, fn(s) { s.value }))
+    a.CheckedBitArrayPattern(fields) -> patterns(c.map(fields, fn(f) { f.0 }))
     a.ListPattern(ps, tail) ->
       c.append(patterns(ps), case tail {
         a.NoPatternRest -> []
@@ -76,6 +78,8 @@ fn expression(
       expression(e, bound, free)
     a.Binary(_, l, r) -> expressions([l, r], bound, free)
     a.TupleLiteral(es) -> expressions(es, bound, free)
+    a.BitArrayLiteral(segments) ->
+      expressions(c.map(segments, fn(s) { s.value }), bound, free)
     a.ListLiteral(es, tail) -> {
       let free = expressions(es, bound, free)
       case tail {

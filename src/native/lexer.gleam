@@ -51,6 +51,10 @@ fn scan(
     }
     <<46, 46, rest:bits>> ->
       scan(rest, offset + 2, [Token(Symbol(".."), offset), ..acc])
+    <<60, 60, rest:bits>> ->
+      scan(rest, offset + 2, [Token(Symbol("<<"), offset), ..acc])
+    <<62, 62, rest:bits>> ->
+      scan(rest, offset + 2, [Token(Symbol(">>"), offset), ..acc])
     <<60, 45, rest:bits>> ->
       scan(rest, offset + 2, [Token(Symbol("<-"), offset), ..acc])
     <<45, 62, rest:bits>> ->

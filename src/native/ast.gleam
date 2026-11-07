@@ -3,6 +3,7 @@ pub type Type {
   Boolean
   Unit
   StringType
+  BitArrayType
   TupleType(List(Type))
   ListType(Type)
   NamedType(String)
@@ -25,6 +26,7 @@ pub type Expression {
   StringLiteral(BitArray)
   TupleLiteral(List(Expression))
   ListLiteral(List(Expression), ListRest)
+  BitArrayLiteral(List(BitSegment(Expression)))
   TupleIndex(Expression, Int)
   FieldAccess(Expression, String)
   Variable(String)
@@ -62,6 +64,8 @@ pub type Statement {
 }
 
 pub type Pattern {
+  BitArrayPattern(List(BitSegment(Pattern)))
+  CheckedBitArrayPattern(List(#(Pattern, BitMode)))
   IntegerPattern(Int)
   BooleanPattern(Bool)
   DiscardPattern
@@ -111,4 +115,19 @@ pub type Variant {
 
 pub type FieldDefinition {
   FieldDefinition(label: String, type_: Type)
+}
+
+pub type BitSegment(t) {
+  BitSegment(value: t, options: List(BitOption))
+}
+
+pub type BitOption {
+  BitName(String)
+  BitSize(Int)
+}
+
+pub type BitMode {
+  IntegerSegment(bytes: Int, little: Bool, signed: Bool)
+  BitsSegment
+  BytesSegment
 }

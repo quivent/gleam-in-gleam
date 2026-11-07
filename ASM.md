@@ -188,3 +188,42 @@ direct tail-recursive traversal, avoiding one bootstrap host stack frame per
 instruction. Relocation offsets/order are unchanged: all seven older example
 binaries retain their previous SHA256 values. A dedicated regression checks a
 forward jump over 12,000 instructions and rejects an unresolved label.
+
+## Byte-aligned bit arrays
+
+The current owned buffer layout is:
+
+```text
+[aligned object size:u64][tag=-1:i64][byte length:u64]
+[data pointer:u64][root owner:pointer][inline payload bytes...]
+```
+
+An owned allocation uses `align8(40 + byte_length)` and points its owner field to
+itself. A slice is a 40-byte descriptor with adjusted length/data pointer and the
+same root-owner pointer; it does not copy payload bytes. Explicit ownership avoids
+requiring a future collector to infer the allocation from an interior data pointer.
+The current arena retains all values until exit, so no reclamation is claimed.
+
+Construction evaluates nonzero segment expressions in source order and saves the
+values in frame slots. Statically zero-width integer expressions are checked but
+not evaluated, matching upstream. Length sums, header/alignment addition and arena
+allocation are checked before writes. Integer segments copy the low bytes with
+explicit shifts; bit-array segments use `cld; rep movsb`. No external memcpy or
+endian library is involved. These straightforward instructions prioritize verified
+semantics; instruction selection has not been optimized or benchmarked.
+
+Patterns check tag and exact/minimum length before reading any data. Fixed integer
+reads assemble bytes with shifts/OR; signed reads sign-extend the requested width.
+Unsigned 64-bit variable extraction with its high bit set exceeds the documented
+native signed Int range and exits 70. Literals instead fail to match, and discards
+remain valid, avoiding an incorrect negative interpretation. Pattern tails allocate
+only the shared descriptor and preserve the root owner.
+
+For artifact SHA256
+`3a6246603edd9e0564244ccf98899133111713eff214b49d0bdb3a391dd0c849`,
+`evidence/bit_arrays-disassembly.txt` shows minimum-length checking at `0x40012f`
+and its failure branch at `0x400137`, before the first byte load at `0x40014a`.
+A returned tail copies the root-owner field at `0x4001a1`/`0x4001a5`. Root allocations
+store their own address into that field, for example at `0x400286`. Concatenation
+copies bytes with `rep movsb` at `0x40039a`. The full 1,825-byte example prints
+`5,9,-2,4660`. All eight earlier example executables remain byte-identical.

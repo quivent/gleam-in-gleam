@@ -41,6 +41,7 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
     [l.Token(l.Word("Bool"), _), ..rest] -> Ok(#(a.Boolean, rest))
     [l.Token(l.Word("Nil"), _), ..rest] -> Ok(#(a.Unit, rest))
     [l.Token(l.Word("String"), _), ..rest] -> Ok(#(a.StringType, rest))
+    [l.Token(l.Word("BitArray"), _), ..rest] -> Ok(#(a.BitArrayType, rest))
     [l.Token(l.Word("List"), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(element, rest) <- c.then(type_(rest))
       use rest <- c.then(expect(rest, ")"))
@@ -316,6 +317,12 @@ fn infix(
 
 fn prefix(tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
+    [l.Token(l.Symbol("<<"), _), ..rest] -> {
+      use #(segments, rest) <- c.then(
+        bit_segments(rest, fn(ts) { expression(ts, 7) }),
+      )
+      Ok(#(a.BitArrayLiteral(segments), rest))
+    }
     [l.Token(l.Word("fn"), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(params, rest) <- c.then(separated(rest, ")", lambda_parameter))
       use #(result, rest) <- c.then(case rest {
@@ -424,6 +431,10 @@ fn argument(tokens: Tokens) -> Parsed(a.Argument) {
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
+    [l.Token(l.Symbol("<<"), _), ..rest] -> {
+      use #(segments, rest) <- c.then(bit_segments(rest, pattern))
+      Ok(#(a.BitArrayPattern(segments), rest))
+    }
     [l.Token(l.Word(id), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(fields, spread, rest) <- c.then(constructor_patterns(rest))
       case c.uppercase_name(id) {
@@ -584,5 +595,52 @@ fn arms(tokens: Tokens, acc: List(a.Arm)) -> Parsed(List(a.Arm)) {
       use #(body, rest) <- c.then(expression(rest, 0))
       arms(rest, [a.Arm(pat, body), ..acc])
     }
+  }
+}
+
+fn bit_segments(
+  tokens: Tokens,
+  value: fn(Tokens) -> Parsed(t),
+) -> Parsed(List(a.BitSegment(t))) {
+  case tokens {
+    [l.Token(l.Symbol(">>"), _), ..rest] -> Ok(#([], rest))
+    _ -> {
+      use #(item, rest) <- c.then(value(tokens))
+      use #(options, rest) <- c.then(case rest {
+        [l.Token(l.Symbol(":"), _), ..rest] -> bit_options(rest)
+        _ -> Ok(#([], rest))
+      })
+      let segment = a.BitSegment(item, options)
+      case rest {
+        [l.Token(l.Symbol(","), _), ..rest] -> {
+          use #(tail, rest) <- c.then(bit_segments(rest, value))
+          Ok(#([segment, ..tail], rest))
+        }
+        [l.Token(l.Symbol(">>"), _), ..rest] -> Ok(#([segment], rest))
+        _ -> error(rest, "Expected ',' or '>>' in bit array")
+      }
+    }
+  }
+}
+
+fn bit_options(tokens: Tokens) -> Parsed(List(a.BitOption)) {
+  use #(option, rest) <- c.then(case tokens {
+    [l.Token(l.Number(n), _), ..rest] -> Ok(#(a.BitSize(n), rest))
+    [
+      l.Token(l.Word("size"), _),
+      l.Token(l.Symbol("("), _),
+      l.Token(l.Number(n), _),
+      l.Token(l.Symbol(")"), _),
+      ..rest
+    ] -> Ok(#(a.BitSize(n), rest))
+    [l.Token(l.Word(name), _), ..rest] -> Ok(#(a.BitName(name), rest))
+    _ -> error(tokens, "Bit-array option requires a name or static size")
+  })
+  case rest {
+    [l.Token(l.Symbol("-"), _), ..rest] -> {
+      use #(tail, rest) <- c.then(bit_options(rest))
+      Ok(#([option, ..tail], rest))
+    }
+    _ -> Ok(#([option], rest))
   }
 }

@@ -47,3 +47,39 @@ remaining inference/semantics, native compiler IO and memory reclamation still
 stand between this seed and an actual stage-1/stage-2 self-hosting demonstration.
 No compiler-speed benchmark or finished compiler-size claim follows from these
 feature tests. Optimization follows correctness, with emitted ASM kept visible.
+
+## Byte-aligned bit arrays — 2026-11-07
+
+We added owned construction, concatenation, fixed integer encoding/decoding and
+final-tail matching in Gleam. Every supported width and endian order is tested
+against explicit byte literals, so mutually wrong encoders/decoders cannot hide
+behind a round trip. Signed extraction and low-bit truncation are separate rules.
+Construction and matching options are validated separately: `signed`, `unsigned`
+and `bytes` are pattern-only options upstream.
+
+Initial oracle preparation caught two frontend distinctions: arithmetic segment
+expressions need braces, and `<<>>` plus a nonempty-byte pattern is not exhaustive
+for the full BitArray type. The latter may contain unaligned bits upstream. We
+kept that conservative rule and preserved `bits` versus `bytes` tail coverage;
+we did not use our narrower runtime representation to accept invalid source.
+
+A fresh side-effect comparison then failed: we evaluated the expression of a
+statically zero-width integer segment, but upstream did not. The exact failing
+comparison is retained in evidence/bit-arrays-zero-width-failure.txt. The checker
+still validates that source, while native emission omits the runtime evaluation.
+The final differential suite now includes that exception explicitly.
+
+Native slices retain a root-owner pointer, alongside their length and data pointer.
+This adds a word now so future collection need not guess the owner of an interior
+pointer. Current lifetime still comes from the bounded arena, not a hidden GC.
+Runtime tests also exhaust the arena through actual repeated concatenation and
+verify exit 71 before an oversized copy. Unsigned 64-bit variable extraction keeps
+the existing signed-native-Int limit; discards and impossible literal comparisons
+avoid falsely interpreting high-bit unsigned bytes as negative values.
+
+Final verification: 293 tests, 64 upstream acceptance/runtime comparisons, zero
+third-party dependencies. The 1,825-byte native example has no loader/libraries,
+and all eight preceding example hashes are unchanged. Its ASM is retained with
+actual length guards, owner copies and REP MOVSB addresses. No speed claim or
+self-hosting claim follows: modules, remaining semantics, native IO and collection
+remain necessary work.

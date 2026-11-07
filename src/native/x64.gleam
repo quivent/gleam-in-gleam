@@ -175,6 +175,7 @@ fn expression(e: t.Typed, state: State) -> Generated {
       let #(name, state) = add_string(s, state)
       Ok(#([asm.Relative(<<72, 141, 5>>, name)], state))
     }
+    t.BitArrayNode(segments) -> bit_array(segments, state)
     t.TupleNode(elements) -> object(elements, 1, state)
     t.ConstructorNode(tag, fields) -> object(fields, tag, state)
     t.FieldNode(target, index, tags) -> {
@@ -508,7 +509,8 @@ fn case_arms(
 fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
   case type_ {
     // The type checker rejects compound echo until structural formatting lands.
-    a.TupleType(_)
+    a.BitArrayType
+    | a.TupleType(_)
     | a.ListType(_)
     | a.NamedType(_)
     | a.AppliedType(_, _)
@@ -623,6 +625,10 @@ fn pattern_code(
   state: State,
 ) -> Generated {
   case pat {
+    a.BitArrayPattern(_) ->
+      Error("Unresolved bit-array pattern in native code generation")
+    a.CheckedBitArrayPattern(segments) ->
+      bit_pattern(segments, subject, failure, state)
     a.ConstructorPattern(_, _, _) ->
       Error("Unresolved constructor in native code generation")
     a.CheckedConstructorPattern(tag, fields) -> {
@@ -882,4 +888,326 @@ fn runtime() -> List(asm.Part) {
       195,
     >>),
   ]
+}
+
+// Bit arrays: [aligned object size][tag=-1][byte length][data pointer][owner][owned bytes].
+// Slices retain the root owner explicitly; data pointers may be interior pointers.
+fn bit_array(segments: List(#(t.Typed, a.BitMode)), state: State) -> Generated {
+  use #(evaluated, saved, state) <- c.then(save_bit_values(segments, state))
+  let #(length, state) = slot(state)
+  let #(result, state) = slot(state)
+  let allocation = [
+    raw(<<49, 192>>),
+    ..c.append(bit_lengths(saved), [
+      store(length),
+      // Add descriptor + alignment before calling the checked arena allocator.
+      raw(<<72, 131, 192, 47>>),
+      branch(130, "rt:oom"),
+      raw(<<72, 131, 224, 248, 72, 137, 199>>),
+      call("rt:allocate"),
+      store(result),
+      raw(<<72, 137, 56, 72, 199, 64, 8, 255, 255, 255, 255>>),
+      load(length),
+      raw(<<72, 137, 193>>),
+      load(result),
+      raw(<<
+        72,
+        137,
+        72,
+        16,
+        72,
+        141,
+        120,
+        40,
+        72,
+        137,
+        120,
+        24,
+        72,
+        137,
+        64,
+        32,
+      >>),
+    ])
+  ]
+  Ok(#(
+    c.append(
+      evaluated,
+      c.append(allocation, c.append(write_bit_values(saved), [load(result)])),
+    ),
+    State(..state, needs_heap: True),
+  ))
+}
+
+fn save_bit_values(
+  segments: List(#(t.Typed, a.BitMode)),
+  state: State,
+) -> Result(#(List(asm.Part), List(#(Int, a.BitMode)), State), String) {
+  case segments {
+    [] -> Ok(#([], [], state))
+    [#(_, a.IntegerSegment(0, _, _)), ..rest] ->
+      // Upstream omits evaluation of statically zero-width integer segments.
+      // The checker still validates the expression, but no runtime value is needed.
+      save_bit_values(rest, state)
+    [#(value, mode), ..rest] -> {
+      use #(code, state) <- c.then(expression(value, state))
+      let #(saved, state) = slot(state)
+      use #(tail, values, state) <- c.then(save_bit_values(rest, state))
+      Ok(#(
+        c.append(code, [store(saved), ..tail]),
+        [#(saved, mode), ..values],
+        state,
+      ))
+    }
+  }
+}
+
+fn bit_lengths(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
+  case values {
+    [] -> []
+    [#(saved, mode), ..rest] -> {
+      let add = case mode {
+        a.IntegerSegment(n, _, _) -> [raw(<<72, 131, 192, n:8>>)]
+        a.BitsSegment | a.BytesSegment -> [
+          raw(<<72, 139, 141, saved:32-little, 72, 3, 65, 16>>),
+        ]
+      }
+      c.append(add, [branch(130, "rt:oom"), ..bit_lengths(rest)])
+    }
+  }
+}
+
+fn write_bit_values(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
+  case values {
+    [] -> []
+    [#(saved, mode), ..rest] -> {
+      let write = case mode {
+        a.IntegerSegment(n, little, _) -> [
+          raw(<<72, 137, 194>>),
+          ..write_integer_bytes(n, little, 0)
+        ]
+        a.BitsSegment | a.BytesSegment -> [
+          raw(<<72, 139, 72, 16, 72, 139, 112, 24, 252, 243, 164>>),
+        ]
+      }
+      [load(saved), ..c.append(write, write_bit_values(rest))]
+    }
+  }
+}
+
+fn write_integer_bytes(n: Int, little: Bool, index: Int) -> List(asm.Part) {
+  case index >= n {
+    True -> []
+    False -> {
+      let shift = case little {
+        True -> index * 8
+        False -> { n - index - 1 } * 8
+      }
+      [
+        raw(<<72, 137, 208, 72, 193, 232, shift:8, 136, 7, 72, 255, 199>>),
+        ..write_integer_bytes(n, little, index + 1)
+      ]
+    }
+  }
+}
+
+fn bit_pattern(
+  segments: List(#(a.Pattern, a.BitMode)),
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  let #(minimum, tail) = bit_pattern_size(segments)
+  let condition = case tail {
+    True -> 130
+    False -> 133
+  }
+  let inspect = [
+    load(subject),
+    raw(<<72, 133, 192>>),
+    branch(132, failure),
+    raw(<<72, 131, 120, 8, 255>>),
+    branch(133, failure),
+    raw(<<72, 129, 120, 16, minimum:32-little>>),
+    branch(condition, failure),
+  ]
+  use #(body, state) <- c.then(bit_pattern_fields(
+    segments,
+    0,
+    subject,
+    failure,
+    state,
+  ))
+  Ok(#(c.append(inspect, body), state))
+}
+
+fn bit_pattern_size(segments: List(#(a.Pattern, a.BitMode))) -> #(Int, Bool) {
+  case segments {
+    [] -> #(0, False)
+    [#(_, a.BitsSegment), ..] | [#(_, a.BytesSegment), ..] -> #(0, True)
+    [#(_, a.IntegerSegment(n, _, _)), ..rest] -> {
+      let #(size, tail) = bit_pattern_size(rest)
+      #(size + n, tail)
+    }
+  }
+}
+
+fn bit_pattern_fields(
+  segments: List(#(a.Pattern, a.BitMode)),
+  index: Int,
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  case segments {
+    [] -> Ok(#([], state))
+    [#(pat, mode), ..rest] -> {
+      let #(value, state) = slot(state)
+      let #(decode, state) = case mode {
+        a.IntegerSegment(n, little, signed) -> {
+          let sign = case signed, n {
+            True, size if size > 0 && size < 8 -> {
+              let shift = 64 - size * 8
+              [raw(<<72, 193, 224, shift:8, 72, 193, 248, shift:8>>)]
+            }
+            False, 8 ->
+              case pat {
+                a.DiscardPattern -> []
+                a.IntegerPattern(_) -> [
+                  raw(<<72, 133, 192>>),
+                  branch(136, failure),
+                ]
+                _ -> [raw(<<72, 133, 192>>), branch(136, "rt:overflow")]
+              }
+            _, _ -> []
+          }
+          #(
+            [
+              load(subject),
+              raw(<<72, 139, 80, 24, 49, 192>>),
+              ..c.append(read_integer_bytes(n, little, index, 0), sign)
+            ],
+            state,
+          )
+        }
+        a.BitsSegment | a.BytesSegment -> {
+          #(
+            [
+              raw(<<191, 40, 0, 0, 0>>),
+              call("rt:allocate"),
+              raw(<<
+                72,
+                137,
+                194,
+                72,
+                199,
+                0,
+                40,
+                0,
+                0,
+                0,
+                72,
+                199,
+                64,
+                8,
+                255,
+                255,
+                255,
+                255,
+              >>),
+              load(subject),
+              raw(<<
+                72,
+                139,
+                72,
+                16,
+                72,
+                129,
+                233,
+                index:32-little,
+                72,
+                137,
+                74,
+                16,
+              >>),
+              raw(<<
+                72,
+                139,
+                72,
+                24,
+                72,
+                129,
+                193,
+                index:32-little,
+                72,
+                137,
+                74,
+                24,
+                72,
+                139,
+                72,
+                32,
+                72,
+                137,
+                74,
+                32,
+                72,
+                137,
+                208,
+              >>),
+            ],
+            State(..state, needs_heap: True),
+          )
+        }
+      }
+      use #(match, state) <- c.then(pattern_code(pat, value, failure, state))
+      let next = case mode {
+        a.IntegerSegment(n, _, _) -> index + n
+        a.BitsSegment | a.BytesSegment -> index
+      }
+      use #(tail, state) <- c.then(bit_pattern_fields(
+        rest,
+        next,
+        subject,
+        failure,
+        state,
+      ))
+      Ok(#(c.append(decode, [store(value), ..c.append(match, tail)]), state))
+    }
+  }
+}
+
+fn read_integer_bytes(
+  n: Int,
+  little: Bool,
+  start: Int,
+  index: Int,
+) -> List(asm.Part) {
+  case index >= n {
+    True -> []
+    False -> {
+      let offset = start + index
+      let shift = case little {
+        True -> index * 8
+        False -> { n - index - 1 } * 8
+      }
+      [
+        raw(<<
+          72,
+          15,
+          182,
+          138,
+          offset:32-little,
+          72,
+          193,
+          225,
+          shift:8,
+          72,
+          9,
+          200,
+        >>),
+        ..read_integer_bytes(n, little, start, index + 1)
+      ]
+    }
+  }
 }
