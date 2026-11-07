@@ -116,11 +116,13 @@ fn case_arms(
 ) -> List(String) {
   case arms {
     [] -> free
-    [arm, ..rest] ->
-      case_arms(
-        rest,
-        bound,
-        expression(arm.body, c.append(pattern_names(arm.pattern), bound), free),
-      )
+    [arm, ..rest] -> {
+      let arm_bound = c.append(pattern_names(arm.pattern), bound)
+      let free = case arm.guard {
+        a.NoGuard -> free
+        a.Guard(e) -> expression(e, arm_bound, free)
+      }
+      case_arms(rest, bound, expression(arm.body, arm_bound, free))
+    }
   }
 }

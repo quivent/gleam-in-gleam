@@ -86,7 +86,7 @@ pub type PatternRest {
 }
 
 pub type Arm {
-  Arm(pattern: Pattern, body: Expression)
+  Arm(pattern: Pattern, guard: Guard(Expression), body: Expression)
 }
 
 pub type Function {
@@ -104,6 +104,7 @@ pub type Module {
     functions: List(Function),
     custom_types: List(CustomType),
     imports: List(Import),
+    aliases: List(TypeAlias),
   )
 }
 
@@ -141,4 +142,13 @@ pub type BitMode {
 
 pub type Import {
   Import(module_name: String, alias: String)
+}
+
+pub type TypeAlias {
+  TypeAlias(name: String, parameters: List(String), value: Type, public_: Bool)
+}
+
+pub type Guard(t) {
+  NoGuard
+  Guard(t)
 }

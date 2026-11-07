@@ -257,3 +257,32 @@ artifacts retain their previous hashes. A separate fixture compares the complete
 module output against equivalent single-module machine code and finds identical
 bytes. That demonstrates static name erasure for that fixture, not a universal
 compiler or runtime performance claim.
+
+## Transparent aliases and guarded case arms
+
+Aliases expand in their defining module's type scope before checking/lowering.
+They generate no wrapper, tag, allocation, call or runtime type dictionary. An
+exact-byte test compares generic tuple aliases with explicit tuple annotations and
+finds identical full executables. Nominal recursive types remain distinct, and
+alias expansion validates cycles independently of runtime constructor recursion.
+
+Each guarded arm emits pattern checks/bindings first, then its condition using the
+existing expression instructions. `test rax,rax; jz next_arm` branches on false;
+only a true condition reaches the body. The saved subject and outer environment
+remain available for subsequent arms. Unguarded arms retain their previous bytes.
+Guard expressions are typed/restricted before codegen; short-circuit operators
+retain their existing branch semantics, including skipping unreachable overflow.
+
+For example SHA256
+`c2aa57c17222ca19bb173e4c3f6455b02ff20003f042b85c90fb76b10fcaff96`,
+`evidence/aliases_guards-disassembly.txt` shows tuple-field extraction before the
+comparison at `0x400116`, guard-result testing at `0x400120`, and the false branch
+at `0x400123` reaching the next arm at `0x400135`. That next arm reloads the original
+saved subject rather than reusing a guard expression result.
+
+The example closure's capture is loaded from its descriptor at `0x400359` and
+stored locally at `0x400360`. Its guard compares the argument with that saved
+capture at `0x400393`; the false branch at `0x4003a0` selects False at `0x4003b5`.
+The complete 1,269-byte executable prints `7,5,True,False`. All ten prior examples
+retain their exact hashes. These are correctness/representation checks, not timing
+benchmarks or a measured native compiler size.

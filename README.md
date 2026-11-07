@@ -212,11 +212,30 @@ time resolution into the existing typed IR and relative relocations, with no
 runtime module lookup. A test verifies byte-identical output against an equivalent
 single-module program for one fixture; that is not a compiler-speed benchmark.
 
+Type aliases support generic parameters, forward references and imported aliases.
+They expand transparently in their defining module's scope before checking and
+native lowering. All definitions are validated, including unused aliases;
+direct/mutual cycles, wrong arity, duplicate/unbound/discard parameters and unused
+parameters are rejected. Recursive nominal types may still refer through aliases
+without making the alias itself infinitely recursive. Alias names obey import
+visibility, while public-interface privacy follows the underlying nominal types.
+A private alias of a public type can appear in a public signature; an alias cannot
+hide a private nominal type from that check. No runtime alias wrapper is added.
+
+Case guards support typed Bool conditions with primitive operations, short-circuit
+booleans, grouped expressions and local tuple/record access. Pattern matching
+precedes guard evaluation; a false guard continues to later arms with the original
+outer scope. Guard-only free variables are captured by closures. Guarded arms do
+not prove exhaustiveness, even with `if True`, and unreachable bodies are still
+checked for type consistency. Calls, bindings and effects are forbidden in guards;
+constructor/collection guard forms and structural comparisons remain unsupported
+in this subset. Integer guards use the same checked native Int arithmetic.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
 * Selective/unqualified imports, package resolution, labelled function calls,
-  general type inference, type aliases, constants and attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
+  general type inference, constants and attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
 * Named polymorphic functions can be called directly, but cannot yet be taken as
   polymorphic first-class values. Local function parameters/returned functions
   have their checked function types; there is no general let-polymorphism or
@@ -348,10 +367,20 @@ Builtin-shadowing rejection is tested separately as a known subset restriction,
 not counted as an upstream agreement. Its initial comparison is preserved in
 `evidence/modules-builtin-shadow-limit.txt`.
 
+The aliases/guards milestone passes **382/382** checks and **141/141** fresh
+upstream comparisons (64 existing single-file and 77 project fixtures). Evidence
+includes defining-module alias scope, generic function aliases, recursive nominal
+boundaries, private alias/type distinctions, guard-only captures, fallthrough and
+rejected side effects/coverage claims. A full-byte test shows generic tuple aliases
+produce exactly the same executable as underlying tuple annotations. The receipt
+is `evidence/aliases-guards-verification.json`; the 1,269-byte example prints
+`7,5,True,False` and its actual branches/capture loads are in
+`evidence/aliases_guards-disassembly.txt`. All ten prior example hashes are unchanged.
+
 Next actions, in dependency order:
 
-1. Add the remaining syntax and semantics needed by this compiler: type aliases,
-   guards, string operations, implicit prelude types, inference and remaining
+1. Add the remaining syntax and semantics needed by this compiler: string
+   operations, implicit prelude types, inference and remaining
    bit-array forms. Extend import forms with upstream comparisons. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node

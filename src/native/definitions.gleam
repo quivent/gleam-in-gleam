@@ -245,7 +245,7 @@ fn parameter_names(
   case params {
     [] -> Ok(Nil)
     [name, ..rest] ->
-      case c.uppercase_name(name) || name == "_" {
+      case c.uppercase_name(name) || c.discarded_name(name) {
         True -> Error("Type parameters must be named lowercase variables")
         False ->
           case c.lookup(seen, name) {

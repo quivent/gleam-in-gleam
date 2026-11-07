@@ -8,7 +8,7 @@ import {BitArray,toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile as compileSingle,compile_project} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
 import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
-const fixtures=JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8'));
+const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
 function compile(files,entry='main') {return compile_project(entry,sources(files));}
 function run(result) {
@@ -87,4 +87,17 @@ test('static module name resolution matches equivalent single-module machine cod
  const flat=compileSingle(new BitArray(Buffer.from('pub fn add(a: Int,b: Int) -> Int {a+b} pub fn main() -> Nil {echo add(4,5) Nil}')));
  assert.equal(modular.isOk(),true,modular[0]);assert.equal(flat.isOk(),true,flat[0]);
  assert.deepEqual(modular[0].rawBuffer,flat[0].rawBuffer);
+});
+
+test('type aliases erase completely into the underlying machine code',()=>{
+ const aliased=compileSingle(new BitArray(Buffer.from('type Pair(a)=#(a,a) fn sum(p:Pair(Int)) -> Int {let #(a,b)=p a+b} pub fn main() -> Nil {echo sum(#(3,4)) Nil}')));
+ const direct=compileSingle(new BitArray(Buffer.from('fn sum(p:#(Int,Int)) -> Int {let #(a,b)=p a+b} pub fn main() -> Nil {echo sum(#(3,4)) Nil}')));
+ assert.equal(aliased.isOk(),true,aliased[0]);assert.equal(direct.isOk(),true,direct[0]);
+ assert.deepEqual(aliased[0].rawBuffer,direct[0].rawBuffer);
+ const linked=link('main',sources({main:'type Count=Int pub fn main() -> Nil {echo 3 Nil}'}));
+ assert.equal(linked.isOk(),true,linked[0]);assert.equal(linked[0].aliases.toArray().length,0);assert.equal(linked[0].custom_types.toArray().length,0);
+});
+test('guard short-circuiting skips overflow in an unreachable operand',()=>{
+ const result=compile({main:'pub fn main() -> Nil {echo case 0 {n if False && {2147483647*2147483647*3>0} -> 0 _ -> 1} Nil}'});
+ const actual=run(result);assert.equal(actual.status,0);assert.equal(actual.stdout,'1\n');
 });

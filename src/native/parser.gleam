@@ -88,7 +88,7 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
 }
 
 pub fn parse(tokens: Tokens) -> Result(a.Module, String) {
-  functions(tokens, [], [], [])
+  functions(tokens, [], [], [], [])
 }
 
 fn functions(
@@ -96,10 +96,16 @@ fn functions(
   acc: List(a.Function),
   types: List(a.CustomType),
   imports: List(a.Import),
+  aliases: List(a.TypeAlias),
 ) -> Result(a.Module, String) {
   case tokens {
     [l.Token(l.End, _)] ->
-      Ok(a.Module(c.reverse(acc), c.reverse(types), c.reverse(imports)))
+      Ok(a.Module(
+        c.reverse(acc),
+        c.reverse(types),
+        c.reverse(imports),
+        c.reverse(aliases),
+      ))
     [l.Token(l.Word("import"), _), ..rest] -> {
       use #(segments, rest) <- c.then(import_path(rest))
       let module_name = c.join(segments, "/")
@@ -108,11 +114,17 @@ fn functions(
         [l.Token(l.Word("as"), _), ..rest] -> name(rest)
         _ -> Ok(#(default_alias, rest))
       })
-      functions(rest, acc, types, [a.Import(module_name, alias), ..imports])
+      functions(
+        rest,
+        acc,
+        types,
+        [a.Import(module_name, alias), ..imports],
+        aliases,
+      )
     }
     [l.Token(l.Word("pub"), _), ..rest] ->
-      declaration(rest, acc, types, imports, True)
-    _ -> declaration(tokens, acc, types, imports, False)
+      declaration(rest, acc, types, imports, aliases, True)
+    _ -> declaration(tokens, acc, types, imports, aliases, False)
   }
 }
 
@@ -121,20 +133,33 @@ fn declaration(
   acc: List(a.Function),
   types: List(a.CustomType),
   imports: List(a.Import),
+  aliases: List(a.TypeAlias),
   public_: Bool,
 ) -> Result(a.Module, String) {
   case tokens {
     [l.Token(l.Word("type"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
       use #(params, rest) <- c.then(type_parameters(rest))
-      use rest <- c.then(expect(rest, "{"))
-      use #(variants, rest) <- c.then(variants(rest, []))
-      functions(
-        rest,
-        acc,
-        [a.CustomType(id, variants, public_, params), ..types],
-        imports,
-      )
+      case rest {
+        [l.Token(l.Symbol("="), _), ..rest] -> {
+          use #(value, rest) <- c.then(type_(rest))
+          functions(rest, acc, types, imports, [
+            a.TypeAlias(id, params, value, public_),
+            ..aliases
+          ])
+        }
+        _ -> {
+          use rest <- c.then(expect(rest, "{"))
+          use #(variants, rest) <- c.then(variants(rest, []))
+          functions(
+            rest,
+            acc,
+            [a.CustomType(id, variants, public_, params), ..types],
+            imports,
+            aliases,
+          )
+        }
+      }
     }
     [l.Token(l.Word("fn"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
@@ -149,6 +174,7 @@ fn declaration(
         [a.Function(id, params, return_type, body, public_), ..acc],
         types,
         imports,
+        aliases,
       )
     }
     _ ->
@@ -645,9 +671,16 @@ fn arms(tokens: Tokens, acc: List(a.Arm)) -> Parsed(List(a.Arm)) {
     [l.Token(l.Symbol("}"), _), ..rest] -> Ok(#(c.reverse(acc), rest))
     _ -> {
       use #(pat, rest) <- c.then(pattern(tokens))
+      use #(guard, rest) <- c.then(case rest {
+        [l.Token(l.Word("if"), _), ..rest] -> {
+          use #(guard, rest) <- c.then(expression(rest, 0))
+          Ok(#(a.Guard(guard), rest))
+        }
+        _ -> Ok(#(a.NoGuard, rest))
+      })
       use rest <- c.then(expect(rest, "->"))
       use #(body, rest) <- c.then(expression(rest, 0))
-      arms(rest, [a.Arm(pat, body), ..acc])
+      arms(rest, [a.Arm(pat, guard, body), ..acc])
     }
   }
 }

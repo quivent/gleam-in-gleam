@@ -492,12 +492,22 @@ fn case_arms(
         next,
         state,
       ))
+      use #(guard, state) <- c.then(case arm.guard {
+        a.NoGuard -> Ok(#([], state))
+        a.Guard(value) -> {
+          use #(code, state) <- c.then(expression(value, state))
+          Ok(#(
+            c.append(code, [raw(<<72, 133, 192>>), branch(132, next)]),
+            state,
+          ))
+        }
+      })
       use #(body, state) <- c.then(expression(arm.body, state))
       let state = State(..state, env: env)
       use #(tail, state) <- c.then(case_arms(rest, subject, finish, state))
       Ok(#(
         c.append(
-          condition_code,
+          c.append(condition_code, guard),
           c.append(body, [jump(finish), asm.Label(next), ..tail]),
         ),
         state,

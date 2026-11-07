@@ -6,7 +6,7 @@ count or test count is not a defensible completion percentage.
 
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports and patterns | Type aliases, guards, remaining bit-array forms and more syntax |
+| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards and patterns | String patterns, remaining bit-array forms and more syntax |
 | Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Full inference/coverage, equality, dynamic strings, remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
@@ -14,7 +14,7 @@ count or test count is not a defensible completion percentage.
 | Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current module milestone has 336 passing checks and 97 agreeing upstream
+The current aliases/guards milestone has 382 passing checks and 141 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,7 +26,7 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add remaining source features (type aliases, guards, strings, prelude types,
+1. Add remaining source features (strings, prelude types,
    inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
@@ -60,3 +60,10 @@ is in Gleam. This removes a project-compilation barrier, but does not establish
 native self-compilation: several constructs used by the compiler and its native
 entrypoint/runtime are still missing. Completion is still measured by actual
 stage-1/stage-2 rebuilding, not a feature percentage.
+
+Transparent generic aliases and restricted pure case guards now execute with
+upstream-checked scope, visibility and fallthrough behavior. Alias definitions are
+erased; guards use normal native branches and capture lifetime. This removes two
+more source-language barriers while preserving every prior example's binary. Full
+string operations/patterns, implicit prelude types, remaining inference/syntax and
+native IO/collection still prevent actual stage-1/stage-2 self-hosting.

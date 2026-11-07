@@ -44,7 +44,7 @@ pub type Statement {
 }
 
 pub type Arm {
-  Arm(pattern: a.Pattern, body: Typed)
+  Arm(pattern: a.Pattern, guard: a.Guard(Typed), body: Typed)
 }
 
 pub type Function {
@@ -86,9 +86,10 @@ pub fn type_name(t: a.Type) -> String {
 }
 
 pub fn module(module: a.Module) -> Result(List(Function), String) {
-  use _ <- c.then(case module.imports {
-    [] -> Ok(Nil)
-    _ -> Error("Project imports must be resolved before type checking")
+  use _ <- c.then(case module.imports, module.aliases {
+    [], [] -> Ok(Nil)
+    _, _ ->
+      Error("Project imports/aliases must be resolved before type checking")
   })
   use _ <- c.then(signatures(module.functions, []))
   use globals <- c.then(d.collect(module))
@@ -393,11 +394,20 @@ fn case_expression(
         globals,
         expected,
       ))
-      Ok(Arm(pat, body))
+      use guard <- c.then(case arm.guard {
+        a.NoGuard -> Ok(a.NoGuard)
+        a.Guard(source) -> {
+          use _ <- c.then(guard_source(source))
+          use value <- c.then(expression(source, branch_env, globals))
+          use _ <- c.then(equal(value.type_, a.Boolean))
+          Ok(a.Guard(value))
+        }
+      })
+      Ok(Arm(pat, guard, body))
     }),
   )
   use _ <- c.then(exhaustive(
-    arms,
+    unguarded(arms),
     subject.type_,
     False,
     False,
@@ -1268,7 +1278,7 @@ fn variants_cover(
 fn tag_cover(arms: List(Arm), tag: Int, globals: Globals) -> Bool {
   case arms {
     [] -> False
-    [Arm(a.CheckedConstructorPattern(id, fields), _), ..rest] ->
+    [Arm(a.CheckedConstructorPattern(id, fields), _, _), ..rest] ->
       { id == tag && fields_cover(fields, globals) }
       || tag_cover(rest, tag, globals)
     [_, ..rest] -> tag_cover(rest, tag, globals)
@@ -1462,5 +1472,38 @@ fn bit_patterns(
       use tail <- c.then(bit_patterns(rest, globals))
       Ok([#(p, mode), ..tail])
     }
+  }
+}
+
+// Guard expressions are a restricted pure language, not arbitrary expressions.
+// In particular, validating normal function bodies does not make calls legal.
+fn guard_source(e: a.Expression) -> Result(Nil, String) {
+  case e {
+    a.IntegerLiteral(_)
+    | a.BooleanLiteral(_)
+    | a.UnitLiteral
+    | a.StringLiteral(_)
+    | a.Variable(_) -> Ok(Nil)
+    a.Unary(_, e) | a.TupleIndex(e, _) | a.FieldAccess(e, _) -> guard_source(e)
+    a.Binary(_, l, r) -> {
+      use _ <- c.then(guard_source(l))
+      guard_source(r)
+    }
+    a.Block([a.Evaluate(e)]) -> guard_source(e)
+    _ ->
+      Error(
+        "Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented",
+      )
+  }
+}
+
+fn unguarded(arms: List(Arm)) -> List(Arm) {
+  case arms {
+    [] -> []
+    [arm, ..rest] ->
+      case arm.guard {
+        a.NoGuard -> [arm, ..unguarded(rest)]
+        a.Guard(_) -> unguarded(rest)
+      }
   }
 }

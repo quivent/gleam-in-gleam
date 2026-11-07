@@ -2,9 +2,11 @@
 // imports, dependency order, namespaces and visibility are compiler policy.
 import native/ast as a
 import native/core as c
+import native/definitions as d
 import native/free_names
 import native/lexer
 import native/parser
+import native/type_system as types
 
 pub type Source {
   Source(name: String, content: BitArray)
@@ -32,13 +34,33 @@ pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
   use resolved <- c.then(
     c.try_map(modules, fn(m) { resolve_module(Scope(m, entry, modules)) }),
   )
-  Ok(
+  let linked =
     a.Module(
       flatten(c.map(resolved, fn(m) { m.functions })),
       flatten(c.map(resolved, fn(m) { m.custom_types })),
       [],
-    ),
+      [],
+    )
+  use context <- c.then(d.collect(linked))
+  use _ <- c.then(
+    c.try_map(modules, fn(m) {
+      c.try_map(m.module_.aliases, fn(alias) {
+        use body <- c.then(expand_alias(alias, Scope(m, entry, modules), []))
+        use _ <- c.then(d.validate_type(
+          body,
+          d.Context(..context, function_parameters: alias.parameters),
+        ))
+        let used = types.variables([body])
+        c.try_map(alias.parameters, fn(n) {
+          case local(used, n) {
+            True -> Ok(Nil)
+            False -> Error("Unused type alias parameter: " <> n)
+          }
+        })
+      })
+    }),
   )
+  Ok(linked)
 }
 
 fn source_index(
@@ -78,6 +100,7 @@ fn visit(
       use tokens <- c.then(lexer.lex(source))
       use module_ <- c.then(parser.parse(tokens))
       use _ <- c.then(validate_imports(module_.imports, []))
+      use _ <- c.then(alias_headers(module_))
       use done <- c.then(visit_imports(
         module_.imports,
         sources,
@@ -252,59 +275,92 @@ fn value(
   }
 }
 
-fn type_in(
+fn named_type(
   name: String,
+  args: List(a.Type),
   m: Loaded,
   external: Bool,
   scope: Scope,
-) -> Result(String, String) {
-  use t <- c.then(
-    case c.lookup(c.map(m.module_.custom_types, fn(t) { #(t.name, t) }), name) {
-      Ok(t) -> Ok(t)
-      Error(_) -> Error("Unknown type: " <> m.name <> "." <> name)
-    },
-  )
-  case external && !t.public_ {
-    True -> Error("Private module type: " <> m.name <> "." <> name)
-    False -> Ok(internal(name, m.name, scope.entry))
+  active: List(#(String, Nil)),
+) -> Result(a.Type, String) {
+  case c.lookup(c.map(m.module_.aliases, fn(t) { #(t.name, t) }), name) {
+    Ok(alias) -> {
+      use _ <- c.then(case external && !alias.public_ {
+        True -> Error("Private module type: " <> m.name <> "." <> name)
+        False -> Ok(Nil)
+      })
+      use body <- c.then(expand_alias(alias, Scope(..scope, current: m), active))
+      use bindings <- c.then(types.bindings(alias.parameters, args))
+      types.substitute(body, bindings)
+    }
+    Error(_) -> {
+      use t <- c.then(
+        case
+          c.lookup(c.map(m.module_.custom_types, fn(t) { #(t.name, t) }), name)
+        {
+          Ok(t) -> Ok(t)
+          Error(_) -> Error("Unknown type: " <> m.name <> "." <> name)
+        },
+      )
+      case external && !t.public_ {
+        True -> Error("Private module type: " <> m.name <> "." <> name)
+        False -> Ok(types.apply(internal(name, m.name, scope.entry), args))
+      }
+    }
   }
 }
 
 fn type_(t: a.Type, scope: Scope) -> Result(a.Type, String) {
+  type_with(t, scope, [])
+}
+
+fn type_with(
+  t: a.Type,
+  scope: Scope,
+  active: List(#(String, Nil)),
+) -> Result(a.Type, String) {
   case t {
     a.QualifiedType(alias, name, args) -> {
       use m <- c.then(imported(alias, scope))
-      use name <- c.then(type_in(name, m, True, scope))
-      use args <- c.then(c.try_map(args, fn(t) { type_(t, scope) }))
-      case args {
-        [] -> Ok(a.NamedType(name))
-        _ -> Ok(a.AppliedType(name, args))
-      }
+      use args <- c.then(c.try_map(args, fn(t) { type_with(t, scope, active) }))
+      named_type(name, args, m, True, scope, active)
     }
-    a.NamedType(name) -> {
-      use name <- c.then(type_in(name, scope.current, False, scope))
-      Ok(a.NamedType(name))
-    }
+    a.NamedType(name) ->
+      named_type(name, [], scope.current, False, scope, active)
     a.AppliedType(name, args) -> {
-      use name <- c.then(type_in(name, scope.current, False, scope))
-      use args <- c.then(c.try_map(args, fn(t) { type_(t, scope) }))
-      Ok(a.AppliedType(name, args))
+      use args <- c.then(c.try_map(args, fn(t) { type_with(t, scope, active) }))
+      named_type(name, args, scope.current, False, scope, active)
     }
     a.TupleType(ts) -> {
-      use ts <- c.then(c.try_map(ts, fn(t) { type_(t, scope) }))
+      use ts <- c.then(c.try_map(ts, fn(t) { type_with(t, scope, active) }))
       Ok(a.TupleType(ts))
     }
     a.ListType(t) -> {
-      use t <- c.then(type_(t, scope))
+      use t <- c.then(type_with(t, scope, active))
       Ok(a.ListType(t))
     }
     a.FunctionType(params, result) -> {
-      use params <- c.then(c.try_map(params, fn(t) { type_(t, scope) }))
-      use result <- c.then(type_(result, scope))
+      use params <- c.then(
+        c.try_map(params, fn(t) { type_with(t, scope, active) }),
+      )
+      use result <- c.then(type_with(result, scope, active))
       Ok(a.FunctionType(params, result))
     }
     _ -> Ok(t)
   }
+}
+
+fn expand_alias(
+  alias: a.TypeAlias,
+  scope: Scope,
+  active: List(#(String, Nil)),
+) -> Result(a.Type, String) {
+  let key = scope.current.name <> "." <> alias.name
+  use _ <- c.then(case c.lookup(active, key) {
+    Ok(_) -> Error("Type alias cycle: " <> key)
+    Error(_) -> Ok(Nil)
+  })
+  type_with(alias.value, scope, [#(key, Nil), ..active])
 }
 
 fn annotation(t: a.Annotation, scope: Scope) -> Result(a.Annotation, String) {
@@ -380,7 +436,7 @@ fn resolve_module(scope: Scope) -> Result(a.Module, String) {
       )
     }),
   )
-  Ok(a.Module(functions, types, []))
+  Ok(a.Module(functions, types, [], []))
 }
 
 fn statements(
@@ -558,7 +614,18 @@ fn expression(
             c.append(free_names.pattern_names(p), bound),
             scope,
           ))
-          Ok(a.Arm(p, body))
+          use guard <- c.then(case arm.guard {
+            a.NoGuard -> Ok(a.NoGuard)
+            a.Guard(e) -> {
+              use e <- c.then(expression(
+                e,
+                c.append(free_names.pattern_names(p), bound),
+                scope,
+              ))
+              Ok(a.Guard(e))
+            }
+          })
+          Ok(a.Arm(p, guard, body))
         }),
       )
       Ok(a.Case(subject, arms))
@@ -617,4 +684,59 @@ fn pattern_fields(
     use p <- c.then(pattern(f.pattern, scope))
     Ok(a.PatternField(..f, pattern: p))
   })
+}
+
+fn alias_headers(module_: a.Module) -> Result(Nil, String) {
+  use _ <- c.then(
+    unique_type_names(
+      c.append(
+        c.map(module_.custom_types, fn(t) { t.name }),
+        c.map(module_.aliases, fn(t) { t.name }),
+      ),
+      [],
+    ),
+  )
+  use _ <- c.then(
+    c.try_map(module_.aliases, fn(alias) {
+      use _ <- c.then(case c.uppercase_name(alias.name) {
+        True -> Ok(Nil)
+        False -> Error("Type names must start with uppercase: " <> alias.name)
+      })
+      case alias.name {
+        "Int" | "Bool" | "Nil" | "String" | "List" | "BitArray" ->
+          Error("Builtin type shadowing is not implemented: " <> alias.name)
+        _ -> alias_parameters(alias.parameters, [])
+      }
+    }),
+  )
+  Ok(Nil)
+}
+
+fn unique_type_names(
+  names: List(String),
+  seen: List(String),
+) -> Result(Nil, String) {
+  case names {
+    [] -> Ok(Nil)
+    [name, ..rest] ->
+      case local(seen, name) {
+        True -> Error("Duplicate type: " <> name)
+        False -> unique_type_names(rest, [name, ..seen])
+      }
+  }
+}
+
+fn alias_parameters(
+  names: List(String),
+  seen: List(String),
+) -> Result(Nil, String) {
+  case names {
+    [] -> Ok(Nil)
+    [name, ..rest] ->
+      case c.uppercase_name(name) || c.discarded_name(name), local(seen, name) {
+        True, _ -> Error("Type parameters must be named lowercase variables")
+        _, True -> Error("Duplicate type parameter: " <> name)
+        _, _ -> alias_parameters(rest, [name, ..seen])
+      }
+  }
 }

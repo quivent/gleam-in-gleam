@@ -121,3 +121,39 @@ follows from this static-linking evidence.
 Selective imports, package resolution, remaining language syntax/semantics and
 native compiler IO/collection remain open. The compiler still runs through the
 explicit Node bootstrap. No installed compiler or unrelated repository was changed.
+
+## Transparent aliases and pure guards — 2026-11-07
+
+Type aliases now resolve in their defining module's scope, including generic and
+forward references. Expansion stops at nominal constructors, allowing legal
+recursive nominal data while rejecting infinitely expanding alias cycles. Every
+alias is validated even when unused. Parameters must be declared, distinct and
+used; discard names are rejected for aliases and nominal type parameters.
+
+Privacy required testing rather than assuming that an alias name was a new type.
+Upstream permits a private alias of a public type in a public function signature.
+A public alias of a private nominal type can be declared unused, but cannot make
+that private type legal in a public function interface. Expansion retains the
+underlying nominal privacy, while imported alias names retain their own visibility.
+A cross-module fixture also verifies that alias bodies bind names in the defining
+module, avoiding accidental capture by same-named caller types.
+
+Guards share the existing native expression operators, with explicit source-form
+validation. Pattern bindings are available to the condition and body; false
+conditions jump to the next arm without leaking those names. Guarded arms are
+excluded from coverage proofs, even for literal True. Grouping is accepted;
+calls, let bindings and echo are rejected. Some pure construction/structural guard
+forms are valid upstream but remain explicitly unsupported in this seed.
+
+Guard free names participate in closure capture analysis. A returned factory
+callback captures a threshold used only in its guard and retains it after the
+factory returns. Native tests also show short-circuiting avoids an overflowing
+operand, and a failed guard recovers the surrounding name bindings correctly.
+
+The existing 336 checks passed unchanged before the new fixtures were added. Final
+qualification passes 382 checks and 141 upstream comparisons: 64 single-file plus
+77 project fixtures. The new 1,269-byte executable has recorded guard branches and
+capture loads. Aliases match underlying tuple machine code byte-for-byte, and all
+ten preceding native examples retain their exact hashes. Zero third-party package
+dependencies remain. No self-hosting or speed claim follows; remaining strings,
+prelude/inference/syntax and native IO/memory management are still necessary.
