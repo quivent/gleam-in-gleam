@@ -1,0 +1,349 @@
+[
+  {
+    "name": "nested-path-default-alias",
+    "entry": "main",
+    "files": {
+      "main": "import numbers/arithmetic pub fn main() -> Nil { echo arithmetic.add(4,5) Nil }",
+      "numbers/arithmetic": "pub fn add(a: Int,b: Int) -> Int { a+b }"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "distinct-private-and-public-names",
+    "entry": "main",
+    "files": {
+      "main": "import left import right type Box { Box(value: Int) } fn f(n: Int) -> Int {n+3} pub fn main() -> Nil { let p=Box(7) echo f(1) echo left.f(1) echo right.f(1) echo p.value Nil }",
+      "left": "pub type Box { Box(value: Int) } pub fn f(n:Int) -> Int { let p=Box(n) p.value+1 }",
+      "right": "pub type Box { Box(value: Int) } pub fn f(n:Int) -> Int { let p=Box(n) p.value+2 }"
+    },
+    "accepted": true,
+    "stdout": "4\n2\n3\n7\n"
+  },
+  {
+    "name": "generic-imported-call",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil { echo l.id(7) echo l.id(True) Nil }",
+      "library": "pub fn id(x:a) -> a {x}"
+    },
+    "accepted": true,
+    "stdout": "7\nTrue\n"
+  },
+  {
+    "name": "private-helper-within-module",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil { echo l.f(4) Nil }",
+      "library": "fn helper(n:Int) -> Int {n*2} pub fn f(n:Int) -> Int {helper(n)+1}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "diamond-dependency",
+    "entry": "main",
+    "files": {
+      "main": "import left import right pub fn main() -> Nil { echo left.f(3)+right.f(3) Nil }",
+      "left": "import shared pub fn f(n:Int) -> Int {shared.inc(n)}",
+      "right": "import shared pub fn f(n:Int) -> Int {shared.inc(shared.inc(n))}",
+      "shared": "pub fn inc(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "transitive-qualified-generic-type",
+    "entry": "main",
+    "files": {
+      "main": "import service import model as m pub fn main() -> Nil { let p=service.make(8) case p { m.Box(n) -> {echo n Nil} } }",
+      "service": "import model as m pub fn make(n:Int) -> m.Box(Int) {m.Box(n)}",
+      "model": "pub type Box(a) {Box(value:a)}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "qualified-record-type-change",
+    "entry": "main",
+    "files": {
+      "main": "import model as m pub fn main() -> Nil { let p=m.Box(1,9) let q=m.Box(..p,value:True) case q { m.Box(v,k) -> {echo v echo k Nil} } echo p.value Nil }",
+      "model": "pub type Box(a) {Box(value:a,keep:Int)}"
+    },
+    "accepted": true,
+    "stdout": "True\n9\n1\n"
+  },
+  {
+    "name": "qualified-zero-constructor",
+    "entry": "main",
+    "files": {
+      "main": "import model as m pub fn main() -> Nil { echo case m.Absent {m.Absent -> 7} Nil }",
+      "model": "pub type Maybe {Absent Present(Int)}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "imported-closure-factory",
+    "entry": "main",
+    "files": {
+      "main": "import factory pub fn main() -> Nil { let f=factory.make(6) echo f(3) Nil }",
+      "factory": "pub fn make(n:Int) -> fn(Int) -> Int {fn(x){n+x}}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "qualified-function-value",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil { let f=l.inc echo f(6) Nil }",
+      "library": "pub fn inc(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "block-alias-shadowing",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type Holder {Holder(f:fn(Int)->Int)} pub fn main() -> Nil { echo m.f(1) let v={let m=Holder(fn(n:Int){n+1}) m.f(3)} echo v echo m.f(2) Nil }",
+      "library": "pub fn f(n:Int) -> Int {n+100}"
+    },
+    "accepted": true,
+    "stdout": "101\n4\n102\n"
+  },
+  {
+    "name": "function-and-module-alias-coexist",
+    "entry": "main",
+    "files": {
+      "main": "import library as m fn m(n:Int) -> Int {n*2} pub fn main() -> Nil {echo m(3) echo m.f(3) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+100}"
+    },
+    "accepted": true,
+    "stdout": "6\n103\n"
+  },
+  {
+    "name": "constructor-namespace-survives-value-shadow",
+    "entry": "main",
+    "files": {
+      "main": "import model as m type Holder {Holder(x:Int)} pub fn main() -> Nil {let m=Holder(1) echo m.x let p=m.Box(4,2) let q=m.Box(..p,x:5) case q {m.Box(n,_) -> {echo n Nil}} }",
+      "model": "pub type Box {Box(x:Int,y:Int)}"
+    },
+    "accepted": true,
+    "stdout": "1\n5\n"
+  },
+  {
+    "name": "imported-main-is-not-entrypoint",
+    "entry": "main",
+    "files": {
+      "main": "import library pub fn main() -> Nil {echo library.main(4) Nil}",
+      "library": "pub fn main(n:Int) -> Int {n+5}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "same-module-two-aliases",
+    "entry": "main",
+    "files": {
+      "main": "import library as a import library as b pub fn main() -> Nil {echo a.f(1)+b.f(2) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "parameter-shadows-module-value",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type Holder {Holder(f:fn(Int)->Int)} fn read(m:Holder) -> Int {m.f(4)} pub fn main() -> Nil {echo read(Holder(fn(n:Int){n+2})) echo m.f(1) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+100}"
+    },
+    "accepted": true,
+    "stdout": "6\n101\n"
+  },
+  {
+    "name": "qualified-constructor-in-list-pattern",
+    "entry": "main",
+    "files": {
+      "main": "import model as m pub fn main() -> Nil {echo case [m.Wrap(7)] {[m.Wrap(n)] -> n _ -> 0} Nil}",
+      "model": "pub type Wrap(a) {Wrap(a)}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "imported-recursion",
+    "entry": "main",
+    "files": {
+      "main": "import sums pub fn main() -> Nil {echo sums.sum(6) Nil}",
+      "sums": "pub fn sum(n:Int) -> Int {case n {0 -> 0 _ -> n+sum(n-1)}}"
+    },
+    "accepted": true,
+    "stdout": "21\n"
+  },
+  {
+    "name": "imported-callback-record",
+    "entry": "main",
+    "files": {
+      "main": "import model as m pub fn main() -> Nil {let n=4 let p=m.Box(fn(x:Int){n+x}) let f=p.value echo f(3) Nil}",
+      "model": "pub type Box(a) {Box(value:a)}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "bit-arrays-across-module",
+    "entry": "main",
+    "files": {
+      "main": "import packet pub fn main() -> Nil {let p=<<9,packet.make(7):bits>> case p {<<a,b,c>> -> {echo a echo b echo c Nil} _ -> Nil}}",
+      "packet": "pub fn make(n:Int) -> BitArray {<<n,{n+1}>>}"
+    },
+    "accepted": true,
+    "stdout": "9\n7\n8\n"
+  },
+  {
+    "name": "private-function-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil {echo l.hidden(3) Nil}",
+      "library": "fn hidden(n:Int) -> Int {n+1}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Private module member"
+  },
+  {
+    "name": "private-type-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as l fn take(x:l.Hidden) -> Nil {Nil} pub fn main() -> Nil {Nil}",
+      "library": "type Hidden {Hidden(Int)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Private module type"
+  },
+  {
+    "name": "private-constructor-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil {let x=l.Hidden(3) Nil}",
+      "library": "type Hidden {Hidden(Int)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Private module member"
+  },
+  {
+    "name": "unknown-member-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as l pub fn main() -> Nil {echo l.missing(3) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown name"
+  },
+  {
+    "name": "unqualified-module-member-is-not-global",
+    "entry": "main",
+    "files": {
+      "main": "import library pub fn main() -> Nil {echo f(3) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown name"
+  },
+  {
+    "name": "cross-module-nominal-mismatch",
+    "entry": "main",
+    "files": {
+      "main": "import left import right pub fn main() -> Nil {echo left.read(right.Box(3)) Nil}",
+      "left": "pub type Box {Box(value:Int)} pub fn read(x:Box) -> Int {x.value}",
+      "right": "pub type Box {Box(value:Int)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "import-cycle",
+    "entry": "main",
+    "files": {
+      "main": "import library pub fn main() -> Nil {Nil}",
+      "library": "import main pub fn f() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Import cycle"
+  },
+  {
+    "name": "missing-import",
+    "entry": "main",
+    "files": {
+      "main": "import missing pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Missing module source"
+  },
+  {
+    "name": "duplicate-alias",
+    "entry": "main",
+    "files": {
+      "main": "import left as m import right as m pub fn main() -> Nil {Nil}",
+      "left": "pub fn f() -> Nil {Nil}",
+      "right": "pub fn f() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate module alias"
+  },
+  {
+    "name": "unknown-type-alias",
+    "entry": "main",
+    "files": {
+      "main": "fn read(x:missing.Type) -> Nil {Nil} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown module alias"
+  },
+  {
+    "name": "duplicate-function-in-dependency",
+    "entry": "main",
+    "files": {
+      "main": "import bad pub fn main() -> Nil {Nil}",
+      "bad": "pub fn f() -> Int {1} pub fn f() -> Int {2}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate function"
+  },
+  {
+    "name": "qualified-type-arity",
+    "entry": "main",
+    "files": {
+      "main": "import model as m fn read(x:m.Box(Int,Bool)) -> Nil {Nil} pub fn main() -> Nil {Nil}",
+      "model": "pub type Box(a) {Box(value:a)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type argument count"
+  },
+  {
+    "name": "private-constructor-pattern-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as l fn read(x:Int) -> Int {case x {l.Hidden(n) -> n _ -> 0}} pub fn main() -> Nil {Nil}",
+      "library": "type Hidden {Hidden(Int)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Private module member"
+  }
+]

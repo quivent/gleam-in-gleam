@@ -83,3 +83,41 @@ and all eight preceding example hashes are unchanged. Its ASM is retained with
 actual length guards, owner copies and REP MOVSB addresses. No speed claim or
 self-hosting claim follows: modules, remaining semantics, native IO and collection
 remain necessary work.
+
+## Local modules and visibility — 2026-11-07
+
+We added a pure Gleam project pass rather than concatenating files in JavaScript.
+The host bridge follows compiler-parsed file requests; import graph traversal,
+cycles, visibility, lexical scopes and names are resolved in Gleam. Distinct
+internal names prevent private/public helpers and nominal types from colliding
+across modules. Shared dependencies link once in deterministic import order.
+
+Qualified calls become ordinary checked calls; qualified constructor/type/pattern
+and update references become module-qualified declarations. Upstream probes showed
+that local values shadow lowercase module access, while qualified constructors
+retain their module namespace. Module aliases can also coexist with global
+function names, and a module may be imported twice under different aliases. These
+cases are now executable differential fixtures, not assumptions about the grammar.
+
+The first baseline run had 291 of 293 checks passing. Both failures were diagnostics:
+missing imports now report a missing source instead of unsupported syntax, and a
+discarded lambda name was rejected too early as unknown. We updated the changed
+import diagnostic and restored explicit discard checking before name resolution.
+
+The first module oracle also exposed a testing classification error: upstream
+allows builtin-type shadowing, which our seed explicitly does not implement.
+That rejection must not be called an upstream agreement. The failed reference is
+preserved in evidence/modules-builtin-shadow-limit.txt. Its fixture remains a
+separate native restriction check, ensuring module name mangling cannot silently
+bypass the existing restriction and change the meaning of builtin annotations.
+
+Final evidence is 336 checks and 97 fresh upstream comparisons (64 single-module,
+33 project fixtures). A multi-file example links to a 1,060-byte executable with
+no loader/shared libraries. Its resolved names and actual relative call targets
+are recorded. The previous nine examples remain byte-identical, and a fixture
+matches equivalent manually flattened single-module code exactly. No timing claim
+follows from this static-linking evidence.
+
+Selective imports, package resolution, remaining language syntax/semantics and
+native compiler IO/collection remain open. The compiler still runs through the
+explicit Node bootstrap. No installed compiler or unrelated repository was changed.

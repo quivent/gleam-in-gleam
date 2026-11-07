@@ -86,6 +86,10 @@ pub fn type_name(t: a.Type) -> String {
 }
 
 pub fn module(module: a.Module) -> Result(List(Function), String) {
+  use _ <- c.then(case module.imports {
+    [] -> Ok(Nil)
+    _ -> Error("Project imports must be resolved before type checking")
+  })
   use _ <- c.then(signatures(module.functions, []))
   use globals <- c.then(d.collect(module))
   use main <- c.then(c.lookup(globals.functions, "main"))
@@ -328,6 +332,8 @@ fn expression(
       Ok(plain(BinaryNode(op, left, right), result))
     }
     a.Call(name, args) -> named_call(name, args, env, globals)
+    a.QualifiedRecordUpdate(_, _, _, _) ->
+      Error("Unresolved module record update")
     a.RecordUpdate(name, target, args) ->
       record_update(name, target, args, env, globals)
     a.Apply(target, args) -> {
@@ -927,6 +933,8 @@ fn resolve_pattern(
     }
     a.CheckedBitArrayPattern(_) ->
       Error("Internal checked bit-array pattern in source AST")
+    a.ModuleConstructorPattern(_, _, _, _) ->
+      Error("Unresolved module constructor pattern")
     a.ConstructorPattern(name, fields, spread) -> {
       use definition <- c.then(c.lookup(globals.constructors, name))
       use _ <- c.then(
@@ -1011,6 +1019,8 @@ fn pattern_bindings(
         c.map(fields, fn(f) { #(f.0, bit_segment_type(f.1)) }),
         bindings,
       )
+    a.ModuleConstructorPattern(_, _, _, _) ->
+      Error("Unresolved module constructor pattern")
     a.ConstructorPattern(_, _, _) -> Error("Unresolved constructor pattern")
     a.CheckedConstructorPattern(_, fields) ->
       checked_field_bindings(fields, bindings)

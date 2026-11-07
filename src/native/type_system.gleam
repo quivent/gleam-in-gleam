@@ -12,6 +12,7 @@ pub fn name(t: a.Type) -> String {
     a.Unit -> "Nil"
     a.StringType -> "String"
     a.BitArrayType -> "BitArray"
+    a.QualifiedType(alias, n, _) -> alias <> "." <> n
     a.NamedType(n) | a.VariableType(n) -> n
     a.AppliedType(n, args) -> n <> "(" <> c.join(c.map(args, name), ", ") <> ")"
     a.ListType(t) -> "List(" <> name(t) <> ")"

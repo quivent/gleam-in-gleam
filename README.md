@@ -18,7 +18,7 @@ Current bootstrap:
 Gleam compiler source (this repository)
     → existing Gleam 1.19.2 bootstrap compiler
     → generated JavaScript + Node host-IO bridge
-    → input Gleam source
+    → input Gleam source modules
     → native ELF bytes
     → Linux kernel executes the program
 ```
@@ -68,11 +68,32 @@ The downloaded official Linux-musl archive's SHA256 was verified:
 No system or Crew compiler was replaced. The private compiler install is
 bootstrap tooling, not a dependency to ship with the final compiler.
 
+A local multi-file example uses the same command:
+
+```sh
+node bootstrap.mjs examples/modules.gleam out/modules
+./out/modules
+# 14, 8, 3 on separate lines
+```
+
+The default source root is the entry file's directory. For a nested entrypoint in
+a supported source tree, select its root explicitly:
+
+```sh
+node bootstrap.mjs path/to/src/app/main.gleam out/program --source-root path/to/src
+```
+
+The bridge loads only requested local `.gleam` modules and refuses symlinks that
+escape that root. It still refuses to overwrite an existing executable. There is
+no package download or external object-file linker in this implementation.
+
 ## Current implementation
 
 All parsing, checking, instruction selection, relocation and ELF writing live in
 Gleam. `bootstrap.mjs` supplies argument/file IO and converts the bootstrap's
-BitArray representation. It performs no language compilation itself.
+BitArray representation. It follows file requests returned by the Gleam parser and enforces the selected
+source root. Dependency ordering, name resolution, visibility, type checking and
+code generation remain in Gleam; the bridge performs no language compilation.
 
 | Module | Responsibility |
 | --- | --- |
@@ -90,7 +111,8 @@ BitArray representation. It performs no language compilation itself.
 | `native/heap` | Bounded arena allocation through direct Linux mmap |
 | `native/assembler` | Internal labels and signed relative relocations |
 | `native/elf` | ELF64 image and program headers, non-executable stack |
-| `native/compiler` | Compile pipeline |
+| `native/project` | Import graph, local module names, visibility and lexical resolution |
+| `native/compiler` | Single-file/project compile pipeline |
 
 The internal assembler is written in Gleam and emits bytes. It is not an
 external assembler dependency. The small generated integer/string print
@@ -173,11 +195,28 @@ and literal matching still handle such bytes without treating them as negative
 unsigned numbers. Non-byte-aligned segments, dynamic/sized-array segments, floats,
 UTF-8 segments and structural BitArray equality/printing remain unsupported.
 
+Local module imports support default names and `as` aliases, qualified functions,
+function values, custom types, constructors, patterns and record updates. A pure
+Gleam project pass rejects cycles/missing modules, resolves lexical shadowing,
+checks exported membership and gives every module's declarations distinct internal
+names. Identically shaped types in different modules remain nominally distinct.
+Module paths/aliases currently require lowercase-initial ASCII components, with
+lowercase letters, digits and underscores afterward. Shared dependencies are
+linked once in deterministic import order. Unreachable
+supplied source content is not parsed or linked.
+
+Lowercase value access respects local shadowing; qualified constructor access and
+type/pattern namespaces retain their module meaning. Private helpers remain usable
+inside their defining module and inaccessible through an import. This is compile-
+time resolution into the existing typed IR and relative relocations, with no
+runtime module lookup. A test verifies byte-identical output against an equivalent
+single-module program for one fixture; that is not a compiler-speed benchmark.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
-* Imports, labelled function calls, general type inference, constants,
-  attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
+* Selective/unqualified imports, package resolution, labelled function calls,
+  general type inference, type aliases, constants and attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
 * Named polymorphic functions can be called directly, but cannot yet be taken as
   polymorphic first-class values. Local function parameters/returned functions
   have their checked function types; there is no general let-polymorphism or
@@ -187,7 +226,9 @@ UTF-8 segments and structural BitArray equality/printing remain unsupported.
   Shadowing built-in Int/Bool/Nil/String/List types or True/False/Nil constructors
   is explicitly rejected for now. User-defined Result/Ok/Error names
   are supported. Private-type checking covers public function signatures and
-  public constructor fields within the current single-module implementation.
+  public constructor fields after project resolution. Builtin shadowing is valid
+  upstream but remains an explicit unsupported subset feature here, including in
+  imported modules.
 * Integer literals are restricted to nonnegative decimal magnitudes up to
   2,147,483,647 (with unary negation supported). Generated arithmetic is checked
   signed 64-bit arithmetic; overflow exits 70. This is an explicit seed
@@ -295,10 +336,23 @@ The initial zero-width evaluation mismatch is preserved in
 All eight prior examples retain their exact hashes. This measures example size,
 not compiler size or speed.
 
+The local-module milestone passes **336/336** checks and **97/97** fresh upstream
+comparisons: 64 existing single-file comparisons plus 33 multi-module fixtures.
+They cover alias shadowing, private helpers/access denial, generic types/calls,
+qualified record updates/patterns, shared imports, recursion, cross-module nominal
+mismatches and cycles. `evidence/modules-verification.json` records source and
+bootstrap-bridge hashes plus the resolved example symbol names. The 1,060-byte
+module example prints `14,8,3`, with its actual direct-call instructions retained
+in `evidence/modules-disassembly.txt`. All nine older examples remain byte-identical.
+Builtin-shadowing rejection is tested separately as a known subset restriction,
+not counted as an upstream agreement. Its initial comparison is preserved in
+`evidence/modules-builtin-shadow-limit.txt`.
+
 Next actions, in dependency order:
 
-1. Add module imports and the remaining bit-array operations, testing each
-   against upstream results and failures. Structural
+1. Add the remaining syntax and semantics needed by this compiler: type aliases,
+   guards, string operations, implicit prelude types, inference and remaining
+   bit-array forms. Extend import forms with upstream comparisons. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.

@@ -6,15 +6,15 @@ count or test count is not a defensible completion percentage.
 
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates and patterns | Imports, remaining bit-array forms and more syntax |
+| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports and patterns | Type aliases, guards, remaining bit-array forms and more syntax |
 | Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Full inference/coverage, equality, dynamic strings, remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
 | Runtime | Primitive printing and guarded 64 MiB RW arena; no external libraries | Collection, compiler file/argument IO, byte/string primitives and robust IO |
-| Project compilation | Single source module compiled through a Node IO bootstrap | Module graph/loading/linking and a native compiler entrypoint |
+| Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current bit-array milestone has 293 passing checks and 64 agreeing upstream
+The current module milestone has 336 passing checks and 97 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,8 +26,8 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add module loading and the remaining bit-array forms with upstream
-   differential tests. Continue closing explicit inference/semantic gaps.
+1. Add remaining source features (type aliases, guards, strings, prelude types,
+   inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
 3. Compile the complete compiler source into a native stage-1 compiler. Use that
@@ -53,3 +53,10 @@ Slices carry an explicit owner pointer for later collection. This is not complet
 bit-array compatibility: unaligned bits, dynamic sizing, UTF-8/float segments and
 structural comparison remain open. Native file IO, string operations, remaining
 syntax/inference and module integration are still required for stage 1.
+
+Local modules now resolve and link into one native image without an external
+linker or runtime module lookup. The bootstrap reads source bytes; project policy
+is in Gleam. This removes a project-compilation barrier, but does not establish
+native self-compilation: several constructs used by the compiler and its native
+entrypoint/runtime are still missing. Completion is still measured by actual
+stage-1/stage-2 rebuilding, not a feature percentage.

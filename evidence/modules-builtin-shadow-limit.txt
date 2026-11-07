@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/oscillihue/gleam-in-gleam/verify.py", line 214, in <module>
+    assert (reference.returncode == 0) == accepted, (name, reference.stdout, reference.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('builtin-shadow-in-dependency', '', '  Resolving versions\n   Checking module_oracle\nwarning: Unused private type\n  ┌─ /tmp/gleam-native-module-oracle-q6nda35n/builtin-shadow-in-dependency/src/bad.gleam:1:1\n  │\n1 │ type BitArray {Foo}\n  │ ^^^^^^^^^^^^^ This private type is never used\n\nHint: You can safely remove it.\n\nwarning: Unused private constructor\n  ┌─ /tmp/gleam-native-module-oracle-q6nda35n/builtin-shadow-in-dependency/src/bad.gleam:1:16\n  │\n1 │ type BitArray {Foo}\n  │                ^^^ This private constructor is never used\n\nHint: You can safely remove it.\n\nwarning: Unused imported module\n  ┌─ /tmp/gleam-native-module-oracle-q6nda35n/builtin-shadow-in-dependency/src/main.gleam:1:1\n  │\n1 │ import bad pub fn main() -> Nil {Nil}\n  │ ^^^^^^^^^^ This imported module is never used\n\nHint: You can safely remove it.\n\n   Compiled in 0.01s\n')

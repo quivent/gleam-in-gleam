@@ -14,7 +14,8 @@ pub fn pattern_names(p: a.Pattern) -> List(String) {
         a.NoPatternRest -> []
         a.RestPattern(p) -> pattern_names(p)
       })
-    a.ConstructorPattern(_, fields, _) ->
+    a.ModuleConstructorPattern(_, _, fields, _)
+    | a.ConstructorPattern(_, fields, _) ->
       patterns(c.map(fields, fn(f) { f.pattern }))
     a.CheckedConstructorPattern(_, fields) ->
       patterns(c.map(fields, fn(f) { f.0 }))
@@ -93,7 +94,9 @@ fn expression(
         bound,
         add(n, bound, free),
       )
-    a.RecordUpdate(_, target, args) | a.Apply(target, args) ->
+    a.QualifiedRecordUpdate(_, _, target, args)
+    | a.RecordUpdate(_, target, args)
+    | a.Apply(target, args) ->
       expressions([target, ..c.map(args, fn(arg) { arg.value })], bound, free)
     a.Block(body) -> statements(body, bound, free)
     a.Lambda(params, _, body) -> {

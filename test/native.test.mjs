@@ -286,7 +286,7 @@ const rejected = [
   ['nonexhaustive', 'pub fn main() -> Int { case 1 { 1 -> 2 } }', /Non-exhaustive/],
   ['branch mismatch', 'pub fn main() -> Int { case True { True -> 1 False -> False } }', /Type mismatch/],
   ['pattern mismatch', 'pub fn main() -> Int { case 1 { True -> 1 _ -> 0 } }', /Type mismatch/],
-  ['unknown import', 'import gleam/io pub fn main() -> Nil { Nil }', /not implemented/],
+  ['missing module source', 'import gleam/io pub fn main() -> Nil { Nil }', /Missing module source/],
   ['polymorphic named values pending', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { let f = identity Nil }', /Polymorphic named function values are not implemented/],
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],

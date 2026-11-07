@@ -227,3 +227,33 @@ A returned tail copies the root-owner field at `0x4001a1`/`0x4001a5`. Root alloc
 store their own address into that field, for example at `0x400286`. Concatenation
 copies bytes with `rep movsb` at `0x40039a`. The full 1,825-byte example prints
 `5,9,-2,4660`. All eight earlier example executables remain byte-identical.
+
+## Local module resolution and static linking
+
+The project pass assigns unlexable internal names such as
+`add@module_demo/numbers` and `Box@module_demo/box` to dependency declarations.
+The entry module retains its original names, including the single `main` entry.
+Imports are removed from the resolved AST before checking. Type identity and
+visibility are validated before lowering; no runtime dictionary of module names,
+PLT/GOT or dynamic linker is added. Generic type arguments remain erased.
+
+The owned relative-relocation pass links ordinary function code in deterministic
+DFS postorder. Shared dependencies appear once, and cycles fail before codegen.
+Constructor tags are assigned to the resulting module-qualified declarations, so
+same-named types/constructors from different modules cannot collide. This is the
+existing internal ABI, not an external object-file format or cross-package FFI.
+
+For the module example SHA256
+`58afdd9c3f748246bf4ebe29c7cd63a884c0b94daeaeaf4aac1734cbec4856f2`,
+`evidence/modules-disassembly.txt` shows the entry call at `0x4000b5` reaching
+root `main` at `0x40013b`. Root code directly calls imported `twice` at `0x4001c5`,
+reaching its body at `0x4000e9`; that body calls its private module-local `add` at
+`0x400104`, reaching `0x4000c3`. The imported `increment` function value uses the
+existing descriptor ABI: its code address is loaded at `0x4002c8`, targeting
+`0x400112`, and called indirectly at `0x400316`.
+
+The complete executable is 1,060 bytes and prints `14,8,3`. All nine earlier
+artifacts retain their previous hashes. A separate fixture compares the complete
+module output against equivalent single-module machine code and finds identical
+bytes. That demonstrates static name erasure for that fixture, not a universal
+compiler or runtime performance claim.

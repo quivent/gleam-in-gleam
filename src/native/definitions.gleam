@@ -211,6 +211,7 @@ fn validate_type_in(
       )
       validate_type_in(result, context, params)
     }
+    a.QualifiedType(_, _, _) -> Error("Unresolved module type")
     a.Unresolved -> Error("Internal unresolved type is not a source annotation")
     _ -> Ok(Nil)
   }

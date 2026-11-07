@@ -6,6 +6,7 @@ pub type Type {
   BitArrayType
   TupleType(List(Type))
   ListType(Type)
+  QualifiedType(String, String, List(Type))
   NamedType(String)
   AppliedType(String, List(Type))
   VariableType(String)
@@ -35,6 +36,7 @@ pub type Expression {
   Call(String, List(Argument))
   Apply(Expression, List(Argument))
   RecordUpdate(String, Expression, List(Argument))
+  QualifiedRecordUpdate(String, String, Expression, List(Argument))
   Lambda(List(LambdaParameter), Annotation, List(Statement))
   Block(List(Statement))
   Case(Expression, List(Arm))
@@ -72,6 +74,7 @@ pub type Pattern {
   VariablePattern(String)
   TuplePattern(List(Pattern))
   ListPattern(List(Pattern), PatternRest)
+  ModuleConstructorPattern(String, String, List(PatternField), Bool)
   ConstructorPattern(String, List(PatternField), Bool)
   // Checker-produced constructor identity and field types, never parser output.
   CheckedConstructorPattern(Int, List(#(Pattern, Type)))
@@ -97,7 +100,11 @@ pub type Function {
 }
 
 pub type Module {
-  Module(functions: List(Function), custom_types: List(CustomType))
+  Module(
+    functions: List(Function),
+    custom_types: List(CustomType),
+    imports: List(Import),
+  )
 }
 
 pub type CustomType {
@@ -130,4 +137,8 @@ pub type BitMode {
   IntegerSegment(bytes: Int, little: Bool, signed: Bool)
   BitsSegment
   BytesSegment
+}
+
+pub type Import {
+  Import(module_name: String, alias: String)
 }

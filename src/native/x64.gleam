@@ -512,6 +512,7 @@ fn render_echo(type_: a.Type, state: State) -> #(List(asm.Part), State) {
     a.BitArrayType
     | a.TupleType(_)
     | a.ListType(_)
+    | a.QualifiedType(_, _, _)
     | a.NamedType(_)
     | a.AppliedType(_, _)
     | a.VariableType(_)
@@ -629,6 +630,8 @@ fn pattern_code(
       Error("Unresolved bit-array pattern in native code generation")
     a.CheckedBitArrayPattern(segments) ->
       bit_pattern(segments, subject, failure, state)
+    a.ModuleConstructorPattern(_, _, _, _) ->
+      Error("Unresolved module constructor in native lowering")
     a.ConstructorPattern(_, _, _) ->
       Error("Unresolved constructor in native code generation")
     a.CheckedConstructorPattern(tag, fields) -> {

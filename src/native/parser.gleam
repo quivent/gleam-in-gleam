@@ -31,6 +31,18 @@ fn name(tokens: Tokens) -> Parsed(String) {
 
 fn type_(tokens: Tokens) -> Parsed(a.Type) {
   case tokens {
+    [
+      l.Token(l.Word(alias), _),
+      l.Token(l.Symbol("."), _),
+      l.Token(l.Word(member), _),
+      ..rest
+    ] -> {
+      use #(args, rest) <- c.then(case rest {
+        [l.Token(l.Symbol("("), _), ..rest] -> separated(rest, ")", type_)
+        _ -> Ok(#([], rest))
+      })
+      Ok(#(a.QualifiedType(alias, member, args), rest))
+    }
     [l.Token(l.Word("fn"), _), l.Token(l.Symbol("("), _), ..rest] -> {
       use #(params, rest) <- c.then(separated(rest, ")", type_))
       use rest <- c.then(expect(rest, "->"))
@@ -76,18 +88,31 @@ fn type_(tokens: Tokens) -> Parsed(a.Type) {
 }
 
 pub fn parse(tokens: Tokens) -> Result(a.Module, String) {
-  functions(tokens, [], [])
+  functions(tokens, [], [], [])
 }
 
 fn functions(
   tokens: Tokens,
   acc: List(a.Function),
   types: List(a.CustomType),
+  imports: List(a.Import),
 ) -> Result(a.Module, String) {
   case tokens {
-    [l.Token(l.End, _)] -> Ok(a.Module(c.reverse(acc), c.reverse(types)))
-    [l.Token(l.Word("pub"), _), ..rest] -> declaration(rest, acc, types, True)
-    _ -> declaration(tokens, acc, types, False)
+    [l.Token(l.End, _)] ->
+      Ok(a.Module(c.reverse(acc), c.reverse(types), c.reverse(imports)))
+    [l.Token(l.Word("import"), _), ..rest] -> {
+      use #(segments, rest) <- c.then(import_path(rest))
+      let module_name = c.join(segments, "/")
+      use #(default_alias, _) <- c.then(last_path(segments))
+      use #(alias, rest) <- c.then(case rest {
+        [l.Token(l.Word("as"), _), ..rest] -> name(rest)
+        _ -> Ok(#(default_alias, rest))
+      })
+      functions(rest, acc, types, [a.Import(module_name, alias), ..imports])
+    }
+    [l.Token(l.Word("pub"), _), ..rest] ->
+      declaration(rest, acc, types, imports, True)
+    _ -> declaration(tokens, acc, types, imports, False)
   }
 }
 
@@ -95,6 +120,7 @@ fn declaration(
   tokens: Tokens,
   acc: List(a.Function),
   types: List(a.CustomType),
+  imports: List(a.Import),
   public_: Bool,
 ) -> Result(a.Module, String) {
   case tokens {
@@ -103,10 +129,12 @@ fn declaration(
       use #(params, rest) <- c.then(type_parameters(rest))
       use rest <- c.then(expect(rest, "{"))
       use #(variants, rest) <- c.then(variants(rest, []))
-      functions(rest, acc, [
-        a.CustomType(id, variants, public_, params),
-        ..types
-      ])
+      functions(
+        rest,
+        acc,
+        [a.CustomType(id, variants, public_, params), ..types],
+        imports,
+      )
     }
     [l.Token(l.Word("fn"), _), ..rest] -> {
       use #(id, rest) <- c.then(name(rest))
@@ -120,6 +148,7 @@ fn declaration(
         rest,
         [a.Function(id, params, return_type, body, public_), ..acc],
         types,
+        imports,
       )
     }
     _ ->
@@ -249,6 +278,19 @@ fn expression(tokens: Tokens, minimum: Int) -> Parsed(a.Expression) {
 
 fn postfix(left: a.Expression, tokens: Tokens) -> Parsed(a.Expression) {
   case tokens {
+    [l.Token(l.Symbol("("), _), l.Token(l.Symbol(".."), _), ..rest] -> {
+      use #(target, rest) <- c.then(expression(rest, 0))
+      use #(args, rest) <- c.then(case rest {
+        [l.Token(l.Symbol(")"), _), ..rest] -> Ok(#([], rest))
+        [l.Token(l.Symbol(","), _), ..rest] -> arguments(rest, [])
+        _ -> error(rest, "Expected ',' or ')' after record update target")
+      })
+      case left {
+        a.FieldAccess(a.Variable(alias), member) ->
+          postfix(a.QualifiedRecordUpdate(alias, member, target, args), rest)
+        _ -> error(tokens, "Record update requires a named constructor")
+      }
+    }
     [l.Token(l.Symbol("("), _), ..rest] -> {
       use #(args, rest) <- c.then(arguments(rest, []))
       postfix(a.Apply(left, args), rest)
@@ -431,6 +473,18 @@ fn argument(tokens: Tokens) -> Parsed(a.Argument) {
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
+    [
+      l.Token(l.Word(alias), _),
+      l.Token(l.Symbol("."), _),
+      l.Token(l.Word(member), _),
+      ..rest
+    ] -> {
+      use #(fields, spread, rest) <- c.then(case rest {
+        [l.Token(l.Symbol("("), _), ..rest] -> constructor_patterns(rest)
+        _ -> Ok(#([], False, rest))
+      })
+      Ok(#(a.ModuleConstructorPattern(alias, member, fields, spread), rest))
+    }
     [l.Token(l.Symbol("<<"), _), ..rest] -> {
       use #(segments, rest) <- c.then(bit_segments(rest, pattern))
       Ok(#(a.BitArrayPattern(segments), rest))
@@ -642,5 +696,24 @@ fn bit_options(tokens: Tokens) -> Parsed(List(a.BitOption)) {
       Ok(#([option, ..tail], rest))
     }
     _ -> Ok(#([option], rest))
+  }
+}
+
+fn import_path(tokens: Tokens) -> Parsed(List(String)) {
+  use #(part, rest) <- c.then(name(tokens))
+  case rest {
+    [l.Token(l.Symbol("/"), _), ..rest] -> {
+      use #(tail, rest) <- c.then(import_path(rest))
+      Ok(#([part, ..tail], rest))
+    }
+    _ -> Ok(#([part], rest))
+  }
+}
+
+fn last_path(parts: List(String)) -> Result(#(String, Nil), String) {
+  case parts {
+    [last] -> Ok(#(last, Nil))
+    [_, ..rest] -> last_path(rest)
+    [] -> Error("Empty module path")
   }
 }
