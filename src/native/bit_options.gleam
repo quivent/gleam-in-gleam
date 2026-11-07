@@ -7,6 +7,20 @@ pub fn mode(
   options: List(a.BitOption),
   pattern: Bool,
 ) -> Result(a.BitMode, String) {
+  case options {
+    [a.BitName("utf8")] ->
+      case pattern {
+        True -> Error("UTF-8 codepoint patterns are not implemented yet")
+        False -> Ok(a.Utf8Segment)
+      }
+    _ -> integer_mode(options, pattern)
+  }
+}
+
+fn integer_mode(
+  options: List(a.BitOption),
+  pattern: Bool,
+) -> Result(a.BitMode, String) {
   use _ <- c.then(usage(options, pattern))
   use #(width, little, signed, bits) <- c.then(
     read(options, 8, False, False, False, []),

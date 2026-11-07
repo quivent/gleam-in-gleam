@@ -8,7 +8,7 @@ import {BitArray,toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile as compileSingle,compile_project} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
 import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
-const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8'))];
+const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
 function compile(files,entry='main') {return compile_project(entry,sources(files));}
 function run(result) {

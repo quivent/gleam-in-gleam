@@ -1,4 +1,5 @@
 import native/core
+import native/utf8
 
 pub type Kind {
   Word(String)
@@ -13,7 +14,10 @@ pub type Token {
 }
 
 pub fn lex(source: BitArray) -> Result(List(Token), String) {
-  scan(source, 0, [])
+  case utf8.valid(source) {
+    True -> scan(source, 0, [])
+    False -> Error("Source is not valid UTF-8")
+  }
 }
 
 fn fail(offset: Int, message: String) -> Result(a, String) {
@@ -51,6 +55,8 @@ fn scan(
     }
     <<46, 46, rest:bits>> ->
       scan(rest, offset + 2, [Token(Symbol(".."), offset), ..acc])
+    <<60, 62, rest:bits>> ->
+      scan(rest, offset + 2, [Token(Symbol("<>"), offset), ..acc])
     <<60, 60, rest:bits>> ->
       scan(rest, offset + 2, [Token(Symbol("<<"), offset), ..acc])
     <<62, 62, rest:bits>> ->

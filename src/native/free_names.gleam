@@ -6,6 +6,7 @@ import native/core as c
 pub fn pattern_names(p: a.Pattern) -> List(String) {
   case p {
     a.VariablePattern(n) -> [n]
+    a.StringPrefixPattern(_, binding, tail) -> patterns([binding, tail])
     a.TuplePattern(ps) -> patterns(ps)
     a.BitArrayPattern(segments) -> patterns(c.map(segments, fn(s) { s.value }))
     a.CheckedBitArrayPattern(fields) -> patterns(c.map(fields, fn(f) { f.0 }))

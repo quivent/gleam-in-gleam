@@ -1,5 +1,6 @@
 import native/ast as a
 import native/core as c
+import native/prelude
 import native/type_system as types
 
 pub type Constructor {
@@ -24,8 +25,9 @@ pub type Context {
 }
 
 pub fn collect(module: a.Module) -> Result(Context, String) {
-  use types <- c.then(type_index(module.custom_types, []))
-  use constructors <- c.then(constructor_index(module.custom_types, [], 3))
+  let all_types = c.append(module.custom_types, [prelude.result_type()])
+  use types <- c.then(type_index(all_types, []))
+  use constructors <- c.then(constructor_index(all_types, [], 3))
   let context =
     Context(
       c.map(module.functions, fn(f) { #(f.name, f) }),

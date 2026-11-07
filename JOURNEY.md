@@ -157,3 +157,45 @@ capture loads. Aliases match underlying tuple machine code byte-for-byte, and al
 ten preceding native examples retain their exact hashes. Zero third-party package
 dependencies remain. No self-hosting or speed claim follows; remaining strings,
 prelude/inference/syntax and native IO/memory management are still necessary.
+
+## Strings and implicit Result — 2026-11-07
+
+We preserved the exposed static String layout rather than changing every earlier
+program. Owned dynamic strings add an allocation-size/tag header before that value
+pointer, use checked arena space and copy bytes directly. Literal matching/equality
+check lengths before CMPSB, and concatenation/tails use MOVSB. Helpers are emitted
+only when used; comparisons alone do not introduce heap startup. A future collector
+must recognize the fixed interior String value pointer, and current allocation is
+still bounded with no collection.
+
+Upstream probes established that empty-prefix patterns remain refutable, prefix
+tails require names/discards, prefix `as` bindings are legal, and string concat is
+legal in guards. We implemented those rules and compare Unicode bytes exactly,
+without normalization. Literal byte-array string segments default to UTF-8;
+nonliteral strings require the explicit option. Codepoint patterns remain open.
+
+The implicit Result type uses reserved names independent of module paths. Local
+types/aliases and constructors shadow their respective prelude names separately;
+qualified module access does not re-export the prelude. The definition collector
+indexes its constructors after user types, preserving prior constructor tags and
+emitting nothing for unused definitions. Generic Result callbacks and `use` are
+covered, including an Error that skips its continuation entirely.
+
+Malformed UTF-8 is rejected before scanning. The owned validator handles overlong
+sequences, surrogates, invalid continuations, truncation and the scalar upper bound.
+Independent fatal-decoder checks cover every single byte, boundary sequences and
+1,000 deterministic samples. We also compiled the validator's actual Gleam source
+with this compiler and executed it natively on eleven valid/invalid inputs. This
+is an actual owned-component bootstrap step, not a complete compiler rebuild.
+
+The initial baseline had 381/382 checks passing: the single old rejection expected
+String equality to be unsupported. That obsolete negative was replaced by positive
+string oracles. New fixture diagnostics and redundant-literal warnings in oracle
+source were corrected before qualification. Final evidence is 437 checks and 173
+fresh upstream comparisons; pure return-value string oracles additionally compare
+actual Unicode/newline output. The 1,852-byte example has recorded ASM, all eleven
+older binaries retain their hashes, and repeated concat exhausts the arena safely.
+
+Float/UtfCodepoint, remaining pattern forms, non-string structural equality,
+inference, native IO and memory collection remain necessary work. The compiler is
+still explicitly bootstrapped through Gleam/Node; no installed tool was replaced.

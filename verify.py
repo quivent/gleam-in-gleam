@@ -30,7 +30,7 @@ def sha(data):
 
 run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
-suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs'])
+suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs'])
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
 passed = int(re.search(r'^# pass (\d+)$', suite.stdout, re.M)[1])
 failed = int(re.search(r'^# fail (\d+)$', suite.stdout, re.M)[1])
@@ -56,6 +56,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('bit_arrays', '5\n9\n-2\n4660\n'),
         ('modules', '14\n8\n3\n'),
         ('aliases_guards', '7\n5\nTrue\nFalse\n'),
+        ('strings_prelude', 'True\nTrue\nλ😀\n206\n187\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -69,7 +70,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates', 'bit_arrays', 'modules', 'aliases_guards') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates', 'bit_arrays', 'modules', 'aliases_guards', 'strings_prelude') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -199,7 +200,8 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
 module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/aliases-guards-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/aliases-guards-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/strings-prelude-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
@@ -242,9 +244,9 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr.replace(str(project), '<oracle>')))
-(evidence / 'aliases-guards-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
+(evidence / 'strings-prelude-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
 
-(evidence / 'aliases-guards-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'strings-prelude-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 trace_script = f"""
 import {{readFileSync}} from 'node:fs';
@@ -265,7 +267,7 @@ assert module_trace == dict(functions=['add@module_demo/numbers', 'twice@module_
                             types=['Box@module_demo/box'], remainingImports=0, remainingAliases=0)
 
 receipt = dict(
-    schema='gleam-in-gleam.aliases-guards-verification/1',
+    schema='gleam-in-gleam.strings-prelude-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -279,16 +281,20 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/aliases-guards-upstream-checks.json'),
+                                  path='evidence/strings-prelude-upstream-checks.json'),
     bitArrayRepresentation='arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice',
     bitArraySubset='byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails',
     projectCompilation=dict(sourceLanguage='Gleam', imports='local module aliases and qualified values/types/constructors', namespace='unlexable module-qualified internal names', dependencyOrder='deterministic DFS postorder, cycles rejected, shared modules linked once', nativeLinker='owned Gleam relocation emitter, no external linker', selectiveImports=False),
-    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/aliases-guards-project-upstream-checks.json'),
+    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/strings-prelude-project-upstream-checks.json'),
     totalFreshUpstreamComparisons=len(oracle_results)+len(module_results),
     linkedExampleSymbols=module_trace,
     exactSingleModuleEquivalenceFixture='nested-path-default-alias (native test)',
     moduleFixturesSHA256=sha((ROOT / 'test/modules-fixtures.json').read_bytes()),
     aliasesGuardsFixturesSHA256=sha((ROOT / 'test/aliases-guards-fixtures.json').read_bytes()),
+    stringsPreludeFixturesSHA256=sha((ROOT / 'test/strings-prelude-fixtures.json').read_bytes()),
+    stringRepresentation='static length/UTF8/newline; owned arena buffers have size/tag -2 preceding value pointer; prefix tails copy payload',
+    implicitPrelude='reserved Result(a,e)/Ok/Error, shared across modules; local declarations shadow each name; not re-exported',
+    nativeOwnedComponentTest='src/native/utf8.gleam compiled by this compiler and executed on valid/invalid byte sequences',
     aliases='transparent, scoped expansion; cycle/arity/parameter/visibility checks; no target wrappers',
     guards='restricted pure expressions, typed Bool; guard failure falls through; guarded arms do not prove exhaustiveness',
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
@@ -301,10 +307,10 @@ receipt = dict(
                  'No polymorphic named function values/labelled function calls/selective imports or package resolution yet; guard construction/structural equality remain unsupported',
                  'Anonymous parameters require annotations or a sufficiently resolved expected function type',
                  'Bounded arena only: no collection or native compiler file IO yet',
-                 'Compound structural equality/printing and complex coverage are not implemented',
-                 'Unaligned/dynamic-size/float/UTF8 bit-array segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
+                 'Non-string compound structural equality/printing and complex coverage are not implemented',
+                 'Unaligned/dynamic-size/float and UTF8 codepoint pattern segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'aliases-guards-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'aliases-guards-test-output.tap').write_text(suite.stdout)
+(evidence / 'strings-prelude-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'strings-prelude-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

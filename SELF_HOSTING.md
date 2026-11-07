@@ -6,15 +6,15 @@ count or test count is not a defensible completion percentage.
 
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards and patterns | String patterns, remaining bit-array forms and more syntax |
-| Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Full inference/coverage, equality, dynamic strings, remaining language semantics |
+| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards and patterns | Multiple case subjects, alternative patterns, remaining bit-array forms and more syntax |
+| Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Non-string structural equality, full inference/coverage and remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
-| Runtime | Primitive printing and guarded 64 MiB RW arena; no external libraries | Collection, compiler file/argument IO, byte/string primitives and robust IO |
+| Runtime | Primitive printing, owned strings and guarded 64 MiB RW arena; no external libraries | Collection, compiler file/argument IO, remaining byte/string primitives and robust IO |
 | Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current aliases/guards milestone has 382 passing checks and 141 agreeing upstream
+The current strings/prelude milestone has 437 passing checks and 173 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,8 +26,8 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add remaining source features (strings, prelude types,
-   inference and bit-array forms) and import forms with upstream differential tests.
+1. Add remaining source features (multiple subjects, alternative patterns,
+   structural equality, inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
 3. Compile the complete compiler source into a native stage-1 compiler. Use that
@@ -50,8 +50,8 @@ runtime dependencies or establishing native self-hosting.
 The byte-aligned bit-array subset now covers the fixed-width integer encoding,
 concatenation and byte/rest matching used extensively by our emitter and lexer.
 Slices carry an explicit owner pointer for later collection. This is not complete
-bit-array compatibility: unaligned bits, dynamic sizing, UTF-8/float segments and
-structural comparison remain open. Native file IO, string operations, remaining
+bit-array compatibility: unaligned bits, dynamic sizing, UTF-8 codepoint patterns/float segments and
+structural comparison remain open. Native file IO, remaining string operations, other
 syntax/inference and module integration are still required for stage 1.
 
 Local modules now resolve and link into one native image without an external
@@ -64,6 +64,14 @@ stage-1/stage-2 rebuilding, not a feature percentage.
 Transparent generic aliases and restricted pure case guards now execute with
 upstream-checked scope, visibility and fallthrough behavior. Alias definitions are
 erased; guards use normal native branches and capture lifetime. This removes two
-more source-language barriers while preserving every prior example's binary. Full
-string operations/patterns, implicit prelude types, remaining inference/syntax and
+more source-language barriers while preserving every prior example's binary. Remaining
+string/prelude operations, inference/syntax and
 native IO/collection still prevent actual stage-1/stage-2 self-hosting.
+
+Dynamic strings, exact equality, prefix/literal patterns and UTF-8 byte construction
+now execute natively. Implicit Result/Ok/Error work across modules with local
+shadowing. The compiler-owned UTF-8 validator itself has been compiled and executed
+by this compiler, while independent host-oracle comparisons cover more input cases.
+This establishes one component, not the complete native compiler. Float/codepoints,
+multiple subjects/alternative patterns, structural equality and native IO/collection
+remain open; no stage-1/stage-2 claim is made.

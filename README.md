@@ -98,6 +98,9 @@ code generation remain in Gleam; the bridge performs no language compilation.
 | Module | Responsibility |
 | --- | --- |
 | `native/core` | Compiler-owned list, byte and diagnostic utilities |
+| `native/utf8` | Compiler-owned scalar UTF-8 validation |
+| `native/prelude` | Reserved implicit Result/Ok/Error definitions |
+| `native/string_runtime` | Owned byte comparisons, checked concatenation and prefix-tail copies |
 | `native/lexer` | Tokens, comments, decimal literals, UTF-8 string bytes |
 | `native/ast` | Language seed syntax types |
 | `native/parser` | Precedence, functions, bindings, calls and case expressions |
@@ -122,8 +125,7 @@ need compiler-owned code; zero external dependencies does not mean that memory
 management can be omitted.
 
 Implemented seed features: explicitly typed functions and parameters,
-forward/recursive calls, local bindings and shadowing, Int/Bool/Nil/static
-String values, integer operations, comparisons, short-circuit booleans,
+forward/recursive calls, local bindings and shadowing, Int/Bool/Nil/String values, integer operations, comparisons, short-circuit booleans,
 single-subject case matching, exhaustiveness checks for this subset and primitive
 value printing. Typed tuples, tuple indexing/destructuring, lists,
 list spreads and nested tuple/list patterns are supported. Unlabelled calls,
@@ -193,7 +195,9 @@ owner pointer, preparing for future collection. No collection exists yet. Signed
 native Int limits apply: unsigned 64-bit extraction above 2^63-1 exits 70; wildcard
 and literal matching still handle such bytes without treating them as negative
 unsigned numbers. Non-byte-aligned segments, dynamic/sized-array segments, floats,
-UTF-8 segments and structural BitArray equality/printing remain unsupported.
+UTF-8 codepoint patterns and structural BitArray equality/printing remain unsupported.
+String-to-byte construction with `:utf8` is supported, including the default
+encoding for literal string segments; nonliteral strings require `:utf8`.
 
 Local module imports support default names and `as` aliases, qualified functions,
 function values, custom types, constructors, patterns and record updates. A pure
@@ -231,6 +235,23 @@ checked for type consistency. Calls, bindings and effects are forbidden in guard
 constructor/collection guard forms and structural comparisons remain unsupported
 in this subset. Integer guards use the same checked native Int arithmetic.
 
+Strings now support dynamic `<>` concatenation, byte-exact `==`/`!=`, literal
+matching and literal prefixes with a rest/discard and optional prefix binding
+(`"pre" as head <> tail`). Unicode scalar UTF-8 is preserved without normalization;
+concatenation and equality work in guards too. Prefix patterns remain conservative
+for exhaustiveness/refutable lets even when the prefix is empty, matching upstream.
+Returned tails own copied payload bytes, and closures retain their values safely.
+String-to-bit-array UTF-8 construction excludes the diagnostic trailing newline.
+The lexer rejects malformed UTF-8 source before tokenization.
+
+The implicit prelude now includes `Result(a, e)`, `Ok` and `Error` alongside the
+primitive types already implemented. Reserved internal names keep the default Result
+nominally shared across modules. Local type/alias/constructor declarations shadow
+the corresponding prelude names independently; imported modules do not re-export
+implicit prelude members. Prelude constructors use the existing generic ADT layout
+and positional arguments. Unused prelude definitions add no target code or change
+existing constructor tags. Float and UtfCodepoint are not implemented yet.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
@@ -252,8 +273,10 @@ in this subset. Integer guards use the same checked native Int arithmetic.
   2,147,483,647 (with unary negation supported). Generated arithmetic is checked
   signed 64-bit arithmetic; overflow exits 70. This is an explicit seed
   limitation, not Gleam's full cross-target integer semantics.
-* String literals retain their UTF-8 bytes; only a few escapes are supported.
-  String structural equality and dynamic string allocation are not implemented.
+* Strings retain valid scalar UTF-8 bytes; only a few source escapes are supported.
+  Unicode escape syntax, grapheme operations and general pattern aliases remain
+  unsupported. String prefixes/concatenation/equality are byte-based and do not
+  normalize equivalent Unicode spellings.
 * Compound objects and function descriptors use a single 64 MiB read/write, non-executable mmap arena, only in
   programs with compound allocation. Allocation is checked and exhaustion exits
   71. There is no collection or arena growth yet. This is not the final memory
@@ -377,11 +400,25 @@ is `evidence/aliases-guards-verification.json`; the 1,269-byte example prints
 `7,5,True,False` and its actual branches/capture loads are in
 `evidence/aliases_guards-disassembly.txt`. All ten prior example hashes are unchanged.
 
+The strings/prelude milestone passes **437/437** checks and **173/173** fresh
+upstream comparisons. Additional pure string oracles compare actual upstream
+return values with native printing, including Unicode and embedded newlines.
+Malformed UTF-8 validation is compared against an independent fatal decoder on
+boundaries, every single byte and 1,000 deterministic samples. The compiler's own
+`native/utf8` module also compiles and runs natively on valid/invalid byte sequences;
+this is an owned-component test, not full compiler self-hosting.
+
+`evidence/strings-prelude-verification.json` records current source hashes and
+`evidence/strings_prelude-disassembly.txt` retains actual comparison/copy instructions.
+The 1,852-byte example prints two True values, `λ😀`, then UTF-8 bytes `206,187`.
+All eleven earlier example binaries remain byte-identical. Repeated string growth
+also verifies guarded arena exhaustion before copying; reclamation remains open.
+
 Next actions, in dependency order:
 
-1. Add the remaining syntax and semantics needed by this compiler: string
-   operations, implicit prelude types, inference and remaining
-   bit-array forms. Extend import forms with upstream comparisons. Structural
+1. Add the remaining syntax and semantics needed by this compiler: multiple
+   case subjects, alternative patterns, non-string structural equality, remaining
+   inference and bit-array forms. Extend import forms with upstream comparisons. Structural
    equality and owned collection also remain necessary work.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.

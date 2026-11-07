@@ -357,7 +357,7 @@ fn precedence(op: String) -> Int {
     "&&" -> 2
     "==" | "!=" -> 3
     "<" | "<=" | ">" | ">=" -> 4
-    "+" | "-" -> 5
+    "+" | "-" | "<>" -> 5
     "*" | "/" | "%" -> 6
     _ -> -1
   }
@@ -499,6 +499,23 @@ fn argument(tokens: Tokens) -> Parsed(a.Argument) {
 
 fn pattern(tokens: Tokens) -> Parsed(a.Pattern) {
   case tokens {
+    [l.Token(l.Text(text), _), ..rest] -> {
+      use #(binding, rest) <- c.then(case rest {
+        [l.Token(l.Word("as"), _), ..rest] -> string_binding(rest)
+        _ -> Ok(#(a.DiscardPattern, rest))
+      })
+      case rest {
+        [l.Token(l.Symbol("<>"), _), ..rest] -> {
+          use #(tail, rest) <- c.then(string_binding(rest))
+          Ok(#(a.StringPrefixPattern(text, binding, tail), rest))
+        }
+        _ ->
+          case binding {
+            a.DiscardPattern -> Ok(#(a.StringPattern(text), rest))
+            _ -> error(rest, "String prefix binding requires '<>'")
+          }
+      }
+    }
     [
       l.Token(l.Word(alias), _),
       l.Token(l.Symbol("."), _),
@@ -748,5 +765,14 @@ fn last_path(parts: List(String)) -> Result(#(String, Nil), String) {
     [last] -> Ok(#(last, Nil))
     [_, ..rest] -> last_path(rest)
     [] -> Error("Empty module path")
+  }
+}
+
+fn string_binding(tokens: Tokens) -> Parsed(a.Pattern) {
+  use #(id, rest) <- c.then(name(tokens))
+  case c.uppercase_name(id), c.discarded_name(id) {
+    True, _ -> error(tokens, "String prefix requires a variable or discard")
+    _, True -> Ok(#(a.DiscardPattern, rest))
+    _, False -> Ok(#(a.VariablePattern(id), rest))
   }
 }

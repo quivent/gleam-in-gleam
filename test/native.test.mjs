@@ -291,7 +291,6 @@ const rejected = [
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
   ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
-  ['unimplemented structural equality', 'pub fn main() -> Bool { "a" == "a" }', /not implemented/],
   ['heterogeneous list', 'pub fn main() -> Nil { let xs = [1, True] Nil }', /Type mismatch/],
   ['bad list tail', 'pub fn main() -> Nil { let xs = [1, ..True] Nil }', /tail must be a list/],
   ['bad nested list', 'pub fn main() -> Nil { let xs = [[1], [True]] Nil }', /Type mismatch/],

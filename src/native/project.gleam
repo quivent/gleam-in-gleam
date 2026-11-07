@@ -6,6 +6,7 @@ import native/definitions as d
 import native/free_names
 import native/lexer
 import native/parser
+import native/prelude
 import native/type_system as types
 
 pub type Source {
@@ -245,13 +246,18 @@ fn value_in(
         c.map(t.variants, fn(v) { #(v.name, t.public_) })
       }),
     )
-  use public_ <- c.then(case c.lookup(c.append(functions, constructors), name) {
-    Ok(public_) -> Ok(public_)
-    Error(_) -> Error("Unknown name: " <> m.name <> "." <> name)
-  })
-  case external && !public_ {
-    True -> Error("Private module member: " <> m.name <> "." <> name)
-    False -> Ok(internal(name, m.name, entry))
+  case c.lookup(c.append(functions, constructors), name) {
+    Ok(public_) ->
+      case external && !public_ {
+        True -> Error("Private module member: " <> m.name <> "." <> name)
+        False -> Ok(internal(name, m.name, entry))
+      }
+    Error(_) ->
+      case external, name {
+        False, "Ok" -> Ok(prelude.ok_name())
+        False, "Error" -> Ok(prelude.error_name())
+        _, _ -> Error("Unknown name: " <> m.name <> "." <> name)
+      }
   }
 }
 
@@ -299,12 +305,23 @@ fn named_type(
           c.lookup(c.map(m.module_.custom_types, fn(t) { #(t.name, t) }), name)
         {
           Ok(t) -> Ok(t)
-          Error(_) -> Error("Unknown type: " <> m.name <> "." <> name)
+          Error(_) ->
+            case name == "Result" && !external {
+              True -> Ok(prelude.result_type())
+              False -> Error("Unknown type: " <> m.name <> "." <> name)
+            }
         },
       )
       case external && !t.public_ {
         True -> Error("Private module type: " <> m.name <> "." <> name)
-        False -> Ok(types.apply(internal(name, m.name, scope.entry), args))
+        False ->
+          Ok(types.apply(
+            case t.name == prelude.result_name() {
+              True -> prelude.result_name()
+              False -> internal(name, m.name, scope.entry)
+            },
+            args,
+          ))
       }
     }
   }

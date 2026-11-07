@@ -47,7 +47,9 @@ program. GNU objdump is used only as a development inspection tool.
 
 * Int values are checked signed 64-bit words; Bool is 0/1 and Nil is 0. Types
   distinguish those representations. This is still a documented integer subset.
-* Strings remain pointers to static `[length:u64][UTF-8 bytes][newline]` data.
+* String value pointers expose `[length:u64][UTF-8 bytes][newline]`. Literals
+  remain static; dynamic values have an arena header before the value pointer
+  (see the strings milestone below).
 * Empty lists are null pointers. A cons cell is 32 bytes:
   `[size=32:u64][tag=2:u64][head:u64][tail:pointer]`.
 * A tuple is `[size:u64][tag=1:u64][field0:u64]...`. Empty tuples still allocate
@@ -286,3 +288,47 @@ capture at `0x400393`; the false branch at `0x4003a0` selects False at `0x4003b5
 The complete 1,269-byte executable prints `7,5,True,False`. All ten prior examples
 retain their exact hashes. These are correctness/representation checks, not timing
 benchmarks or a measured native compiler size.
+
+## Owned strings and implicit Result
+
+String concatenation and tail copying allocate:
+
+```text
+[aligned size:u64][tag=-2:i64][byte length:u64][UTF-8 bytes][newline][padding]
+                               ^ returned String pointer (allocation + 16)
+```
+
+The size is `align8(25 + length)`. Both length addition and header/alignment
+addition are checked before the existing arena allocator is called. The hidden
+header keeps heap objects identifiable, while the exposed length/data/newline
+layout remains compatible with all static strings and the existing print helper.
+A future collector must account for the fixed interior value-pointer offset;
+current lifetime comes from the retained arena, not reclamation. Prefix tails
+copy their payload into owned storage instead of returning stack/interior views.
+
+Only used string helpers are emitted. Equality and prefix-discard matching do not
+require allocation/heap startup by themselves. Helpers use explicit lengths and
+`cld; repe cmpsb`; concatenation/tail copies use `cld; rep movsb`, with no external
+memcmp/memcpy/malloc. Empty strings take an explicit equality/prefix success path
+before CMPSB, avoiding dependence on stale flags for zero iterations. R14/R15 retain
+the arena meanings throughout helper calls. The String-to-UTF8 byte-array path
+copies only length bytes, excluding the diagnostic newline.
+
+For example SHA256
+`d6bd4fc63a544b0777cf6e3aac45eed54b9743d894efc5d91898ceef75dbe610`,
+`evidence/strings_prelude-disassembly.txt` shows equality's length comparison at
+`0x400555` and mismatch branch at `0x400558`, before CMPSB at `0x400570`. Prefix
+matching rejects a shorter subject at `0x40058f` before CMPSB at `0x4005a7`.
+Concatenation checks the length sum at `0x4005d3`, alignment addition at `0x4005e1`,
+then allocates at `0x4005ee`; left/right byte copies occur at `0x40061d`/`0x40062b`.
+The heap string tag is stored at `0x4005f6` and the final newline at `0x40062d`.
+
+Implicit Result is a normal generic ADT under reserved unlexable internal names.
+Its two constructors are indexed after user constructors, preserving all previous
+tags. There is no Result-specific VM, helper library or runtime dictionary; unused
+prelude definitions emit no code. Source resolution checks local names first and
+never treats implicit constructors as an imported module's exports.
+
+The complete example is 1,852 bytes and all eleven previous example hashes remain
+unchanged. Actual outputs and raw instructions establish correctness for the tested
+cases, not compiler speed, a final ABI or full self-hosting.

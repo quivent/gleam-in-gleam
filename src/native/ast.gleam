@@ -68,6 +68,8 @@ pub type Statement {
 pub type Pattern {
   BitArrayPattern(List(BitSegment(Pattern)))
   CheckedBitArrayPattern(List(#(Pattern, BitMode)))
+  StringPattern(BitArray)
+  StringPrefixPattern(BitArray, Pattern, Pattern)
   IntegerPattern(Int)
   BooleanPattern(Bool)
   DiscardPattern
@@ -138,6 +140,7 @@ pub type BitMode {
   IntegerSegment(bytes: Int, little: Bool, signed: Bool)
   BitsSegment
   BytesSegment
+  Utf8Segment
 }
 
 pub type Import {

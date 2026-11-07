@@ -1,0 +1,305 @@
+[
+  {
+    "name": "strings-literal-equality",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo \"a\"==\"a\" echo \"a\"!=\"b\" echo \"\"==\"\" echo \"\"==\"x\" Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nTrue\nFalse\n"
+  },
+  {
+    "name": "strings-dynamic-equality",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let a=\"\u03bb\"<>\"\ud83d\ude00\" echo a==\"\u03bb\ud83d\ude00\" echo a!=\"\u03bb\" echo \"\u00e9\"==\"e\u0301\" Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nFalse\n"
+  },
+  {
+    "name": "strings-prefix-guard",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(s:String) -> Int {case s {\"pre:\" <> tail if tail==\"yes\" -> 1 \"pre:\" <> _ -> 2 _ -> 3}} pub fn main() -> Nil {echo pick(\"pre:\"<>\"yes\") echo pick(\"pre:no\") echo pick(\"pre\") Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n3\n"
+  },
+  {
+    "name": "strings-prefix-as",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"\u03bbtail\" {\"\u03bb\" as head <> tail -> head==\"\u03bb\" && tail==\"tail\" _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "strings-guard-concat",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"ab\" {s if s<>\"c\"==\"abc\" -> True _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "strings-UTF8-dynamic",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let s=\"\u03bb\"<>\"\u03b2\" case <<s:utf8>> {<<a,b,c,d>> -> {echo a echo b echo c echo d Nil} _ -> Nil} Nil}"
+    },
+    "accepted": true,
+    "stdout": "206\n187\n206\n178\n"
+  },
+  {
+    "name": "strings-UTF8-literal-default",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case <<\"hi\",33>> {<<a,b,c>> -> {echo a echo b echo c Nil} _ -> Nil} Nil}"
+    },
+    "accepted": true,
+    "stdout": "104\n105\n33\n"
+  },
+  {
+    "name": "strings-length-guards",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"\" {\"long\" <> _ -> 9 \"\" -> 1 _ -> 0} echo case \"ab\" {\"abc\" -> 9 \"ab\" -> 2 _ -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n"
+  },
+  {
+    "name": "strings-empty-prefix",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"\u03bb\" {\"\" <> tail -> tail==\"\u03bb\" _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "strings-operand-order",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let text={echo 1 \"a\"}<>{echo 2 \"b\"} echo text==\"ab\" Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\nTrue\n"
+  },
+  {
+    "name": "strings-imported-return",
+    "entry": "main",
+    "files": {
+      "main": "import words pub fn main() -> Nil {echo words.make(\"\u03bb\")==\"\u03bbtail\" Nil}",
+      "words": "pub fn make(s:String) -> String {s<>\"tail\"}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "strings-concat-wrong-type",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let s=\"a\"<>1 Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "strings-equality-wrong-type",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo \"1\"==1 Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "strings-prefix-literal-tail",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"ab\" {\"a\" <> \"b\" -> 1 _ -> 0} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "identifier"
+  },
+  {
+    "name": "strings-empty-prefix-refutable-let",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let \"\" <> tail=\"hi\" echo tail Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Refutable let"
+  },
+  {
+    "name": "strings-prefix-coverage-conservative",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"hi\" {\"\" <> tail -> tail} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Non-exhaustive"
+  },
+  {
+    "name": "strings-prefix-duplicate-binding",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case \"hi\" {\"h\" as x <> x -> True _ -> False} Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Duplicate variable"
+  },
+  {
+    "name": "strings-variable-needs-UTF8-option",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let s=\"hi\" let b=<<s>> Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "prelude-default-result",
+    "entry": "main",
+    "files": {
+      "main": "fn make(n:Int) -> Result(Int,String) {case n {0 -> Error(\"bad\") _ -> Ok(n+1)}} pub fn main() -> Nil {echo case make(3) {Ok(n) -> n Error(_) -> 0} echo case make(0) {Ok(_) -> False Error(e) -> e==\"bad\"} Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\nTrue\n"
+  },
+  {
+    "name": "prelude-generic-result",
+    "entry": "main",
+    "files": {
+      "main": "fn map(r:Result(a,e),f:fn(a)->b) -> Result(b,e) {case r {Ok(x) -> Ok(f(x)) Error(e) -> Error(e)}} pub fn main() -> Nil {let r:Result(Int,String)=Ok(3) echo case map(r,fn(n:Int){n+2}) {Ok(n) -> n Error(_) -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "prelude-result-alias",
+    "entry": "main",
+    "files": {
+      "main": "type Parsed(a)=Result(a,String) fn make() -> Parsed(Int) {Ok(9)} pub fn main() -> Nil {echo case make() {Ok(n) -> n Error(_) -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "prelude-cross-module-result",
+    "entry": "main",
+    "files": {
+      "main": "import producer fn read(r:Result(Int,String)) -> Int {case r {Ok(n) -> n Error(_) -> 0}} pub fn main() -> Nil {echo read(producer.make()) Nil}",
+      "producer": "pub fn make() -> Result(Int,String) {Ok(8)}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "prelude-local-result-shadow",
+    "entry": "main",
+    "files": {
+      "main": "type Result {Ok(Int) Error(String)} pub fn main() -> Nil {let Ok(n)=Ok(7) echo n Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "prelude-independent-local-shadow",
+    "entry": "main",
+    "files": {
+      "main": "import producer type Result {Ok(Int) Error(String)} fn read(r:Result) -> Int {case r {Ok(n) -> n Error(_) -> 0}} pub fn main() -> Nil {echo read(Ok(7)) echo producer.value() Nil}",
+      "producer": "pub fn value() -> Int {let r:Result(Int,String)=Ok(8) case r {Ok(n) -> n Error(_) -> 0}}"
+    },
+    "accepted": true,
+    "stdout": "7\n8\n"
+  },
+  {
+    "name": "prelude-unused-result-alias",
+    "entry": "main",
+    "files": {
+      "main": "type Parsed=Result(Int,String) pub fn main() -> Nil {echo 7 Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "prelude-local-Ok-shadows-only-value",
+    "entry": "main",
+    "files": {
+      "main": "type Other {Ok(Int)} pub fn main() -> Nil {let a:Result(Int,String)=Ok(3) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "prelude-local-Result-alias-shadow",
+    "entry": "main",
+    "files": {
+      "main": "type Result=Int pub fn main() -> Nil {let n:Result=7 echo n Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "prelude-not-reexported",
+    "entry": "main",
+    "files": {
+      "main": "import library pub fn main() -> Nil {let a=library.Ok(3) Nil}",
+      "library": "pub fn make() -> Result(Int,String) {Ok(3)}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown name"
+  },
+  {
+    "name": "prelude-result-wrong-arity",
+    "entry": "main",
+    "files": {
+      "main": "fn read(r:Result(Int)) -> Nil {Nil} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type argument count"
+  },
+  {
+    "name": "prelude-Ok-unlabelled",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let a:Result(Int,String)=Ok(value:3) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Unknown constructor label"
+  },
+  {
+    "name": "prelude-use-continuation",
+    "entry": "main",
+    "files": {
+      "main": "fn then(value:Result(a,String),f:fn(a)->Result(b,String)) -> Result(b,String) {case value {Ok(n) -> f(n) Error(e) -> Error(e)}} pub fn main() -> Nil {let result={use n <- then(Ok(3)) Ok(n+4)} echo case result {Ok(n) -> n Error(_) -> 0} Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "prelude-error-skips-continuation",
+    "entry": "main",
+    "files": {
+      "main": "fn then(value:Result(a,String),f:fn(a)->Result(b,String)) -> Result(b,String) {case value {Ok(n) -> f(n) Error(e) -> Error(e)}} pub fn main() -> Nil {let failure:Result(Int,String)=Error(\"bad\") let result={use n <- then(failure) echo 999 Ok(n+4)} echo case result {Ok(_) -> False Error(e) -> e==\"bad\"} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  }
+]

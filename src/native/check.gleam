@@ -241,7 +241,10 @@ fn expression(
     a.BitArrayLiteral(segments) -> {
       use segments <- c.then(
         c.try_map(segments, fn(segment) {
-          use mode <- c.then(bit_options.mode(segment.options, False))
+          use mode <- c.then(case segment.value, segment.options {
+            a.StringLiteral(_), [] -> Ok(a.Utf8Segment)
+            _, _ -> bit_options.mode(segment.options, False)
+          })
           use value <- c.then(expression(segment.value, env, globals))
           use _ <- c.then(equal(value.type_, bit_segment_type(mode)))
           Ok(#(value, mode))
@@ -679,6 +682,11 @@ fn binary_type(
   right: a.Type,
 ) -> Result(a.Type, String) {
   case op {
+    "<>" -> {
+      use _ <- c.then(equal(left, a.StringType))
+      use _ <- c.then(equal(right, a.StringType))
+      Ok(a.StringType)
+    }
     "&&" | "||" -> {
       use _ <- c.then(equal(left, a.Boolean))
       use _ <- c.then(equal(right, a.Boolean))
@@ -687,8 +695,7 @@ fn binary_type(
     "==" | "!=" -> {
       use _ <- c.then(equal(left, right))
       case left {
-        a.StringType ->
-          Error("Structural String equality is not implemented yet")
+        a.StringType -> Ok(a.Boolean)
         a.BitArrayType
         | a.ListType(_)
         | a.TupleType(_)
@@ -1023,6 +1030,15 @@ fn pattern_bindings(
   bindings: Environment,
 ) -> Result(Environment, String) {
   case p {
+    a.StringPattern(_) -> {
+      use _ <- c.then(equal(t, a.StringType))
+      Ok(bindings)
+    }
+    a.StringPrefixPattern(_, binding, tail) -> {
+      use _ <- c.then(equal(t, a.StringType))
+      use bindings <- c.then(pattern_bindings(binding, t, bindings))
+      pattern_bindings(tail, t, bindings)
+    }
     a.BitArrayPattern(_) -> Error("Unresolved bit-array pattern")
     a.CheckedBitArrayPattern(fields) ->
       checked_field_bindings(
@@ -1434,6 +1450,7 @@ fn bit_segment_type(mode: a.BitMode) -> a.Type {
   case mode {
     a.IntegerSegment(_, _, _) -> a.Integer
     a.BitsSegment | a.BytesSegment -> a.BitArrayType
+    a.Utf8Segment -> a.StringType
   }
 }
 

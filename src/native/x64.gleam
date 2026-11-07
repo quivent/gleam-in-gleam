@@ -3,6 +3,7 @@ import native/ast as a
 import native/check as t
 import native/core as c
 import native/heap
+import native/string_runtime
 
 type State {
   State(
@@ -12,6 +13,7 @@ type State {
     data: List(asm.Part),
     needs_heap: Bool,
     closures: List(asm.Part),
+    strings: List(String),
   )
 }
 
@@ -71,7 +73,7 @@ fn add_string(bytes: BitArray, state: State) -> #(String, State) {
 pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
   use #(bodies, state) <- c.then(function_list(
     functions,
-    State(0, 0, [], [], False, []),
+    State(0, 0, [], [], False, [], []),
   ))
   let init = case state.needs_heap {
     True -> [call("rt:heap_init")]
@@ -88,7 +90,16 @@ pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
       entry,
       c.append(
         c.append(bodies, state.closures),
-        c.append(runtime(), c.append(heap_runtime, c.reverse(state.data))),
+        c.append(
+          runtime(),
+          c.append(
+            heap_runtime,
+            c.append(
+              string_runtime.generate(state.strings),
+              c.reverse(state.data),
+            ),
+          ),
+        ),
       ),
     )
   asm.assemble(parts)
@@ -415,7 +426,21 @@ fn binary(
     }
     _ -> {
       use #(right_code, state) <- c.then(expression(right, state))
-      let #(operation, state) = operation(op, state)
+      let #(operation, state) = case left.type_ {
+        a.StringType -> {
+          let name = case op {
+            "<>" -> "concat"
+            _ -> "equal"
+          }
+          let state = string_helper(state, name)
+          let invert = case op {
+            "!=" -> [raw(<<72, 131, 240, 1>>)]
+            _ -> []
+          }
+          #([call("rt:string_" <> name), ..invert], state)
+        }
+        _ -> operation(op, state)
+      }
       Ok(#(
         c.append(left_code, [
           raw(<<80>>),
@@ -636,6 +661,21 @@ fn pattern_code(
   state: State,
 ) -> Generated {
   case pat {
+    a.StringPattern(text) -> {
+      let #(name, state) = add_string(text, state)
+      Ok(#(
+        [
+          load(subject),
+          asm.Relative(<<72, 141, 13>>, name),
+          call("rt:string_equal"),
+          raw(<<72, 133, 192>>),
+          branch(132, failure),
+        ],
+        string_helper(state, "equal"),
+      ))
+    }
+    a.StringPrefixPattern(prefix, binding, tail) ->
+      string_prefix(prefix, binding, tail, subject, failure, state)
     a.BitArrayPattern(_) ->
       Error("Unresolved bit-array pattern in native code generation")
     a.CheckedBitArrayPattern(segments) ->
@@ -984,6 +1024,7 @@ fn bit_lengths(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
         a.BitsSegment | a.BytesSegment -> [
           raw(<<72, 139, 141, saved:32-little, 72, 3, 65, 16>>),
         ]
+        a.Utf8Segment -> [raw(<<72, 139, 141, saved:32-little, 72, 3, 1>>)]
       }
       c.append(add, [branch(130, "rt:oom"), ..bit_lengths(rest)])
     }
@@ -1002,6 +1043,7 @@ fn write_bit_values(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
         a.BitsSegment | a.BytesSegment -> [
           raw(<<72, 139, 72, 16, 72, 139, 112, 24, 252, 243, 164>>),
         ]
+        a.Utf8Segment -> [raw(<<72, 139, 8, 72, 141, 112, 8, 252, 243, 164>>)]
       }
       [load(saved), ..c.append(write, write_bit_values(rest))]
     }
@@ -1030,6 +1072,15 @@ fn bit_pattern(
   failure: String,
   state: State,
 ) -> Generated {
+  use _ <- c.then(
+    c.try_map(segments, fn(segment) {
+      case segment.1 {
+        a.Utf8Segment ->
+          Error("UTF-8 codepoint pattern reached native lowering")
+        _ -> Ok(Nil)
+      }
+    }),
+  )
   let #(minimum, tail) = bit_pattern_size(segments)
   let condition = case tail {
     True -> 130
@@ -1057,6 +1108,7 @@ fn bit_pattern(
 fn bit_pattern_size(segments: List(#(a.Pattern, a.BitMode))) -> #(Int, Bool) {
   case segments {
     [] -> #(0, False)
+    [#(_, a.Utf8Segment), ..] -> #(0, False)
     [#(_, a.BitsSegment), ..] | [#(_, a.BytesSegment), ..] -> #(0, True)
     [#(_, a.IntegerSegment(n, _, _)), ..rest] -> {
       let #(size, tail) = bit_pattern_size(rest)
@@ -1103,6 +1155,7 @@ fn bit_pattern_fields(
             state,
           )
         }
+        a.Utf8Segment -> #([jump("rt:match")], state)
         a.BitsSegment | a.BytesSegment -> {
           #(
             [
@@ -1176,7 +1229,7 @@ fn bit_pattern_fields(
       use #(match, state) <- c.then(pattern_code(pat, value, failure, state))
       let next = case mode {
         a.IntegerSegment(n, _, _) -> index + n
-        a.BitsSegment | a.BytesSegment -> index
+        a.BitsSegment | a.BytesSegment | a.Utf8Segment -> index
       }
       use #(tail, state) <- c.then(bit_pattern_fields(
         rest,
@@ -1223,4 +1276,58 @@ fn read_integer_bytes(
       ]
     }
   }
+}
+
+fn string_helper(state: State, name: String) -> State {
+  State(
+    ..state,
+    strings: [name, ..state.strings],
+    needs_heap: state.needs_heap || name == "concat" || name == "drop",
+  )
+}
+
+fn string_prefix(
+  prefix: BitArray,
+  binding: a.Pattern,
+  tail: a.Pattern,
+  subject: Int,
+  failure: String,
+  state: State,
+) -> Generated {
+  let #(name, state) = add_string(prefix, state)
+  let state = string_helper(state, "prefix")
+  let inspect = [
+    load(subject),
+    asm.Relative(<<72, 141, 13>>, name),
+    call("rt:string_prefix"),
+    raw(<<72, 133, 192>>),
+    branch(132, failure),
+  ]
+  use #(head, state) <- c.then(case binding {
+    a.DiscardPattern -> Ok(#([], state))
+    _ -> {
+      let #(saved, state) = slot(state)
+      use #(code, state) <- c.then(pattern_code(binding, saved, failure, state))
+      Ok(#([asm.Relative(<<72, 141, 5>>, name), store(saved), ..code], state))
+    }
+  })
+  use #(rest, state) <- c.then(case tail {
+    a.DiscardPattern -> Ok(#([], state))
+    _ -> {
+      let #(saved, state) = slot(state)
+      let size = c.byte_length(prefix)
+      use #(code, state) <- c.then(pattern_code(tail, saved, failure, state))
+      Ok(#(
+        [
+          load(subject),
+          raw(<<72, 199, 193, size:32-little>>),
+          call("rt:string_drop"),
+          store(saved),
+          ..code
+        ],
+        string_helper(state, "drop"),
+      ))
+    }
+  })
+  Ok(#(c.append(inspect, c.append(head, rest)), state))
 }
