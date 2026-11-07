@@ -1,0 +1,15 @@
+pub fn main() -> Nil {
+  let tree = a.CustomType("Tree", [
+    a.Variant("Leaf", [a.FieldDefinition("", a.Integer)]),
+    a.Variant("Branch", [a.FieldDefinition("", a.ListType(a.NamedType("Tree")))])
+  ], True, [])
+  let module_ = a.Module([], [tree], [], [])
+  case d.collect(module_) {
+    Ok(context) -> case plan(a.NamedType("Tree"), context) {
+      Ok(p) -> { echo c.length(p.entries) echo p.root Nil }
+      Error(error) -> { echo error Nil }
+    }
+    Error(error) -> { echo error Nil }
+  }
+  Nil
+}

@@ -58,6 +58,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
         ('aliases_guards', '7\n5\nTrue\nFalse\n'),
         ('strings_prelude', 'True\nTrue\nλ😀\n206\n187\n'),
         ('multi_patterns', '7\n9\n3\n'),
+        ('structural_equality', 'True\nFalse\nTrue\nTrue\n'),
     ]:
         output = Path(tmp) / name
         run(['node', 'bootstrap.mjs', f'examples/{name}.gleam', str(output)])
@@ -71,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                    for i in range(phnum)]
         assert all(kind not in (2, 3) for kind, _ in headers)
         assert (0x6474e551, 6) in headers
-        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates', 'bit_arrays', 'modules', 'aliases_guards', 'strings_prelude', 'multi_patterns') and shutil.which('objdump'):
+        if name in ('collections', 'custom_types', 'generics_records', 'functions', 'closures', 'record_updates', 'bit_arrays', 'modules', 'aliases_guards', 'strings_prelude', 'multi_patterns', 'structural_equality') and shutil.which('objdump'):
             entry = struct.unpack_from('<Q', data, 24)[0]
             load_base = struct.unpack_from('<Q', data, phoff + 16)[0]
             raw = Path(tmp) / f'{name}-code.bin'
@@ -203,7 +204,8 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
 module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/aliases-guards-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/strings-prelude-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/multi-pattern-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/multi-pattern-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/equality-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
@@ -246,9 +248,9 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr.replace(str(project), '<oracle>')))
-(evidence / 'multi-patterns-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
+(evidence / 'structural-equality-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
 
-(evidence / 'multi-patterns-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'structural-equality-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 trace_script = f"""
 import {{readFileSync}} from 'node:fs';
@@ -286,8 +288,36 @@ with tempfile.TemporaryDirectory(prefix='gleam-owned-core-native-') as tmp:
                       allSourceFunctionsCompiled=True, fullCompilerSelfHosting=False)
 (evidence / 'owned-core-native-verification.json').write_text(json.dumps(owned_core, indent=2) + '\n')
 
+def owned_project_receipt(entry, modules, driver_name, expected):
+    driver = (ROOT / driver_name).read_bytes()
+    source_hashes = {}
+    with tempfile.TemporaryDirectory(prefix='gleam-owned-component-') as tmp:
+        root = Path(tmp)
+        for module in modules:
+            original = (ROOT / 'src' / (module + '.gleam')).read_bytes()
+            source_hashes['src/' + module + '.gleam'] = sha(original)
+            output = root / (module + '.gleam')
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_bytes(original + (b'\n' + driver if module == entry else b''))
+        output = root / 'component'
+        run(['node', 'bootstrap.mjs', str(root / (entry + '.gleam')), str(output), '--source-root', str(root)])
+        observed = run([str(output)])
+        assert observed.stdout == expected and not observed.stderr
+        return dict(entry=entry, sourceSHA256=source_hashes, driver=driver_name,
+                    driverSHA256=sha(driver), executableSHA256=sha(output.read_bytes()),
+                    bytes=len(output.read_bytes()), exitCode=observed.returncode, stdout=observed.stdout,
+                    allSourceFunctionsCompiled=True, fullCompilerSelfHosting=False,
+                    oracle='native test compares current upstream-compiled owned module function results')
+
+owned_types = owned_project_receipt('native/type_system', ['native/type_system','native/core','native/ast'],
+                    'test/owned-type-system-driver.source', 'Box(Int)\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n')
+owned_equality = owned_project_receipt('native/equality', ['native/equality','native/definitions','native/type_system','native/core','native/ast','native/prelude'],
+                    'test/owned-equality-driver.source', '3\n0\n')
+(evidence / 'owned-type-system-native-verification.json').write_text(json.dumps(owned_types, indent=2) + '\n')
+(evidence / 'owned-equality-native-verification.json').write_text(json.dumps(owned_equality, indent=2) + '\n')
+
 receipt = dict(
-    schema='gleam-in-gleam.multi-patterns-verification/1',
+    schema='gleam-in-gleam.structural-equality-verification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -301,11 +331,11 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/multi-patterns-upstream-checks.json'),
+                                  path='evidence/structural-equality-upstream-checks.json'),
     bitArrayRepresentation='arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice',
     bitArraySubset='byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails',
     projectCompilation=dict(sourceLanguage='Gleam', imports='local module aliases and qualified values/types/constructors', namespace='unlexable module-qualified internal names', dependencyOrder='deterministic DFS postorder, cycles rejected, shared modules linked once', nativeLinker='owned Gleam relocation emitter, no external linker', selectiveImports=False),
-    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/multi-patterns-project-upstream-checks.json'),
+    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/structural-equality-project-upstream-checks.json'),
     totalFreshUpstreamComparisons=len(oracle_results)+len(module_results),
     linkedExampleSymbols=module_trace,
     exactSingleModuleEquivalenceFixture='nested-path-default-alias (native test)',
@@ -318,6 +348,11 @@ receipt = dict(
     multiPatternsFixturesSHA256=sha((ROOT / 'test/multi-pattern-fixtures.json').read_bytes()),
     multiPatterns='subjects evaluated once left-to-right into stack slots; alternatives share bindings/body; failed guard retries next alternative; finite constructor-product coverage',
     ownedCore=owned_core,
+    equalityFixturesSHA256=sha((ROOT / 'test/equality-fixtures.json').read_bytes()),
+    structuralEquality='type-directed static helper graph; lists loop over tails; nominal tags checked before variant fields; strings/bits compare bytes; no heap allocation during comparison',
+    equalityLimits='128 shape nodes per root; erased stored fields and function values explicitly unsupported; unresolved inference-only fields trap if visited',
+    ownedTypeSystem=owned_types,
+    ownedEqualityPlanner=owned_equality,
     aliases='transparent, scoped expansion; cycle/arity/parameter/visibility checks; no target wrappers',
     guards='restricted pure expressions, typed Bool; failed alternative guard retries alternatives then later arms; guarded arms do not prove exhaustiveness',
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
@@ -327,13 +362,13 @@ receipt = dict(
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
     limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
-                 'No polymorphic named function values/labelled function calls/selective imports or package resolution yet; guard construction/structural equality remain unsupported',
+                 'No polymorphic named function values/labelled function calls/selective imports or package resolution yet; guard construction remains unsupported',
                  'Anonymous parameters require annotations or a sufficiently resolved expected function type',
                  'Bounded arena only: no collection or native compiler file IO yet',
-                 'Non-string compound structural equality/printing and complex coverage are not implemented',
+                 'Erased stored-field/function equality, compound printing and full coverage are not implemented; equality graphs are bounded to 128 shape nodes',
                  'Unaligned/dynamic-size/float and UTF8 codepoint pattern segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'multi-patterns-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'multi-patterns-test-output.tap').write_text(suite.stdout)
+(evidence / 'structural-equality-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'structural-equality-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

@@ -2,6 +2,9 @@ import native/assembler as asm
 import native/ast as a
 import native/check as t
 import native/core as c
+import native/definitions as d
+import native/equality as eq
+import native/equality_runtime as eq_runtime
 import native/heap
 import native/string_runtime
 
@@ -14,6 +17,8 @@ type State {
     needs_heap: Bool,
     closures: List(asm.Part),
     strings: List(String),
+    globals: d.Context,
+    equalities: List(#(a.Type, eq.Plan)),
   )
 }
 
@@ -71,10 +76,18 @@ fn add_string(bytes: BitArray, state: State) -> #(String, State) {
 }
 
 pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
+  generate_with(functions, d.Context([], [], [], [], ""))
+}
+
+pub fn generate_with(
+  functions: List(t.Function),
+  globals: d.Context,
+) -> Result(BitArray, String) {
   use #(bodies, state) <- c.then(function_list(
     functions,
-    State(0, 0, [], [], False, [], []),
+    State(0, 0, [], [], False, [], [], globals, []),
   ))
+  use equality_code <- c.then(equality_helpers(state.equalities, 0))
   let init = case state.needs_heap {
     True -> [call("rt:heap_init")]
     False -> []
@@ -89,7 +102,7 @@ pub fn generate(functions: List(t.Function)) -> Result(BitArray, String) {
     c.append(
       entry,
       c.append(
-        c.append(bodies, state.closures),
+        c.append(c.append(bodies, state.closures), equality_code),
         c.append(
           runtime(),
           c.append(
@@ -233,6 +246,22 @@ fn expression(e: t.Typed, state: State) -> Generated {
       Ok(#(c.append(code, instructions), state))
     }
     t.BinaryNode(op, left, right) -> binary(op, left, right, state)
+    t.EqualityNode(left, right, type_, invert) -> {
+      use #(code, state) <- c.then(expression(left, state))
+      use #(rhs, state) <- c.then(expression(right, state))
+      use #(target, state) <- c.then(equality_target(type_, state))
+      let invert = case invert {
+        True -> [raw(<<72, 131, 240, 1>>)]
+        False -> []
+      }
+      Ok(#(
+        c.append(code, [
+          raw(<<80>>),
+          ..c.append(rhs, [raw(<<89>>), call(target), ..invert])
+        ]),
+        state,
+      ))
+    }
     t.CallNode(name, args) -> {
       use #(code, state) <- c.then(arguments(args, state))
       let cleanup = c.length(args) * 8
@@ -1502,6 +1531,55 @@ fn copy_bindings(
       use source <- c.then(c.lookup(env, name))
       use tail <- c.then(copy_bindings(rest, env))
       Ok([load(source), store(target), ..tail])
+    }
+  }
+}
+
+fn equality_target(
+  type_: a.Type,
+  state: State,
+) -> Result(#(String, State), String) {
+  case equality_index(type_, state.equalities, 0) {
+    Ok(#(id, plan)) -> Ok(#(eq_runtime.label(id, plan.root), state))
+    Error(_) -> {
+      use plan <- c.then(eq.plan(type_, state.globals))
+      let id = c.length(state.equalities)
+      let state =
+        State(..state, equalities: c.append(state.equalities, [#(type_, plan)]))
+      let state = case eq_runtime.uses_strings(plan) {
+        True -> string_helper(state, "equal")
+        False -> state
+      }
+      Ok(#(eq_runtime.label(id, plan.root), state))
+    }
+  }
+}
+
+fn equality_index(
+  type_: a.Type,
+  plans: List(#(a.Type, eq.Plan)),
+  index: Int,
+) -> Result(#(Int, eq.Plan), String) {
+  case plans {
+    [] -> Error("No equality plan")
+    [#(t, plan), ..rest] ->
+      case t == type_ {
+        True -> Ok(#(index, plan))
+        False -> equality_index(type_, rest, index + 1)
+      }
+  }
+}
+
+fn equality_helpers(
+  plans: List(#(a.Type, eq.Plan)),
+  index: Int,
+) -> Result(List(asm.Part), String) {
+  case plans {
+    [] -> Ok([])
+    [#(_, plan), ..rest] -> {
+      use code <- c.then(eq_runtime.generate(plan, index))
+      use tail <- c.then(equality_helpers(rest, index + 1))
+      Ok(c.append(code, tail))
     }
   }
 }

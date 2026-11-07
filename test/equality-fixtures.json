@@ -1,0 +1,312 @@
+[
+  {
+    "name": "eq-list-values",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo [1,2,3]==[1,2,3] echo [1,2]!=[1,3] echo [1]==[1,2] echo []==[] Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nFalse\nTrue\n"
+  },
+  {
+    "name": "eq-tuple-nested",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo #(1,True,[2,3],\"a\"<>\"b\")==#(1,True,[2,3],\"ab\") echo #(1,True)==#(1,False) echo #()==#() Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\nTrue\n"
+  },
+  {
+    "name": "eq-recursive-tree",
+    "entry": "main",
+    "files": {
+      "main": "type Tree {Leaf(Int) Branch(List(Tree))} pub fn main() -> Nil {echo Branch([Leaf(1),Leaf(2)])==Branch([Leaf(1),Leaf(2)]) echo Branch([Leaf(1)])!=Branch([Leaf(2)]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\n"
+  },
+  {
+    "name": "eq-constructor-tag-before-fields",
+    "entry": "main",
+    "files": {
+      "main": "type V {Empty Many(Int,String,List(Int))} pub fn main() -> Nil {echo Empty==Many(1,\"x\",[2]) echo Many(1,\"x\",[2])==Empty echo Empty==Empty Nil}"
+    },
+    "accepted": true,
+    "stdout": "False\nFalse\nTrue\n"
+  },
+  {
+    "name": "eq-mutually-recursive-types",
+    "entry": "main",
+    "files": {
+      "main": "type A {EndA ToB(B)} type B {EndB ToA(A)} pub fn main() -> Nil {echo ToB(ToA(EndA))==ToB(ToA(EndA)) echo ToB(EndB)==ToB(ToA(EndA)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "eq-generic-record",
+    "entry": "main",
+    "files": {
+      "main": "type Box(a) {Box(value:a,other:Int)} pub fn main() -> Nil {echo Box([1,2],3)==Box([1,2],3) echo Box(\"\u03bb\"<>\"\u03b2\",3)==Box(\"\u03bb\u03b2\",3) echo Box(1,3)!=Box(1,4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nTrue\n"
+  },
+  {
+    "name": "eq-nested-generic-same-owner",
+    "entry": "main",
+    "files": {
+      "main": "type Box(a) {Box(a)} pub fn main() -> Nil {echo Box(Box(1))==Box(Box(1)) echo Box(Box(1))!=Box(Box(2)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\n"
+  },
+  {
+    "name": "eq-generic-recursive-tree",
+    "entry": "main",
+    "files": {
+      "main": "type Tree(a) {Leaf(a) Branch(List(Tree(a)))} pub fn main() -> Nil {echo Branch([Leaf(\"\u03bb\")])==Branch([Leaf(\"\u03bb\")]) echo Branch([Leaf(1)])==Branch([Leaf(2)]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "eq-parameter-swap-recursion",
+    "entry": "main",
+    "files": {
+      "main": "type Flip(a,b) {Pair(a,b) Next(Flip(b,a))} pub fn main() -> Nil {echo Next(Pair(\"x\",1))==Next(Pair(\"x\",1)) echo Next(Pair(\"x\",1))!=Next(Pair(\"y\",1)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\n"
+  },
+  {
+    "name": "eq-phantom-rigid-parameter",
+    "entry": "main",
+    "files": {
+      "main": "type Phantom(a) {Phantom(Int)} fn same(a:Phantom(t),b:Phantom(t)) -> Bool {a==b} pub fn main() -> Nil {echo same(Phantom(1),Phantom(1)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "eq-result-holes",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo Error(\"a\"<>\"b\")==Error(\"ab\") echo Ok([])==Ok([]) echo Error(\"x\")==Ok(1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nFalse\n"
+  },
+  {
+    "name": "eq-empty-inference-unification",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo []==[1] echo [[],[]]==[[],[]] echo #([],[])==#([],[]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "False\nTrue\nTrue\n"
+  },
+  {
+    "name": "eq-bit-arrays",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo <<1,2>> == <<1,2>> echo <<1>> != <<1,2>> echo <<>> == <<>> Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nTrue\n"
+  },
+  {
+    "name": "eq-bit-array-view",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {case <<9,1,2>> {<<_,tail:bits>> -> {echo tail==<<1,2>> Nil} _ -> Nil} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "eq-byte-payload-inside-record",
+    "entry": "main",
+    "files": {
+      "main": "type Packet {Packet(BitArray,String)} pub fn main() -> Nil {echo Packet(<<\"\u03bb\">>,\"x\"<>\"y\")==Packet(<<206,187>>,\"xy\") Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "eq-alias",
+    "entry": "main",
+    "files": {
+      "main": "type Items=List(#(Int,String)) pub fn main() -> Nil {let a:Items=[#(1,\"\u03bb\")] let b:Items=[#(1,\"\u03bb\")] echo a==b Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "eq-guard-local-values",
+    "entry": "main",
+    "files": {
+      "main": "fn same(a:List(Int),b:List(Int)) -> Bool {case True {_ if a==b -> True _ -> False}} pub fn main() -> Nil {echo same([1],[1]) echo same([1],[2]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "eq-operand-evaluation-order",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo #({echo 1 3})==#({echo 2 3}) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\nTrue\n"
+  },
+  {
+    "name": "eq-shared-tail",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {let shared=[3,4] echo [1,2,..shared]==[1,2,..shared] echo [0,..shared]!=[1,..shared] Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\n"
+  },
+  {
+    "name": "eq-empty-constructor-generic",
+    "entry": "main",
+    "files": {
+      "main": "type Maybe(a) {Nothing Some(a)} pub fn main() -> Nil {echo Nothing==Nothing echo Some([])==Some([]) echo Nothing!=Some(1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nTrue\n"
+  },
+  {
+    "name": "eq-cross-module-nominal",
+    "entry": "main",
+    "files": {
+      "main": "import model as m pub fn main() -> Nil {echo m.make(3)==m.make(3) echo m.make(3)==m.make(4) Nil}",
+      "model": "pub type Node {Node(Int)} pub fn make(n:Int) -> Node {Node(n)}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "eq-wrong-nominal-types",
+    "entry": "main",
+    "files": {
+      "main": "type A {A(Int)} type B {B(Int)} pub fn main() -> Nil {echo A(1)==B(1) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "eq-wrong-list-elements",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo [1]==[True] Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "eq-wrong-tuple-arity",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo #(1)==#(1,2) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "arity"
+  },
+  {
+    "name": "eq-wrong-generic-instantiation",
+    "entry": "main",
+    "files": {
+      "main": "type Box(a) {Box(a)} pub fn main() -> Nil {echo Box(1)==Box(True) Nil}"
+    },
+    "accepted": false,
+    "stdout": "",
+    "error": "Type mismatch"
+  },
+  {
+    "name": "alias-fallback-nonrecord",
+    "entry": "main",
+    "files": {
+      "main": "import library as m pub fn main() -> Nil {let m=[1,2] echo m.f(2) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "alias-fallback-missing-record-field",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(x:Int)} pub fn main() -> Nil {let m=R(9) echo m.f(2) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "alias-present-field-wins",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(f:Int)} pub fn main() -> Nil {let m=R(9) echo m.f Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "alias-present-noncallable-does-not-fallback",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(f:Int)} pub fn main() -> Nil {let m=R(9) echo m.f(2) Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "alias-private-fallback-denied",
+    "entry": "main",
+    "files": {
+      "main": "import library as m pub fn main() -> Nil {let m=1 echo m.f(2) Nil}",
+      "library": "fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "alias-local-field-can-shadow-private",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(f:Int)} pub fn main() -> Nil {let m=R(9) echo m.f Nil}",
+      "library": "fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "alias-closure-captures-present-field",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(f:Int)} fn make(m:R) -> fn()->Int {fn(){m.f}} pub fn main() -> Nil {let f=make(R(9)) echo f() Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "alias-field-in-guard",
+    "entry": "main",
+    "files": {
+      "main": "import library as m type R {R(f:Int)} pub fn main() -> Nil {let m=R(9) echo case 1 {_ if m.f>5 -> True _ -> False} Nil}",
+      "library": "pub fn f(n:Int) -> Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  }
+]

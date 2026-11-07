@@ -1,0 +1,20 @@
+{
+  "entry": "native/equality",
+  "sourceSHA256": {
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/core.gleam": "3dbe6f2d71e9bf5aabd5f4c18bf45ea5d9be46e08cbdfa9e39ea575d00d671da",
+    "src/native/ast.gleam": "8c02d1d7bddc2251cba7c937b38b22586bb4469d19f6badee3c1765a5c9fb440",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f"
+  },
+  "driver": "test/owned-equality-driver.source",
+  "driverSHA256": "218c2ca8a95af3a9329d0caa64f305e0b8b015df8db20b4a37d8bdca144b6cfb",
+  "executableSHA256": "ea2d8727ef5de9d727c7a0680f53b973029791b1a2cb554ef5c7786c8dd7825c",
+  "bytes": 48175,
+  "exitCode": 0,
+  "stdout": "3\n0\n",
+  "allSourceFunctionsCompiled": true,
+  "fullCompilerSelfHosting": false,
+  "oracle": "native test compares current upstream-compiled owned module function results"
+}

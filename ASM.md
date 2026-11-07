@@ -147,8 +147,8 @@ example executable, not a measured compiler binary or a speed benchmark.
 
 The runtime tests execute an exact-fit allocator probe and an over-end probe
 through these same Gleam emitter/ELF modules. Pure oracle tests compare actual
-native results to unmodified upstream-generated JavaScript results. Structural
-equality and printing of compound values remain rejected until implemented.
+native results to unmodified upstream-generated JavaScript results. Compound
+printing remains unsupported; structural equality is implemented below.
 
 ## Closure milestone inspection
 
@@ -361,3 +361,28 @@ The complete 1,146-byte executable prints `7,9,3`. Entry calls main directly at
 previous artifacts retain their exact hashes. The separate core-plus-driver native
 receipt measures 12,064 bytes and validates actual owned source on bounded inputs;
 neither number is a complete compiler size or a speed benchmark.
+
+## Typed structural equality
+
+`native/equality` builds a finite typed layout graph. `native/equality_runtime`
+emits helpers with RCX=left and RAX=right, returning Bool in RAX. R14/R15 arena
+registers are preserved and comparison allocates nothing. Pointer identity is a
+valid fast path for the supported immutable, reflexive types; functions and stored
+erased type parameters are rejected. Primitive scalar/string code stays unchanged.
+
+Tuple and nominal helpers save operand pointers in a 16-byte frame, compare tags
+before reading fields, and call the appropriate child helper. BitArray equality
+compares byte lengths and payload bytes, ignoring descriptor/owner identity.
+Empty payloads succeed without a memory read. List helpers save the next pair
+before comparing heads, then loop over tails rather than growing one frame per
+list cell. Recursive nested values still consume stack; this is not general TCO.
+
+For the 2,602-byte artifact SHA256
+`172f4ae1c8f01fb1682aedf961eee286c0b84fec91a199bdfe89262b9d242a38`,
+`evidence/structural_equality-disassembly.txt` shows nominal tags compared at
+`0x4005d6`. The string field calls its wrapper at `0x40064b`; the wrapper at
+`0x40069d` jumps to the existing string comparison at `0x4008de`. The recursive
+list-head call at `0x400706` reaches the Tree helper at `0x4005a7`; the tail
+back-jump at `0x400714` reaches `0x4006b2`. A separate 10,000-cell equality test
+checks that tail traversal does not recurse. All thirteen older examples retain
+their exact hashes. No runtime-speed claim is inferred from these instructions.

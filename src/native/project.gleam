@@ -520,7 +520,15 @@ fn expression(
         }
         False -> {
           use target <- c.then(expression(a.Variable(alias), bound, scope))
-          Ok(a.FieldAccess(target, member))
+          case imported(alias, scope) {
+            Ok(_) ->
+              Ok(a.ModuleFallbackField(
+                target,
+                member,
+                qualified_value(alias, member, scope),
+              ))
+            Error(_) -> Ok(a.FieldAccess(target, member))
+          }
         }
       }
     }

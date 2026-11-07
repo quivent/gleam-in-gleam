@@ -7,14 +7,14 @@ count or test count is not a defensible completion percentage.
 | Area | Actual evidence | Remaining work relevant to this compiler's own source |
 | --- | --- | --- |
 | Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards, multiple subjects and alternative rows | Remaining pattern/bit-array forms and more syntax |
-| Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Non-string structural equality, full inference/coverage and remaining language semantics |
+| Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Stored erased equality, full inference/coverage and remaining language semantics |
 | Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
 | Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
 | Runtime | Primitive printing, owned strings and guarded 64 MiB RW arena; no external libraries | Collection, compiler file/argument IO, remaining byte/string primitives and robust IO |
 | Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
 | Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
 
-The current multi-pattern milestone has 479 passing checks and 213 agreeing upstream
+The current structural-equality milestone has 516 passing checks and 246 agreeing upstream
 accept/reject comparisons. Pure oracle functions are compiled by upstream and
 compared with executed native results. Accepted entrypoint fixtures also compare
 observable output/evaluation order. These are concrete subset checks, not a full
@@ -26,7 +26,7 @@ do not establish the size of a finished native compiler.
 
 ## Next actions
 
-1. Add remaining source features (structural equality, remaining patterns,
+1. Add remaining source features (nested `as` patterns, remaining patterns,
    inference and bit-array forms) and import forms with upstream differential tests.
 2. Implement native compiler file/argument IO and owned memory collection. Keep
    development/oracle dependencies separate from final execution requirements.
@@ -50,8 +50,8 @@ runtime dependencies or establishing native self-hosting.
 The byte-aligned bit-array subset now covers the fixed-width integer encoding,
 concatenation and byte/rest matching used extensively by our emitter and lexer.
 Slices carry an explicit owner pointer for later collection. This is not complete
-bit-array compatibility: unaligned bits, dynamic sizing, UTF-8 codepoint patterns/float segments and
-structural comparison remain open. Native file IO, remaining string operations, other
+bit-array compatibility: unaligned bits, dynamic sizing, UTF-8 codepoint patterns/float segments remain open; byte-aligned structural
+comparison is now supported. Native file IO, remaining string operations, other
 syntax/inference and module integration are still required for stage 1.
 
 Local modules now resolve and link into one native image without an external
@@ -73,7 +73,7 @@ now execute natively. Implicit Result/Ok/Error work across modules with local
 shadowing. The compiler-owned UTF-8 validator itself has been compiled and executed
 by this compiler, while independent host-oracle comparisons cover more input cases.
 This establishes one component, not the complete native compiler. Float/codepoints,
-remaining pattern forms, structural equality and native IO/collection
+remaining pattern forms, erased generic equality and native IO/collection
 remain open; no stage-1/stage-2 claim is made.
 
 Multiple subjects and top-level pattern alternatives now compile to stack-based
@@ -81,6 +81,18 @@ matching, including guard retries and consistent shared bindings. The complete
 actual core utilities module compiles into native code; a bounded driver executes
 representative functions and compares their results with upstream-compiled core.
 This is a second concrete owned-source compilation step beyond UTF-8 validation,
-not the complete compiler. Non-string structural equality, remaining language
+not the complete compiler. Erased generic equality, remaining language
 semantics, tail-call/runtime work, native IO and collection still stand before an
 actual stage-1 compiler rebuilding itself for stage 2.
+
+Structural comparison now follows concrete type layouts through tuples, lists,
+byte arrays and recursive nominal data. The actual type-system module and actual
+equality planner compile and execute natively, with outputs compared against their
+upstream-compiled counterparts. Their 24,916-byte and 48,175-byte executables each
+include dependencies and a test driver; these are owned-component proofs.
+
+The complete compiler API probe now reaches a specific syntax rejection in
+`check.gleam` at line 1437: `ReplaceField(a.Lambda(_, _, _) as e)`. Nested pattern
+aliases are the next concrete frontend gap, recorded with source hashes in
+`evidence/complete-api-equality-probe.json`. No native compiler rebuilding itself
+has been observed. The bootstrap still uses official Gleam and Node.

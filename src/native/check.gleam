@@ -3,6 +3,7 @@ import native/bit_options
 import native/core as c
 import native/coverage
 import native/definitions as d
+import native/equality
 import native/free_names
 import native/labels
 import native/type_system as types
@@ -25,6 +26,7 @@ pub type Node {
   VariableNode(String)
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
+  EqualityNode(Typed, Typed, a.Type, Bool)
   CallNode(String, List(Typed))
   FunctionNode(String)
   IndirectCallNode(Typed, List(Typed))
@@ -343,20 +345,54 @@ fn expression(
     a.Binary(op, left, right) -> {
       use left <- c.then(expression(left, env, globals))
       use right <- c.then(expression(right, env, globals))
-      use result <- c.then(binary_type(op, left.type_, right.type_))
-      Ok(plain(BinaryNode(op, left, right), result))
+      case op == "==" || op == "!=" {
+        True -> {
+          use common <- c.then(merge_type(left.type_, right.type_))
+          use _ <- c.then(equality.plan(common, globals))
+          case common {
+            a.Integer | a.Boolean | a.Unit | a.StringType ->
+              Ok(plain(BinaryNode(op, left, right), a.Boolean))
+            _ ->
+              Ok(plain(EqualityNode(left, right, common, op == "!="), a.Boolean))
+          }
+        }
+        False -> {
+          use result <- c.then(binary_type(op, left.type_, right.type_))
+          Ok(plain(BinaryNode(op, left, right), result))
+        }
+      }
     }
     a.Call(name, args) -> named_call(name, args, env, globals)
     a.QualifiedRecordUpdate(_, _, _, _) ->
       Error("Unresolved module record update")
     a.RecordUpdate(name, target, args) ->
       record_update(name, target, args, env, globals)
+    a.Apply(a.ModuleFallbackField(target, field, fallback), args) -> {
+      use target <- c.then(expression(target, env, globals))
+      case field_access(target, field, globals) {
+        Ok(field) -> indirect_source_call(field, args, env, globals)
+        Error(_) -> {
+          use name <- c.then(fallback)
+          named_call(name, args, env, globals)
+        }
+      }
+    }
     a.Apply(target, args) -> {
       use target <- c.then(expression(target, env, globals))
       indirect_source_call(target, args, env, globals)
     }
     a.Lambda(params, annotation, body) ->
       lambda(params, annotation, body, env, globals, a.Unresolved)
+    a.ModuleFallbackField(target, field, fallback) -> {
+      use target <- c.then(expression(target, env, globals))
+      case field_access(target, field, globals) {
+        Ok(field) -> Ok(field)
+        Error(_) -> {
+          use name <- c.then(fallback)
+          expression(a.Variable(name), env, globals)
+        }
+      }
+    }
     a.FieldAccess(target, field) -> {
       use target <- c.then(expression(target, env, globals))
       field_access(target, field, globals)
@@ -707,22 +743,7 @@ fn binary_type(
       use _ <- c.then(equal(right, a.Boolean))
       Ok(a.Boolean)
     }
-    "==" | "!=" -> {
-      use _ <- c.then(equal(left, right))
-      case left {
-        a.StringType -> Ok(a.Boolean)
-        a.BitArrayType
-        | a.ListType(_)
-        | a.TupleType(_)
-        | a.NamedType(_)
-        | a.AppliedType(_, _)
-        | a.VariableType(_)
-        | a.FunctionType(_, _)
-        | a.Unresolved ->
-          Error("Structural compound equality is not implemented yet")
-        _ -> Ok(a.Boolean)
-      }
-    }
+
     _ -> {
       use _ <- c.then(equal(left, a.Integer))
       use _ <- c.then(equal(right, a.Integer))
@@ -1516,7 +1537,10 @@ fn guard_source(e: a.Expression) -> Result(Nil, String) {
     | a.UnitLiteral
     | a.StringLiteral(_)
     | a.Variable(_) -> Ok(Nil)
-    a.Unary(_, e) | a.TupleIndex(e, _) | a.FieldAccess(e, _) -> guard_source(e)
+    a.Unary(_, e)
+    | a.TupleIndex(e, _)
+    | a.FieldAccess(e, _)
+    | a.ModuleFallbackField(e, _, _) -> guard_source(e)
     a.Binary(_, l, r) -> {
       use _ <- c.then(guard_source(l))
       guard_source(r)

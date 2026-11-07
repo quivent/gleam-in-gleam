@@ -30,6 +30,7 @@ pub type Expression {
   BitArrayLiteral(List(BitSegment(Expression)))
   TupleIndex(Expression, Int)
   FieldAccess(Expression, String)
+  ModuleFallbackField(Expression, String, Result(String, String))
   Variable(String)
   Unary(String, Expression)
   Binary(String, Expression, Expression)

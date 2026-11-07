@@ -237,3 +237,42 @@ and the 12,064-byte core-plus-driver result are preserved separately. This is no
 the whole compiler or proof of stage-1/stage-2 self-hosting. Structural equality
 for the compiler's data types is the next language barrier; native IO, remaining
 semantics and owned memory/runtime work remain necessary afterward.
+
+## Structural equality and native compiler components — 2026-11-08
+
+We added a typed comparison graph instead of comparing object pointers or generic
+words. Registering each shape before its children supports regular recursion;
+constructor tags select the correct fields. Tuples, lists, concrete generic ADTs,
+Result, strings and byte arrays now compare by value. List tails loop in native
+code and a 10,000-cell check passes; recursive nested fields still use stack.
+Comparison does not allocate. Erased stored types, functions and expanding shape
+graphs remain explicit rejections, with a 128-entry expansion bound.
+
+Inference holes needed care: the merged operand type supplies missing list/Result
+information, while genuinely unreachable fields trap if ever visited. No unknown
+field is silently treated as an Int. Phantom parameters need no runtime layout.
+Three obsolete pending-equality rejection tests were removed and replaced with
+positive and negative semantic coverage. Final evidence: 516 tests, 246 fresh
+upstream comparisons, a 2,602-byte example and thirteen unchanged older binaries.
+The emitted instructions show tag-before-field checks and a list-tail back-jump.
+
+Compiling our actual definition collector exposed a namespace bug: its local
+`types` list shares a name with an imported module. Upstream selects a real local
+record field when available and otherwise falls back to the module member. We
+implemented that distinction, including private-member checks, non-callable field
+priority, guards and captures; eight fresh upstream fixtures verify it.
+
+The entire type-system module now runs natively with its core/AST dependencies and
+a bounded driver (24,916 bytes), comparing recursive Type values and exercising
+merge/infer/substitute/variables. The entire equality planner runs with its actual
+definition collector and dependencies (48,175 bytes), producing the expected
+three-node recursive Tree plan. Both receipts compare actual native output against
+upstream-compiled owned modules, and retain source/driver/artifact hashes.
+
+A complete compiler API probe remains rejected, not self-hosted: its checker uses
+`ReplaceField(a.Lambda(_, _, _) as e)` at line 1437 and the parser does not yet
+accept nested `as` patterns. The exact error and source hashes are preserved in
+`evidence/complete-api-equality-probe.json`. Next is that concrete pattern gap,
+followed by whatever actual whole-source probes expose. Native IO, runtime memory
+work and a genuine stage-1/stage-2 rebuild remain unproven; no installed compiler
+or crew process was changed.

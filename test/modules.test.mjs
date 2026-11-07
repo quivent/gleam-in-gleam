@@ -4,12 +4,16 @@ import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,symlinkSync} fro
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
-import {BitArray,toList,Ok,Error as ResultError} from '../build/dev/javascript/gleam_native/gleam.mjs';
+import {BitArray,toList,Ok,Error as ResultError,isEqual} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {compile as compileSingle,compile_project} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
+import * as definitionsOracle from '../build/dev/javascript/gleam_native/native/definitions.mjs';
+import * as equalityOracle from '../build/dev/javascript/gleam_native/native/equality.mjs';
+import * as typeOracle from '../build/dev/javascript/gleam_native/native/type_system.mjs';
+import * as astOracle from '../build/dev/javascript/gleam_native/native/ast.mjs';
 import * as coreOracle from '../build/dev/javascript/gleam_native/native/core.mjs';
 import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
-const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8'))];
+const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./equality-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
 function compile(files,entry='main') {return compile_project(entry,sources(files));}
 function run(result) {
@@ -128,4 +132,36 @@ test('Boolean product coverage agrees with an independent finite truth table',()
   const result=compile({main:`fn choose(a:Bool,b:Bool,c:Bool) -> Int {case a,b,c {${body}}} pub fn main() -> Nil {Nil}`});
   assert.equal(result.isOk(),complete,`wildcard trial ${trial}`);
  }
+});
+
+test('compiler-owned type_system module and real dependencies execute natively',()=>{
+ const driver=readFileSync(new URL('./owned-type-system-driver.source',import.meta.url),'utf8');
+ const files={};for(const n of ['native/type_system','native/core','native/ast'])files[n]=readFileSync(new URL('../src/'+n+'.gleam',import.meta.url),'utf8')+(n==='native/type_system'?'\n'+driver:'');
+ const actual=run(compile(files,'native/type_system'));assert.equal(actual.status,0);assert.equal(actual.stderr,'');
+ const int=()=>new astOracle.Integer(),str=()=>new astOracle.StringType(),named=n=>new astOracle.NamedType(n),v=n=>new astOracle.VariableType(n),list=t=>new astOracle.ListType(t);
+ const inferred=typeOracle.infer(v('t'),list(int()),toList([['t',new astOracle.Unresolved()]]));
+ const sub=inferred.isOk()?typeOracle.substitute(v('t'),inferred[0]):inferred;
+ const same=typeOracle.merge(named('A'),named('A'));
+ const values=[typeOracle.name(new astOracle.AppliedType('Box',toList([int()]))),isEqual(list(int()),list(int())),same.isOk()&&isEqual(same[0],named('A')),!typeOracle.merge(named('A'),named('B')).isOk(),sub.isOk()&&isEqual(sub[0],list(int())),isEqual(typeOracle.variables(toList([new astOracle.FunctionType(toList([v('x')]),v('y'))])),toList(['x','y'])),!typeOracle.infer(new astOracle.TupleType(toList([v('t'),v('t')])),new astOracle.TupleType(toList([int(),new astOracle.Boolean()])),toList([['t',new astOracle.Unresolved()]])).isOk()];
+ assert.equal(actual.stdout,values.map(v=>v===true?'True':v===false?'False':String(v)).join('\n')+'\n');
+});
+test('list structural equality loops over long independent spines',()=>{
+ const actual=run(compile({main:'fn build(n:Int,acc:List(Int)) -> List(Int) {case n {0 -> acc _ -> build(n-1,[n,..acc])}} pub fn main() -> Nil {echo build(10000,[])==build(10000,[]) Nil}'}));
+ assert.equal(actual.status,0);assert.equal(actual.stdout,'True\n');
+});
+for(const [name,text,error] of [
+ ['erased stored parameter','fn same(x:a,y:a) -> Bool {x==y} pub fn main() -> Nil {Nil}',/concrete stored field/],
+ ['function value','fn f(n:Int) -> Int {n} pub fn main() -> Nil {echo f==f Nil}',/Function-value equality/],
+ ['function field','type Holder {Holder(fn(Int)->Int)} fn f(n:Int) -> Int {n} pub fn main() -> Nil {echo Holder(f)==Holder(f) Nil}',/Function-value equality/],
+ ['nonregular expansion','type Grow(a) {End More(Grow(List(a)))} fn same(x:Grow(Int),y:Grow(Int)) -> Bool {x==y} pub fn main() -> Nil {Nil}',/shape expansion limit/],
+])test(`equality explicit subset restriction: ${name}`,()=>{const result=compile({main:text});assert.equal(result.isOk(),false);assert.match(result[0],error);});
+
+test('the actual equality planner and definition collector also run natively',()=>{
+ const driver=readFileSync(new URL('./owned-equality-driver.source',import.meta.url),'utf8');
+ const files={};for(const n of ['native/equality','native/definitions','native/type_system','native/core','native/ast','native/prelude'])files[n]=readFileSync(new URL('../src/'+n+'.gleam',import.meta.url),'utf8')+(n==='native/equality'?'\n'+driver:'');
+ const actual=run(compile(files,'native/equality'));assert.equal(actual.status,0);assert.equal(actual.stderr,'');
+ const tree=new astOracle.CustomType('Tree',toList([new astOracle.Variant('Leaf',toList([new astOracle.FieldDefinition('',new astOracle.Integer())])),new astOracle.Variant('Branch',toList([new astOracle.FieldDefinition('',new astOracle.ListType(new astOracle.NamedType('Tree')))]))]),true,toList([]));
+ const ctx=definitionsOracle.collect(new astOracle.Module(toList([]),toList([tree]),toList([]),toList([])));assert.equal(ctx.isOk(),true);
+ const plan=equalityOracle.plan(new astOracle.NamedType('Tree'),ctx[0]);assert.equal(plan.isOk(),true);
+ assert.equal(actual.stdout,plan[0].entries.toArray().length+'\n'+plan[0].root+'\n');
 });

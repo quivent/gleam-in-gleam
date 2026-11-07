@@ -78,6 +78,7 @@ fn expression(
     a.Variable(n) -> add(n, bound, free)
     a.Unary(_, e) | a.Echo(e) | a.TupleIndex(e, _) | a.FieldAccess(e, _) ->
       expression(e, bound, free)
+    a.ModuleFallbackField(e, _, _) -> expression(e, bound, free)
     a.Binary(_, l, r) -> expressions([l, r], bound, free)
     a.TupleLiteral(es) -> expressions(es, bound, free)
     a.BitArrayLiteral(segments) ->

@@ -302,7 +302,6 @@ const rejected = [
   ['incomplete list case', 'pub fn main() -> Int { case [1] { [] -> 0 } }', /Non-exhaustive/],
   ['incomplete nonempty case', 'pub fn main() -> Int { case [1] { [] -> 0 [1, .._] -> 1 } }', /Non-exhaustive/],
   ['list element pattern type', 'pub fn main() -> Int { case [1] { [True] -> 1 _ -> 0 } }', /Type mismatch/],
-  ['list equality pending', 'pub fn main() -> Bool { [1] == [1] }', /Structural compound equality/],
   ['compound echo pending', 'pub fn main() -> Nil { echo [1] Nil }', /Compound-value echo/],
   ['nominal constructor argument', 'type A { AValue(Int) } type B { BValue(Int) } fn f(a: A) -> Nil { Nil } pub fn main() -> Nil { f(BValue(1)) }', /Type mismatch/],
   ['nominal pattern', 'type A { AValue(Int) } type B { BValue(Int) } pub fn main() -> Int { case AValue(1) { BValue(x) -> x } }', /Type mismatch/],
@@ -319,7 +318,6 @@ const rejected = [
   ['unknown annotation inside empty list', 'pub fn main() -> Nil { let xs: List(Unknown) = [] Nil }', /Unknown type/],
   ['constructor duplicate field binding', 'type A { Pair(Int, Int) } pub fn main() -> Int { let Pair(x,x) = Pair(1,2) x }', /Duplicate variable/],
   ['constructor mixed list types', 'type A { AValue } type B { BValue } pub fn main() -> Nil { let xs = [AValue, BValue] Nil }', /Type mismatch/],
-  ['constructor equality pending', 'type A { AValue } pub fn main() -> Bool { AValue == AValue }', /Structural compound equality/],
   ['constructor echo pending', 'type A { AValue } pub fn main() -> Nil { echo AValue Nil }', /Compound-value echo/],
   ['zero-field constructor called', 'pub type A { AValue } pub fn main() -> A { AValue() }', /Zero-field constructor is a value/],
   ['private type return', 'type A { AValue } pub fn main() -> A { AValue }', /Private type used in public interface/],
@@ -458,7 +456,6 @@ for (const [name, source, error] of [
   ['float option pending', 'pub fn main() -> Nil { let a=<<1:float>> Nil }', /option not implemented/],
   ['dynamic size pending', 'fn f(n: Int) -> BitArray { <<1:size(n)>> } pub fn main() -> Nil { Nil }', /Expected ','|option|Expression/],
   ['compound bit-array printing pending', 'pub fn main() -> Nil { echo <<1>> Nil }', /Compound-value echo/],
-  ['structural bit-array equality pending', 'pub fn main() -> Nil { echo <<1>> == <<1>> Nil }', /Structural compound equality/],
   ['builtin BitArray shadowing', 'type BitArray { A } pub fn main() -> Nil { Nil }', /Builtin type shadowing/],
 ]) {
   test(`bit arrays reject without fallback: ${name}`, () => {

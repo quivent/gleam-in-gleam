@@ -108,6 +108,8 @@ code generation remain in Gleam; the bridge performs no language compilation.
 | `native/check` | Typed expressions, constructor inference, scope and exhaustiveness |
 | `native/definitions` | Nominal types, constructor identities and public interfaces |
 | `native/type_system` | Scoped constructor/function substitution and function types |
+| `native/equality` | Recursive typed structural-comparison shape graphs |
+| `native/equality_runtime` | Owned native comparison helpers and iterative list tails |
 | `native/free_names` | Lexically scoped free names for copied closure captures |
 | `native/bit_options` | Static byte-segment options and pattern/construction validation |
 | `native/labels` | Constructor labels, positional validation and declaration ordering |
@@ -196,7 +198,7 @@ owner pointer, preparing for future collection. No collection exists yet. Signed
 native Int limits apply: unsigned 64-bit extraction above 2^63-1 exits 70; wildcard
 and literal matching still handle such bytes without treating them as negative
 unsigned numbers. Non-byte-aligned segments, dynamic/sized-array segments, floats,
-UTF-8 codepoint patterns and structural BitArray equality/printing remain unsupported.
+UTF-8 codepoint patterns and BitArray printing remain unsupported. Structural byte equality is supported.
 String-to-byte construction with `:utf8` is supported, including the default
 encoding for literal string segments; nonliteral strings require `:utf8`.
 
@@ -233,8 +235,8 @@ precedes guard evaluation; a false guard continues to later arms with the origin
 outer scope. Guard-only free variables are captured by closures. Guarded arms do
 not prove exhaustiveness, even with `if True`, and unreachable bodies are still
 checked for type consistency. Calls, bindings and effects are forbidden in guards;
-constructor/collection guard forms and structural comparisons remain unsupported
-in this subset. Integer guards use the same checked native Int arithmetic.
+constructor/collection guard forms remain unsupported in this subset. Structural
+comparisons use the same typed helpers as ordinary expressions. Integer guards use the same checked native Int arithmetic.
 
 Strings now support dynamic `<>` concatenation, byte-exact `==`/`!=`, literal
 matching and literal prefixes with a rest/discard and optional prefix binding
@@ -272,6 +274,27 @@ Nested `|` inside an individual pattern is rejected, as upstream requires comple
 alternative rows instead. Ordinary single-subject/non-alternative cases retain
 their historical IR and conservative coverage checks.
 
+## Structural equality
+
+`==` and `!=` compare tuples, lists, byte-aligned BitArrays and concrete nominal
+values structurally, including nested strings, Result, generic fields, and regular
+recursive or mutually recursive types. Comparison plans use the merged operand
+type, so empty lists and unused Result alternatives infer from the other operand.
+Unresolved fields in unreachable variants use a trap helper, never a guessed word
+layout. Phantom type parameters need no stored-field comparator.
+
+`native/equality` registers a type before descending into its fields, allowing
+recursive references. A 128-node bound explicitly rejects non-regular expanding
+recursion and excessively large shape graphs. Stored erased type parameters and
+function-value equality remain unsupported. Equality allocates no heap memory;
+list tails loop, while nested fields and recursive trees still consume call stack.
+
+Value/module-name collisions follow upstream field priority: an existing local
+record field wins; otherwise the imported module member is resolved with normal
+visibility checks. A present non-callable field is an error when called, rather
+than a reason to fall back to a module function. Closure captures and guards retain
+local-field semantics.
+
 ## Limits that must not be confused with full Gleam compatibility
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
@@ -300,7 +323,7 @@ their historical IR and conservative coverage checks.
 * Compound objects and function descriptors use a single 64 MiB read/write, non-executable mmap arena, only in
   programs with compound allocation. Allocation is checked and exhaustion exits
   71. There is no collection or arena growth yet. This is not the final memory
-  manager. Structural compound equality/printing remain rejected.
+  manager. Compound printing remains unsupported; structural equality is described below.
 * Legacy single-subject/non-alternative case coverage remains conservative.
   Multi-pattern cases use the constructor-product matrix described above.
   Empty/nonempty lists with irrefutable head/tail,
@@ -453,11 +476,27 @@ Native results are compared with actual upstream-compiled core function results.
 12,064-byte executable's output/hash. That size includes core plus its test driver;
 it is not the size of the complete compiler, nor a full self-hosting result.
 
+The structural-equality milestone passes **516/516** checks and **246/246** fresh
+upstream comparisons (64 single-file plus 182 project fixtures). The 2,602-byte
+example prints `True,False,True,True`; all thirteen earlier executable hashes are
+unchanged. Source hashes, outputs, limits and actual instructions are retained in
+`evidence/structural-equality-verification.json` and
+`evidence/structural_equality-disassembly.txt`.
+
+The complete actual type-system module now compiles and executes natively with
+core/AST dependencies (24,916 bytes including its driver). The actual equality
+planner also runs natively with its definition collector and dependencies (48,175
+bytes including its driver), producing the expected recursive three-node plan.
+Their separate `owned-*-native-verification.json` receipts compare outputs against
+upstream-compiled owned modules. Neither size is the complete compiler size.
+The complete compiler API probe remains rejected at a nested `as` pattern; see
+`evidence/complete-api-equality-probe.json`. No stage-1/stage-2 result is claimed.
+
 Next actions, in dependency order:
 
-1. Add non-string structural equality required by the compiler's own data types,
-   then remaining inference, pattern and bit-array forms. Extend import forms with upstream comparisons. Structural
-   equality and owned collection also remain necessary work.
+1. Implement nested `as` patterns: the full compiler API probe currently rejects
+   `ReplaceField(a.Lambda(_, _, _) as e)` in its own checker. Continue remaining
+   inference, pattern, bit-array and import forms with upstream comparisons.
 2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
    bootstrap bridge from the native compiler execution path.
 3. Compile the compiler source natively, then rebuild that compiler with itself

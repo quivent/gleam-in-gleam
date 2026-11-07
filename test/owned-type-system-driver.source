@@ -1,0 +1,26 @@
+pub fn main() -> Nil {
+  echo name(a.AppliedType("Box", [a.Integer]))
+  echo a.ListType(a.Integer) == a.ListType(a.Integer)
+  echo case merge(a.NamedType("A"), a.NamedType("A")) {
+    Ok(t) -> t == a.NamedType("A")
+    Error(_) -> False
+  }
+  echo case merge(a.NamedType("A"), a.NamedType("B")) {
+    Ok(_) -> False
+    Error(_) -> True
+  }
+  echo case infer(a.VariableType("t"), a.ListType(a.Integer), [#("t", a.Unresolved)]) {
+    Ok(bindings) -> case substitute(a.VariableType("t"), bindings) {
+      Ok(t) -> t == a.ListType(a.Integer)
+      Error(_) -> False
+    }
+    Error(_) -> False
+  }
+  echo variables([a.FunctionType([a.VariableType("x")], a.VariableType("y"))]) == ["x", "y"]
+  echo case infer(a.TupleType([a.VariableType("t"), a.VariableType("t")]),
+                 a.TupleType([a.Integer, a.Boolean]), [#("t", a.Unresolved)]) {
+    Ok(_) -> False
+    Error(_) -> True
+  }
+  Nil
+}
