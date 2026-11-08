@@ -1,13 +1,34 @@
-pub fn main() -> Nil {
-  case compile(<<"pub fn main() -> Nil { echo 7 Nil }":utf8>>) {
+fn emit_program_bytes(binary: BitArray) -> Nil {
+  case binary {
+    <<>> -> Nil
+    <<byte, rest:bits>> -> {
+      echo byte
+      emit_program_bytes(rest)
+    }
+    _ -> {
+      echo -1
+      Nil
+    }
+  }
+}
+
+fn compile_probe(source: BitArray) -> Nil {
+  case compile(source) {
     Ok(binary) -> {
       echo core.byte_length(binary)
-      Nil
+      emit_program_bytes(binary)
     }
     Error(error) -> {
       echo error
       Nil
     }
   }
+}
+
+pub fn main() -> Nil {
+  compile_probe(<<"pub fn main() -> Nil { echo 7 Nil }":utf8>>)
+  compile_probe(<<
+    "fn choose(n: Int) -> Int {case n {4294967296 -> 7 _ -> 0}} pub fn main() -> Nil {let #(x,y) as whole=#(3,4) echo choose(4294967296) echo x+y+whole.0 Nil}":utf8,
+  >>)
   Nil
 }

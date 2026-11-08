@@ -124,13 +124,16 @@ fn number(
 ) -> Result(#(Int, BitArray, Int), String) {
   case source {
     <<c, rest:bits>> if c >= 48 && c <= 57 ->
-      case acc > 214_748_364 || acc == 214_748_364 && c > 55 {
+      // Keep both the digit accumulation and bootstrap JS representation exact.
+      // The native Int range is wider; literals beyond 2^53-1 need a separate
+      // representation rather than silently rounding through the bootstrap.
+      case acc > 900_719_925_474_099 || acc == 900_719_925_474_099 && c > 49 {
         True ->
           fail(
             offset,
-            "Integer literal outside seed compiler's 32-bit literal range",
+            "Integer literal outside seed compiler's exact 53-bit literal range",
           )
-        False -> number(rest, offset + 1, acc * 10 + c - 48, True)
+        False -> number(rest, offset + 1, acc * 10 + { c - 48 }, True)
       }
     <<95, rest:bits>> if seen -> number(rest, offset + 1, acc, seen)
     _ -> Ok(#(acc, source, offset))

@@ -1,106 +1,50 @@
 # Progress toward self-hosting
 
-Current status: **working native compiler for a growing, tested Gleam subset;
-not a self-hosted compiler or a replacement for upstream Gleam yet.** A feature
-count or test count is not a defensible completion percentage.
+**The complete compiler API now compiles and runs natively. The native CLI and
+stage-2 self-rebuild are not yet proved.** This remains a tested Gleam subset,
+not a replacement for upstream or a defensible completion percentage.
 
-| Area | Actual evidence | Remaining work relevant to this compiler's own source |
+The repeatable `node test/probe-compiler-api.mjs` builds all 22 actual compiler
+modules plus `test/owned-compiler-api-driver.source` into a standalone Linux
+x86-64 ELF. That native program compiles two embedded Gleam sources. The probe
+extracts both resulting ELF files, compares their exact bytes with bootstrap
+compiler output, and executes them: outputs are `7` and `7,10` respectively.
+The second source exercises a wide integer pattern, tuple alias and field read.
+
+The native API-plus-driver image is 498,418 bytes. It and both emitted programs
+have no dynamic loader or dynamic segment and have a non-executable stack.
+Source, driver and executable hashes plus real execution results are retained in
+`evidence/complete-api-wide-integers-probe.json`. This is an actual native compiler
+core executing, not JavaScript wrapped in an executable. The initial image is
+still produced through the official Gleam-to-JS bootstrap and our own backend.
+
+| Area | Actual evidence | Remaining work |
 | --- | --- | --- |
-| Frontend | Own Gleam lexer/parser for typed functions, data types, records, updates, imports, aliases, guards, multiple subjects and alternative rows | Remaining pattern/bit-array forms and more syntax |
-| Data types | Tuples/lists, recursive generic ADTs, labels, record access and byte-aligned bit arrays execute natively | Stored erased equality, full inference/coverage and remaining language semantics |
-| Functions | Explicit generic signatures, direct recursion, named values, captured closures and `use` execute natively | polymorphic function values, omitted signatures and full inference |
-| Machine code | Own x86-64 instruction emitter, relative relocations and standalone ELF writer | Remaining operations and eventual additional targets |
-| Runtime | Primitive printing, owned strings and guarded 64 MiB RW arena; no external libraries | Collection, compiler file/argument IO, remaining byte/string primitives and robust IO |
-| Project compilation | Local import graph, visibility and namespaces resolved in Gleam; own native relocation/linking | Selective imports/packages and native compiler file IO/entrypoint |
-| Bootstrap | Upstream Gleam builds the implementation to JS; that implementation emits real native programs | Native compiler stage 1, native stage 2 and byte-for-byte bootstrap comparison |
+| Source compilation | All actual compiler modules compile to native code under a bounded driver | Native compilation of a complete compiler rebuild input |
+| Native compiler execution | Two programs emitted, byte-identical to bootstrap output, both execute correctly | Broader native-path qualification and self-rebuild |
+| CLI/IO | Bootstrap supplies ordinary source-file and argument IO; native probe uses embedded sources and stdout | Owned native arguments/files, robust partial IO and errors |
+| Language | Recursive ADTs, closures/use, aliases/guards, product cases, structural equality and exact 53-bit literals | Remaining upstream syntax/inference/imports, erased equality, exact larger literals |
+| Runtime | Owned strings/bytes, direct syscalls and checked 64 MiB arena | Native tail-call elimination, collection/allocation scaling |
+| Targets/dependencies | Own x86-64 emitter/relocator/ELF, no external runtime/assembler/linker/libc/packages | Additional architectures/OS formats |
 
-The current pattern-alias milestone has 546 passing checks and 276 agreeing upstream
-accept/reject comparisons. Pure oracle functions are compiled by upstream and
-compared with executed native results. Accepted entrypoint fixtures also compare
-observable output/evaluation order. These are concrete subset checks, not a full
-upstream conformance suite.
+Current qualification: **572/572** tests and **297/297** fresh upstream
+comparisons. All fifteen older example hashes remain unchanged. The two native
+compiler output/execute checks are recorded separately from that test count in
+`evidence/integers-coverage-verification.json` and its linked API proof.
 
-Every delivered example executes without a dynamic loader or shared libraries.
-**The compiler still requires the bootstrap toolchain.** The example binary sizes
-do not establish the size of a finished native compiler.
+## Next acceptance steps
 
-## Next actions
+1. Supply an owned native compiler CLI for arguments/source files, keeping the
+   development bootstrap separate from runtime dependencies.
+2. Compile complete compiler inputs natively and fix measured resource limits.
+   The append change avoids bootstrap stack overflow but uses an extra reversed
+   prefix. Its traversals still consume stack in native code until TCO exists;
+   the arena has no collection. Do not assume small-input success proves scale.
+3. Rebuild the exact compiler source with the native compiler, compare the
+   stage-1/stage-2 bytes and execute the rebuilt compiler's checks. Only then
+   claim native self-hosting.
 
-1. Extend integer literals, then remaining source features (patterns,
-   inference and bit-array forms) and import forms with upstream differential tests.
-2. Implement native compiler file/argument IO and owned memory collection. Keep
-   development/oracle dependencies separate from final execution requirements.
-3. Compile the complete compiler source into a native stage-1 compiler. Use that
-   executable to compile the same source again, and compare stage-1/stage-2
-   outputs and test results. Only then claim native self-hosting.
-
-Correctness precedes optimization. Retain emitted-ASM inspection, zero declared
-package dependencies and unchanged historical evidence throughout.
-
-Closures currently retain copied captures in the owned arena. The descriptor ABI
-is shared with named values, with a saved descriptor word passed to indirect
-callees. This establishes tested lifetime semantics without stack captures; it
-does not establish memory reclamation or a finalized optimized ABI.
-
-Record updates now lower to a saved original and immutable reconstruction. Their
-type-changing behavior and declaration-order effects match the tested upstream
-cases. This removes another syntax dependency in our own source without adding
-runtime dependencies or establishing native self-hosting.
-
-The byte-aligned bit-array subset now covers the fixed-width integer encoding,
-concatenation and byte/rest matching used extensively by our emitter and lexer.
-Slices carry an explicit owner pointer for later collection. This is not complete
-bit-array compatibility: unaligned bits, dynamic sizing, UTF-8 codepoint patterns/float segments remain open; byte-aligned structural
-comparison is now supported. Native file IO, remaining string operations, other
-syntax/inference and module integration are still required for stage 1.
-
-Local modules now resolve and link into one native image without an external
-linker or runtime module lookup. The bootstrap reads source bytes; project policy
-is in Gleam. This removes a project-compilation barrier, but does not establish
-native self-compilation: several constructs used by the compiler and its native
-entrypoint/runtime are still missing. Completion is still measured by actual
-stage-1/stage-2 rebuilding, not a feature percentage.
-
-Transparent generic aliases and restricted pure case guards now execute with
-upstream-checked scope, visibility and fallthrough behavior. Alias definitions are
-erased; guards use normal native branches and capture lifetime. This removes two
-more source-language barriers while preserving every prior example's binary. Remaining
-string/prelude operations, inference/syntax and
-native IO/collection still prevent actual stage-1/stage-2 self-hosting.
-
-Dynamic strings, exact equality, prefix/literal patterns and UTF-8 byte construction
-now execute natively. Implicit Result/Ok/Error work across modules with local
-shadowing. The compiler-owned UTF-8 validator itself has been compiled and executed
-by this compiler, while independent host-oracle comparisons cover more input cases.
-This establishes one component, not the complete native compiler. Float/codepoints,
-remaining pattern forms, erased generic equality and native IO/collection
-remain open; no stage-1/stage-2 claim is made.
-
-Multiple subjects and top-level pattern alternatives now compile to stack-based
-matching, including guard retries and consistent shared bindings. The complete
-actual core utilities module compiles into native code; a bounded driver executes
-representative functions and compares their results with upstream-compiled core.
-This is a second concrete owned-source compilation step beyond UTF-8 validation,
-not the complete compiler. Erased generic equality, remaining language
-semantics, tail-call/runtime work, native IO and collection still stand before an
-actual stage-1 compiler rebuilding itself for stage 2.
-
-Structural comparison now follows concrete type layouts through tuples, lists,
-byte arrays and recursive nominal data. The actual type-system module and actual
-equality planner compile and execute natively, with outputs compared against their
-upstream-compiled counterparts. Their 24,916-byte and 48,175-byte executables each
-include dependencies and a test driver; these are owned-component proofs.
-
-At the structural-equality checkpoint, the complete compiler API probe reached a
-syntax rejection in `check.gleam` at line 1437: `ReplaceField(a.Lambda(_, _, _) as e)`. That historical gap is recorded with source hashes in
-`evidence/complete-api-equality-probe.json`. No native compiler rebuilding itself
-has been observed. The bootstrap still uses official Gleam and Node.
-
-Nested `pattern as name` now binds the original whole value without copying it.
-Coverage strips aliases while retaining the underlying matcher; guards,
-alternatives, closure capture and duplicate/type checks retain ordinary binding
-semantics. The repeatable `node test/probe-compiler-api.mjs` now lexes/parses every
-compiler module except the assembler, where `-2_147_483_648` exceeds the current
-literal magnitude limit. This clears the earlier alias syntax blocker, without
-claiming all modules typecheck or run natively. The source-hashed diagnostic is in
-`evidence/complete-api-pattern-aliases-probe.json`.
+Historical component proofs for UTF-8, core, type-system and equality planner
+remain in evidence and JOURNEY.md. Earlier alias and literal rejections are
+preserved under their original receipt names. The default file-based CLI still
+uses Node; no installed compiler or Crew process has been replaced.

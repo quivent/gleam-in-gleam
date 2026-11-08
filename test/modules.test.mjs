@@ -13,7 +13,7 @@ import * as astOracle from '../build/dev/javascript/gleam_native/native/ast.mjs'
 import * as coreOracle from '../build/dev/javascript/gleam_native/native/core.mjs';
 import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
-const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./equality-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./pattern-alias-fixtures.json',import.meta.url),'utf8'))];
+const fixtures=[...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./equality-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./pattern-alias-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./integer-coverage-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
 function compile(files,entry='main') {return compile_project(entry,sources(files));}
 function run(result) {
@@ -164,4 +164,22 @@ test('the actual equality planner and definition collector also run natively',()
  const ctx=definitionsOracle.collect(new astOracle.Module(toList([]),toList([tree]),toList([]),toList([])));assert.equal(ctx.isOk(),true);
  const plan=equalityOracle.plan(new astOracle.NamedType('Tree'),ctx[0]);assert.equal(plan.isOk(),true);
  assert.equal(actual.stdout,plan[0].entries.toArray().length+'\n'+plan[0].root+'\n');
+});
+
+test('owned append handles a full bootstrap code stream and preserves the shared suffix',()=>{
+ const values=Array.from({length:50000},(_,i)=>i),xs=toList(values),ys=toList([50000,50001]);
+ const joined=coreOracle.append(xs,ys);
+ assert.deepEqual(joined.toArray(),[...values,50000,50001]);
+ let tail=joined;for(let i=0;i<values.length;i++)tail=tail.tail;
+ assert.equal(tail,ys);assert.equal(coreOracle.append(toList([]),ys),ys);
+ assert.deepEqual(xs.toArray(),values);
+});
+test('the actual native append preserves order and inputs on a bounded 10000-cell prefix',()=>{
+ const own=readFileSync(new URL('../src/native/core.gleam',import.meta.url),'utf8');
+ const driver=`fn build(n:Int,acc:List(Int)) -> List(Int) {case n {0 -> acc _ -> build(n-1,[n,..acc])}}
+ pub fn main() -> Nil {let xs=build(10000,[]) let ys=[20001,20002] let joined=append(xs,ys)
+ echo length(joined) echo case nth(joined,9999) {Ok(n)->n Error(_)->0}
+ echo case nth(joined,10000) {Ok(n)->n Error(_)->0} echo length(xs) echo length(ys) Nil}`;
+ const actual=run(compileSingle(new BitArray(Buffer.from(own+'\n'+driver))));
+ assert.equal(actual.status,0);assert.equal(actual.stdout,'10002\n10000\n20001\n10000\n2\n');
 });

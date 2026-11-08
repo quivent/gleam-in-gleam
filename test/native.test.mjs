@@ -290,7 +290,7 @@ const rejected = [
   ['polymorphic named values pending', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { let f = identity Nil }', /Polymorphic named function values are not implemented/],
   ['unterminated string', 'pub fn main() -> String { "hello }', /Unterminated string/],
   ['missing entrypoint', 'fn f() -> Int { 1 }', /Unknown name: main/],
-  ['unimplemented literal range', 'pub fn main() -> Int { 2147483648 }', /literal range/],
+  ['unimplemented literal range', 'pub fn main() -> Int { 9007199254740992 }', /literal range/],
   ['heterogeneous list', 'pub fn main() -> Nil { let xs = [1, True] Nil }', /Type mismatch/],
   ['bad list tail', 'pub fn main() -> Nil { let xs = [1, ..True] Nil }', /tail must be a list/],
   ['bad nested list', 'pub fn main() -> Nil { let xs = [[1], [True]] Nil }', /Type mismatch/],
@@ -499,4 +499,31 @@ test('bit-array construction fails before copying beyond the bounded arena', () 
  const result=run('fn grow(a: BitArray,n: Int) -> BitArray { case n { 0 -> a _ -> grow(<<a:bits,a:bits>>,n-1) } } pub fn main() -> Nil { let _a=grow(<<1>>,25) echo 99 Nil }');
  assert.equal(result.status,71);
  assert.equal(result.stdout,'');
+});
+
+test('wide literal scanning and 64-bit immediates preserve every exact boundary digit', () => {
+ const values=[2147483647,2147483648,4294967295,4294967296,4503599627370495,
+  4503599627370496,9007199254740987,9007199254740988,9007199254740989,
+  9007199254740990,9007199254740991];
+ const source='pub fn main() -> Nil {'+values.map(n=>'echo '+n+' echo -'+n).join(' ')+' Nil}';
+ const actual=run(source);
+ assert.equal(actual.status,0);
+ assert.equal(actual.stdout,values.flatMap(n=>[String(n),String(-n)]).join('\n')+'\n');
+});
+test('wide patterns compare complete words rather than truncated or sign-extended immediates', () => {
+ const values=[2147483648,4294967295,4294967296,9007199254740991,-2147483649,-9007199254740991];
+ for(const n of values){
+  const low=Number(BigInt.asIntN(32,BigInt(n)));
+  const source='fn f(n: Int) -> Bool {case n {'+n+' -> True _ -> False}} pub fn main() -> Nil {echo f('+n+') echo f('+low+') Nil}';
+  const actual=run(source);assert.equal(actual.status,0);assert.equal(actual.stdout,'True\nFalse\n');
+ }
+});
+test('out-of-range magnitudes are rejected before bootstrap rounding, including negative literals and patterns', () => {
+ for(const digits of ['9007199254740992','9007199254740993','9223372036854775807','999999999999999999999999999999999999']){
+  for(const source of ['pub fn main() -> Nil {echo '+digits+' Nil}',
+   'pub fn main() -> Nil {echo -'+digits+' Nil}',
+   'pub fn main() -> Nil {case 0 {'+digits+' -> Nil _ -> Nil}}']){
+   const result=compileResult(source);assert.equal(result.isOk(),false);assert.match(result[0],/exact 53-bit literal range/);
+  }
+ }
 });

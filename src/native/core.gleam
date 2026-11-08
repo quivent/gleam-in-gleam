@@ -21,10 +21,9 @@ fn reverse_into(xs: List(a), acc: List(a)) -> List(a) {
 }
 
 pub fn append(xs: List(a), ys: List(a)) -> List(a) {
-  case xs {
-    [] -> ys
-    [x, ..rest] -> [x, ..append(rest, ys)]
-  }
+  // Both traversals are direct tail calls in bootstrap JS. Constructing the
+  // result after a recursive call overflows on the compiler's full code stream.
+  reverse_into(reverse(xs), ys)
 }
 
 pub fn length(xs: List(a)) -> Int {

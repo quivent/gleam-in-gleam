@@ -5,10 +5,11 @@ third-party dependencies** as a hard design constraint. No LLVM, Cranelift,
 Glance, standard-library package, external assembler, external linker, libc,
 or bundled VM is used by the native seed.
 
-**Status: working native language seed, not a complete Gleam compiler and not
-self-hosted yet.** The compiler currently runs through a clearly separated
-JavaScript bootstrap. Generated programs are native Linux x86-64 ELF executables.
-The intended finished compiler must itself be a standalone native executable.
+**Status: the complete compiler API now compiles and runs as a standalone native
+ELF, but the native CLI and self-rebuilding compiler are not finished.** A bounded
+driver exercises the actual compiler source on two embedded programs, checks its
+emitted ELF bytes against the bootstrap implementation, and executes both outputs.
+The ordinary file-based CLI still uses the separated JavaScript bootstrap.
 
 ## What actually runs
 
@@ -24,8 +25,9 @@ Gleam compiler source (this repository)
 ```
 
 The final two steps do not use Node, Rust, Gleam tooling, libraries, a dynamic
-loader, an assembler or a linker. The compiler currently does require the
-bootstrap. A 601-byte Fibonacci executable is **a generated example program**,
+loader, an assembler or a linker. The default CLI still uses the bootstrap; the
+native API proof executes without it after the initial image is generated.
+A 601-byte Fibonacci executable is **a generated example program**,
 not the size of a completed compiler.
 
 Target bootstrap completion:
@@ -36,9 +38,10 @@ Stage 1: that compiler emits a native compiler from the same source
 Stage 2: the native compiler recompiles itself with identical output
 ```
 
-Stage 1 and Stage 2 have not been achieved. Self-hosting is only established
-after that chain succeeds; accepting the compiler's text or wrapping its
-JavaScript in a native executable would not establish it.
+The stage-1 compiler core now executes natively under a bounded driver. A usable
+native compiler CLI and the stage-2 self-rebuild/byte comparison remain unproved.
+Self-hosting requires that actual rebuild; neither accepting compiler text nor
+wrapping JavaScript in a native executable establishes it.
 
 ## Run the current implementation
 
@@ -86,6 +89,18 @@ node bootstrap.mjs path/to/src/app/main.gleam out/program --source-root path/to/
 The bridge loads only requested local `.gleam` modules and refuses symlinks that
 escape that root. It still refuses to overwrite an existing executable. There is
 no package download or external object-file linker in this implementation.
+
+To repeat the native compiler API proof after building the bootstrap:
+
+```sh
+node test/probe-compiler-api.mjs
+```
+
+This compiles all 22 actual compiler modules with a tracked test driver, executes
+the native image, extracts two generated ELF files, compares them byte-for-byte
+with bootstrap output, and runs both. It does not invoke upstream compilation
+inside the native compiler, replace an installed compiler, or prove a self-rebuild.
+See `evidence/complete-api-wide-integers-probe.json` for source/driver/artifact hashes.
 
 ## Current implementation
 
@@ -315,7 +330,8 @@ local-field semantics.
 
 * Only Linux x86-64 executable output is implemented. No ARM64/Mach-O target yet.
 * Selective/unqualified imports, package resolution, labelled function calls,
-  general type inference, constants and attributes are not implemented. The compiler uses several of those itself, so cannot self-compile.
+  general type inference, constants and attributes are not implemented. These limit
+  upstream compatibility; the current compiler API sources fit the supported subset.
 * Named polymorphic functions can be called directly, but cannot yet be taken as
   polymorphic first-class values. Local function parameters/returned functions
   have their checked function types; there is no general let-polymorphism or
@@ -328,10 +344,12 @@ local-field semantics.
   public constructor fields after project resolution. Builtin shadowing is valid
   upstream but remains an explicit unsupported subset feature here, including in
   imported modules.
-* Integer literals are restricted to nonnegative decimal magnitudes up to
-  2,147,483,647 (with unary negation supported). Generated arithmetic is checked
-  signed 64-bit arithmetic; overflow exits 70. This is an explicit seed
-  limitation, not Gleam's full cross-target integer semantics.
+* Decimal literal magnitudes now extend through 9,007,199,254,740,991 (2^53-1),
+  with unary negation supported. Digit accumulation checks before arithmetic and
+  groups the digit subtraction to avoid intermediate bootstrap rounding. Larger
+  literals are rejected explicitly until an independent exact representation is
+  implemented. Generated arithmetic remains checked signed 64-bit; overflow exits
+  70. This is not Gleam's complete cross-target integer semantics.
 * Strings retain valid scalar UTF-8 bytes; only a few source escapes are supported.
   Unicode escape syntax and grapheme operations remain unsupported.
   General pattern aliases are supported as described below. String prefixes/concatenation/equality are byte-based and do not
@@ -340,16 +358,13 @@ local-field semantics.
   programs with compound allocation. Allocation is checked and exhaustion exits
   71. There is no collection or arena growth yet. This is not the final memory
   manager. Compound printing remains unsupported; structural equality is described below.
-* Legacy single-subject/non-alternative case coverage remains conservative.
-  Multi-pattern cases use the constructor-product matrix described above.
-  Empty/nonempty lists with irrefutable head/tail,
-  fully irrefutable tuples, Bool alternatives and catch-alls are understood;
-  more complex coverage may require an explicit catch-all. Refutable lets are
-  rejected until let-assert is supported. A custom-type case must cover every
-  possible constructor with irrefutable fields, or use a catch-all. Direct/simple
-  local known-constructor values can narrow that constructor set, as upstream
-  does; this knowledge is not propagated into nested fields or across function
-  calls. Other valid refinement/coverage combinations may still be rejected.
+* Single-subject cases retain the legacy coverage fast path and diagnostics,
+  with the existing constructor-product matrix as a fallback. Split nested ADT,
+  tuple and list coverage can now prove exhaustiveness across arms; guards never
+  contribute. Infinite domains and bit-array coverage remain conservative.
+  Refutable lets remain rejected until let-assert is supported. Direct/simple
+  local known-constructor values narrow that constructor set; nested values and
+  arbitrary function calls do not acquire invented refinement facts.
 * `echo` prints a value and newline to stdout without upstream's source-location
   diagnostics. That is a seed diagnostic convention, not completed `echo`
   compatibility. Oracle tests compare returned pure values and render them
@@ -507,9 +522,9 @@ Their separate `owned-*-native-verification.json` receipts compare outputs again
 upstream-compiled owned modules. Neither size is the complete compiler size.
 The historical complete compiler API probe stopped at a nested `as` pattern; see
 `evidence/complete-api-equality-probe.json`. That syntax is now supported. The
-repeatable current probe, `node test/probe-compiler-api.mjs`, instead reaches an
-integer-literal limit in the assembler; its receipt is
-`evidence/complete-api-pattern-aliases-probe.json`. No stage-1/stage-2 result is claimed.
+historical next probe reached an integer-literal limit in the assembler; see
+`evidence/complete-api-pattern-aliases-probe.json`. Both barriers are now cleared;
+the current native API proof is described below. A stage-2 rebuild is not claimed.
 
 The pattern-alias milestone passes **546/546** checks and **276/276** fresh
 upstream comparisons (64 single-file plus 212 project fixtures). Its 884-byte
@@ -518,16 +533,30 @@ fourteen earlier example hashes remain unchanged, and the owned compiler-compone
 native checks still pass. Source/artifact hashes and fresh oracle diagnostics are
 in `evidence/pattern-aliases-verification.json` and its linked receipts.
 
+The integers/coverage/native-API milestone passes **572/572** tests and
+**297/297** fresh upstream comparisons (64 single-file plus 233 project fixtures).
+The 662-byte wide-pattern example prints `True,False,9007199254740991,-2147483648`;
+all fifteen earlier example hashes are unchanged. The owned core/type-system/
+equality-planner checks pass again with current source hashes.
+`evidence/integers-coverage-verification.json` links the fresh checks and actual ASM.
+
+The complete compiler API plus its bounded driver is **498,418 bytes**. It runs
+without a dynamic loader or shared libraries and natively emits 380- and 745-byte
+programs, both exactly identical to bootstrap output; both execute correctly.
+`evidence/complete-api-wide-integers-probe.json` records source/driver/image hashes,
+ELF headers and child execution. This measures a native compiler core plus driver,
+not a finished file-based CLI, full Gleam compatibility or a self-rebuild.
+
 Next actions, in dependency order:
 
-1. Extend integer literal handling: after pattern aliases the complete compiler
-   API probe reaches its assembler's `-2_147_483_648` displacement check, beyond
-   the current literal magnitude limit. Continue remaining inference, pattern,
-   bit-array and import forms with upstream comparisons.
-2. Supply native file/argument/syscall IO in the owned runtime; remove the Node
-   bootstrap bridge from the native compiler execution path.
-3. Compile the compiler source natively, then rebuild that compiler with itself
-   and compare exact bytes. Record actual size and dependencies at each stage.
+1. Add an owned native compiler entrypoint for argument/source-file IO, with
+   correct partial read/write and error handling; replace the Node bridge in the
+   usable native CLI path.
+2. Exercise native compilation of the compiler's full source at real scale.
+   Address measured tail-call, arena/allocation and collection limits without
+   changing language semantics or introducing external dependencies.
+3. Use the native compiler to rebuild the exact same compiler source, then
+   compare stage-1/stage-2 bytes and behavior. That rebuild remains unproved.
 4. Expand upstream compatibility and add a direct ARM64/Mach-O emitter. Verify
    architecture/OS semantics rather than assuming ELF code transfers unchanged.
 

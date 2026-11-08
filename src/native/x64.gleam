@@ -743,11 +743,15 @@ fn pattern_code(
     a.DiscardPattern -> Ok(#([], state))
     a.VariablePattern(name) ->
       Ok(#([], State(..state, env: [#(name, subject), ..state.env])))
-    a.IntegerPattern(n) ->
-      Ok(#(
-        [load(subject), raw(<<72, 61, n:32-little>>), branch(133, failure)],
-        state,
-      ))
+    a.IntegerPattern(n) -> {
+      // CMP r64, imm32 sign-extends the immediate. Wider literals must use a
+      // full-width scratch register or distinct values can alias after truncation.
+      let compare = case n < -2_147_483_648 || n > 2_147_483_647 {
+        True -> raw(<<72, 186, n:64-little, 72, 57, 208>>)
+        False -> raw(<<72, 61, n:32-little>>)
+      }
+      Ok(#([load(subject), compare, branch(133, failure)], state))
+    }
     a.BooleanPattern(b) -> {
       let n = case b {
         True -> 1

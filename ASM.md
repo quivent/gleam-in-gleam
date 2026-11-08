@@ -407,3 +407,34 @@ The alias example is 884 bytes, SHA256
 prints `14,10`, and needs no dynamic loader/shared libraries. All fourteen earlier
 example hashes are unchanged. The final alias suite passes 546 checks and 276
 fresh upstream comparisons; this remains subset evidence, not full conformance.
+
+## Wide integer patterns and the native compiler API
+
+Decimal source magnitudes are bounded to 2^53-1 for exact bootstrap representation;
+that does not reduce the generated Int arithmetic's checked signed-64-bit range.
+For patterns in signed imm32 range the old `cmp rax,imm32` bytes stay unchanged.
+Other supported values load a full immediate into scratch RDX with `48 BA imm64`,
+then compare RAX/RDX with `48 39 D0`. Failure still branches through the same
+matcher path. RDX is scratch in the existing ABI; subject values remain in slots.
+
+`evidence/wide_patterns-disassembly.txt` shows `movabs $0x100000000,%rdx` at
+`0x4000de`, followed by `cmp %rdx,%rax` at `0x4000e8` and mismatch branch at
+`0x4000eb`. Zero therefore cannot match 4_294_967_296 through truncation. The
+maximum supported literal appears as `movabs $0x1fffffffffffff,%rax` at
+`0x400195`. Unary negation of magnitude 2_147_483_648 is emitted at `0x4001ae`.
+
+The full compiler API-plus-driver image executes the same owned emitter/assembler/
+ELF code natively. Its two emitted programs are compared byte-for-byte against
+bootstrap results and executed; the proof also inspects the actual ELF headers of
+the compiler and children for absence of dynamic loader/segment and an RW,
+non-executable stack. Native tail calls, GC and full-size self-rebuilding remain
+unimplemented/unproved; successful small-input compilation is not a scale or speed
+benchmark.
+
+The wide-pattern example is 662 bytes, SHA256
+`28d44ea87e06a0a11702cd14c3168c626cc0d442ff27f31dae810167af919ba7`.
+The current native compiler API-plus-driver is 498,418 bytes, SHA256
+`942095a73e00d715e43ab34f7f2a62ce3c3cfce95bb78e54e0ea95d95383afec`.
+Its generated 380- and 745-byte children execute and match bootstrap bytes exactly;
+all fifteen previous examples remain byte-identical. Those measurements establish
+specific artifacts and execution, not a final compiler size or performance result.

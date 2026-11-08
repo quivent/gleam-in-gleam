@@ -458,14 +458,7 @@ fn case_expression(
       Ok(Arm(pat, guard, body))
     }),
   )
-  use _ <- c.then(exhaustive(
-    unguarded(arms),
-    subject.type_,
-    False,
-    False,
-    globals,
-    subject.known_variant,
-  ))
+  use _ <- c.then(case_exhaustive(unguarded(arms), subject, globals))
   case arms {
     [] -> Error("Empty case")
     [first, ..rest] -> {
@@ -1215,6 +1208,38 @@ fn branch_type(arms: List(Arm), type_: a.Type) -> Result(a.Type, String) {
       use next <- c.then(merge_type(arm.body.type_, type_))
       branch_type(rest, next)
     }
+  }
+}
+
+// Preserve the legacy fast path and diagnostics. If it cannot prove a case,
+// reuse the existing constructor-product matrix with one subject column.
+fn case_exhaustive(
+  arms: List(Arm),
+  subject: Typed,
+  globals: Globals,
+) -> Result(Nil, String) {
+  case
+    exhaustive(
+      arms,
+      subject.type_,
+      False,
+      False,
+      globals,
+      subject.known_variant,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(legacy_error) ->
+      case
+        coverage.complete(
+          c.map(arms, fn(arm) { [arm.pattern] }),
+          [coverage.Column(subject.type_, subject.known_variant)],
+          globals,
+        )
+      {
+        Ok(_) -> Ok(Nil)
+        Error(_) -> Error(legacy_error)
+      }
   }
 }
 

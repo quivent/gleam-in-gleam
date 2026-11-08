@@ -1,0 +1,191 @@
+[
+  {
+    "name": "wide-int-positive-boundaries",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo 2_147_483_648 echo 4_294_967_295 echo 4_294_967_296 echo 9_007_199_254_740_991 Nil}"
+    },
+    "accepted": true,
+    "stdout": "2147483648\n4294967295\n4294967296\n9007199254740991\n"
+  },
+  {
+    "name": "wide-int-negative-boundaries",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo -2_147_483_648 echo -2_147_483_649 echo -4_294_967_296 echo -9_007_199_254_740_991 Nil}"
+    },
+    "accepted": true,
+    "stdout": "-2147483648\n-2147483649\n-4294967296\n-9007199254740991\n"
+  },
+  {
+    "name": "wide-pattern-sign",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n: Int) -> Bool {case n {2147483648 -> True _ -> False}} pub fn main() -> Nil {echo f(2147483648) echo f(-2147483648) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "wide-pattern-word",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n: Int) -> Bool {case n {4294967296 -> True _ -> False}} pub fn main() -> Nil {echo f(4294967296) echo f(0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "wide-pattern-high",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n: Int) -> Bool {case n {9007199254740991 -> True _ -> False}} pub fn main() -> Nil {echo f(9007199254740991) echo f(-1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "wide-pattern-negative",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n: Int) -> Bool {case n {-9007199254740991 -> True _ -> False}} pub fn main() -> Nil {echo f(-9007199254740991) echo f(1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "wide-pattern-nested",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case #(4_294_967_296,[9_007_199_254_740_991]) {#(4_294_967_296,[9_007_199_254_740_991]) -> True _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "wide-pattern-bit-array",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case <<9_007_199_254_740_991:64>> {<<9_007_199_254_740_991:64>> -> True _ -> False} echo case <<0:64>> {<<4_294_967_296:64>> -> True _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n"
+  },
+  {
+    "name": "wide-pattern-signed-array",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main() -> Nil {echo case <<-4_294_967_297:64>> {<<-4_294_967_297:64-signed>> -> True _ -> False} Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "wide-pattern-guard",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n: Int) -> Int {case n {9_007_199_254_740_991 as whole if whole>4_294_967_296 -> 7 _ -> 0}} pub fn main() -> Nil {echo f(9_007_199_254_740_991) echo f(-1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n0\n"
+  },
+  {
+    "name": "single-list-sum-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type S {Bind(Int) Eval(Int)} fn total(ss: List(S)) -> Int {case ss {[] -> 0 [Bind(n),..rest] -> n+total(rest) [Eval(n),..rest] -> n+total(rest)}} pub fn main() -> Nil {echo total([Bind(2),Eval(3)]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "single-list-sum-missing",
+    "entry": "main",
+    "files": {
+      "main": "type S {Bind(Int) Eval(Int)} fn f(ss: List(S)) -> Int {case ss {[] -> 0 [Bind(n),.._] -> n}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "single-tuple-bool-coverage",
+    "entry": "main",
+    "files": {
+      "main": "fn f(t: #(Bool,Bool)) -> Int {case t {#(True,_) -> 1 #(False,True) -> 2 #(False,False) -> 3}} pub fn main() -> Nil {echo f(#(False,False)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "single-tuple-bool-hole",
+    "entry": "main",
+    "files": {
+      "main": "fn f(t: #(Bool,Bool)) -> Int {case t {#(True,True) -> 1 #(False,False) -> 2}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "single-nested-adt-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type T {Wrap(Bool) Empty} fn f(t: T) -> Int {case t {Wrap(True) -> 1 Wrap(False) -> 2 Empty -> 3}} pub fn main() -> Nil {echo f(Wrap(False)) echo f(Empty) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n3\n"
+  },
+  {
+    "name": "single-nested-adt-hole",
+    "entry": "main",
+    "files": {
+      "main": "type T {Wrap(Bool) Empty} fn f(t: T) -> Int {case t {Wrap(True) -> 1 Empty -> 3}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "single-recursive-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type T {End Next(T)} fn f(t: T) -> Int {case t {End -> 0 Next(End) -> 1 Next(Next(t)) -> 2+f(t)}} pub fn main() -> Nil {echo f(Next(Next(Next(End)))) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "single-list-bool-coverage",
+    "entry": "main",
+    "files": {
+      "main": "fn f(xs: List(Bool)) -> Int {case xs {[] -> 0 [True,.._] -> 1 [False,.._] -> 2}} pub fn main() -> Nil {echo f([False,True]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n"
+  },
+  {
+    "name": "single-list-tail-hole",
+    "entry": "main",
+    "files": {
+      "main": "fn f(xs: List(Bool)) -> Int {case xs {[] -> 0 [True] -> 1 [False,.._] -> 2}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "single-guarded-leaf-not-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type T {A(Bool) B} fn f(t: T) -> Int {case t {A(True) if True -> 1 A(False) -> 2 B -> 0}} pub fn main() -> Nil {Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "single-aliased-nested-coverage",
+    "entry": "main",
+    "files": {
+      "main": "type T {A(Bool) B} fn f(t: T) -> Int {case t {A(True) as whole -> {echo whole==A(True) 1} A(False) as whole -> {echo whole==A(False) 2} B -> 0}} pub fn main() -> Nil {echo f(A(False)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n2\n"
+  }
+]
