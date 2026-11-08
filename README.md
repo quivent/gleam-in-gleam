@@ -21,6 +21,11 @@ score. Native CLI/IO now works for bounded inputs; full-size stack/memory
 reliability and the actual self-rebuild remain. See [ROADMAP.md](ROADMAP.md) for
 scope, remaining work and completion evidence.
 
+[Open the interactive eight-step roadmap](docs/roadmap.html): expandable specs,
+acceptance review, evidence links, search and local notes. Open the checkout HTML
+in a browser; GitHub shows its source. [Preview/update instructions](docs/README.md).
+The next implementation plan is [full-size reliability](FULL_SIZE_RELIABILITY_SPEC.md).
+
 ## What actually runs
 
 The bootstrap remains available for development:

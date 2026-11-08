@@ -1,0 +1,406 @@
+{
+  "schema": "gleam-in-gleam.interactive-roadmap/1",
+  "project": "Gleam in Gleam",
+  "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
+  "focus": "full-size",
+  "estimate": {
+    "percent": 70,
+    "kind": "subjective",
+    "scope": "Usable, self-hosting Linux x86-64 compiler",
+    "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
+    "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
+  },
+  "verification": "evidence/native-cli-verification.json",
+  "ioVerification": "evidence/native-cli-io-verification.json",
+  "steps": [
+    {
+      "id": "native-cli",
+      "title": "Native compiler CLI",
+      "scope": "core",
+      "status": "verified",
+      "statusLabel": "Verified · bounded",
+      "summary": "Read source files and imports, then publish a runnable executable without Node at runtime.",
+      "nextAction": "Preserve the qualified IO contract while the next stage lifts the size boundary.",
+      "specMaturity": "Qualified bounded implementation",
+      "design": [
+        "Command: gleam-native SOURCE.gleam NEW_OUTPUT [--source-root DIRECTORY]. SOURCE is relative to that root, or cwd by default.",
+        "Pure Gleam requests drive an owned Linux syscall runner. Resolved constructor fields, label order and callback types are checked before emission.",
+        "Rooted regular-file reads refuse source symlinks. Exclusive sibling output, complete writes, fsync and no-replace rename preserve existing paths.",
+        "The qualified limit is 16 KiB per source, with a 64 MiB arena. This is a bounded delivery, not full-size reliability."
+      ],
+      "acceptance": [
+        {
+          "id": "native-cli-1",
+          "text": "Compile and execute all 16 tracked examples with exact bootstrap byte comparisons."
+        },
+        {
+          "id": "native-cli-2",
+          "text": "Run the native CLI with an empty PATH and no external process execution."
+        },
+        {
+          "id": "native-cli-3",
+          "text": "Verify real short IO, interrupted/error paths and unchanged existing destinations."
+        },
+        {
+          "id": "native-cli-4",
+          "text": "Record input limits, native image hashes and actual ELF dependency checks."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "59 CLI checks and IO observations",
+          "path": "evidence/native-cli-io-verification.json"
+        },
+        {
+          "label": "Full 631-test verification",
+          "path": "evidence/native-cli-verification.json"
+        },
+        {
+          "label": "Actual native instruction windows",
+          "path": "evidence/native-cli-disassembly.txt"
+        }
+      ],
+      "related": [],
+      "spec": "NATIVE_CLI_SPEC.md"
+    },
+    {
+      "id": "full-size",
+      "title": "Full-size reliability",
+      "scope": "core",
+      "status": "next",
+      "statusLabel": "Next · specified",
+      "summary": "Move beyond the 16 KiB guard using measured stack and allocation fixes.",
+      "nextAction": "Attribute the known large-input failure to actual native frames; qualify a focused stack fix before raising the cap.",
+      "specMaturity": "Implementation proposal",
+      "design": [
+        "Keep the production bound until an explicit diagnostic path records the stack frontier for comments, whitespace, UTF-8 and token-heavy input.",
+        "Direct self-tail-call lowering is the first candidate: left-to-right argument evaluation, simultaneous parameter replacement and a jump after the prologue.",
+        "Measure the fixed arena, two-pass append and repeated byte concatenation. Choose memory changes from evidence.",
+        "Current sources total 230,817 bytes across 25 modules; the largest file is 50,640 bytes. These inputs exceed the current cap."
+      ],
+      "acceptance": [
+        {
+          "id": "full-size-1",
+          "text": "Record the causal native stack/frame path for a reproducible large-input failure."
+        },
+        {
+          "id": "full-size-2",
+          "text": "Prove bounded-stack loops, dependent/reordered arguments and unchanged non-tail recursion semantics; inspect ASM."
+        },
+        {
+          "id": "full-size-3",
+          "text": "Measure memory behavior and fail without publishing partial output on exhaustion."
+        },
+        {
+          "id": "full-size-4",
+          "text": "Qualify a higher boundary against actual large modules and a representative full graph."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Preserved large-input failure",
+          "path": "evidence/native-cli-initial-size-failure.json"
+        },
+        {
+          "label": "Current CLI guard and boundary checks",
+          "path": "evidence/native-cli-io-verification.json"
+        }
+      ],
+      "related": [
+        "native-cli"
+      ],
+      "spec": "FULL_SIZE_RELIABILITY_SPEC.md"
+    },
+    {
+      "id": "native-testing",
+      "title": "Broader native testing",
+      "scope": "core",
+      "status": "partial",
+      "statusLabel": "Partial · examples verified",
+      "summary": "Exercise the wider correctness suite through the native compiler, not just the bootstrap implementation.",
+      "nextAction": "Reuse the existing fixture corpus through native file compilation and record exact per-case results.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "There are 631 regression checks and 297 upstream comparisons; that does not mean all cases were compiled by the native CLI.",
+        "Current native evidence includes all 16 example programs plus two embedded API compilation/output checks.",
+        "Compare acceptance/rejection, emitted bytes and execution; preserve platform/build/source identity and initial failures.",
+        "Extend coverage to modules, generic/recursive data, closures, evaluation order, patterns, Unicode and byte arrays."
+      ],
+      "acceptance": [
+        {
+          "id": "native-testing-1",
+          "text": "Run representative positive and negative fixtures through the native file path."
+        },
+        {
+          "id": "native-testing-2",
+          "text": "Compare exact outputs and diagnostics where the supported contract requires them."
+        },
+        {
+          "id": "native-testing-3",
+          "text": "Exercise multi-module and resource/error behavior; retain an explicit coverage matrix."
+        },
+        {
+          "id": "native-testing-4",
+          "text": "Record independent upstream agreement separately from native-path coverage."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Native CLI example/IO evidence",
+          "path": "evidence/native-cli-io-verification.json"
+        },
+        {
+          "label": "Two native API output checks",
+          "path": "evidence/complete-api-native-cli-probe.json"
+        },
+        {
+          "label": "Upstream fixture results",
+          "path": "evidence/native-cli-project-upstream-checks.json"
+        }
+      ],
+      "related": [
+        "native-cli"
+      ],
+      "spec": null
+    },
+    {
+      "id": "self-hosting",
+      "title": "The self-hosting proof",
+      "scope": "core",
+      "status": "pending",
+      "statusLabel": "Not yet verified",
+      "summary": "Make the native compiler rebuild its own exact source and compare successive images.",
+      "nextAction": "After scale qualification, connect the dedicated native self-build route through cli_builder.build.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "Retain the effect-runner entry when rebuilding the compiler; the ordinary program entry alone is insufficient.",
+        "Freeze identical inputs and record source, command, compiler and output hashes.",
+        "Execute the rebuilt compiler and repeat the same rebuild, then compare bytes and behavior.",
+        "A sample-program compile, a parsed compiler source or an ELF wrapper does not satisfy this milestone."
+      ],
+      "acceptance": [
+        {
+          "id": "self-hosting-1",
+          "text": "Compile the complete exact compiler input graph through a native self-build command."
+        },
+        {
+          "id": "self-hosting-2",
+          "text": "Run the rebuilt compiler independently of the stage-0 host."
+        },
+        {
+          "id": "self-hosting-3",
+          "text": "Produce byte-identical successive compiler images from identical inputs."
+        },
+        {
+          "id": "self-hosting-4",
+          "text": "Run native-path checks with the rebuilt image and retain the full provenance."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Current self-hosting status",
+          "path": "SELF_HOSTING.md"
+        },
+        {
+          "label": "Dedicated build entry source",
+          "path": "src/native/cli_builder.gleam"
+        }
+      ],
+      "related": [
+        "full-size",
+        "native-testing"
+      ],
+      "spec": null
+    },
+    {
+      "id": "language",
+      "title": "Gleam compatibility",
+      "scope": "extension",
+      "status": "partial",
+      "statusLabel": "Partial · tested subset",
+      "summary": "Extend language coverage beyond what this compiler currently needs to compile its own source.",
+      "nextAction": "Select the next construct from a real source need and establish upstream semantic probes first.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "Remaining areas include general inference, polymorphic function values, selective/package imports and labelled function calls.",
+        "Constants, attributes, opaque types, remaining patterns, floats and Unicode operations need bounded, explicit implementations.",
+        "Keep unsupported forms explicit; do not turn a growing subset into a claim of full conformance.",
+        "Refine each outline when its implementation starts rather than freezing speculative architecture now."
+      ],
+      "acceptance": [
+        {
+          "id": "language-1",
+          "text": "Define the supported syntax/types/semantics for each increment."
+        },
+        {
+          "id": "language-2",
+          "text": "Add independent upstream acceptance and observable-behavior comparisons."
+        },
+        {
+          "id": "language-3",
+          "text": "Test scope, inference, evaluation order, errors and relevant emitted instructions."
+        },
+        {
+          "id": "language-4",
+          "text": "Update documented compatibility limits without deleting historical failures."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Current compatibility limits",
+          "path": "README.md"
+        },
+        {
+          "label": "Fresh upstream comparisons",
+          "path": "evidence/native-cli-project-upstream-checks.json"
+        }
+      ],
+      "related": [],
+      "spec": null
+    },
+    {
+      "id": "values",
+      "title": "Complete value semantics",
+      "scope": "extension",
+      "status": "partial",
+      "statusLabel": "Partial · concrete layouts",
+      "summary": "Finish exact literals, erased generic equality, compound printing and remaining bit-array operations.",
+      "nextAction": "Choose one real semantic gap and settle its representation before extending accepted inputs.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "Decimal literal magnitude currently stops at 2^53−1 to retain exact bootstrap representation; native arithmetic remains checked signed 64-bit.",
+        "Structural equality works for concrete supported layouts, including recursive values. Stored erased parameters and actual function values remain explicit rejections.",
+        "Compound formatting and remaining byte/bit/codepoint forms need owned runtime semantics.",
+        "Use an explicit exact representation for larger literals; never round or guess an unknown layout."
+      ],
+      "acceptance": [
+        {
+          "id": "values-1",
+          "text": "Preserve exact value bits across lexing, checking, emission and execution."
+        },
+        {
+          "id": "values-2",
+          "text": "Define representation/type information for any new generic value operation."
+        },
+        {
+          "id": "values-3",
+          "text": "Qualify boundary, negative, nested and unsupported cases against upstream where applicable."
+        },
+        {
+          "id": "values-4",
+          "text": "Inspect the relevant native instructions and retain overflow/resource behavior."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Value/equality limits",
+          "path": "README.md"
+        },
+        {
+          "label": "Structural equality evidence",
+          "path": "evidence/structural-equality-verification.json"
+        },
+        {
+          "label": "Exact literal/native API milestone",
+          "path": "evidence/integers-coverage-verification.json"
+        }
+      ],
+      "related": [],
+      "spec": null
+    },
+    {
+      "id": "optimization",
+      "title": "Measured optimization",
+      "scope": "extension",
+      "status": "pending",
+      "statusLabel": "Benchmarks pending",
+      "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
+      "nextAction": "Define reproducible workloads and instrumentation before claiming speed improvements.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
+        "Separate cold/warm compilation, runtime execution, allocation/peak memory and artifact-size measurements.",
+        "Use multiple runs, retain environment/toolchain/input hashes and report variation.",
+        "Select an observed bottleneck, inspect ASM and compare correctness before/after."
+      ],
+      "acceptance": [
+        {
+          "id": "optimization-1",
+          "text": "Publish a reproducible baseline with separate speed, memory and size measures."
+        },
+        {
+          "id": "optimization-2",
+          "text": "Identify the actual hot path rather than infer runtime speed from binary size."
+        },
+        {
+          "id": "optimization-3",
+          "text": "Retain semantic qualification while changing code generation or allocation."
+        },
+        {
+          "id": "optimization-4",
+          "text": "Record measured improvement, regressions and uncertainty on representative workloads."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Current instruction contract",
+          "path": "ASM.md"
+        },
+        {
+          "label": "Development history and limits",
+          "path": "JOURNEY.md"
+        }
+      ],
+      "related": [
+        "native-testing"
+      ],
+      "spec": null
+    },
+    {
+      "id": "targets",
+      "title": "Targets & distribution",
+      "scope": "extension",
+      "status": "pending",
+      "statusLabel": "Planned",
+      "summary": "Add ARM64/macOS and make qualified native releases convenient to install.",
+      "nextAction": "Define the next target ABI and executable/runtime contract before implementing it.",
+      "specMaturity": "Outline; refine before implementation",
+      "design": [
+        "Current native execution is Linux x86-64 only. ARM64 needs its own emitter/ABI and macOS needs executable-format and syscall/runtime work.",
+        "Verify target semantics on the actual target rather than treating ELF output as portable.",
+        "Source is in the private GitHub repository; local generated images are excluded from Git.",
+        "Release packaging, install/update commands and artifact provenance follow a qualified standalone result."
+      ],
+      "acceptance": [
+        {
+          "id": "targets-1",
+          "text": "Specify calling convention, object/runtime behavior and executable headers for each target."
+        },
+        {
+          "id": "targets-2",
+          "text": "Execute compiler/output checks on actual target environments."
+        },
+        {
+          "id": "targets-3",
+          "text": "Publish versioned artifacts with hashes and supported-target/limit declarations."
+        },
+        {
+          "id": "targets-4",
+          "text": "Verify standalone installation/update behavior without adding runtime dependencies."
+        }
+      ],
+      "evidence": [
+        {
+          "label": "Repository setup and current target",
+          "path": "README.md"
+        },
+        {
+          "label": "Current native calling convention",
+          "path": "ASM.md"
+        }
+      ],
+      "related": [],
+      "spec": null
+    }
+  ]
+}

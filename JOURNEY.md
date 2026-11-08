@@ -430,3 +430,34 @@ source cap. A native self-build route must invoke cli_builder.build to retain th
 compiler effect runner; the ordinary program compile path does not supply that
 entry. Stage-2 rebuilding remains unproved. Subjective milestone progress moves
 from 65% to 70% for delivered bounded CLI/IO, not full-language compatibility.
+
+## An interactive, evidence-linked roadmap — 2026-11-08
+
+Jay asked to turn the eight-step plan and its specs into something interactive.
+We kept it in the private repository as a portable offline HTML document: eight
+expandable workstreams with Spec, Acceptance and Evidence tabs, searchable text,
+core/expansion filters, next actions and versioned links. The stage status and
+70% subjective estimate are readonly baseline facts. Acceptance marks and notes
+are personal browser review only, persist locally and can be exported; they do
+not mark compiler work complete or create another task database.
+
+The structured roadmap manifest feeds a small standard-library Python generator.
+It validates stages/links and agreement between actual verification receipts,
+derives the 631/297/16-example/582,442-byte metrics and embeds the snapshot. Browser
+code belongs only to documentation; compiler/runtime dependencies are unchanged.
+GitHub renders HTML source, so the instructions explicitly show opening the local
+file or serving a loopback preview. No public deployment is implied.
+
+We also wrote the next full-size reliability spec. It preserves the known
+33,036-byte failure and 24,036-byte success, inventories the actual 230,817-byte
+compiler graph, and separates stack attribution, a candidate self-tail-call fix,
+allocation measurements and a qualified cap increase. Later workstream specs stay
+outlines until evidence warrants detailed design. Self-hosting remains unproved.
+
+Ten real-browser check groups pass in Chromium: stage/metric rendering, filtering,
+search, keyboard tabs, persistent inert notes, export, mobile/touch layout,
+malformed/blocked storage, no-JavaScript fallback and zero external HTTP requests.
+Desktop/mobile screenshots were visually inspected and remain in ignored out/.
+The dedicated UI receipt retains source/screenshot hashes. Compiler qualification
+continues to refer to the prior source baseline, rather than counting these UI
+checks as newly compiled language cases.

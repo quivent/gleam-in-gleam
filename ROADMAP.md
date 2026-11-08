@@ -3,6 +3,13 @@
 Updated 2026-11-08. Correctness comes first; inspect generated ASM throughout.
 Compiler logic stays in Gleam, with zero third-party compiler/runtime dependencies.
 
+[Interactive version](docs/roadmap.html) · [How to open/use it](docs/README.md) ·
+[Next implementation spec](FULL_SIZE_RELIABILITY_SPEC.md)
+
+The interactive view has the same eight workstreams, with spec outlines,
+acceptance criteria, evidence and browser-local review notes. It does not promote
+review marks into verified status.
+
 ## Subjective progress
 
 **Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 70%**
@@ -60,8 +67,8 @@ A complete compiler rebuild and full upstream Gleam compatibility are unfinished
 
 3. **Broader native-compiler testing.**
    Run the wider correctness suite through the native compiler path. Current
-   native API qualification covers two emitted programs; the existing 572-test
-   suite does not mean all 572 cases were compiled by that native API. Compare
+   qualification includes 16 native CLI examples and two embedded API outputs;
+   the 631-test suite does not mean every case was compiled by the native CLI. Compare
    native/bootstrap output and observable behavior, including rejection cases,
    modules, closures, recursive data, patterns, strings and byte arrays.
 

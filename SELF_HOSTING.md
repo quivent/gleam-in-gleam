@@ -36,6 +36,10 @@ image are preserved under their original receipt names.
 
 The full prioritized backlog and acceptance evidence are in [ROADMAP.md](ROADMAP.md).
 
+The [interactive roadmap](docs/roadmap.html) exposes the eight specs/evidence;
+[the full-size reliability spec](FULL_SIZE_RELIABILITY_SPEC.md) defines the next
+bounded implementation sequence.
+
 ## Next acceptance steps
 
 1. Extend the delivered bounded native CLI to actual compiler-source scale,
