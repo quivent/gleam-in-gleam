@@ -15,7 +15,7 @@ pub type Token {
 
 pub fn lex(source: BitArray) -> Result(List(Token), String) {
   case utf8.valid(source) {
-    True -> scan(source, 0, [])
+    True -> scan(source, 0, [], 0)
     False -> Error("Source is not valid UTF-8")
   }
 }
@@ -28,65 +28,96 @@ fn scan(
   source: BitArray,
   offset: Int,
   acc: List(Token),
+  previous_end: Int,
 ) -> Result(List(Token), String) {
   case source {
     <<>> -> Ok(core.reverse([Token(End, offset), ..acc]))
     <<c, rest:bits>> if c == 32 || c == 9 || c == 10 || c == 13 -> {
       // Keep long whitespace runs out of scan's much larger native frame.
       let #(remaining, at) = whitespace(rest, offset + 1)
-      scan(remaining, at, acc)
+      scan(remaining, at, acc, previous_end)
     }
     <<47, 47, rest:bits>> -> {
       let #(remaining, at) = comment(rest, offset + 2)
-      scan(remaining, at, acc)
+      scan(remaining, at, acc, previous_end)
     }
     <<34, rest:bits>> ->
       case quoted(rest, offset + 1, <<>>) {
         Error(e) -> Error(e)
         Ok(#(value, remaining, at)) ->
-          scan(remaining, at, [Token(Text(value), offset), ..acc])
+          scan(remaining, at, [Token(Text(value), offset), ..acc], at)
       }
+    <<45, digit, tail:bits>> if digit >= 48 && digit <= 57 -> {
+      // A signed numeric token starts a new expression unless its minus is
+      // adjacent to a preceding word/number: x-1 subtracts, x -1 does not.
+      // Closing delimiters never turn an adjacent signed literal into infix '-'.
+      let subtract = case acc {
+        [Token(Word(_), _), ..] | [Token(Number(_), _), ..] ->
+          previous_end == offset
+        _ -> False
+      }
+      case subtract {
+        True ->
+          scan(
+            <<digit, tail:bits>>,
+            offset + 1,
+            [Token(Symbol("-"), offset), ..acc],
+            offset + 1,
+          )
+        False ->
+          case number(<<digit, tail:bits>>, offset + 1, 0, False) {
+            Error(e) -> Error(e)
+            Ok(#(value, rest, at)) ->
+              scan(rest, at, [Token(Number(0 - value), offset), ..acc], at)
+          }
+      }
+    }
     <<c, _:bits>> if c >= 48 && c <= 57 ->
       case number(source, offset, 0, False) {
         Error(e) -> Error(e)
         Ok(#(value, rest, at)) ->
-          scan(rest, at, [Token(Number(value), offset), ..acc])
+          scan(rest, at, [Token(Number(value), offset), ..acc], at)
       }
     <<c, _:bits>> if c >= 65 && c <= 90 || c >= 97 && c <= 122 || c == 95 -> {
       let #(name, rest, at) = identifier(source, offset, "")
-      scan(rest, at, [Token(Word(name), offset), ..acc])
+      scan(rest, at, [Token(Word(name), offset), ..acc], at)
     }
     <<46, 46, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol(".."), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol(".."), offset), ..acc], offset + 2)
     <<60, 62, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("<>"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("<>"), offset), ..acc], offset + 2)
     <<60, 60, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("<<"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("<<"), offset), ..acc], offset + 2)
     <<62, 62, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol(">>"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol(">>"), offset), ..acc], offset + 2)
     <<60, 45, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("<-"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("<-"), offset), ..acc], offset + 2)
     <<45, 62, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("->"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("->"), offset), ..acc], offset + 2)
     <<61, 61, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("=="), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("=="), offset), ..acc], offset + 2)
     <<33, 61, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("!="), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("!="), offset), ..acc], offset + 2)
     <<60, 61, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("<="), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("<="), offset), ..acc], offset + 2)
     <<62, 61, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol(">="), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol(">="), offset), ..acc], offset + 2)
     <<38, 38, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("&&"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("&&"), offset), ..acc], offset + 2)
     <<124, 124, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("||"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("||"), offset), ..acc], offset + 2)
     <<124, 62, rest:bits>> ->
-      scan(rest, offset + 2, [Token(Symbol("|>"), offset), ..acc])
+      scan(rest, offset + 2, [Token(Symbol("|>"), offset), ..acc], offset + 2)
     <<c, rest:bits>> ->
       case punctuation(c) {
         Error(_) -> fail(offset, "Unsupported character " <> core.decimal(c))
         Ok(symbol) ->
-          scan(rest, offset + 1, [Token(Symbol(symbol), offset), ..acc])
+          scan(
+            rest,
+            offset + 1,
+            [Token(Symbol(symbol), offset), ..acc],
+            offset + 1,
+          )
       }
     _ -> fail(offset, "Source is not byte aligned")
   }

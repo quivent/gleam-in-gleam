@@ -48,7 +48,7 @@ try{
  assert.notEqual(sha(variantBytes),sha(seed));assert.deepEqual(variantBytes,variantReference);
  const variantVersion=run(variant,['--version']);assert.equal(variantVersion.status,0);assert.match(variantVersion.stdout,/gleam-native 0\.1\.1/);
  receipt.sourceSensitivity={isolatedChange:'native/cli version literal 0.1.0 -> 0.1.1',compilerStage:3,compileExit:variantRun.status,bytes:variantBytes.length,sha256:sha(variantBytes),differsFromSeed:true,byteIdenticalToBootstrap:true,versionStdout:variantVersion.stdout};
- const fixturePaths=['test/modules-fixtures.json','test/aliases-guards-fixtures.json','test/strings-prelude-fixtures.json','test/multi-pattern-fixtures.json','test/equality-fixtures.json','test/pattern-alias-fixtures.json','test/integer-coverage-fixtures.json','test/tail-calls-fixtures.json'];
+ const fixturePaths=['test/modules-fixtures.json','test/aliases-guards-fixtures.json','test/strings-prelude-fixtures.json','test/multi-pattern-fixtures.json','test/equality-fixtures.json','test/pattern-alias-fixtures.json','test/integer-coverage-fixtures.json','test/tail-calls-fixtures.json','test/register-fixtures.json'];
  const fixtures=fixturePaths.flatMap(p=>JSON.parse(readFileSync(join(root,p),'utf8')));
  const grammar=JSON.parse(readFileSync(join(root,'test/grammar-fixtures.json'),'utf8')).map(f=>({...f,entry:'main',files:{main:f.source}}));
  receipt.fixtureSHA256=Object.fromEntries([...fixturePaths,'test/grammar-fixtures.json'].map(p=>[p,sha(readFileSync(join(root,p)))]));

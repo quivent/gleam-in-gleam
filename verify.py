@@ -12,6 +12,8 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parent
+PREFIX = os.environ.get('GIG_VERIFY_PREFIX', 'current')
+assert re.fullmatch(r'[a-z][a-z0-9-]*', PREFIX), 'Invalid evidence prefix'
 PRIVATE_BOOTSTRAP = Path.home() / '.local/share/gleam-native/bootstrap/1.19.2/gleam'
 gleam = os.environ.get('GLEAM') or shutil.which('gleam') or str(PRIVATE_BOOTSTRAP)
 
@@ -30,9 +32,9 @@ def sha(data):
 
 run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
-suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs'],
-            env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / 'evidence/self-hosting-io-verification.json'),
-                 'NATIVE_CLI_ASM': str(ROOT / 'evidence/self-hosting-disassembly.txt')})
+suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs', 'test/registers.test.mjs'],
+            env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / f'evidence/{PREFIX}-io-verification.json'),
+                 'NATIVE_CLI_ASM': str(ROOT / f'evidence/{PREFIX}-disassembly.txt')})
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
 passed = int(re.search(r'^# pass (\d+)$', suite.stdout, re.M)[1])
 failed = int(re.search(r'^# fail (\d+)$', suite.stdout, re.M)[1])
@@ -86,7 +88,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
             # Preserve a stable path in the listing, not a disposable temp name.
             listing = listing.replace(str(raw), f'{name}-code.bin')
             listing = '\n'.join(line.rstrip() for line in listing.splitlines()) + '\n'
-            listing_name = 'self-hosting-' + ('functions-descriptor' if name == 'functions' else name)
+            listing_name = f'{PREFIX}-' + ('functions-descriptor' if name == 'functions' else name)
             disassemblies.append(dict(tool=run(['objdump', '--version']).stdout.splitlines()[0],
                                entryAddress=hex(entry), rawCodeSHA256=sha(raw.read_bytes()),
                                includesTrailingStaticData=True,
@@ -148,7 +150,8 @@ module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/equality-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/pattern-alias-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/integer-coverage-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/tail-calls-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/tail-calls-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/register-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
@@ -191,9 +194,9 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr.replace(str(project), '<oracle>')))
-(evidence / 'self-hosting-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
+(evidence / f'{PREFIX}-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
 
-(evidence / 'self-hosting-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / f'{PREFIX}-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 trace_script = f"""
 import {{readFileSync}} from 'node:fs';
@@ -229,7 +232,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-owned-core-native-') as tmp:
                       exitCode=observed.returncode, stdout=observed.stdout,
                       oracle='native test compares current upstream-compiled core function results',
                       allSourceFunctionsCompiled=True, fullCompilerSelfHosting=False)
-(evidence / 'owned-core-self-hosting-native-verification.json').write_text(json.dumps(owned_core, indent=2) + '\n')
+(evidence / f'owned-core-{PREFIX}-native-verification.json').write_text(json.dumps(owned_core, indent=2) + '\n')
 
 def owned_project_receipt(entry, modules, driver_name, expected):
     driver = (ROOT / driver_name).read_bytes()
@@ -256,26 +259,26 @@ owned_types = owned_project_receipt('native/type_system', ['native/type_system',
                     'test/owned-type-system-driver.source', 'Box(Int)\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n')
 owned_equality = owned_project_receipt('native/equality', ['native/equality','native/definitions','native/type_system','native/core','native/ast','native/prelude'],
                     'test/owned-equality-driver.source', '3\n0\n')
-(evidence / 'owned-type-system-self-hosting-native-verification.json').write_text(json.dumps(owned_types, indent=2) + '\n')
-(evidence / 'owned-equality-self-hosting-native-verification.json').write_text(json.dumps(owned_equality, indent=2) + '\n')
+(evidence / f'owned-type-system-{PREFIX}-native-verification.json').write_text(json.dumps(owned_types, indent=2) + '\n')
+(evidence / f'owned-equality-{PREFIX}-native-verification.json').write_text(json.dumps(owned_equality, indent=2) + '\n')
 
 # Run the entire owned compiler API natively; execute and compare its emitted ELF.
-run(['node', 'test/probe-compiler-api.mjs', 'evidence/complete-api-self-hosting-probe.json'])
-native_compiler_api = json.loads((evidence / 'complete-api-self-hosting-probe.json').read_text())
+run(['node', 'test/probe-compiler-api.mjs', f'evidence/complete-api-{PREFIX}-probe.json'])
+native_compiler_api = json.loads((evidence / f'complete-api-{PREFIX}-probe.json').read_text())
 assert native_compiler_api.get('nativeCompilationVerified') is True, native_compiler_api
 assert len(native_compiler_api['nativePrograms']) == 2
 for path, expected_hash in native_compiler_api['sourceSHA256'].items():
     assert sha((ROOT / path).read_bytes()) == expected_hash, path
 
-native_cli = json.loads((evidence / 'self-hosting-io-verification.json').read_text())
+native_cli = json.loads((evidence / f'{PREFIX}-io-verification.json').read_text())
 assert not native_cli['artifact']['dynamicLoader'] and not native_cli['artifact']['dynamicSegment']
 assert native_cli['artifact']['nonExecutableStack']
 for path, expected_hash in native_cli['sourceSHA256'].items():
     assert sha((ROOT / path).read_bytes()) == expected_hash, path
 assert any(v['kind'] == 'actual-short-io' and v['positiveShortReads'] > 0 and v['positiveShortWrites'] > 0 for v in native_cli['observations'])
 
-run(['node', 'tools/verify_self_hosting.mjs', 'evidence/self-hosting-native-rebuilds.json'])
-self_host = json.loads((evidence / 'self-hosting-native-rebuilds.json').read_text())
+run(['node', 'tools/verify_self_hosting.mjs', f'evidence/{PREFIX}-native-rebuilds.json'])
+self_host = json.loads((evidence / f'{PREFIX}-native-rebuilds.json').read_text())
 assert self_host['selfHosting'] and self_host['sourceSHA256'] == sources
 assert self_host['stages'][0]['sha256'] == native_cli['artifact']['sha256']
 assert self_host['nativeCorpusSummary']['total'] == len(oracle_results) + len(module_results)
@@ -295,11 +298,11 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/self-hosting-upstream-checks.json'),
+                                  path=f'evidence/{PREFIX}-upstream-checks.json'),
     bitArrayRepresentation='arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice',
     bitArraySubset='byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails',
     projectCompilation=dict(sourceLanguage='Gleam', imports='local module aliases and qualified values/types/constructors', namespace='unlexable module-qualified internal names', dependencyOrder='deterministic DFS postorder, cycles rejected, shared modules linked once', nativeLinker='owned Gleam relocation emitter, no external linker', selectiveImports=False),
-    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/self-hosting-project-upstream-checks.json'),
+    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path=f'evidence/{PREFIX}-project-upstream-checks.json'),
     totalFreshUpstreamComparisons=len(oracle_results)+len(module_results),
     linkedExampleSymbols=module_trace,
     exactSingleModuleEquivalenceFixture='nested-path-default-alias (native test)',
@@ -327,19 +330,19 @@ receipt = dict(
     guards='restricted pure expressions, typed Bool; failed alternative guard retries alternatives then later arms; guarded arms do not prove exhaustiveness',
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
     compilerRunsNatively=True,
-    nativeCompilerAPI=dict(path='evidence/complete-api-self-hosting-probe.json',
+    nativeCompilerAPI=dict(path=f'evidence/complete-api-{PREFIX}-probe.json',
                            bytes=native_compiler_api['artifact']['bytes'],
                            emittedPrograms=len(native_compiler_api['nativePrograms']),
                            byteIdenticalToBootstrap=True,
                            nativeCLI=False),
-    nativeCLI=dict(path="evidence/self-hosting-io-verification.json",
+    nativeCLI=dict(path=f"evidence/{PREFIX}-io-verification.json",
                    artifact=native_cli["artifact"],sourceLimitBytes=native_cli["limits"]["sourceBytes"],
                    compilerArenaBytes=native_cli["limits"]["arenaBytes"],
                    sourceConvention="module path relative to explicit root or cwd",
                    syscallBoundary="typed pure Gleam request state machine + owned Linux effect runner",
                    disassembly=native_cli["disassembly"]),
     selfHosting=True,
-    selfHostingProof="evidence/self-hosting-native-rebuilds.json",
+    selfHostingProof=f"evidence/{PREFIX}-native-rebuilds.json",
     nativeCorpus=self_host["nativeCorpusSummary"],
     tailCalls="direct returned self calls in blocks and cases; arguments evaluated before parameter replacement",
     fullGleamCompatibility=False,
@@ -353,6 +356,6 @@ receipt = dict(
                  'Unaligned/dynamic-size/float and UTF8 codepoint pattern segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'self-hosting-qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'self-hosting-test-output.tap').write_text(suite.stdout)
+(evidence / f'{PREFIX}-qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / f'{PREFIX}-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

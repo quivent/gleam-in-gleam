@@ -1,0 +1,146 @@
+[
+  {
+    "name": "register-leaf-operands",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int)->Nil {echo a+b echo a-b echo a*b echo a/b echo a%b echo a<b echo a>=b Nil} pub fn main()->Nil {f(17,5)}"
+    },
+    "accepted": true,
+    "stdout": "22\n12\n85\n3\n2\nFalse\nTrue\n"
+  },
+  {
+    "name": "register-wide-immediates",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {echo 9007199254740991-2147483648 echo 2147483648+3 Nil}"
+    },
+    "accepted": true,
+    "stdout": "9007197107257343\n2147483651\n"
+  },
+  {
+    "name": "register-left-effect-right-local",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} fn f(n:Int)->Int {mark(4)+n} pub fn main()->Nil {echo f(9) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n13\n"
+  },
+  {
+    "name": "register-spill-right-call",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo mark(11)-mark(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "11\n3\n8\n"
+  },
+  {
+    "name": "register-nested-order",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo {mark(1)+2}*{mark(3) - 1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n3\n6\n"
+  },
+  {
+    "name": "register-string-local-helper",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:String,b:String)->String {a<>b} pub fn main()->Nil {echo f(\"λ\",\"😀\")==\"λ😀\" Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "register-short-circuit-effects",
+    "entry": "main",
+    "files": {
+      "main": "fn mark()->Bool {echo 8 True} pub fn main()->Nil {echo False && mark() echo True || mark() Nil}"
+    },
+    "accepted": true,
+    "stdout": "False\nTrue\n"
+  },
+  {
+    "name": "register-division-zero-leaf",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int)->Nil {echo a/b echo a%b Nil} pub fn main()->Nil {f(13,0)}"
+    },
+    "accepted": true,
+    "stdout": "0\n0\n"
+  },
+  {
+    "name": "signed-nested-call-adjacency",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo {mark(1)+2}*{mark(3)-1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n3\n-3\n"
+  },
+  {
+    "name": "signed-space-after-variable",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {let x=3 echo {x -1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "-1\n"
+  },
+  {
+    "name": "signed-adjacent-variable-subtract",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {let x=3 echo {x-1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n"
+  },
+  {
+    "name": "signed-newline-expression",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {echo {3\n-1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "-1\n"
+  },
+  {
+    "name": "signed-underscored-subtract",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {echo 1_000-1 Nil}"
+    },
+    "accepted": true,
+    "stdout": "999\n"
+  },
+  {
+    "name": "signed-comment-expression",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {let x=3 echo {x // gap\n-1} Nil}"
+    },
+    "accepted": true,
+    "stdout": "-1\n"
+  },
+  {
+    "name": "signed-minus-negative",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {echo 3--1 Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n"
+  },
+  {
+    "name": "signed-missing-argument-comma",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {n} pub fn main()->Nil {echo f(3 -1) Nil}"
+    },
+    "accepted": false,
+    "stdout": ""
+  }
+]

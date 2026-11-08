@@ -594,7 +594,12 @@ fn binary(
       ))
     }
     _ -> {
-      use #(right_code, state) <- c.then(expression(right, state))
+      use #(values, state) <- c.then(binary_values(
+        left,
+        right,
+        left_code,
+        state,
+      ))
       let #(operation, state) = case left.type_ {
         a.StringType -> {
           let name = case op {
@@ -610,11 +615,59 @@ fn binary(
         }
         _ -> operation(op, state)
       }
+      Ok(#(c.append(values, operation), state))
+    }
+  }
+}
+
+// Bounded look-ahead, not a general register allocator. A leaf RHS has no calls,
+// effects or scratch-register clobbers: keep the left word in RCX, right in RAX.
+// Anything else still spills the left word before evaluating the right operand.
+fn register_leaf(e: t.Typed) -> Bool {
+  case e.node {
+    t.IntegerNode(_) | t.BooleanNode(_) | t.UnitNode | t.VariableNode(_) -> True
+    _ -> False
+  }
+}
+
+fn leaf_in_rcx(e: t.Typed, state: State) -> Result(List(asm.Part), String) {
+  case e.node {
+    t.IntegerNode(n) -> Ok([raw(<<72, 185, n:64-little>>)])
+    t.BooleanNode(b) -> {
+      let n = case b {
+        True -> 1
+        False -> 0
+      }
+      Ok([raw(<<72, 185, n:64-little>>)])
+    }
+    t.UnitNode -> Ok([raw(<<72, 185, 0:64-little>>)])
+    t.VariableNode(name) -> {
+      use offset <- c.then(c.lookup(state.env, name))
+      Ok([raw(<<72, 139, 141, offset:32-little>>)])
+    }
+    _ -> Error("Internal non-leaf in RCX materialization")
+  }
+}
+
+fn binary_values(
+  left: t.Typed,
+  right: t.Typed,
+  left_code: List(asm.Part),
+  state: State,
+) -> Generated {
+  case register_leaf(right) {
+    True -> {
+      use saved <- c.then(case register_leaf(left) {
+        True -> leaf_in_rcx(left, state)
+        False -> Ok(c.append(left_code, [raw(<<72, 137, 193>>)]))
+      })
+      use #(rhs, state) <- c.then(expression(right, state))
+      Ok(#(c.append(saved, rhs), state))
+    }
+    False -> {
+      use #(rhs, state) <- c.then(expression(right, state))
       Ok(#(
-        c.append(left_code, [
-          raw(<<80>>),
-          ..c.append(right_code, [raw(<<89>>), ..operation])
-        ]),
+        c.append(left_code, [raw(<<80>>), ..c.append(rhs, [raw(<<89>>)])]),
         state,
       ))
     }

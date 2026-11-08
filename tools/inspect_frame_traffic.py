@@ -5,6 +5,7 @@ These are emitted instruction counts, NOT dynamic spill counts or benchmarks.
 No disassembler or Python becomes a compiler/runtime dependency.
 """
 import argparse
+import bisect
 import collections
 import hashlib
 import json
@@ -42,8 +43,10 @@ for line in listing.splitlines():
         instructions.append((int(match[1], 16), match[2], match[3], line))
 rows = []
 windows = []
+addresses = [i[0] for i in instructions]
 for function in symbols['functions']:
-    body = [i for i in instructions if function['start'] <= i[0] < function['end']]
+    body = instructions[bisect.bisect_left(addresses, function['start']):
+                        bisect.bisect_left(addresses, function['end'])]
     counts = collections.Counter()
     for address, op, operands, line in body:
         counts['instructions'] += 1
