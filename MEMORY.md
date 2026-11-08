@@ -209,3 +209,87 @@ python3 tools/profile_native_allocations.py \
   --function collect@native/definitions --function source_index@native/project \
   --function validate_imports@native/project --function alias_headers@native/project
 ```
+
+## Implemented: direct lookup, then one immutable parse — 2026-11-08
+
+The architecture stayed clear enough to act in two separable increments rather
+than design an elaborate indexing/cache framework first:
+
+1. `6bf1d50` searches existing immutable lists. `core.find` stops at the first match;
+   module, import, alias and nominal-type lookups no longer map whole lists into
+   key/value pairs. Member lookup checks functions first, then constructor lists,
+   preserving precedence, declaration order and visibility. Local membership walks
+   the existing names without allocating a parallel list. Results/errors remain
+   at the original semantic boundary. No hash table or external dependency was added.
+2. `2a140ed` carries `PreparedSource(name, content, parsed)` through CLI loading.
+   It retains the original immutable read and AST; dependencies and linking share
+   that parse. Raw `Source` callers remain valid, including unreachable malformed
+   sources that must not be parsed. No global cache, invalidation protocol, file
+   reload, or second authority was introduced. Cycle, visibility, duplicate-source,
+   mixed raw/prepared input and source-order behavior remain checked.
+
+The same frozen 27-module input is used at every measured stage. Both frontend
+changes emit exactly the same target compiler bytes as the preceding byte-count
+backend: `58065cea325f468ea25f18fea3ca728781dafc43413e59586dabb8427885296e`.
+This output is the older frozen compiler; current-source native fixed-point proof
+is separately recorded in the qualification.
+
+| Same-input rebuilding stage | Allocated bytes | Peak RSS KiB |
+|---|---:|---:|
+| Before byte-count rewrite | 409,183,952 | 400,128 |
+| Byte-count rewrite | 338,729,536 | 331,392 |
+| Also direct lookup | 288,852,736 | 282,496 |
+| Also retained parse | 228,947,576 | 223,744 |
+
+The two frontend increments save **109,781,960 allocated bytes (32.4%)** relative
+to the byte-count stage. Across all three rewrites the saving is **180,236,376
+bytes (44.0%)**. Peak RSS is now **218.5 MiB**, versus **390.8 MiB** at the original
+baseline. Measured RSS can differ slightly with tracing/launch overhead; these are
+observed values, not an identity between resident and allocated bytes.
+
+Within linking, resolution falls **60,433,512 → 10,673,728 bytes**. Total linking
+falls **121,725,864 → 11,941,584 bytes** after both changes. The trace observes
+**27 lexer calls and 27 parser calls**, all during loading, instead of 54 each
+split between loading and linking. The retained state has a small allocation cost;
+net measured savings, rather than subtracting an assumed pass cost, are reported.
+
+[Comparison](evidence/parsed-snapshot-allocation-reduction.json),
+[lookup trace](evidence/lookup-search-allocation-phases.json),
+[retained-parse trace](evidence/parsed-snapshot-allocation-phases.json),
+[whole-phase trace](evidence/parsed-snapshot-full-phases.json).
+
+The lookup-only qualification passes 744 tests. The final qualification passes
+**748 tests**, **383 upstream comparisons**, and all native stage-3 corpus cases.
+Two self-rebuilds are byte-identical to the 645,969-byte native seed, SHA256
+`7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
+Nine complete examples in [GUIDE.md](GUIDE.md) also compile and execute with checked
+outputs; that separate receipt is not added to the regression-suite count.
+
+[Qualification](evidence/parsed-snapshot-qualification.json),
+[native rebuilds](evidence/parsed-snapshot-native-rebuilds.json),
+[guide executions](evidence/parsed-snapshot-guide-execution.json).
+
+### Where the cost moved
+
+The new whole-phase trace still observes code planning at **82,964,584 bytes**,
+type checking at **41,866,200**, assembly at **30,210,408**, and ELF packaging at
+**638,168** on the frozen input. These are inclusive phase volumes: code generation
+contains planning/assembly, so do not sum nested categories. Source intake now does
+one real lex/parse pass and retains its AST. Code planning is the next measured
+candidate, rather than continuing to optimize linking merely because it was once
+largest. There is still no GC or third-party native dependency.
+
+These choices are revisable. Direct scans may eventually become reusable indexes;
+AST lifetime management may change. Preserved commits, fixed-input measurements,
+explicit raw/prepared APIs and the full supported language guide make that revision
+possible without hiding semantic regressions behind a broad architectural rewrite.
+
+### Timing: a memory win, without a broad speed claim
+
+The final five-repeat untraced comparison uses the preceding byte-count compiler
+as baseline. Median CPU is **4.833 → 4.730 seconds** (2.1% lower); median wall time
+is **5.102 → 5.150 seconds** (0.9% higher). Untraced maximum RSS is **323.6 → 218.9
+MiB**. The earlier trace measured 218.5 MiB; retain that run distinction. Allocation
+reductions do not translate proportionally into timing improvements. Other phases
+remain unchanged and the arena allocator itself is simple. [All samples and ranges](BENCHMARKS.md)
+are retained, including the separately measured lookup-only increment.

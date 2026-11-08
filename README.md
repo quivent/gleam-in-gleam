@@ -54,12 +54,15 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **644,591 bytes**, SHA256
-`47999bf4831281341ad5e2d8ca15e49663d67fe5304a302ca6c44f6685995c7f`.
+The native image is **645,969 bytes**, SHA256
+`7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/byte-count-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/parsed-snapshot-native-rebuilds.json).
+
+Read the [complete implementation and language guide](GUIDE.md) for syntax,
+CLI usage, architecture, representation, verification and explicit limitations.
 
 ## Run the current implementation
 
@@ -789,6 +792,22 @@ A phase trace found millions of temporary byte-tail descriptors in pure counting
 loops. Structural recognition now replaces exactly that effect-free loop with a
 length load and checked addition; it never chooses an optimization by function name.
 On identical frozen compiler input, allocated volume falls **17.2%** and peak RSS
-falls **390.8 → 323.6 MiB**, without GC. The current compiler is 644,591 bytes;
-744 tests, 383 upstream comparisons and two byte-identical native rebuilds pass.
+falls **390.8 → 323.6 MiB**, without GC. At that milestone the compiler was 644,591 bytes;
+744 tests, 383 upstream comparisons and two byte-identical native rebuilds passed.
 See [MEMORY.md](MEMORY.md) for measurements, emitted instructions and remaining work.
+
+
+## Direct lookup and retained parsed sources — 2026-11-08
+
+Project resolution now searches immutable lists without rebuilding temporary name
+maps. CLI loading retains each parsed module alongside its original read snapshot;
+linking reuses that AST. Raw source callers remain supported and unreachable raw
+sources remain unparsed. No persistent mutable cache or runtime dependency was added.
+
+On the same frozen input as the previous experiment, resolution allocation falls
+60.4 → 10.7 MB, and duplicate lex/parse work is eliminated. Total rebuild allocation
+falls 338.7 → 228.9 MB; peak RSS falls 323.6 → 218.5 MiB. Compared with the original
+pre-byte-count baseline, allocation is down 44.0%. The native image is 645,969 bytes.
+All 748 tests and 383 upstream comparisons pass; native rebuilds are byte-identical.
+See [MEMORY.md](MEMORY.md), [the full guide](GUIDE.md) and the separately retained
+[qualification](evidence/parsed-snapshot-qualification.json).

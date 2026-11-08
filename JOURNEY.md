@@ -658,3 +658,27 @@ The code generator and runtime remain unchanged. We preserved the detailed trace
 hash, additive summary and output verification, and paused the next rewrite to
 ask Jay for advice on lookup indexing, parse-once ownership and cursor/span input.
 See [MEMORY.md](MEMORY.md) for the complete breakdown and cautions.
+
+## Act on the measured direction, keep the increments reversible — 2026-11-08
+
+Jay's advice was to choose a direction while the architecture is clear, understand
+that a sequence of optimizations may later be replaced, and avoid over-planning.
+We removed rebuilt lookup lists first, then retained parsed source snapshots.
+
+Direct search preserves lookup order and privacy without allocating parallel name
+lists. Resolution allocation falls 60.4 to 10.7 MB. Parse-once carries the existing
+immutable source bytes with their AST through loading/linking, preserving raw API
+compatibility and unreachable-source behavior. Actual traces show 27 rather than 54
+lexer/parser calls. No global mutable cache or invalidation machinery was needed.
+
+Combined with the earlier byte-count rewrite, same-input allocation falls 409.2 to
+228.9 MB and peak RSS 390.8 to 218.5 MiB. The current native compiler grows modestly
+to 645,969 bytes. The final 748 tests, 383 independent upstream comparisons and
+byte-identical native rebuilds pass. These volumes do not prove live heap size;
+separate repeated benchmarks retain timing and host variation.
+
+The new GUIDE.md documents installation/bootstrap versus native use, language
+syntax/examples, exact supported semantics, module/AST/type-checking architecture,
+ASM/register/runtime layout constraints, compiler API, limits and extension rules.
+All nine complete Gleam examples execute with checked outputs. Lookup and AST
+changes are separate commits so we can revise either when later evidence warrants.

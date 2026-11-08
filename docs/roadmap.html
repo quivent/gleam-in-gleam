@@ -26,7 +26,7 @@
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "5844aec5f47675e066426f3ead7ceeeadf4cf152",
+  "sourceRevision": "2a140ed7fb421f2ce70f333328b2705070d2933c",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -35,8 +35,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/byte-count-qualification.json",
-  "ioVerification": "evidence/byte-count-io-verification.json",
+  "verification": "evidence/parsed-snapshot-qualification.json",
+  "ioVerification": "evidence/parsed-snapshot-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -74,15 +74,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/byte-count-io-verification.json"
+          "path": "evidence/parsed-snapshot-io-verification.json"
         },
         {
-          "label": "744 checks and 383 upstream comparisons",
-          "path": "evidence/byte-count-qualification.json"
+          "label": "748 checks and 383 upstream comparisons",
+          "path": "evidence/parsed-snapshot-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/byte-count-disassembly.txt"
+          "path": "evidence/parsed-snapshot-disassembly.txt"
         }
       ],
       "related": [],
@@ -128,7 +128,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/byte-count-native-rebuilds.json"
+          "path": "evidence/parsed-snapshot-native-rebuilds.json"
         }
       ],
       "related": [
@@ -146,7 +146,7 @@
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "744 regression checks and 383 fresh upstream comparisons are separately recorded.",
+        "748 regression checks and 383 fresh upstream comparisons are separately recorded.",
         "Stage 3 compiles 251 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
@@ -172,15 +172,15 @@
       "evidence": [
         {
           "label": "383 native cases, individual outcomes",
-          "path": "evidence/byte-count-native-rebuilds.json"
+          "path": "evidence/parsed-snapshot-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/byte-count-project-upstream-checks.json"
+          "path": "evidence/parsed-snapshot-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/byte-count-upstream-checks.json"
+          "path": "evidence/parsed-snapshot-upstream-checks.json"
         }
       ],
       "related": [
@@ -194,12 +194,12 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 644,591-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 645,969-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 27 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65.",
+        "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 28 actual compiler modules are read through the native IO path.",
+        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7483110403dc80f7c757fab0a893add0089a367ca8b65.",
         "The rebuilt image runs --version and qualifies the entire 383-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
@@ -224,7 +224,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/byte-count-native-rebuilds.json"
+          "path": "evidence/parsed-snapshot-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/byte-count-project-upstream-checks.json"
+          "path": "evidence/parsed-snapshot-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -338,9 +338,9 @@
       "title": "Measured optimization",
       "scope": "extension",
       "status": "partial",
-      "statusLabel": "Partial · byte-count allocation reduced",
+      "statusLabel": "Partial · lookup and parse reuse measured",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Profile linker/parser allocation next; preserve source and effect semantics. Crew CLI integration awaits its separate owner’s pushed revision.",
+      "nextAction": "Profile code-planning allocation next, with the current immutable frontend qualified; preserve separate rollback-friendly increments.",
       "specMaturity": "Scalar CFG/calls qualified and benchmarked; general whole-function scope remains",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
@@ -357,7 +357,8 @@
         "A separate seeded call program verifies 286 calls and 386 ordered effects. The fixed compiler-source image is unchanged; no broad speedup is claimed.",
         "Scalar comparisons, short-circuit expressions and supported two-arm cases now use successor-aware CFG liveness and real joins.",
         "Repeated benchmarks show no conclusive broad speedup; identical-code controls expose shared-host wall noise. Actual current-source self-build: 8.75 s median wall, 7.42 s CPU, 390.8 MiB peak RSS.",
-        "On identical frozen input, structurally recognized byte counting reduces allocation 409,183,952 to 338,729,536 bytes and peak RSS 390.8 to 323.6 MiB, without GC. Earlier timing above remains historical."
+        "On identical frozen input, structurally recognized byte counting reduces allocation 409,183,952 to 338,729,536 bytes and peak RSS 390.8 to 323.6 MiB, without GC. Earlier timing above remains historical.",
+        "Direct immutable lookup and parse-once handoff reduce same-input allocation further to 228,947,576 bytes and peak RSS to 218.5 MiB. Raw-source compatibility and unreachable-source behavior are tested."
       ],
       "acceptance": [
         {
@@ -409,6 +410,22 @@
         {
           "label": "Repeated fixed-input compilation timings",
           "path": "evidence/byte-count-benchmark.json"
+        },
+        {
+          "label": "Frontend allocation stages",
+          "path": "evidence/parsed-snapshot-allocation-reduction.json"
+        },
+        {
+          "label": "748 tests and exact native rebuilds",
+          "path": "evidence/parsed-snapshot-qualification.json"
+        },
+        {
+          "label": "Language, usage and architecture reference",
+          "path": "GUIDE.md"
+        },
+        {
+          "label": "Frontend timing and RSS repeats",
+          "path": "evidence/parsed-snapshot-benchmark.json"
         }
       ],
       "related": [
@@ -464,16 +481,16 @@
     }
   ],
   "metrics": {
-    "tests": 744,
+    "tests": 748,
     "upstream": 383,
     "examples": 16,
-    "cliBytes": 644591,
+    "cliBytes": 645969,
     "sourceLimitBytes": 131072,
-    "observedAt": "2026-11-08T13:25:30.642872+00:00"
+    "observedAt": "2026-11-08T14:08:11.737079+00:00"
   },
   "evidenceSHA256": {
-    "evidence/byte-count-qualification.json": "0e418279ae7dde1f4bf8c25935cb13bba8eb12aaaabd9909f088db06f4efa0b7",
-    "evidence/byte-count-io-verification.json": "8bacacd036ca3a03f2db5f258102f199aabb9f1176d89ba7d626098f2dd717ce"
+    "evidence/parsed-snapshot-qualification.json": "de48baf62ed7b6bed018926ac70918b212a7c2042c60c9172cf96745ee0ff383",
+    "evidence/parsed-snapshot-io-verification.json": "30b721ff7a29f5387ff52575ac2c840ddb5a70f12f79526faf7bb4863a9c2d25"
   }
 }</script>
 <script>

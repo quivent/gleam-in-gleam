@@ -138,3 +138,32 @@ output is 637,775 bytes vs 637,999 before. Current 28-module self-rebuilds remai
 byte-identical to the candidate. See [all samples](evidence/byte-count-benchmark.json)
 and [phase allocation analysis](MEMORY.md). Earlier measurements above are retained
 as historical results, not overwritten with this later improvement.
+
+## Direct lookup and retained parse — 2026-11-08
+
+These changes primarily reduce memory use. Two independent repeated comparisons
+use the same frozen `7fc27b6` compiler input and the preceding byte-count compiler
+as baseline. Five alternating repeats follow one warm-up per variant; host variation
+is preserved rather than turning allocation savings into a predicted speedup.
+
+| Comparison | Baseline CPU median | Candidate CPU median | Baseline wall median | Candidate wall median |
+|---|---:|---:|---:|---:|
+| Direct lookup only | 5.016 s | 4.867 s | 6.233 s | 5.720 s |
+| Lookup + retained parse | 4.833 s | 4.730 s | 5.102 s | 5.150 s |
+
+The final combined comparison uses about **2.1% less CPU time**, while median wall
+time is about **0.9% higher**. That is not a convincing broad wall-speed improvement.
+The memory result is much stronger: final untraced maximum RSS is **224,128 KiB**
+(218.9 MiB), vs **331,392 KiB** (323.6 MiB) for that run's baseline. Trace-derived
+RSS is slightly different (218.5 MiB); retain both as observations of different runs.
+Allocation falls 338,729,536 → 228,947,576 bytes in the separate cursor traces.
+
+Lookup-only wall ranges are 5.654–7.290 s baseline and 5.463–9.568 s candidate;
+final ranges are 4.741–5.411 s baseline and 5.125–5.250 s candidate. Do not compare
+medians from the two different runs as though they were controlled against each
+other. The baseline itself varies. Both frontend candidates emit the exact same
+frozen-target compiler hash as the preceding byte-count backend.
+
+[Lookup-only samples](evidence/lookup-search-benchmark.json),
+[combined samples](evidence/parsed-snapshot-benchmark.json),
+[allocation evidence](evidence/parsed-snapshot-allocation-reduction.json).

@@ -23,14 +23,14 @@ compatibility score. The extension workstreams below remain incomplete.
 
 ## Verified starting point
 
-All 27 compiler modules rebuild through the native effect-runner entry. Stages
-1, 2 and 3 are byte-identical: 644,591 bytes, SHA256
-`47999bf4831281341ad5e2d8ca15e49663d67fe5304a302ca6c44f6685995c7f`.
+All 28 compiler modules rebuild through the native effect-runner entry. Stages
+1, 2 and 3 are byte-identical: 645,969 bytes, SHA256
+`7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
 The stage-3 compiler passes 383 corpus cases; every accepted output matches the
-bootstrap bytes and executes correctly. Full qualification includes 744 tests,
+bootstrap bytes and executes correctly. Full qualification includes 748 tests,
 383 independent upstream comparisons, 16 examples and 59 native IO checks.
 See [the proof](SELF_HOSTING.md) and
-[qualification receipt](evidence/byte-count-qualification.json).
+[qualification receipt](evidence/parsed-snapshot-qualification.json).
 
 The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
 Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
@@ -59,7 +59,7 @@ receipts remain preserved under their original names.
    Two native self-rebuilds from the exact frozen source match the seed. A separate
    changed-source control produces the correctly changed compiler. Source hashes,
    stage images, native corpus and ELF observations are retained in
-   [the rebuild receipt](evidence/byte-count-native-rebuilds.json).
+   [the rebuild receipt](evidence/parsed-snapshot-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -85,6 +85,9 @@ receipts remain preserved under their original names.
    with caller saves. Scalar joins now have successor-aware liveness; general
    pattern/data/control-flow boundaries remain. Actual benchmarks are recorded in
    [BENCHMARKS.md](BENCHMARKS.md), with no conclusive broad speedup.
+   Direct searches and retained parsed sources now reduce same-input rebuild
+   allocation to 228.9 MB and peak RSS to about 219 MiB; code planning is the next
+   measured allocation candidate. See [MEMORY.md](MEMORY.md) and [GUIDE.md](GUIDE.md).
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
    retaining correctness checks. Jay specifically requested look-ahead to avoid

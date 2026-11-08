@@ -1,0 +1,393 @@
+Actual native CLI instruction windows; includes trailing instructions after selected prefixes.
+
+entry/dispatch prefix
+
+native-cli-window-0.bin:     file format binary
+
+
+Disassembly of section .data:
+
+00000000004000b0 <.data>:
+  4000b0:	55                   	push   %rbp
+  4000b1:	48 89 e5             	mov    %rsp,%rbp
+  4000b4:	48 81 ec 40 00 00 00 	sub    $0x40,%rsp
+  4000bb:	e8 a5 82 09 00       	call   0x498365
+  4000c0:	e8 f5 be 05 00       	call   0x45bfba
+  4000c5:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+  4000cc:	48 8b 48 08          	mov    0x8(%rax),%rcx
+  4000d0:	48 81 f9 ba 00 00 00 	cmp    $0xba,%rcx
+  4000d7:	0f 84 38 00 00 00    	je     0x400115
+  4000dd:	48 81 f9 bb 00 00 00 	cmp    $0xbb,%rcx
+  4000e4:	0f 84 53 00 00 00    	je     0x40013d
+  4000ea:	48 81 f9 bc 00 00 00 	cmp    $0xbc,%rcx
+  4000f1:	0f 84 8a 00 00 00    	je     0x400181
+  4000f7:	48 81 f9 bd 00 00 00 	cmp    $0xbd,%rcx
+  4000fe:	0f 84 bd 00 00 00    	je     0x4001c1
+  400104:	48 bf 46 00 00 00 00 	movabs $0x46,%rdi
+  40010b:	00 00 00
+  40010e:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  400113:	0f 05                	syscall
+  400115:	48 8d bd 08 00 00 00 	lea    0x8(%rbp),%rdi
+  40011c:	e8 84 76 09 00       	call   0x4977a5
+  400121:	48 81 f8 01 00 00 00 	cmp    $0x1,%rax
+  400128:	0f 84 0f 01 00 00    	je     0x40023d
+  40012e:	50                   	push   %rax
+  40012f:	e8 c0 be 05 00       	call   0x45bff4
+  400134:	48 83 c4 08          	add    $0x8,%rsp
+  400138:	e9 88 ff ff ff       	jmp    0x4000c5
+  40013d:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  400144:	48 8b 50 20          	mov    0x20(%rax),%rdx
+  400148:	48 89 95 e8 ff ff ff 	mov    %rdx,-0x18(%rbp)
+  40014f:	48 8b 70 18          	mov    0x18(%rax),%rsi
+  400153:	48 8b 78 10          	mov    0x10(%rax),%rdi
+  400157:	e8 1d 77 09 00       	call   0x497879
+  40015c:	48 89 85 e0 ff ff ff 	mov    %rax,-0x20(%rbp)
+  400163:	48 8b 85 e8 ff ff ff 	mov    -0x18(%rbp),%rax
+  40016a:	50                   	push   %rax
+  40016b:	48 8b 85 e0 ff ff ff 	mov    -0x20(%rbp),%rax
+  400172:	50                   	push   %rax
+  400173:	e8 af d2 05 00       	call   0x45d427
+  400178:	48 83 c4 10          	add    $0x10,%rsp
+  40017c:	e9 44 ff ff ff       	jmp    0x4000c5
+  400181:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  400188:	48 8b 78 10          	mov    0x10(%rax),%rdi
+  40018c:	48 89 bd e8 ff ff ff 	mov    %rdi,-0x18(%rbp)
+  400193:	48 8b 70 18          	mov    0x18(%rax),%rsi
+  400197:	e8 40 7b 09 00       	call   0x497cdc
+  40019c:	48 89 85 e0 ff ff ff 	mov    %rax,-0x20(%rbp)
+  4001a3:	48 8b 85 e8 ff ff ff 	mov    -0x18(%rbp),%rax
+  4001aa:	50                   	push   %rax
+  4001ab:	48 8b 85 e0 ff ff ff 	mov    -0x20(%rbp),%rax
+  4001b2:	50                   	push   %rax
+  4001b3:	e8 5e d6 05 00       	call   0x45d816
+  4001b8:	48 83 c4 10          	add    $0x10,%rsp
+  4001bc:	e9 04 ff ff ff       	jmp    0x4000c5
+  4001c1:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  4001c8:	48 8b 78 10          	mov    0x10(%rax),%rdi
+  4001cc:	48 89 bd e8 ff ff ff 	mov    %rdi,-0x18(%rbp)
+  4001d3:	48 8b 70 18          	mov    0x18(%rax),%rsi
+  4001d7:	48 8b 50 20          	mov    0x20(%rax),%rdx
+  4001db:	48 bf 01 00 00 00 00 	movabs $0x1,%rdi
+  4001e2:	00 00 00
+  4001e5:	48 85 d2             	test   %rdx,%rdx
+  4001e8:	0f 84 0a 00 00 00    	je     0x4001f8
+  4001ee:	48 bf 02 00 00 00 00 	movabs $0x2,%rdi
+  4001f5:	00 00 00
+  4001f8:	48 8b 16             	mov    (%rsi),%rdx
+  4001fb:	48 85 d2             	test   %rdx,%rdx
+  4001fe:	0f 84 1a 00 00 00    	je     0x40021e
+  400204:	48 83 c2 01          	add    $0x1,%rdx
+  400208:	48 83 c6 08          	add    $0x8,%rsi
+  40020c:	e8 20 7a 09 00       	call   0x497c31
+  400211:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  400218:	0f 8c 0e 00 00 00    	jl     0x40022c
+  40021e:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  400225:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  40022a:	0f 05                	syscall
+  40022c:	48 bf 01 00 00 00 00 	movabs $0x1,%rdi
+  400233:	00 00 00
+  400236:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  40023b:	0f 05                	syscall
+  40023d:	48 8d 35 a6 7d 09 00 	lea    0x97da6(%rip),%rsi        # 0x497fea
+  400244:	48 8b 16             	mov    (%rsi),%rdx
+  400247:	48 83 c2 01          	add    $0x1,%rdx
+  40024b:	48 83 c6 08          	add    $0x8,%rsi
+  40024f:	48 bf 02 00 00 00 00 	movabs $0x2,%rdi
+  400256:	00 00 00
+  400259:	e8 d3 79 09 00       	call   0x497c31
+  40025e:	48 bf 02 00 00 00 00 	movabs $0x2,%rdi
+  400265:	00 00 00
+  400268:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  40026d:	0f 05                	syscall
+  40026f:	55                   	push   %rbp
+  400270:	48 89 e5             	mov    %rsp,%rbp
+  400273:	48 81 ec 20 00 00 00 	sub    $0x20,%rsp
+  40027a:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  400281:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  400288:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  40028f:	48 85 c0             	test   %rax,%rax
+  400292:	0f 84 52 00 00 00    	je     0x4002ea
+  400298:	48 81 78 08 2f 00 00 	cmpq   $0x2f,0x8(%rax)
+  40029f:	00
+  4002a0:	0f 85 44 00 00 00    	jne    0x4002ea
+  4002a6:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  4002ad:	48 8b 80 10 00 00 00 	mov    0x10(%rax),%rax
+  4002b4:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+  4002bb:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  4002c2:	48 8b 80 18 00 00 00 	mov    0x18(%rax),%rax
+  4002c9:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  4002d0:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+  4002d7:	50                   	push   %rax
+  4002d8:	58                   	pop    %rax
+  4002d9:	48 89 85 10 00 00 00 	mov    %rax,0x10(%rbp)
+  4002e0:	e9 95 ff ff ff       	jmp    0x40027a
+  4002e5:	e9 11 00 00 00       	jmp    0x4002fb
+  4002ea:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  4002f1:	e9 05 00 00 00       	jmp    0x4002fb
+  4002f6:	e9 d2 7f 09 00       	jmp    0x4982cd
+  4002fb:	c9                   	leave
+  4002fc:	c3                   	ret
+  4002fd:	55                   	push   %rbp
+  4002fe:	48 89 e5             	mov    %rsp,%rbp
+  400301:	48 81 ec 10 00 00 00 	sub    $0x10,%rsp
+  400308:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+  40030f:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  400316:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  40031d:	48 85 c0             	test   %rax,%rax
+  400320:	0f 84 6a 00 00 00    	je     0x400390
+  400326:	48 81 78 08 be 00 00 	cmpq   $0xbe,0x8(%rax)
+  40032d:	00
+  40032e:	0f                   	.byte 0xf
+  40032f:	85                   	.byte 0x85
+
+owned read syscall helper prefix
+
+native-cli-window-1.bin:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000497879 <.data>:
+  497879:	55                   	push   %rbp
+  49787a:	48 89 e5             	mov    %rsp,%rbp
+  49787d:	48 81 ec 10 01 00 00 	sub    $0x110,%rsp
+  497884:	48 89 bd b8 ff ff ff 	mov    %rdi,-0x48(%rbp)
+  49788b:	48 89 b5 b0 ff ff ff 	mov    %rsi,-0x50(%rbp)
+  497892:	48 b8 ff ff ff ff ff 	movabs $0xffffffffffffffff,%rax
+  497899:	ff ff ff
+  49789c:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  4978a3:	48 89 85 e0 ff ff ff 	mov    %rax,-0x20(%rbp)
+  4978aa:	e8 7d fd ff ff       	call   0x49762c
+  4978af:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  4978b6:	0f 84 b2 02 00 00    	je     0x497b6e
+  4978bc:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  4978c3:	48 8b bd b0 ff ff ff 	mov    -0x50(%rbp),%rdi
+  4978ca:	e8 5d fd ff ff       	call   0x49762c
+  4978cf:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  4978d6:	0f 84 92 02 00 00    	je     0x497b6e
+  4978dc:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+  4978e3:	48 bf 9c ff ff ff ff 	movabs $0xffffffffffffff9c,%rdi
+  4978ea:	ff ff ff
+  4978ed:	48 8b b5 f8 ff ff ff 	mov    -0x8(%rbp),%rsi
+  4978f4:	48 ba 00 00 29 00 00 	movabs $0x290000,%rdx
+  4978fb:	00 00 00
+  4978fe:	b8 01 01 00 00       	mov    $0x101,%eax
+  497903:	0f 05                	syscall
+  497905:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  49790c:	0f 84 d1 ff ff ff    	je     0x4978e3
+  497912:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497919:	0f 8c 5b 02 00 00    	jl     0x497b7a
+  49791f:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  497926:	48 b8 00 08 0a 00 00 	movabs $0xa0800,%rax
+  49792d:	00 00 00
+  497930:	48 89 85 98 ff ff ff 	mov    %rax,-0x68(%rbp)
+  497937:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+  49793e:	00 00 00
+  497941:	48 89 85 a0 ff ff ff 	mov    %rax,-0x60(%rbp)
+  497948:	48 b8 0e 00 00 00 00 	movabs $0xe,%rax
+  49794f:	00 00 00
+  497952:	48 89 85 a8 ff ff ff 	mov    %rax,-0x58(%rbp)
+  497959:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497960:	48 8b b5 f0 ff ff ff 	mov    -0x10(%rbp),%rsi
+  497967:	48 8d 95 98 ff ff ff 	lea    -0x68(%rbp),%rdx
+  49796e:	41 ba 18 00 00 00    	mov    $0x18,%r10d
+  497974:	b8 b5 01 00 00       	mov    $0x1b5,%eax
+  497979:	0f 05                	syscall
+  49797b:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497982:	0f 84 d1 ff ff ff    	je     0x497959
+  497988:	48 81 f8 da ff ff ff 	cmp    $0xffffffffffffffda,%rax
+  49798f:	0f 84 f1 01 00 00    	je     0x497b86
+  497995:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  49799c:	0f 8c f0 01 00 00    	jl     0x497b92
+  4979a2:	48 89 85 e0 ff ff ff 	mov    %rax,-0x20(%rbp)
+  4979a9:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  4979b0:	48 b8 ff ff ff ff ff 	movabs $0xffffffffffffffff,%rax
+  4979b7:	ff ff ff
+  4979ba:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  4979c1:	b8 03 00 00 00       	mov    $0x3,%eax
+  4979c6:	0f 05                	syscall
+  4979c8:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  4979cf:	0f 8c c9 01 00 00    	jl     0x497b9e
+  4979d5:	48 8b bd e0 ff ff ff 	mov    -0x20(%rbp),%rdi
+  4979dc:	48 8d b5 00 ff ff ff 	lea    -0x100(%rbp),%rsi
+  4979e3:	b8 05 00 00 00       	mov    $0x5,%eax
+  4979e8:	0f 05                	syscall
+  4979ea:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  4979f1:	0f 84 de ff ff ff    	je     0x4979d5
+  4979f7:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  4979fe:	0f 8c a6 01 00 00    	jl     0x497baa
+  497a04:	8b 85 18 ff ff ff    	mov    -0xe8(%rbp),%eax
+  497a0a:	25 00 f0 00 00       	and    $0xf000,%eax
+  497a0f:	48 81 f8 00 80 00 00 	cmp    $0x8000,%rax
+  497a16:	0f 85 9a 01 00 00    	jne    0x497bb6
+  497a1c:	48 8b 85 30 ff ff ff 	mov    -0xd0(%rbp),%rax
+  497a23:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497a2a:	0f 8c 92 01 00 00    	jl     0x497bc2
+  497a30:	48 81 f8 00 00 02 00 	cmp    $0x20000,%rax
+  497a37:	0f 87 85 01 00 00    	ja     0x497bc2
+  497a3d:	48 89 85 d8 ff ff ff 	mov    %rax,-0x28(%rbp)
+  497a44:	48 83 c0 30          	add    $0x30,%rax
+  497a48:	48 83 e0 f8          	and    $0xfffffffffffffff8,%rax
+  497a4c:	48 89 c7             	mov    %rax,%rdi
+  497a4f:	e8 4b 09 00 00       	call   0x49839f
+  497a54:	48 89 85 d0 ff ff ff 	mov    %rax,-0x30(%rbp)
+  497a5b:	48 89 38             	mov    %rdi,(%rax)
+  497a5e:	48 c7 40 08 ff ff ff 	movq   $0xffffffffffffffff,0x8(%rax)
+  497a65:	ff
+  497a66:	48 8b 8d d8 ff ff ff 	mov    -0x28(%rbp),%rcx
+  497a6d:	48 89 48 10          	mov    %rcx,0x10(%rax)
+  497a71:	48 8d 50 28          	lea    0x28(%rax),%rdx
+  497a75:	48 89 50 18          	mov    %rdx,0x18(%rax)
+  497a79:	48 c7 40 20 00 00 00 	movq   $0x0,0x20(%rax)
+  497a80:	00
+  497a81:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+  497a88:	00 00 00
+  497a8b:	48 89 85 c8 ff ff ff 	mov    %rax,-0x38(%rbp)
+  497a92:	48 8b 85 d0 ff ff ff 	mov    -0x30(%rbp),%rax
+  497a99:	48 8b 70 18          	mov    0x18(%rax),%rsi
+  497a9d:	48 8b 8d c8 ff ff ff 	mov    -0x38(%rbp),%rcx
+  497aa4:	48 01 ce             	add    %rcx,%rsi
+  497aa7:	48 8b 95 d8 ff ff ff 	mov    -0x28(%rbp),%rdx
+  497aae:	48 83 c2 01          	add    $0x1,%rdx
+  497ab2:	48 29 ca             	sub    %rcx,%rdx
+  497ab5:	48 81 fa 00 10 00 00 	cmp    $0x1000,%rdx
+  497abc:	0f 86 0a 00 00 00    	jbe    0x497acc
+  497ac2:	48 ba 00 10 00 00 00 	movabs $0x1000,%rdx
+  497ac9:	00 00 00
+  497acc:	48 8b bd e0 ff ff ff 	mov    -0x20(%rbp),%rdi
+  497ad3:	b8 00 00 00 00       	mov    $0x0,%eax
+  497ad8:	0f 05                	syscall
+  497ada:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497ae1:	0f 84 ab ff ff ff    	je     0x497a92
+  497ae7:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497aee:	0f 8c da 00 00 00    	jl     0x497bce
+  497af4:	0f                   	.byte 0xf
+  497af5:	84 23                	test   %ah,(%rbx)
+	...
+
+owned write syscall helper prefix
+
+native-cli-window-2.bin:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000497cdc <.data>:
+  497cdc:	55                   	push   %rbp
+  497cdd:	48 89 e5             	mov    %rsp,%rbp
+  497ce0:	48 81 ec 50 00 00 00 	sub    $0x50,%rsp
+  497ce7:	48 89 bd c8 ff ff ff 	mov    %rdi,-0x38(%rbp)
+  497cee:	48 89 b5 e0 ff ff ff 	mov    %rsi,-0x20(%rbp)
+  497cf5:	48 b8 ff ff ff ff ff 	movabs $0xffffffffffffffff,%rax
+  497cfc:	ff ff ff
+  497cff:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  497d06:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+  497d0d:	00 00 00
+  497d10:	48 89 85 b8 ff ff ff 	mov    %rax,-0x48(%rbp)
+  497d17:	e8 10 f9 ff ff       	call   0x49762c
+  497d1c:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497d23:	0f 84 a1 01 00 00    	je     0x497eca
+  497d29:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  497d30:	48 8b 85 c8 ff ff ff 	mov    -0x38(%rbp),%rax
+  497d37:	50                   	push   %rax
+  497d38:	b8 27 00 00 00       	mov    $0x27,%eax
+  497d3d:	0f 05                	syscall
+  497d3f:	50                   	push   %rax
+  497d40:	e8 2b 5c fc ff       	call   0x45d970
+  497d45:	48 83 c4 10          	add    $0x10,%rsp
+  497d49:	48 89 c7             	mov    %rax,%rdi
+  497d4c:	e8 db f8 ff ff       	call   0x49762c
+  497d51:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497d58:	0f 84 6c 01 00 00    	je     0x497eca
+  497d5e:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+  497d65:	48 bf 9c ff ff ff ff 	movabs $0xffffffffffffff9c,%rdi
+  497d6c:	ff ff ff
+  497d6f:	48 8b b5 f0 ff ff ff 	mov    -0x10(%rbp),%rsi
+  497d76:	48 ba c1 00 0a 00 00 	movabs $0xa00c1,%rdx
+  497d7d:	00 00 00
+  497d80:	41 ba 80 01 00 00    	mov    $0x180,%r10d
+  497d86:	b8 01 01 00 00       	mov    $0x101,%eax
+  497d8b:	0f 05                	syscall
+  497d8d:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497d94:	0f 84 cb ff ff ff    	je     0x497d65
+  497d9a:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497da1:	0f 8c 2f 01 00 00    	jl     0x497ed6
+  497da7:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  497dae:	48 b8 01 00 00 00 00 	movabs $0x1,%rax
+  497db5:	00 00 00
+  497db8:	48 89 85 b8 ff ff ff 	mov    %rax,-0x48(%rbp)
+  497dbf:	48 8b 85 e0 ff ff ff 	mov    -0x20(%rbp),%rax
+  497dc6:	48 8b 70 18          	mov    0x18(%rax),%rsi
+  497dca:	48 8b 50 10          	mov    0x10(%rax),%rdx
+  497dce:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497dd5:	e8 57 fe ff ff       	call   0x497c31
+  497dda:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497de1:	0f 8c fb 00 00 00    	jl     0x497ee2
+  497de7:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497dee:	48 be ed 01 00 00 00 	movabs $0x1ed,%rsi
+  497df5:	00 00 00
+  497df8:	b8 5b 00 00 00       	mov    $0x5b,%eax
+  497dfd:	0f 05                	syscall
+  497dff:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497e06:	0f 84 db ff ff ff    	je     0x497de7
+  497e0c:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497e13:	0f 8c d5 00 00 00    	jl     0x497eee
+  497e19:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497e20:	b8 4a 00 00 00       	mov    $0x4a,%eax
+  497e25:	0f 05                	syscall
+  497e27:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497e2e:	0f 84 e5 ff ff ff    	je     0x497e19
+  497e34:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497e3b:	0f 8c b9 00 00 00    	jl     0x497efa
+  497e41:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497e48:	48 b8 ff ff ff ff ff 	movabs $0xffffffffffffffff,%rax
+  497e4f:	ff ff ff
+  497e52:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+  497e59:	b8 03 00 00 00       	mov    $0x3,%eax
+  497e5e:	0f 05                	syscall
+  497e60:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497e67:	0f 8c 99 00 00 00    	jl     0x497f06
+  497e6d:	48 bf 9c ff ff ff ff 	movabs $0xffffffffffffff9c,%rdi
+  497e74:	ff ff ff
+  497e77:	48 8b b5 f0 ff ff ff 	mov    -0x10(%rbp),%rsi
+  497e7e:	48 ba 9c ff ff ff ff 	movabs $0xffffffffffffff9c,%rdx
+  497e85:	ff ff ff
+  497e88:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  497e8f:	49 89 c2             	mov    %rax,%r10
+  497e92:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+  497e98:	b8 3c 01 00 00       	mov    $0x13c,%eax
+  497e9d:	0f 05                	syscall
+  497e9f:	48 81 f8 fc ff ff ff 	cmp    $0xfffffffffffffffc,%rax
+  497ea6:	0f 84 c1 ff ff ff    	je     0x497e6d
+  497eac:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497eb3:	0f 8c 59 00 00 00    	jl     0x497f12
+  497eb9:	48 bf 00 00 00 00 00 	movabs $0x0,%rdi
+  497ec0:	00 00 00
+  497ec3:	e8 a8 00 00 00       	call   0x497f70
+  497ec8:	c9                   	leave
+  497ec9:	c3                   	ret
+  497eca:	48 8d 05 f3 02 00 00 	lea    0x2f3(%rip),%rax        # 0x4981c4
+  497ed1:	e9 48 00 00 00       	jmp    0x497f1e
+  497ed6:	48 8d 05 0e 03 00 00 	lea    0x30e(%rip),%rax        # 0x4981eb
+  497edd:	e9 3c 00 00 00       	jmp    0x497f1e
+  497ee2:	48 8d 05 33 03 00 00 	lea    0x333(%rip),%rax        # 0x49821c
+  497ee9:	e9 30 00 00 00       	jmp    0x497f1e
+  497eee:	48 8d 05 43 03 00 00 	lea    0x343(%rip),%rax        # 0x498238
+  497ef5:	e9 24 00 00 00       	jmp    0x497f1e
+  497efa:	48 8d 05 53 03 00 00 	lea    0x353(%rip),%rax        # 0x498254
+  497f01:	e9 18 00 00 00       	jmp    0x497f1e
+  497f06:	48 8d 05 63 03 00 00 	lea    0x363(%rip),%rax        # 0x498270
+  497f0d:	e9 0c 00 00 00       	jmp    0x497f1e
+  497f12:	48 8d 05 73 03 00 00 	lea    0x373(%rip),%rax        # 0x49828c
+  497f19:	e9 00 00 00 00       	jmp    0x497f1e
+  497f1e:	48 89 85 d0 ff ff ff 	mov    %rax,-0x30(%rbp)
+  497f25:	48 8b bd e8 ff ff ff 	mov    -0x18(%rbp),%rdi
+  497f2c:	48 81 ff 00 00 00 00 	cmp    $0x0,%rdi
+  497f33:	0f 8c 07 00 00 00    	jl     0x497f40
+  497f39:	b8 03 00 00 00       	mov    $0x3,%eax
+  497f3e:	0f 05                	syscall
+  497f40:	48 8b 85 b8 ff ff ff 	mov    -0x48(%rbp),%rax
+  497f47:	48 81 f8 00 00 00 00 	cmp    $0x0,%rax
+  497f4e:	0f 84 0e 00 00 00    	je     0x497f62
+  497f54:	48 8b bd f0 ff ff ff 	mov    -0x10(%rbp),%rdi
+  497f5b:	b8                   	.byte 0xb8

@@ -10,8 +10,8 @@ still incomplete.
 2. Stage 1 reads a frozen copy of all 28 actual compiler modules through the owned
    file runner and `--build-compiler`, producing stage 2.
 3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
-4. All three are 644,591 bytes with SHA256
-   `47999bf4831281341ad5e2d8ca15e49663d67fe5304a302ca6c44f6685995c7f`.
+4. All three are 645,969 bytes with SHA256
+   `7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
 5. Stage 3 compiles 383 corpus cases: 263 accepted, 120 rejected. Every accepted
    output is byte-identical to bootstrap output and executes correctly. Rejections
    have controlled compiler exits and publish no output.
@@ -50,11 +50,11 @@ value equality, measured optimization/register allocation and targets remain ope
 
 ## Evidence
 
-* [Complete qualification](evidence/byte-count-qualification.json): 744 checks,
+* [Complete qualification](evidence/parsed-snapshot-qualification.json): 748 checks,
   383 fresh independent upstream comparisons and all 16 native example runs.
-* [Native rebuilds and corpus](evidence/byte-count-native-rebuilds.json): exact
+* [Native rebuilds and corpus](evidence/parsed-snapshot-native-rebuilds.json): exact
   sources, image hashes, source-sensitivity control and individual native cases.
-* [Native IO qualification](evidence/byte-count-io-verification.json): 59 targeted
+* [Native IO qualification](evidence/parsed-snapshot-io-verification.json): 59 targeted
   checks, actual short IO, errors, preservation and ELF headers.
 * [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
   initial stack/heap failures and measured fixes; snapshots are not peak stack.
@@ -92,3 +92,5 @@ measurements without claiming whole-function allocation or a broad speedup.
 Pure byte-count loops now use the descriptor length and a checked addition,
 avoiding suffix allocation. The same frozen input rebuild uses 323.6 MiB peak RSS
 instead of 390.8 MiB. See [MEMORY.md](MEMORY.md) for exact phases and limits.
+The subsequent direct-lookup and retained-AST changes reduce that same-input peak
+further to 218.5 MiB; the latest qualification above includes both changes.
