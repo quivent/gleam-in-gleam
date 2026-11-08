@@ -1,0 +1,1050 @@
+{
+  "schema": "gleam-in-gleam.scale-frontier/1",
+  "observedAt": "2026-11-08T02:28:08.763680+00:00",
+  "method": "bounded ptrace child; actual registers/frame chain and wait4 RSS; no timing benchmark claim",
+  "commentInput": {
+    "bytes": 33036,
+    "sha256": "bd39db5236e7b3aae60dd636b8a6426720468f0e3f3b827a2c511934b72990f2",
+    "shape": "33000 a characters in a line comment, then main echo 7"
+  },
+  "runs": [
+    {
+      "case": "before-fault",
+      "interpretation": "frozen baseline; raised diagnostic cap only",
+      "originalTraceSHA256": "73348793ca85fb0f4412b920b7ed10796d108dff35e44f0115595a3a3b84c9d4",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "6d3ea8cae38eb398cd4a69f14712be575323469463421837d82cf51c3cb568b6",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "e6bde851f4a2acaa8cc852bfb99d9890afeeec1e98fa2dfe0acea7efba3f560a",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_runtime.gleam": "ded5c3aa37e8509d268c2b192fcc18952a8139fe2aaec2945d4de8e8ec4e3a4b",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "5a6a26a431ade3b6222b1a4ffe67a93720a5ba37588d7a123009eb8067f4d8a0",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "81cc1ec923c97f7f8e523e53de16b0598f29fb0ac1e1d52c33f4b9dfda7f7d46",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "eb6ea87fa9f83b13a997145465b28837bc9819de927cff9e12bd1edd6c79b281"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "bc04f3a7794d23b86455394a2111f03df5e710949af97aa310a2881bd36039a3",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9"
+        },
+        "artifact": {
+          "bytes": 582447,
+          "sha256": "f1b344b3a1d7d9d358068b7d4dcd6aae1b1c4cb7406f3a58ac51940033bf9d74"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 582447,
+          "sha256": "f1b344b3a1d7d9d358068b7d4dcd6aae1b1c4cb7406f3a58ac51940033bf9d74"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [
+          {
+            "signal": 11
+          }
+        ],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x7649aab1e620",
+            "r14": "0x7649aea00000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7ffcc1f42000",
+            "rbx": "0x0",
+            "r11": "0x246",
+            "r10": "0x18",
+            "r9": "0x0",
+            "r8": "0xffffffffffffffff",
+            "rax": "0x7649aab1e5f8",
+            "rcx": "0x61",
+            "rdx": "0x7649aab1e5f8",
+            "rsi": "0x7649aaa09bec",
+            "rdi": "0x28",
+            "orig_rax": "0xffffffffffffffff",
+            "rip": "0x41642a",
+            "cs": "0x33",
+            "eflags": "0x10206",
+            "rsp": "0x7ffcc1f41ef0",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7ffcc1f42000-7ffcc2742000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x41642a",
+              "rbp": "0x7ffcc1f42000",
+              "function": "valid@native/utf8",
+              "frameBytes": 272
+            },
+            {
+              "index": 254,
+              "pc": "0x41653a",
+              "rbp": "0x7ffcc1f545b0",
+              "function": "valid@native/utf8",
+              "frameBytes": 272
+            },
+            {
+              "index": 255,
+              "pc": "0x41653a",
+              "rbp": "0x7ffcc1f546d8",
+              "function": "valid@native/utf8",
+              "frameBytes": 272
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 1173024,
+          "arenaCapacityBytes": 67108864,
+          "sampledFrameCounts": {
+            "valid@native/utf8": 256
+          },
+          "sampledFrames": 256,
+          "framesExcerpt": true
+        },
+        "exitCode": null,
+        "signal": 11,
+        "peakRSSKiB": 12404,
+        "userCPUSeconds": 0.000838,
+        "systemCPUSeconds": 0.009941,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "after-tco",
+      "interpretation": "same frozen target, direct self-tail lowering",
+      "originalTraceSHA256": "24980b62ca385d2a66207a0145fabda83b30979d3a26b216e9f16de10540974a",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "6d3ea8cae38eb398cd4a69f14712be575323469463421837d82cf51c3cb568b6",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "e6bde851f4a2acaa8cc852bfb99d9890afeeec1e98fa2dfe0acea7efba3f560a",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_runtime.gleam": "ded5c3aa37e8509d268c2b192fcc18952a8139fe2aaec2945d4de8e8ec4e3a4b",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "5a6a26a431ade3b6222b1a4ffe67a93720a5ba37588d7a123009eb8067f4d8a0",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "81cc1ec923c97f7f8e523e53de16b0598f29fb0ac1e1d52c33f4b9dfda7f7d46",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "eb6ea87fa9f83b13a997145465b28837bc9819de927cff9e12bd1edd6c79b281"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "531a0322adf73bc0961e9f6f024d4128d706fa0ca983ea3d32869a2d34cbc1e7",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9"
+        },
+        "artifact": {
+          "bytes": 583703,
+          "sha256": "a60afcb37e8a1af1e861c297ff1ebefa347a2dd29d36a8c5072b387ba2024c6d"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 583703,
+          "sha256": "a60afcb37e8a1af1e861c297ff1ebefa347a2dd29d36a8c5072b387ba2024c6d"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x7d43735265d8",
+            "r14": "0x7d4377000000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7fff97e919b8",
+            "rbx": "0x0",
+            "r11": "0x246",
+            "r10": "0x7d4373526358",
+            "r9": "0x0",
+            "r8": "0x1",
+            "rax": "0xffffffffffffffda",
+            "rcx": "0x40022c",
+            "rdx": "0x0",
+            "rsi": "0x48e7d9",
+            "rdi": "0x0",
+            "orig_rax": "0x3c",
+            "rip": "0x40022c",
+            "cs": "0x33",
+            "eflags": "0x246",
+            "rsp": "0x7fff97e91978",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7fff97e73000-7fff97e94000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7fff97e919b8",
+              "function": null,
+              "frameBytes": null
+            },
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7fff97e919b8",
+              "function": null,
+              "frameBytes": null
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 5400024,
+          "arenaCapacityBytes": 67108864,
+          "mappedStackBytes": 135168,
+          "stackUsedAtSnapshotBytes": 9864,
+          "sampledFrameCounts": {
+            "unmapped": 1
+          },
+          "sampledFrames": 1,
+          "framesExcerpt": true
+        },
+        "exitCode": 0,
+        "signal": null,
+        "peakRSSKiB": 12620,
+        "userCPUSeconds": 0.0021089999999999998,
+        "systemCPUSeconds": 0.00804,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "full-graph-first",
+      "interpretation": "full source graph, 64 MiB arena exhaustion",
+      "originalTraceSHA256": "888018d25851b8c77d8ba4314234ec7539242ea441d330e2bafbc78585777d3e",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceKind": "working-tree-snapshot",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "e6bde851f4a2acaa8cc852bfb99d9890afeeec1e98fa2dfe0acea7efba3f560a",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "5a6a26a431ade3b6222b1a4ffe67a93720a5ba37588d7a123009eb8067f4d8a0",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "81cc1ec923c97f7f8e523e53de16b0598f29fb0ac1e1d52c33f4b9dfda7f7d46",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "515591b2d287d6e6467b91a2b7f2a9b2c3ecfaa8a8752adee1fb3ec8be04dae4"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "515591b2d287d6e6467b91a2b7f2a9b2c3ecfaa8a8752adee1fb3ec8be04dae4",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9"
+        },
+        "artifact": {
+          "bytes": 589333,
+          "sha256": "fe2e616e3e75de096a9bc0dc93cb7bb8c804ba842b1f02af31edcb036b1fc773"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 589333,
+          "sha256": "fe2e616e3e75de096a9bc0dc93cb7bb8c804ba842b1f02af31edcb036b1fc773"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x71f474c00020",
+            "r14": "0x71f474c00000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7ffd6a4b6220",
+            "rbx": "0x0",
+            "r11": "0x202",
+            "r10": "0x18",
+            "r9": "0x0",
+            "r8": "0xffffffffffffffff",
+            "rax": "0xffffffffffffffda",
+            "rcx": "0x48b022",
+            "rdx": "0x0",
+            "rsi": "0x48d7ad",
+            "rdi": "0x47",
+            "orig_rax": "0x3c",
+            "rip": "0x48b022",
+            "cs": "0x33",
+            "eflags": "0x202",
+            "rsp": "0x7ffd6a4b61c8",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7ffd6a499000-7ffd6a4bd000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x48b022",
+              "rbp": "0x7ffd6a4b6220",
+              "function": null,
+              "frameBytes": null
+            },
+            {
+              "index": 1,
+              "pc": "0x400383",
+              "rbp": "0x7ffd6a4b6260",
+              "function": "then@native/core",
+              "frameBytes": 32
+            },
+            {
+              "index": 2,
+              "pc": "0x42154e",
+              "rbp": "0x7ffd6a4b6630",
+              "function": "pattern_atom@native/parser",
+              "frameBytes": 944
+            },
+            {
+              "index": 3,
+              "pc": "0x420b37",
+              "rbp": "0x7ffd6a4b6648",
+              "function": "pattern@native/parser",
+              "frameBytes": 0
+            },
+            {
+              "index": 4,
+              "pc": "0x42376b",
+              "rbp": "0x7ffd6a4b6660",
+              "function": "pattern_row@native/parser",
+              "frameBytes": 0
+            },
+            {
+              "index": 5,
+              "pc": "0x4237be",
+              "rbp": "0x7ffd6a4b6678",
+              "function": "alternative_rows@native/parser",
+              "frameBytes": 0
+            },
+            {
+              "index": 6,
+              "pc": "0x42394c",
+              "rbp": "0x7ffd6a4b66c0",
+              "function": "multi_arms@native/parser",
+              "frameBytes": 48
+            },
+            {
+              "index": 20,
+              "pc": "0x41fcc8",
+              "rbp": "0x7ffd6a4b6dc0",
+              "function": "prefix@native/parser",
+              "frameBytes": 848
+            },
+            {
+              "index": 21,
+              "pc": "0x41e012",
+              "rbp": "0x7ffd6a4b6dd8",
+              "function": "expression@native/parser",
+              "frameBytes": 0
+            },
+            {
+              "index": 22,
+              "pc": "0x420ada",
+              "rbp": "0x7ffd6a4b6ea8",
+              "function": "argument@native/parser",
+              "frameBytes": 176
+            },
+            {
+              "index": 23,
+              "pc": "0x420625",
+              "rbp": "0x7ffd6a4b6ef0",
+              "function": "arguments@native/parser",
+              "frameBytes": 48
+            },
+            {
+              "index": 24,
+              "pc": "0x41e344",
+              "rbp": "0x7ffd6a4b7030",
+              "function": "postfix@native/parser",
+              "frameBytes": 288
+            },
+            {
+              "index": 30,
+              "pc": "0x41de66",
+              "rbp": "0x7ffd6a4b7200",
+              "function": "statements@native/parser",
+              "frameBytes": 128
+            },
+            {
+              "index": 68,
+              "pc": "0x41d2eb",
+              "rbp": "0x7ffd6a4b83c0",
+              "function": "declaration@native/parser",
+              "frameBytes": 96
+            },
+            {
+              "index": 69,
+              "pc": "0x41d015",
+              "rbp": "0x7ffd6a4b8480",
+              "function": "functions@native/parser",
+              "frameBytes": 128
+            },
+            {
+              "index": 116,
+              "pc": "0x41cc19",
+              "rbp": "0x7ffd6a4b9678",
+              "function": "parse@native/parser",
+              "frameBytes": 0
+            },
+            {
+              "index": 123,
+              "pc": "0x424b63",
+              "rbp": "0x7ffd6a4b9880",
+              "function": "visit@native/project",
+              "frameBytes": 48
+            },
+            {
+              "index": 124,
+              "pc": "0x424c3e",
+              "rbp": "0x7ffd6a4b98d0",
+              "function": "visit_imports@native/project",
+              "frameBytes": 32
+            },
+            {
+              "index": 173,
+              "pc": "0x4247db",
+              "rbp": "0x7ffd6a4ba6d0",
+              "function": "link@native/project",
+              "frameBytes": 0
+            },
+            {
+              "index": 174,
+              "pc": "0x453c31",
+              "rbp": "0x7ffd6a4ba6f0",
+              "function": "compile_project@native/compiler",
+              "frameBytes": 0
+            },
+            {
+              "index": 175,
+              "pc": "0x454a73",
+              "rbp": "0x7ffd6a4ba770",
+              "function": "next",
+              "frameBytes": 96
+            },
+            {
+              "index": 176,
+              "pc": "0x45517d",
+              "rbp": "0x7ffd6a4ba7f8",
+              "function": "with_source",
+              "frameBytes": 112
+            },
+            {
+              "index": 176,
+              "pc": "0x45517d",
+              "rbp": "0x7ffd6a4ba7f8",
+              "function": "with_source",
+              "frameBytes": 112
+            },
+            {
+              "index": 177,
+              "pc": "0x400177",
+              "rbp": "0x7ffd6a4ba858",
+              "function": null,
+              "frameBytes": null
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 67108896,
+          "arenaCapacityBytes": 67108864,
+          "mappedStackBytes": 147456,
+          "stackUsedAtSnapshotBytes": 28216,
+          "sampledFrameCounts": {
+            "unmapped": 69,
+            "then@native/core": 68,
+            "pattern_atom@native/parser": 1,
+            "pattern@native/parser": 1,
+            "pattern_row@native/parser": 1,
+            "alternative_rows@native/parser": 1,
+            "multi_arms@native/parser": 4,
+            "prefix@native/parser": 3,
+            "expression@native/parser": 4,
+            "argument@native/parser": 1,
+            "arguments@native/parser": 1,
+            "postfix@native/parser": 1,
+            "statements@native/parser": 2,
+            "declaration@native/parser": 3,
+            "functions@native/parser": 5,
+            "parse@native/parser": 1,
+            "visit@native/project": 4,
+            "visit_imports@native/project": 4,
+            "link@native/project": 1,
+            "compile_project@native/compiler": 1,
+            "next": 1,
+            "with_source": 1
+          },
+          "sampledFrames": 178,
+          "framesExcerpt": true
+        },
+        "exitCode": 71,
+        "signal": null,
+        "peakRSSKiB": 65920,
+        "userCPUSeconds": 0.067693,
+        "systemCPUSeconds": 0.042051,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "full-graph-balanced-512",
+      "interpretation": "balanced bytes, quadratic closure accumulation still present",
+      "originalTraceSHA256": "c87db4397ce3085b88291129a1d434b7b4ff6d18f569d4e3d25e2e53ac78bb92",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceKind": "working-tree-snapshot",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "arenaCapacityBytes": 536870912,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "e6bde851f4a2acaa8cc852bfb99d9890afeeec1e98fa2dfe0acea7efba3f560a",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "f28d031ea683994aafdd9d809b116e9ca52d3d6e80f8d9974ee2bd110c144215"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "f28d031ea683994aafdd9d809b116e9ca52d3d6e80f8d9974ee2bd110c144215",
+          "src/native/cli_runtime.gleam": "a0ed22d0c41aecc7754d55f99db0b299b328572b291cda3944027349014017c9"
+        },
+        "artifact": {
+          "bytes": 590432,
+          "sha256": "af53cb2de0cc7b5db7071f58fadfd6827db7962bd47f5c665eacab93f5987626"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 590432,
+          "sha256": "af53cb2de0cc7b5db7071f58fadfd6827db7962bd47f5c665eacab93f5987626"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x7e2fbae00018",
+            "r14": "0x7e2fbae00000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7ffe867d96d0",
+            "rbx": "0x0",
+            "r11": "0x206",
+            "r10": "0x18",
+            "r9": "0x0",
+            "r8": "0xffffffffffffffff",
+            "rax": "0xffffffffffffffda",
+            "rcx": "0x48b424",
+            "rdx": "0x7e2fbadfffb8",
+            "rsi": "0x7e2f9f80f0b9",
+            "rdi": "0x47",
+            "orig_rax": "0x3c",
+            "rip": "0x48b424",
+            "cs": "0x33",
+            "eflags": "0x206",
+            "rsp": "0x7ffe867d9690",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7ffe867c9000-7ffe867ec000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x48b424",
+              "rbp": "0x7ffe867d96d0",
+              "function": null,
+              "frameBytes": null
+            },
+            {
+              "index": 1,
+              "pc": "0x40041a",
+              "rbp": "0x7ffe867d96f0",
+              "function": "reverse@native/core",
+              "frameBytes": 0
+            },
+            {
+              "index": 2,
+              "pc": "0x4004f6",
+              "rbp": "0x7ffe867d9708",
+              "function": "append@native/core",
+              "frameBytes": 0
+            },
+            {
+              "index": 4,
+              "pc": "0x400383",
+              "rbp": "0x7ffe867d9870",
+              "function": "then@native/core",
+              "frameBytes": 32
+            },
+            {
+              "index": 5,
+              "pc": "0x445aab",
+              "rbp": "0x7ffe867d98f0",
+              "function": "closure@native/x64",
+              "frameBytes": 96
+            },
+            {
+              "index": 6,
+              "pc": "0x4448f5",
+              "rbp": "0x7ffe867d9ab0",
+              "function": "expression@native/x64",
+              "frameBytes": 400
+            },
+            {
+              "index": 7,
+              "pc": "0x4461a5",
+              "rbp": "0x7ffe867d9af0",
+              "function": "arguments@native/x64",
+              "frameBytes": 32
+            },
+            {
+              "index": 14,
+              "pc": "0x44524f",
+              "rbp": "0x7ffe867d9f70",
+              "function": "case_code@native/x64",
+              "frameBytes": 0
+            },
+            {
+              "index": 18,
+              "pc": "0x445062",
+              "rbp": "0x7ffe867da3b0",
+              "function": "tail_expression@native/x64",
+              "frameBytes": 112
+            },
+            {
+              "index": 19,
+              "pc": "0x443a27",
+              "rbp": "0x7ffe867da438",
+              "function": "statement_mode@native/x64",
+              "frameBytes": 96
+            },
+            {
+              "index": 20,
+              "pc": "0x4436a8",
+              "rbp": "0x7ffe867da490",
+              "function": "function_list@native/x64",
+              "frameBytes": 48
+            },
+            {
+              "index": 254,
+              "pc": "0x4436fa",
+              "rbp": "0x7ffe867e0610",
+              "function": "function_list@native/x64",
+              "frameBytes": 48
+            },
+            {
+              "index": 255,
+              "pc": "0x47dc81",
+              "rbp": "0x7ffe867e06c0",
+              "function": null,
+              "frameBytes": null
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 536870936,
+          "arenaCapacityBytes": 536870912,
+          "mappedStackBytes": 143360,
+          "stackUsedAtSnapshotBytes": 76144,
+          "sampledFrameCounts": {
+            "unmapped": 82,
+            "reverse@native/core": 1,
+            "append@native/core": 1,
+            "then@native/core": 80,
+            "closure@native/x64": 1,
+            "expression@native/x64": 5,
+            "arguments@native/x64": 4,
+            "case_code@native/x64": 1,
+            "tail_expression@native/x64": 1,
+            "statement_mode@native/x64": 1,
+            "function_list@native/x64": 79
+          },
+          "sampledFrames": 256,
+          "framesExcerpt": true
+        },
+        "exitCode": 71,
+        "signal": null,
+        "peakRSSKiB": 524800,
+        "userCPUSeconds": 0.48350699999999996,
+        "systemCPUSeconds": 0.377168,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "full-current-graph",
+      "interpretation": "balanced bytes and reverse closure stream",
+      "originalTraceSHA256": "b0a25f946964bf083c83a16e20726a415d9189cf6099b223f9e2171d7de64b87",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceKind": "working-tree-snapshot",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "arenaCapacityBytes": 536870912,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "e6bde851f4a2acaa8cc852bfb99d9890afeeec1e98fa2dfe0acea7efba3f560a",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_limits.gleam": "f595c7c7cdbea919a96ebaf2955211500ffaf217f749bd621d376d49004faacb",
+          "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "b429872d9eee7d373a6a8b39a723af8bbf9d5898bedcac925d81ae9ec4a8103a"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "b429872d9eee7d373a6a8b39a723af8bbf9d5898bedcac925d81ae9ec4a8103a",
+          "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4"
+        },
+        "artifact": {
+          "bytes": 590626,
+          "sha256": "45204462bab4417d52b760b4f04018b9d0ea014d930f3a51338ff2b34dabecaa"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 590626,
+          "sha256": "45204462bab4417d52b760b4f04018b9d0ea014d930f3a51338ff2b34dabecaa"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x785107165818",
+            "r14": "0x785111400000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7fffca6fb7e8",
+            "rbx": "0x0",
+            "r11": "0x246",
+            "r10": "0x785107165578",
+            "r9": "0x0",
+            "r8": "0x1",
+            "rax": "0xffffffffffffffda",
+            "rcx": "0x40022c",
+            "rdx": "0x0",
+            "rsi": "0x4902e4",
+            "rdi": "0x0",
+            "orig_rax": "0x3c",
+            "rip": "0x40022c",
+            "cs": "0x33",
+            "eflags": "0x246",
+            "rsp": "0x7fffca6fb7a8",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7fffca6da000-7fffca6fd000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7fffca6fb7e8",
+              "function": null,
+              "frameBytes": null
+            },
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7fffca6fb7e8",
+              "function": null,
+              "frameBytes": null
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 366368792,
+          "arenaCapacityBytes": 536870912,
+          "mappedStackBytes": 143360,
+          "stackUsedAtSnapshotBytes": 6232,
+          "sampledFrameCounts": {
+            "unmapped": 1
+          },
+          "sampledFrames": 1,
+          "framesExcerpt": true
+        },
+        "exitCode": 0,
+        "signal": null,
+        "peakRSSKiB": 358272,
+        "userCPUSeconds": 5.55225,
+        "systemCPUSeconds": 0.342918,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "case": "self-build-stage2-trace",
+      "interpretation": "second actual native self-rebuild",
+      "originalTraceSHA256": "0e17054ce514e7e194276e068fde839ecee7490eec4c162038e5f48fc0986684",
+      "compilerProvenance": {
+        "schema": "gleam-in-gleam.native-debug-build/1",
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceKind": "working-tree-snapshot",
+        "diagnostic": true,
+        "sourceCapBytes": 131072,
+        "arenaCapacityBytes": 536870912,
+        "sourceSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+          "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+          "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+          "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+          "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+          "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+          "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+          "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+          "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+          "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+          "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+          "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+          "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+          "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+          "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+          "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+          "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+          "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+          "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+          "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+          "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+          "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+          "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+          "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+          "src/native/x64.gleam": "b429872d9eee7d373a6a8b39a723af8bbf9d5898bedcac925d81ae9ec4a8103a"
+        },
+        "targetSourceUnmodified": true,
+        "emitterSHA256": {
+          "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+          "src/native/x64.gleam": "b429872d9eee7d373a6a8b39a723af8bbf9d5898bedcac925d81ae9ec4a8103a",
+          "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4"
+        },
+        "artifact": {
+          "bytes": 592047,
+          "sha256": "752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb"
+        },
+        "productionLimitUnchanged": true
+      },
+      "observed": {
+        "schema": "gleam-in-gleam.native-fault-trace/1",
+        "diagnostic": true,
+        "sourceRevision": "88e77b9636b9107871f988b53b8844a7a798a3b0",
+        "sourceCapBytes": 131072,
+        "artifact": {
+          "bytes": 592047,
+          "sha256": "752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb"
+        },
+        "stackLimitBytes": 8388608,
+        "events": [],
+        "exitSnapshot": {
+          "registers": {
+            "r15": "0x72d441774040",
+            "r14": "0x72d44b800000",
+            "r13": "0x0",
+            "r12": "0x0",
+            "rbp": "0x7ffd23aea088",
+            "rbx": "0x0",
+            "r11": "0x246",
+            "r10": "0x72d441773db8",
+            "r9": "0x0",
+            "r8": "0x1",
+            "rax": "0xffffffffffffffda",
+            "rcx": "0x40022c",
+            "rdx": "0x0",
+            "rsi": "0x490871",
+            "rdi": "0x0",
+            "orig_rax": "0x3c",
+            "rip": "0x40022c",
+            "cs": "0x33",
+            "eflags": "0x246",
+            "rsp": "0x7ffd23aea048",
+            "ss": "0x2b",
+            "fs_base": "0x0",
+            "gs_base": "0x0",
+            "ds": "0x0",
+            "es": "0x0",
+            "fs": "0x0",
+            "gs": "0x0"
+          },
+          "stackMapping": "7ffd23ac8000-7ffd23aec000 rw-p 00000000 00:00 0                          [stack]",
+          "frames": [
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7ffd23aea088",
+              "function": null,
+              "frameBytes": null
+            },
+            {
+              "index": 0,
+              "pc": "0x40022c",
+              "rbp": "0x7ffd23aea088",
+              "function": null,
+              "frameBytes": null
+            }
+          ],
+          "arenaAllocatedOrAttemptedBytes": 368525376,
+          "arenaCapacityBytes": 536870912,
+          "mappedStackBytes": 147456,
+          "stackUsedAtSnapshotBytes": 8120,
+          "sampledFrameCounts": {
+            "unmapped": 1
+          },
+          "sampledFrames": 1,
+          "framesExcerpt": true
+        },
+        "exitCode": 0,
+        "signal": null,
+        "peakRSSKiB": 360320,
+        "userCPUSeconds": 5.680851,
+        "systemCPUSeconds": 0.329854,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  ],
+  "conclusions": [
+    "Before/after stack case uses identical frozen compiler target source, diagnostic source cap 131072, arena 67108864 and stack limit 8388608",
+    "Before: sampled valid@native/utf8 frames exhaust stack while arena is far below its cap",
+    "After direct self-tail lowering: same input succeeds",
+    "Balanced byte concatenation alone does not fix quadratic closure stream copying",
+    "Reverse closure accumulation plus balanced bytes enables complete source graph and actual native self-rebuild",
+    "Stack snapshots are not peak stack measurements; RSS and arena consumption are distinct; no GC or arena growth exists"
+  ]
+}

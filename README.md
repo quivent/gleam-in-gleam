@@ -5,26 +5,26 @@ third-party dependencies** as a hard design constraint. No LLVM, Cranelift,
 Glance, standard-library package, external assembler, external linker, libc,
 or bundled VM is used by the native seed.
 
-**Status: a bounded standalone native compiler CLI now reads source files and
-imports, emits executables and runs without Node or a third-party runtime.**
-It supports Linux x86-64 and a 16 KiB per-source limit. Larger-input reliability
-and a compiler rebuilding itself remain unfinished.
+**Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
+rebuilds of the exact frozen compiler source are byte-identical to the initial
+native seed. The rebuilt compiler passes all 317 positive/negative corpus cases;
+accepted programs match bootstrap executable bytes and run correctly.
 
-**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 70%**
+**First self-hosting milestone: 100% of its defined acceptance scope.**
 
 ```text
-[██████████████░░░░░░] 70%
+[████████████████████] 100% — supported-subset self-hosting
 ```
 
-This is a judgment call, not measured completion or a full-Gleam compatibility
-score. Native CLI/IO now works for bounded inputs; full-size stack/memory
-reliability and the actual self-rebuild remain. See [ROADMAP.md](ROADMAP.md) for
-scope, remaining work and completion evidence.
+This completes the previously defined first milestone, not full upstream Gleam
+compatibility. Remaining syntax, value semantics, optimization and targets stay
+open in [ROADMAP.md](ROADMAP.md). The source limit is 128 KiB per file; the compiler
+uses a bounded 512 MiB arena without GC. Ordinary emitted programs retain 64 MiB.
 
 [Open the interactive eight-step roadmap](docs/roadmap.html): expandable specs,
 acceptance review, evidence links, search and local notes. Open the checkout HTML
 in a browser; GitHub shows its source. [Preview/update instructions](docs/README.md).
-The next implementation plan is [full-size reliability](FULL_SIZE_RELIABILITY_SPEC.md).
+The [full-size reliability record](FULL_SIZE_RELIABILITY_SPEC.md) preserves the measured failures and fixes.
 
 ## What actually runs
 
@@ -45,18 +45,21 @@ the bootstrap after its initial native image is generated.
 A 601-byte Fibonacci executable is **a generated example program**,
 not the size of a completed compiler.
 
-Target bootstrap completion:
+Observed bootstrap chain:
 
 ```text
-Stage 0: existing toolchain compiles the compiler's Gleam source once
-Stage 1: that compiler emits a native compiler from the same source
-Stage 2: the native compiler recompiles itself with identical output
+Stage 0: existing Gleam toolchain generates the bootstrap implementation
+Stage 1: bootstrap emits our standalone native compiler
+Stage 2: stage 1 recompiles the exact frozen compiler source
+Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The stage-1 compiler core and bounded file-based CLI now execute natively.
-Full-size input reliability and the stage-2 self-rebuild/byte comparison remain unproved.
-Self-hosting requires that actual rebuild; neither accepting compiler text nor
-wrapping JavaScript in a native executable establishes it.
+The native image is **592,047 bytes**, SHA256
+`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+The qualification also changes a version literal in an isolated source copy:
+the native compiler emits the correctly changed image, matching the bootstrap.
+This checks that the rebuild consumes source rather than copying its own image.
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/self-hosting-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -78,13 +81,27 @@ source dirname. Output must be new: completed files are published without replac
 an existing file, directory or symlink. The runtime uses direct Linux syscalls,
 including openat2 and renameat2; unsupported operations fail explicitly.
 
-This first CLI bounds each source file to **16 KiB** and a graph to 256 files,
+The CLI bounds each source file to **128 KiB** and a graph to 256 files,
 refuses source symlinks and nonregular files, and validates UTF-8 arguments.
-The arena is still 64 MiB without GC and native tail calls are not eliminated.
-These limits do not establish full-size reliability. A 33 KiB comment-heavy input
-exposed stack exhaustion during development; the explicit input cap and a small
-whitespace scanner avoid the observed cases within the qualified boundary. See
-[NATIVE_CLI_SPEC.md](NATIVE_CLI_SPEC.md) for the protocol and acceptance evidence.
+Direct returned self-calls loop after the prologue; mutual/indirect calls and
+continuation callbacks retain ordinary calls. Balanced byte concatenation and
+reverse closure accumulation avoid two measured quadratic copying paths.
+The compiler arena is 512 MiB without GC or growth. One native self-rebuild used
+368,525,376 arena bytes and peaked at 360,320 KiB RSS; this is a resource observation,
+not a speed benchmark. Ordinary emitted programs still use a 64 MiB arena.
+
+Rebuild the compiler natively into a new output:
+
+```sh
+./out/gleam-native --build-compiler out/gleam-native-stage2 --source-root src
+./out/gleam-native-stage2 --build-compiler out/gleam-native-stage3 --source-root src
+cmp out/gleam-native out/gleam-native-stage2
+cmp out/gleam-native-stage2 out/gleam-native-stage3
+```
+
+Keep inputs unchanged across these commands. `python3 verify.py` freezes inputs,
+checks both rebuilds and qualifies the rebuilt compiler. See
+[NATIVE_CLI_SPEC.md](NATIVE_CLI_SPEC.md) for IO and explicit bounds.
 
 The native tests require strace, objdump, Python and ptrace permission as
 **development-only fault-injection/inspection tools**. The native compiler itself
@@ -599,7 +616,7 @@ programs, both exactly identical to bootstrap output; both execute correctly.
 ELF headers and child execution. This measures a native compiler core plus driver,
 not a finished file-based CLI, full Gleam compatibility or a self-rebuild.
 
-The native CLI milestone passes **631/631** tests and **297/297** fresh upstream
+The earlier bounded native CLI milestone passed **631/631** tests and **297/297** fresh upstream
 comparisons. Its **59** CLI-specific tests compile/execute all sixteen examples
 with an empty PATH, preserve existing outputs, test input bounds and exercise IO
 failure paths. All sixteen earlier example hashes remain unchanged. The standalone
@@ -613,18 +630,33 @@ expected executable, and spawned no further program. Separate strace injections
 verify EINTR retries, close-error handling and temporary cleanup. These are
 explicit development-only tests, not libraries or wrappers inside the native CLI.
 
-Next actions, in dependency order:
+Next actions after self-hosting:
 
-1. Extend the bounded native CLI to real compiler-source scale, starting with
-   measured stack behavior and the explicit 16 KiB source bound.
-2. Exercise native compilation of the compiler's full source at real scale.
-   Address measured tail-call, arena/allocation and collection limits without
-   changing language semantics or introducing external dependencies.
-3. Use the native compiler to rebuild the exact same compiler source, then
-   compare stage-1/stage-2 bytes and behavior. That rebuild remains unproved.
-4. Expand upstream compatibility and add a direct ARM64/Mach-O emitter. Verify
-   architecture/OS semantics rather than assuming ELF code transfers unchanged.
+1. Measure emitted frame/temporary traffic; implement bounded look-ahead and
+   register retention/spilling with explicit call/syscall clobber contracts.
+2. Expand compatibility and exact value semantics using independent upstream
+   comparisons and actual native-path regressions.
+3. Address further measured allocation or non-tail stack limits without changing
+   language semantics or introducing external dependencies.
+4. Add additional targets and distribution with actual target qualification.
 
 No time, final compiler size, compile-speed or language-wide runtime-performance
 claim is established by the native seed. The finished compiler's external
 dependency budget remains zero.
+
+## Self-hosting qualification — 2026-11-08
+
+The current result is recorded separately in
+[evidence/self-hosting-qualification.json](evidence/self-hosting-qualification.json):
+657 regression checks, 317 fresh upstream comparisons, 59 targeted native CLI
+checks, and the entire 317-case corpus compiled by the rebuilt stage-3 compiler.
+The native corpus contains 198 accepted and 119 rejected cases. Every accepted
+image matches bootstrap bytes and executes with the expected output. Historical
+milestone counts and artifacts above remain records of their original source.
+
+The former 33,036-byte stack failure is reproduced and attributed to actual UTF-8
+validator frames. Direct self-tail lowering removes that stack growth; a million
+iterations also finish under a 64 KiB stack. Heap failures before the copying fixes
+and successful full compiler rebuild consumption are preserved in
+[evidence/self-hosting-scale-frontier.json](evidence/self-hosting-scale-frontier.json).
+No installed Crew/compiler executable or active session was replaced.

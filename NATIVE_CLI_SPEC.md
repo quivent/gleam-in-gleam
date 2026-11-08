@@ -1,13 +1,14 @@
 # Native CLI milestone
 
 Status: bounded implementation qualified in 59 targeted tests; full regression
-receipt in evidence/native-cli-verification.json. Target: standalone Linux x86-64, no Node,
+receipt in evidence/self-hosting-qualification.json. Target: standalone Linux x86-64, no Node,
 libc, external compiler, assembler, linker or VM at runtime.
 
 ## Command
 
 ```text
 gleam-native SOURCE.gleam NEW_OUTPUT [--source-root DIRECTORY]
+gleam-native --build-compiler NEW_OUTPUT [--source-root DIRECTORY]
 gleam-native --help
 gleam-native --version
 ```
@@ -16,6 +17,8 @@ SOURCE is a relative module path beneath DIRECTORY (default current directory).
 For example, `gleam-native modules.gleam out/app --source-root examples` loads
 `examples/modules.gleam` and its imports. This root-relative source convention
 is explicit; the existing bootstrap bridge's default dirname convention is kept.
+For --build-compiler, the default root is src and the fixed entry is native/cli.gleam;
+the dedicated builder preserves the effect-runner entry.
 Module names retain the existing lowercase/digit/underscore path rules.
 
 Exit codes: 0 success/help/version; 1 source/compiler/output failure; 2 invalid
@@ -31,11 +34,13 @@ The runtime validates the actual constructor/function ABI before emitting code.
 
 ReadSource uses a root directory descriptor and openat2 resolution beneath it,
 rejecting symlinks/magic links and traversal. Accept regular files only, with a
-16 KiB per-file bound; detect size changes during reading. Limit argv to 256 user
+128 KiB per-file bound; detect size changes during reading. Limit argv to 256 user
 arguments and 4095 bytes each, validating scalar UTF-8 before forming Strings.
-Cap the source graph at 256 files. The initial 1 MiB proposal was reduced after a 33 KiB comment-only input
-exposed native frontend stack exhaustion. These bounds are explicit, not full-size reliability
-or full upstream compatibility claims. Unsupported syscalls fail explicitly.
+Cap the source graph at 256 files. The initial 16 KiB delivery followed a 33 KiB stack failure.
+Actual frame attribution, direct self-tail lowering, balanced concatenation and
+reverse closure accumulation now qualify the complete compiler input. The compiler
+arena is explicitly 512 MiB, ordinary programs 64 MiB, without GC or growth. These
+bounds are not arbitrary-input reliability or full upstream compatibility claims. Unsupported syscalls fail explicitly.
 
 Output is written to an exclusive sibling temporary file, with complete-write
 loops, mode 0755, file fsync and checked close. Publish through renameat2 with
@@ -67,13 +72,15 @@ headers. These are design references, not delivered dependencies.
 
 ## Qualified result
 
-The standalone image is 582,442 bytes, SHA256
-`d3428f3554f4fbce00f18e8a0fcb52cceeccd332b4e47b15e41b9580648fc39e`.
-59 CLI-specific tests and the full 631-test/297-upstream-comparison run pass.
-All sixteen example outputs match bootstrap bytes and execute correctly.
-The actual ptrace run records 4 short reads and 54 short writes performed by the
-kernel, rather than fake successful syscalls. CLI/child ELF headers and selected
-instruction windows are retained in evidence/native-cli-io-verification.json and
-evidence/native-cli-disassembly.txt. The earlier size failure is preserved in
-evidence/native-cli-initial-size-failure.json. Full-size self-building and a native
-self-build command invoking cli_builder.build remain separate work.
+The standalone image is 592,047 bytes, SHA256
+`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+59 CLI-specific checks and the full 657-test/317-upstream-comparison run pass.
+All sixteen examples match bootstrap bytes and execute correctly. Actual short IO,
+interruptions, errors, existing-path preservation and ELF headers are retained in
+[evidence/self-hosting-io-verification.json](evidence/self-hosting-io-verification.json).
+The native self-build runs twice and produces identical images; stage 3 qualifies
+all 317 corpus cases. See [SELF_HOSTING.md](SELF_HOSTING.md).
+
+The earlier 582,442-byte, 16 KiB CLI and initial failures remain under their original
+native-cli-* receipt names. New scale measurements are retained separately in
+[evidence/self-hosting-scale-frontier.json](evidence/self-hosting-scale-frontier.json).

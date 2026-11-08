@@ -10,75 +10,56 @@ The interactive view has the same eight workstreams, with spec outlines,
 acceptance criteria, evidence and browser-local review notes. It does not promote
 review marks into verified status.
 
-## Subjective progress
-
-**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 70%**
+## First milestone achieved
 
 ```text
-[██████████████░░░░░░] 70%
+[████████████████████] 100% — supported-subset self-hosting
 ```
 
-Estimate as of 2026-11-08. The frontend, backend, native API and bounded native
-file-based CLI work. That raises my subjective estimate from 65% to 70%.
-Substantial uncertainty remains in full-size stack/memory reliability, broader
-native-path testing and an actual self-rebuild; this is not a forecast.
-
-For this bar, **100% means** a usable native Linux x86-64 CLI that compiles the
-complete compiler source, produces a byte-identical successive rebuild, and
-passes the native-path qualification checks with zero third-party runtime
-requirements. Full upstream Gleam compatibility, other targets and subsequent
-optimization remain separate roadmap work; this bar does not claim those are
-70% complete. It is not calculated from test counts or a delivery-date forecast.
-Update it when new evidence changes the assessment.
+The former subjective 70% bar had a defined finish line: native file compilation
+of the complete compiler input, byte-identical successive rebuilds and native-path
+qualification. That finish line is now verified. This is not a full-upstream
+compatibility score. The extension workstreams below remain incomplete.
 
 ## Verified starting point
 
-The native CLI reads files/imports, compiles all sixteen tracked examples to
-bootstrap-identical executables, and executes the outputs. Its input bound is
-16 KiB per source; it does not yet compile the complete compiler source tree.
-Current qualification is **631 passing tests and 297 fresh upstream comparisons**.
-The 59 targeted CLI checks cover real short IO, EINTR, publication/error cleanup,
-Unicode paths, preservation and ABI validation. See the
-[CLI spec](NATIVE_CLI_SPEC.md), [IO evidence](evidence/native-cli-io-verification.json)
-and [current verification](evidence/native-cli-verification.json).
+All 26 compiler modules rebuild through the native effect-runner entry. Stages
+1, 2 and 3 are byte-identical: 592,047 bytes, SHA256
+`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+The stage-3 compiler passes 317 corpus cases; every accepted output matches the
+bootstrap bytes and executes correctly. Full qualification includes 657 tests,
+317 independent upstream comparisons, 16 examples and 59 native IO checks.
+See [the proof](SELF_HOSTING.md) and
+[qualification receipt](evidence/self-hosting-qualification.json).
 
-The earlier 498,418-byte native API-plus-driver result and 572-test baseline remain
-historical in [their receipt](evidence/integers-coverage-verification.json).
-A complete compiler rebuild and full upstream Gleam compatibility are unfinished.
+The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
+Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
+receipts remain preserved under their original names.
 
 ## Priorities and completion evidence
 
-1. **Usable native compiler CLI — delivered for bounded inputs.**
-   Read arguments and source files, resolve local modules, write executables and
-   report errors through owned native IO. Handle partial reads/writes, interrupted
-   syscalls and failures correctly. Complete when a standalone executable compiles
-   a supported source tree from the terminal without Node or upstream tooling at
-   runtime, and its emitted programs execute correctly. This bounded milestone
-   now passes; lifting its 16 KiB source bound belongs to priority 2.
+1. **Usable native compiler CLI — verified within explicit limits.**
+   Owned arguments, rooted reads, imports, complete writes and no-replace
+   publication. The syscall and preservation tests still pass after scale changes.
 
-2. **Full-size compilation reliability.**
-   Exercise large inputs and complete compiler inputs. Address measured stack and
-   allocation limits: the current arena is fixed at 64 MiB with no collection,
-   native calls have no tail-call elimination, and some utilities create large
-   intermediate lists/byte arrays. Complete this milestone when representative
-   full-size inputs compile correctly with recorded resource usage and explicit
-   failure behavior. Choose runtime changes from evidence rather than assuming
-   small-input success proves scale.
+2. **Full-size compilation reliability — verified for the actual compiler graph.**
+   Actual stack frames identified the UTF-8 recursion failure. Returned direct
+   self-calls now loop after the prologue, including blocks and cases. Balanced
+   byte concatenation and reverse closure accumulation remove measured copying
+   frontiers. Full rebuild allocation is 368,525,376 bytes; observed peak RSS is
+   360,320 KiB. These bounded measurements do not prove arbitrary-input reliability.
+   Deep non-tail recursion and arena exhaustion remain explicit limits.
 
-3. **Broader native-compiler testing.**
-   Run the wider correctness suite through the native compiler path. Current
-   qualification includes 16 native CLI examples and two embedded API outputs;
-   the 631-test suite does not mean every case was compiled by the native CLI. Compare
-   native/bootstrap output and observable behavior, including rejection cases,
-   modules, closures, recursive data, patterns, strings and byte arrays.
+3. **Broader native-compiler testing — current corpus verified.**
+   All 317 positive/negative fixtures go through stage 3, with exact accepted
+   image/output comparisons. The separate upstream comparisons are independent.
+   Expand this corpus alongside every new language/runtime feature.
 
-4. **Self-hosting proof.**
-   Have the native compiler compile its own complete source, execute the rebuilt
-   compiler, and compare successive identical-input builds byte-for-byte. Retain
-   exact input hashes, commands, compiler/output hashes and test results. Only an
-   actual rebuild establishes this milestone; compiling embedded sample programs
-   does not. Use the dedicated `cli_builder.build` path for the compiler's own
-   effect-runner entry; a native self-build command still needs to be connected.
+4. **Self-hosting proof — verified.**
+   Two native self-rebuilds from the exact frozen source match the seed. A separate
+   changed-source control produces the correctly changed compiler. Source hashes,
+   stage images, native corpus and ELF observations are retained in
+   [the rebuild receipt](evidence/self-hosting-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -96,7 +77,10 @@ A complete compiler rebuild and full upstream Gleam compatibility are unfinished
 7. **Measured optimization after correctness.**
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
-   retaining correctness checks. Binary size alone does not establish speed; no
+   retaining correctness checks. Jay specifically requested look-ahead to avoid
+   redundant intermediate work and register allocation/spilling. Measure emitted
+   frame traffic first; preserve left-to-right effects, call/syscall clobbers and
+   spill live values only where needed. Binary size alone does not establish speed; no
    language-wide performance claim follows from the current example measurements.
 
 8. **Additional targets and distribution.**

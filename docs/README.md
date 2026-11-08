@@ -21,7 +21,7 @@ preview with Ctrl-C. This is a loopback preview, not a public deployment.
 * Mark acceptance criteria for your own review and keep notes in this browser.
 * Export the review as JSON, including its compiler baseline reference.
 
-Review marks and notes do not change verified status, the subjective 70% estimate,
+Review marks and notes do not change verified status, the verified first-milestone indicator,
 shared tasks or source files. They are browser-local annotations, with no upload
 or synchronization service. Storage-blocked mode supports in-memory review and
 export. A no-JavaScript fallback links to the complete text roadmap.
@@ -31,8 +31,8 @@ export. A no-JavaScript fallback links to the complete text roadmap.
 [roadmap.json](roadmap.json) is the versioned input for the eight interactive specs.
 It contains explicit stage status, scope, maturity, acceptance criteria, next
 steps, related stages and evidence paths. The first delivered stage links to
-[NATIVE_CLI_SPEC.md](../NATIVE_CLI_SPEC.md); the next implementation links to
-[FULL_SIZE_RELIABILITY_SPEC.md](../FULL_SIZE_RELIABILITY_SPEC.md). Later stages are
+[NATIVE_CLI_SPEC.md](../NATIVE_CLI_SPEC.md); the completed scale work links to
+[FULL_SIZE_RELIABILITY_SPEC.md](../FULL_SIZE_RELIABILITY_SPEC.md). Extension stages remain
 spec outlines to refine when work starts.
 
 [roadmap.template.html](roadmap.template.html) supplies the interface.

@@ -18,40 +18,40 @@
 <body>
 <header><div class="brand"><span class="brand-mark" aria-hidden="true">g</span>Gleam in Gleam</div><nav class="header-links" aria-label="Project documents"><a href="../README.md">Project overview ↗</a><a href="../ROADMAP.md">Text roadmap ↗</a></nav></header>
 <div class="page">
-<section class="hero" aria-labelledby="title"><div><div class="eyebrow">A compiler, built in its own language</div><h1 id="title">The route to<br><em>self-hosting.</em></h1><p class="intro">Eight workstreams. Explicit specs. Real evidence.<br>A working map of what’s delivered and what comes next.</p></div><div class="progress-panel"><div class="progress-top"><div class="progress-number"><b id="percent">70</b><span>%</span></div><div class="progress-description">Subjective progress toward a usable, self-hosting Linux x86-64 compiler.</div></div><progress id="progress" value="70" max="100" aria-label="Subjective progress toward native self-hosting">70%</progress><p class="progress-caption"><strong>A judgment call, not a measured score.</strong> Full Gleam compatibility and other targets are separate work. Review marks never change this estimate.</p></div></section>
+<section class="hero" aria-labelledby="title"><div><div class="eyebrow">A compiler, built in its own language</div><h1 id="title">The route to<br><em>self-hosting.</em></h1><p class="intro">Eight workstreams. Explicit specs. Real evidence.<br>A working map of what’s delivered and what comes next.</p></div><div class="progress-panel"><div class="progress-top"><div class="progress-number"><b id="percent">100</b><span>%</span></div><div class="progress-description">First supported-subset self-hosting milestone: defined acceptance met.</div></div><progress id="progress" value="100" max="100" aria-label="First native self-hosting milestone">100%</progress><p class="progress-caption"><strong>Native rebuilds verified.</strong> Full Gleam compatibility, optimization and other targets remain separate work. Review marks never change this status.</p></div></section>
 <section class="metrics" aria-label="Last qualified compiler evidence"><div class="metric"><div class="metric-value" id="tests">—</div><div class="metric-label">passing regression checks</div></div><div class="metric"><div class="metric-value" id="upstream">—</div><div class="metric-label">fresh upstream comparisons</div></div><div class="metric"><div class="metric-value" id="examples">—</div><div class="metric-label">native examples, exact bytes</div></div><div class="metric"><div class="metric-value" id="cli-bytes">—</div><div class="metric-label">standalone CLI · bytes</div></div></section>
-<div class="content-grid"><main class="roadmap-main"><div class="roadmap-top"><h2>The eight workstreams</h2><span class="count" id="count" role="status" aria-live="polite">8 workstreams</span></div><div class="tools"><div class="filters" role="group" aria-label="Filter workstreams"><button type="button" data-filter="all" aria-pressed="true">All eight</button><button type="button" data-filter="core" aria-pressed="false">Core milestone</button><button type="button" data-filter="extension" aria-pressed="false">Beyond self-hosting</button></div><div class="search"><label for="search" class="visually-hidden">Search specs and workstreams</label><input id="search" type="search" placeholder="Search specs, evidence, next actions…" autocomplete="off"></div></div><noscript><div class="fallback">This interactive view needs JavaScript. The complete <a href="../ROADMAP.md">text roadmap</a> and <a href="../FULL_SIZE_RELIABILITY_SPEC.md">next implementation spec</a> remain available.</div></noscript><div id="steps"></div><div id="empty" class="empty" hidden>No matching workstreams. Try a different search or filter.</div></main>
-<aside class="aside" aria-label="Current checkpoint"><section class="aside-card"><div class="eyebrow">Next implementation</div><h2>Make the real<br>input fit.</h2><p>Locate the native stack frontier, qualify a focused fix, then lift the 16 KiB source cap. The larger-input failure is preserved.</p><button type="button" class="primary" id="focus-next">Open the reliability spec →</button></section><section class="limits"><div class="small-label">The qualified boundary</div><dl><div><dt>Target</dt><dd>Linux x86-64</dd></div><div><dt>Source / file</dt><dd id="source-limit">16 KiB</dd></div><div><dt>Arena</dt><dd>64 MiB · no GC</dd></div><div><dt>External runtime</dt><dd>None</dd></div><div><dt>Self-rebuild</dt><dd>Unverified</dd></div></dl></section><div class="aside-foot"><strong>Review it your way.</strong><p>Acceptance checkmarks and notes stay in this browser. They are your review, not new compiler verification or shared task status.</p><div id="storage-warning" role="alert" hidden></div><button type="button" id="export">Export my review ↓</button><div id="export-status" role="status" aria-live="polite"></div><div class="snapshot" id="snapshot"></div></div></aside></div>
+<div class="content-grid"><main class="roadmap-main"><div class="roadmap-top"><h2>The eight workstreams</h2><span class="count" id="count" role="status" aria-live="polite">8 workstreams</span></div><div class="tools"><div class="filters" role="group" aria-label="Filter workstreams"><button type="button" data-filter="all" aria-pressed="true">All eight</button><button type="button" data-filter="core" aria-pressed="false">Core milestone</button><button type="button" data-filter="extension" aria-pressed="false">Beyond self-hosting</button></div><div class="search"><label for="search" class="visually-hidden">Search specs and workstreams</label><input id="search" type="search" placeholder="Search specs, evidence, next actions…" autocomplete="off"></div></div><noscript><div class="fallback">This interactive view needs JavaScript. The complete <a href="../ROADMAP.md">text roadmap</a> and <a href="../FULL_SIZE_RELIABILITY_SPEC.md">scale implementation record</a> remain available.</div></noscript><div id="steps"></div><div id="empty" class="empty" hidden>No matching workstreams. Try a different search or filter.</div></main>
+<aside class="aside" aria-label="Current checkpoint"><section class="aside-card"><div class="eyebrow">Next implementation</div><h2>Keep values<br>in registers.</h2><p>Measure frame traffic, use bounded look-ahead and retain values across operations with explicit clobber and spill rules.</p><button type="button" class="primary" id="focus-next">Open the optimization plan →</button></section><section class="limits"><div class="small-label">The qualified boundary</div><dl><div><dt>Target</dt><dd>Linux x86-64</dd></div><div><dt>Source / file</dt><dd id="source-limit">128 KiB</dd></div><div><dt>Arena</dt><dd>512 MiB compiler · no GC</dd></div><div><dt>External runtime</dt><dd>None</dd></div><div><dt>Self-rebuild</dt><dd>Two identical native rebuilds</dd></div></dl></section><div class="aside-foot"><strong>Review it your way.</strong><p>Acceptance checkmarks and notes stay in this browser. They are your review, not new compiler verification or shared task status.</p><div id="storage-warning" role="alert" hidden></div><button type="button" id="export">Export my review ↓</button><div id="export-status" role="status" aria-live="polite"></div><div class="snapshot" id="snapshot"></div></div></aside></div>
 </div><footer><span>Correctness first. Inspect the ASM. Zero third-party compiler dependencies.</span><a href="../SELF_HOSTING.md">What counts as self-hosting? ↗</a></footer>
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "ba5b3c8a663f050c1efa2582ee4bf1d63f91a595",
-  "focus": "full-size",
+  "sourceRevision": "e09936384d62a65142cf079047c6d0ca160044d4",
+  "focus": "optimization",
   "estimate": {
-    "percent": 70,
+    "percent": 100,
     "kind": "subjective",
-    "scope": "Usable, self-hosting Linux x86-64 compiler",
+    "scope": "First supported-subset self-hosting milestone — defined acceptance met",
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/native-cli-verification.json",
-  "ioVerification": "evidence/native-cli-io-verification.json",
+  "verification": "evidence/self-hosting-qualification.json",
+  "ioVerification": "evidence/self-hosting-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
       "title": "Native compiler CLI",
       "scope": "core",
       "status": "verified",
-      "statusLabel": "Verified · bounded",
+      "statusLabel": "Verified · bounded scope",
       "summary": "Read source files and imports, then publish a runnable executable without Node at runtime.",
-      "nextAction": "Preserve the qualified IO contract while the next stage lifts the size boundary.",
-      "specMaturity": "Qualified bounded implementation",
+      "nextAction": "Preserve rooted IO, typed effects and no-replace publication as optimization proceeds.",
+      "specMaturity": "Qualified implementation; limits retained",
       "design": [
         "Command: gleam-native SOURCE.gleam NEW_OUTPUT [--source-root DIRECTORY]. SOURCE is relative to that root, or cwd by default.",
         "Pure Gleam requests drive an owned Linux syscall runner. Resolved constructor fields, label order and callback types are checked before emission.",
         "Rooted regular-file reads refuse source symlinks. Exclusive sibling output, complete writes, fsync and no-replace rename preserve existing paths.",
-        "The qualified limit is 16 KiB per source, with a 64 MiB arena. This is a bounded delivery, not full-size reliability."
+        "The qualified limit is 128 KiB per source and a 512 MiB compiler arena; ordinary output programs retain 64 MiB. No GC or growth."
       ],
       "acceptance": [
         {
@@ -73,16 +73,16 @@
       ],
       "evidence": [
         {
-          "label": "59 CLI checks and IO observations",
-          "path": "evidence/native-cli-io-verification.json"
+          "label": "59 IO checks and actual headers",
+          "path": "evidence/self-hosting-io-verification.json"
         },
         {
-          "label": "Full 631-test verification",
-          "path": "evidence/native-cli-verification.json"
+          "label": "657 checks and 317 upstream comparisons",
+          "path": "evidence/self-hosting-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/native-cli-disassembly.txt"
+          "path": "evidence/self-hosting-disassembly.txt"
         }
       ],
       "related": [],
@@ -92,16 +92,16 @@
       "id": "full-size",
       "title": "Full-size reliability",
       "scope": "core",
-      "status": "next",
-      "statusLabel": "Next · specified",
-      "summary": "Move beyond the 16 KiB guard using measured stack and allocation fixes.",
-      "nextAction": "Attribute the known large-input failure to actual native frames; qualify a focused stack fix before raising the cap.",
-      "specMaturity": "Implementation proposal",
+      "status": "verified",
+      "statusLabel": "Verified · bounded scope",
+      "summary": "Measured stack and allocation fixes allow the actual complete compiler source to rebuild.",
+      "nextAction": "Retain the measured failure frontier; address further stack or memory limits only with evidence.",
+      "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "Keep the production bound until an explicit diagnostic path records the stack frontier for comments, whitespace, UTF-8 and token-heavy input.",
-        "Direct self-tail-call lowering is the first candidate: left-to-right argument evaluation, simultaneous parameter replacement and a jump after the prologue.",
-        "Measure the fixed arena, two-pass append and repeated byte concatenation. Choose memory changes from evidence.",
-        "Current sources total 230,817 bytes across 25 modules; the largest file is 50,640 bytes. These inputs exceed the current cap."
+        "The frozen baseline failure sampled 256 UTF-8 validator frames; only 1.17 MiB of arena was used. Direct returned self-call lowering fixes that causal stack growth.",
+        "Arguments are evaluated left-to-right before replacing parameters. Blocks/cases propagate tail context; closures and non-tail calls do not.",
+        "Balanced byte merges and reverse closure accumulation remove repeated prefix copies. The earlier 64 MiB and 512 MiB allocation failures remain recorded.",
+        "Production: 128 KiB/source, 512 MiB compiler arena; observed self-rebuild allocation 368,525,376 bytes and peak RSS 360,320 KiB. No arbitrary-input or speed claim."
       ],
       "acceptance": [
         {
@@ -123,12 +123,12 @@
       ],
       "evidence": [
         {
-          "label": "Preserved large-input failure",
-          "path": "evidence/native-cli-initial-size-failure.json"
+          "label": "Failed and successful scale measurements",
+          "path": "evidence/self-hosting-scale-frontier.json"
         },
         {
-          "label": "Current CLI guard and boundary checks",
-          "path": "evidence/native-cli-io-verification.json"
+          "label": "Actual complete native rebuilds",
+          "path": "evidence/self-hosting-native-rebuilds.json"
         }
       ],
       "related": [
@@ -140,16 +140,16 @@
       "id": "native-testing",
       "title": "Broader native testing",
       "scope": "core",
-      "status": "partial",
-      "statusLabel": "Partial · examples verified",
-      "summary": "Exercise the wider correctness suite through the native compiler, not just the bootstrap implementation.",
-      "nextAction": "Reuse the existing fixture corpus through native file compilation and record exact per-case results.",
-      "specMaturity": "Outline; refine before implementation",
+      "status": "verified",
+      "statusLabel": "Verified · bounded scope",
+      "summary": "All 317 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
+      "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
+      "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "There are 631 regression checks and 297 upstream comparisons; that does not mean all cases were compiled by the native CLI.",
-        "Current native evidence includes all 16 example programs plus two embedded API compilation/output checks.",
-        "Compare acceptance/rejection, emitted bytes and execution; preserve platform/build/source identity and initial failures.",
-        "Extend coverage to modules, generic/recursive data, closures, evaluation order, patterns, Unicode and byte arrays."
+        "657 regression checks and 317 fresh upstream comparisons are separately recorded.",
+        "Stage 3 compiles 198 accepted and 119 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
+        "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
+        "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
       ],
       "acceptance": [
         {
@@ -171,16 +171,16 @@
       ],
       "evidence": [
         {
-          "label": "Native CLI example/IO evidence",
-          "path": "evidence/native-cli-io-verification.json"
+          "label": "317 native cases, individual outcomes",
+          "path": "evidence/self-hosting-native-rebuilds.json"
         },
         {
-          "label": "Two native API output checks",
-          "path": "evidence/complete-api-native-cli-probe.json"
+          "label": "Independent project comparisons",
+          "path": "evidence/self-hosting-project-upstream-checks.json"
         },
         {
-          "label": "Upstream fixture results",
-          "path": "evidence/native-cli-project-upstream-checks.json"
+          "label": "Independent grammar comparisons",
+          "path": "evidence/self-hosting-upstream-checks.json"
         }
       ],
       "related": [
@@ -192,16 +192,16 @@
       "id": "self-hosting",
       "title": "The self-hosting proof",
       "scope": "core",
-      "status": "pending",
-      "statusLabel": "Not yet verified",
-      "summary": "Make the native compiler rebuild its own exact source and compare successive images.",
-      "nextAction": "After scale qualification, connect the dedicated native self-build route through cli_builder.build.",
-      "specMaturity": "Outline; refine before implementation",
+      "status": "verified",
+      "statusLabel": "Verified · bounded scope",
+      "summary": "Two actual native self-rebuilds produce the exact same 592,047-byte compiler image.",
+      "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
+      "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "Retain the effect-runner entry when rebuilding the compiler; the ordinary program entry alone is insufficient.",
-        "Freeze identical inputs and record source, command, compiler and output hashes.",
-        "Execute the rebuilt compiler and repeat the same rebuild, then compare bytes and behavior.",
-        "A sample-program compile, a parsed compiler source or an ELF wrapper does not satisfy this milestone."
+        "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 26 actual compiler modules are read through the native IO path.",
+        "Stages 1, 2 and 3 have the same SHA256: 752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb.",
+        "The rebuilt image runs --version and qualifies the entire 317-case corpus with empty PATH.",
+        "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
       "acceptance": [
         {
@@ -223,12 +223,12 @@
       ],
       "evidence": [
         {
-          "label": "Current self-hosting status",
-          "path": "SELF_HOSTING.md"
+          "label": "Rebuild and source-sensitivity proof",
+          "path": "evidence/self-hosting-native-rebuilds.json"
         },
         {
-          "label": "Dedicated build entry source",
-          "path": "src/native/cli_builder.gleam"
+          "label": "Status, commands and limits",
+          "path": "SELF_HOSTING.md"
         }
       ],
       "related": [
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/native-cli-project-upstream-checks.json"
+          "path": "evidence/self-hosting-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -337,16 +337,18 @@
       "id": "optimization",
       "title": "Measured optimization",
       "scope": "extension",
-      "status": "pending",
-      "statusLabel": "Benchmarks pending",
+      "status": "next",
+      "statusLabel": "Next · frame traffic",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Define reproducible workloads and instrumentation before claiming speed improvements.",
+      "nextAction": "Measure actual frame loads/stores and temporary push/pop traffic; use bounded look-ahead and explicit register/clobber rules to remove redundant spills.",
       "specMaturity": "Outline; refine before implementation",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
         "Separate cold/warm compilation, runtime execution, allocation/peak memory and artifact-size measurements.",
         "Use multiple runs, retain environment/toolchain/input hashes and report variation.",
-        "Select an observed bottleneck, inspect ASM and compare correctness before/after."
+        "Select an observed bottleneck, inspect ASM and compare correctness before/after.",
+        "Jay requested look-ahead and register spilling. Keep evaluation order and overflow traps; preserve live values across internal calls and Linux syscall RCX/R11 clobbers.",
+        "R14/R15 remain reserved arena registers. Internal calls use the owned stack ABI, not an assumed SysV convention. Static instruction counts are not dynamic performance evidence."
       ],
       "acceptance": [
         {
@@ -429,16 +431,16 @@
     }
   ],
   "metrics": {
-    "tests": 631,
-    "upstream": 297,
+    "tests": 657,
+    "upstream": 317,
     "examples": 16,
-    "cliBytes": 582442,
-    "sourceLimitBytes": 16384,
-    "observedAt": "2026-11-08T01:16:08.891679+00:00"
+    "cliBytes": 592047,
+    "sourceLimitBytes": 131072,
+    "observedAt": "2026-11-08T02:31:02.550116+00:00"
   },
   "evidenceSHA256": {
-    "evidence/native-cli-verification.json": "395347edeeabc8b126e9dccaf75daacc2eb444074d39a5365a44584a86c83734",
-    "evidence/native-cli-io-verification.json": "cb5d12878c0a1770285a78fcbb2fef56203a5c329ce8dcd39c810221f670c031"
+    "evidence/self-hosting-qualification.json": "a9f7acfc4f2b11e439f8dff1c18b0dfbe43f441f0cebed90f07b2ff28747a394",
+    "evidence/self-hosting-io-verification.json": "c23db329d181b92aa948f7e4417e59ac354887f993c5235d6d30aed8f4a19aba"
   }
 }</script>
 <script>

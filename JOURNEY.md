@@ -461,3 +461,45 @@ Desktop/mobile screenshots were visually inspected and remain in ignored out/.
 The dedicated UI receipt retains source/screenshot hashes. Compiler qualification
 continues to refer to the prior source baseline, rather than counting these UI
 checks as newly compiled language cases.
+
+## The compiler rebuilds itself — 2026-11-08
+
+We reproduced the old large-comment crash using frozen ba5b3c8 target source and
+an explicitly higher diagnostic cap, rather than removing a production guard.
+A bounded ptrace probe found the actual cause: all 256 sampled frames were the
+UTF-8 validator, with 272-byte locals and 296-byte stride. The 8 MiB stack was
+exhausted with only 1,173,024 arena bytes allocated. Zero-byte symbol labels and
+exact artifact hashes tied these observations to real emitted instructions.
+
+Direct self-tail lowering fixed that frontier. Arguments are evaluated left to
+right before replacing parameters; a jump returns to the body after its prologue.
+The identical diagnostic input now compiles, and million-iteration regression runs
+finish under a 64 KiB stack. Ordinary recursive calls and closure boundaries remain
+explicitly ordinary; this is not general tail-call optimization.
+
+The full compiler graph then hit the arena boundary. Raising a diagnostic arena
+to 512 MiB still failed: closure helpers repeatedly copied a growing instruction
+prefix. Balanced byte concatenation plus reverse closure accumulation removed the
+measured copying frontiers. These failures remain in the scale receipt; we did not
+replace them with successful runs or treat capacity alone as an optimization.
+
+Production limits are now 128 KiB/source and a bounded 512 MiB compiler arena,
+while ordinary output programs retain 64 MiB. A native --build-compiler route
+retains the owned effect-runner entry. Two native rebuilds from the same frozen
+26-module source are byte-identical to the initial native seed: 592,047 bytes,
+SHA256 752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb.
+One rebuild allocated 368,525,376 bytes and peaked at 360,320 KiB RSS. These are
+resource observations, not comparative speed benchmarks. No GC or growth exists.
+
+The rebuilt stage-3 compiler passes all 317 corpus cases, including 198 accepted
+outputs byte-identical to bootstrap and 119 controlled rejections. A changed-version
+source control produces the correctly changed image, matching a fresh bootstrap
+reference. Full qualification passes 657 tests and 317 fresh upstream comparisons;
+59 targeted native IO checks preserve syscall/publication behavior. The first
+self-hosting milestone reaches its defined finish line; full upstream compatibility
+is still false. All earlier component proofs remain historical.
+
+Jay next suggested GCC-style look-ahead and register spilling. We will measure
+frame traffic first, then retain values in registers where the actual clobber and
+evaluation-order contracts allow it. No borrowed optimizer, external backend or
+runtime dependency is introduced. Correctness and actual ASM stay the criteria.

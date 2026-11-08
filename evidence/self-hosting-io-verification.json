@@ -1,0 +1,464 @@
+{
+  "schema": "gleam-in-gleam.native-cli/1",
+  "observedAt": "2026-11-08T02:27:57.295Z",
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "61df2907b354c3e0fe915097a3080d7eadab62b981ba39fd5ab9f590caa9b071",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "b429872d9eee7d373a6a8b39a723af8bbf9d5898bedcac925d81ae9ec4a8103a"
+  },
+  "buildBridgeSHA256": "bdec0f88514fb7790ca25a1eb1581c1b25c8e015433ef99a157361e802b284a4",
+  "testSHA256": "12b4333e1210a72fd0615c24ddf19c6265b8f35ecda350cfbc100df82d76aae5",
+  "shortIOHarnessSHA256": "f565d4b4300be79dde1b392a9d8934da7ef35bf6f9d84ffcb1ca5f1d4f758598",
+  "artifact": {
+    "bytes": 592047,
+    "sha256": "752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb",
+    "dynamicLoader": false,
+    "dynamicSegment": false,
+    "nonExecutableStack": true
+  },
+  "observations": [
+    {
+      "kind": "help-version-usage",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 601,
+      "sha256": "59f55018de253f2d8f9d5b35cb9ba900c54aed87558d4a9f2f99342844bea815",
+      "byteIdentical": true,
+      "stdout": "55\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1078,
+      "sha256": "e9857046e97210ff7b3130d72236ffd38acbf835dc74b45377f2d61902a5b1d2",
+      "byteIdentical": true,
+      "stdout": "14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1289,
+      "sha256": "93dc00292d05f673cbca67f548dcbc02342ed2a7c720cd1dc22c25d624008236",
+      "byteIdentical": true,
+      "stdout": "6\n3\n6\n6\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1277,
+      "sha256": "7a45a359782b385ad041969a0d02411f99c12fab07742b4512a1888c11d26d82",
+      "byteIdentical": true,
+      "stdout": "5\n23\n0\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 874,
+      "sha256": "dc7d2a6c6d337956c7eb57afe4b035a7692be212cf4e6aa91ffc0f9e44c2f1e4",
+      "byteIdentical": true,
+      "stdout": "21\n2\n21\n2\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1050,
+      "sha256": "3050f3b1210dbcc803df23d6357574a2dd5fbdf54e93085fce188aca94728ee3",
+      "byteIdentical": true,
+      "stdout": "22\n3\n4\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1021,
+      "sha256": "5189b1237e01dc24846d1c3ea8ea49e201c5098f9802fbc47a6912eaf959cca0",
+      "byteIdentical": true,
+      "stdout": "12\n22\n6\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 930,
+      "sha256": "e9f4236e62b01c9351f170ee36fbdc3005f2bb40aab7986f2c23bd5e8913042a",
+      "byteIdentical": true,
+      "stdout": "3\n7\nTrue\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1825,
+      "sha256": "3a6246603edd9e0564244ccf98899133111713eff214b49d0bdb3a391dd0c849",
+      "byteIdentical": true,
+      "stdout": "5\n9\n-2\n4660\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1060,
+      "sha256": "58afdd9c3f748246bf4ebe29c7cd63a884c0b94daeaeaf4aac1734cbec4856f2",
+      "byteIdentical": true,
+      "stdout": "14\n8\n3\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1269,
+      "sha256": "c2aa57c17222ca19bb173e4c3f6455b02ff20003f042b85c90fb76b10fcaff96",
+      "byteIdentical": true,
+      "stdout": "7\n5\nTrue\nFalse\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1852,
+      "sha256": "d6bd4fc63a544b0777cf6e3aac45eed54b9743d894efc5d91898ceef75dbe610",
+      "byteIdentical": true,
+      "stdout": "True\nTrue\nλ😀\n206\n187\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 1146,
+      "sha256": "cc9b4d05453194a056ba6b6a9589aca5b30888e5199f5f4f04927ec92ff1d44c",
+      "byteIdentical": true,
+      "stdout": "7\n9\n3\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 2602,
+      "sha256": "172f4ae1c8f01fb1682aedf961eee286c0b84fec91a199bdfe89262b9d242a38",
+      "byteIdentical": true,
+      "stdout": "True\nFalse\nTrue\nTrue\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 884,
+      "sha256": "d78b45bc9744a36045a3d4047f426bc4843265ee562117acc74dcddaf3a2b174",
+      "byteIdentical": true,
+      "stdout": "14\n10\n"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 662,
+      "sha256": "28d44ea87e06a0a11702cd14c3168c626cc0d442ff27f31dae810167af919ba7",
+      "byteIdentical": true,
+      "stdout": "True\nFalse\n9007199254740991\n-2147483648\n"
+    },
+    {
+      "kind": "rejection",
+      "case": "syntax",
+      "status": 1,
+      "diagnostic": "In main: byte 22: Expression not implemented in native seed\n"
+    },
+    {
+      "kind": "rejection",
+      "case": "types",
+      "status": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+    },
+    {
+      "kind": "rejection",
+      "case": "missing import",
+      "status": 1,
+      "diagnostic": "Cannot read missing.gleam: Cannot open source beneath root (symlinks are refused)\n"
+    },
+    {
+      "kind": "rejection",
+      "case": "cycle",
+      "status": 1,
+      "diagnostic": "Import cycle at module: main\n"
+    },
+    {
+      "kind": "rejection",
+      "case": "invalid UTF8",
+      "status": 1,
+      "diagnostic": "In main: Source is not valid UTF-8\n"
+    },
+    {
+      "kind": "output-preserved",
+      "case": "file"
+    },
+    {
+      "kind": "output-preserved",
+      "case": "directory"
+    },
+    {
+      "kind": "output-preserved",
+      "case": "symlink"
+    },
+    {
+      "kind": "output-preserved",
+      "case": "dangling-symlink"
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "input-refusal",
+      "case": "symlink-file",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "symlink-directory",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "directory",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "fifo",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "oversized",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "missing-root",
+      "status": 1
+    },
+    {
+      "kind": "input-refusal",
+      "case": "missing-source",
+      "status": 1
+    },
+    {
+      "kind": "argument-bounds",
+      "invalidUTF8": true,
+      "oversized": true,
+      "tooMany": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "read",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "write",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "openat",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "openat2",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "fstat",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "fchmod",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "fsync",
+      "verified": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "EINTR-injection",
+      "syscall": "renameat2",
+      "verified": true
+    },
+    {
+      "kind": "failure-injection",
+      "syscall": "write",
+      "noOutput": true,
+      "temporaryClean": true
+    },
+    {
+      "kind": "failure-injection",
+      "syscall": "fchmod",
+      "noOutput": true,
+      "temporaryClean": true
+    },
+    {
+      "kind": "failure-injection",
+      "syscall": "fsync",
+      "noOutput": true,
+      "temporaryClean": true
+    },
+    {
+      "kind": "failure-injection",
+      "syscall": "renameat2",
+      "noOutput": true,
+      "temporaryClean": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "actual-short-io",
+      "schema": "gleam-in-gleam.short-io/1",
+      "limit": 7,
+      "syscalls": {
+        "0": 6,
+        "1": 55,
+        "3": 3,
+        "5": 1,
+        "9": 1,
+        "39": 1,
+        "59": 1,
+        "60": 1,
+        "74": 1,
+        "91": 1,
+        "257": 2,
+        "316": 1,
+        "437": 1
+      },
+      "shortenedReadRequests": 4,
+      "shortenedWriteRequests": 54,
+      "positiveShortReads": 4,
+      "positiveShortWrites": 54,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "ABI-refusal",
+      "sameTypeFieldOrder": true,
+      "callbackSignature": true
+    },
+    {
+      "kind": "close-error-injection",
+      "calls": 3,
+      "retried": false,
+      "temporaryClean": true
+    },
+    {
+      "kind": "syscall-unavailable",
+      "syscall": "openat2",
+      "status": 1
+    },
+    {
+      "kind": "syscall-unavailable",
+      "syscall": "renameat2",
+      "status": 1
+    },
+    {
+      "kind": "preexisting-temporary-preserved",
+      "verified": true
+    },
+    {
+      "kind": "concurrent-publish",
+      "statuses": [
+        0,
+        1
+      ],
+      "byteIdentical": true
+    },
+    {
+      "kind": "compile-execute",
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdentical": true,
+      "stdout": "7\n"
+    },
+    {
+      "kind": "source-byte-boundary",
+      "acceptedBytes": 131072,
+      "rejectedBytes": 131073
+    }
+  ],
+  "disassembly": {
+    "path": "evidence/native-cli-disassembly.txt",
+    "sha256": "b9ac73b11f524e9c67acc290d50b4e6fc8706f852ebb044a115b42bcc17ce655",
+    "kind": "selected actual instruction windows"
+  },
+  "limits": {
+    "sourceBytes": 131072,
+    "arenaBytes": 536870912
+  },
+  "diagnostic": false,
+  "selfHosting": false
+}

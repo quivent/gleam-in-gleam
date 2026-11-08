@@ -471,3 +471,38 @@ recorded positive short IO still yields byte-identical output. Separate injected
 errors test retry/cleanup branches. Full-size stack handling, native tail-call
 elimination and memory collection remain future work; the first native CLI uses
 an explicit 16 KiB source-file bound.
+
+## Direct self-tail lowering and scale-qualified image
+
+The current image is 592,047 bytes, SHA256
+`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+The previous instruction addresses above describe the older named image.
+Current CLI instruction windows are in evidence/self-hosting-disassembly.txt.
+
+Each named function has zero-byte start/loop/end labels. The loop starts 11 bytes
+past the entry, after push RBP, mov RSP→RBP and sub frame,RSP. A returned direct
+self-call evaluates and pushes arguments left-to-right, then pops all new values
+in reverse order into RBP+16,+24,..., and jumps to that loop. It preserves the
+original frame/return address and any hidden descriptor word. No partial parameter
+update can alter another argument. Function body fallthrough still uses leave/ret.
+
+Tail context propagates only through returned blocks/cases. Closure helpers,
+operands, echoes, let RHSs, mutual calls and indirect calls retain ordinary calls.
+The objdump assertions in test/tail-calls.test.mjs verify both the loop jump and
+non-tail call, and million-iteration runs use an actual 64 KiB RLIMIT_STACK.
+
+Balanced concat merges adjacent chunks without reordering bytes. Closure helpers
+accumulate as a reversed instruction stream and reverse once at final layout;
+this avoids copying every preceding helper while preserving physical order.
+Both changes are compiler-side allocation fixes, not a new generated runtime.
+
+The CLI initializes a bounded 512 MiB arena; ordinary programs retain 64 MiB.
+R14 is its end and R15 its cursor. Neither is available to a register allocator.
+One rebuild used 368,525,376 arena bytes; this is not spill-space or a GC heap claim.
+
+Next: measure actual frame-memory and push/pop traffic before introducing register
+retention. Look-ahead may avoid materializing redundant intermediates, but cannot
+reorder effects or move a trap. RAX/RCX/RDX and other scratch registers are clobbered
+by internal helpers as documented by their actual instructions. Linux syscall
+clobbers RCX/R11. Any values live across these boundaries need explicit spills or
+a preserved-register convention; do not infer that the internal stack ABI is SysV.

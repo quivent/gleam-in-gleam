@@ -1,60 +1,65 @@
-# Progress toward self-hosting
+# Self-hosting proof
 
-**A standalone native file-based compiler CLI now works for bounded inputs. A
-full-size compiler rebuild and stage-2 comparison remain unproved.** This is a
-qualified Gleam subset, not a replacement for upstream. The 70% bar in
-[ROADMAP.md](ROADMAP.md) is a subjective milestone estimate.
+**The supported-subset compiler rebuilds itself natively.** The first milestone's
+previously defined acceptance scope is met; full upstream Gleam compatibility is
+still incomplete.
 
-Build once with `node build-native.mjs out/gleam-native`, then run that executable
-without Node. The CLI loads source/imports beneath a selected root and publishes
-complete executables without replacing existing paths. It compiles and executes
-all sixteen examples with exact bootstrap byte comparisons. Its separate native
-API proof still compiles two embedded programs and verifies their emitted bytes.
+## Exact observed chain
 
-The CLI bounds sources to 16 KiB each, the graph to 256 files, and uses the existing
-64 MiB arena without GC or native TCO. A 33 KiB comment-heavy input exposed a real
-stack limit; full-size reliability is next, rather than an assumed solved problem.
-The 59 targeted CLI tests include actual kernel short reads/writes, injected
-interruptions/errors, Unicode, no-replace publication and effect ABI rejection.
-[The IO receipt](evidence/native-cli-io-verification.json) records observations and
-actual ELF headers; [the spec](NATIVE_CLI_SPEC.md) defines the bounded contract.
+1. The upstream Gleam/JavaScript bootstrap emits stage 1, our native compiler.
+2. Stage 1 reads a frozen copy of all 26 actual compiler modules through the owned
+   file runner and `--build-compiler`, producing stage 2.
+3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
+4. All three are 592,047 bytes with SHA256
+   `752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+5. Stage 3 compiles 317 corpus cases: 198 accepted, 119 rejected. Every accepted
+   output is byte-identical to bootstrap output and executes correctly. Rejections
+   have controlled compiler exits and publish no output.
+6. A changed version literal in a separate source copy produces a different native
+   compiler, reports the changed version and matches a fresh bootstrap reference.
 
-| Area | Actual evidence | Remaining work |
-| --- | --- | --- |
-| Source compilation | All actual compiler modules compile to native code under a bounded driver | Native compilation of a complete compiler rebuild input |
-| Native compiler execution | Two programs emitted, byte-identical to bootstrap output, both execute correctly | Broader native-path qualification and self-rebuild |
-| CLI/IO | Owned native arguments, rooted file reads, robust write/publication loops | Lift qualified 16 KiB input bound; full-size reliability |
-| Language | Recursive ADTs, closures/use, aliases/guards, product cases, structural equality and exact 53-bit literals | Remaining upstream syntax/inference/imports, erased equality, exact larger literals |
-| Runtime | Owned strings/bytes, direct syscalls and checked 64 MiB arena | Native tail-call elimination, collection/allocation scaling |
-| Targets/dependencies | Own x86-64 emitter/relocator/ELF, no external runtime/assembler/linker/libc/packages | Additional architectures/OS formats |
+The rebuilds and corpus run with an empty PATH. Actual ELF headers have no dynamic
+loader/segment and an RW non-executable stack. No upstream compiler, Node, libc,
+external assembler/linker or bundled VM is invoked by the native compiler.
+Development/bootstrap verification tooling remains separate.
 
-The complete regression/upstream run passes **631 tests and 297 fresh upstream
-comparisons**, with all sixteen earlier example hashes unchanged. It is recorded in
-[evidence/native-cli-verification.json](evidence/native-cli-verification.json).
-The earlier 572-test/297-comparison milestone and 498,418-byte API-plus-driver
-image are preserved under their original receipt names.
+## Repeat
 
-The full prioritized backlog and acceptance evidence are in [ROADMAP.md](ROADMAP.md).
+```sh
+gleam build --warnings-as-errors
+node build-native.mjs out/stage1
+./out/stage1 --build-compiler out/stage2 --source-root src
+./out/stage2 --build-compiler out/stage3 --source-root src
+cmp out/stage1 out/stage2
+cmp out/stage2 out/stage3
+python3 verify.py
+```
 
-The [interactive roadmap](docs/roadmap.html) exposes the eight specs/evidence;
-[the full-size reliability spec](FULL_SIZE_RELIABILITY_SPEC.md) defines the next
-bounded implementation sequence.
+Outputs must be new and source bytes unchanged. The verifier freezes its inputs
+and records exact per-module/fixture hashes and per-case observations.
 
-## Next acceptance steps
+## Bounds and remaining work
 
-1. Extend the delivered bounded native CLI to actual compiler-source scale,
-   using measured stack/allocation failures to choose the next runtime changes.
-2. Compile complete compiler inputs natively and fix measured resource limits.
-   The append change avoids bootstrap stack overflow but uses an extra reversed
-   prefix. Its traversals still consume stack in native code until TCO exists;
-   the arena has no collection. Do not assume small-input success proves scale.
-3. Connect a native self-build entry using `cli_builder.build`, preserving the
-   effect runner. Rebuild the exact compiler source with the native compiler, compare the
-   stage-1/stage-2 bytes and execute the rebuilt compiler's checks. Only then
-   claim native self-hosting.
+The native CLI accepts 128 KiB/source, 256 files, and uses a bounded 512 MiB arena.
+One real rebuild allocated 368,525,376 bytes and peaked at 360,320 KiB RSS.
+Ordinary emitted programs retain 64 MiB. No collection or growth exists.
+Direct returned self-calls are optimized through blocks/cases; mutual/indirect
+calls and continuation callbacks still use ordinary calls. Deep non-tail syntax
+can still exhaust the stack. Full compatibility, exact larger literals, erased
+value equality, measured optimization/register allocation and targets remain open.
 
-Historical component proofs for UTF-8, core, type-system and equality planner
-remain in evidence and JOURNEY.md. Earlier alias and literal rejections are
-preserved under their original receipt names. The Node bootstrap is still used
-to create the initial image; the resulting CLI runs independently. No installed
-compiler or Crew process has been replaced.
+## Evidence
+
+* [Complete qualification](evidence/self-hosting-qualification.json): 657 checks,
+  317 fresh independent upstream comparisons and all 16 native example runs.
+* [Native rebuilds and corpus](evidence/self-hosting-native-rebuilds.json): exact
+  sources, image hashes, source-sensitivity control and individual native cases.
+* [Native IO qualification](evidence/self-hosting-io-verification.json): 59 targeted
+  checks, actual short IO, errors, preservation and ELF headers.
+* [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
+  initial stack/heap failures and measured fixes; snapshots are not peak stack.
+* [History](JOURNEY.md) and [remaining roadmap](ROADMAP.md).
+
+Older native API and 16 KiB CLI evidence remains under its original filenames.
+Those component proofs alone were not self-hosting. No installed compiler, Crew
+session or unrelated executable was replaced.
