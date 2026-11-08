@@ -87,7 +87,7 @@ fn visit(
   active: List(#(String, Nil)),
   done: List(Loaded),
 ) -> Result(List(Loaded), String) {
-  case c.lookup(c.map(done, fn(m) { #(m.name, m) }), name) {
+  case c.find(done, fn(m) { m.name == name }) {
     Ok(_) -> Ok(done)
     Error(_) -> {
       use _ <- c.then(case c.lookup(active, name) {
@@ -192,17 +192,15 @@ fn internal(name: String, module_name: String, entry: String) -> String {
 }
 
 fn module_by_name(name: String, scope: Scope) -> Result(Loaded, String) {
-  c.lookup(c.map(scope.modules, fn(m) { #(m.name, m) }), name)
+  case c.find(scope.modules, fn(m) { m.name == name }) {
+    Ok(m) -> Ok(m)
+    Error(_) -> Error("Unknown name: " <> name)
+  }
 }
 
 fn imported(alias: String, scope: Scope) -> Result(Loaded, String) {
   use i <- c.then(
-    case
-      c.lookup(
-        c.map(scope.current.module_.imports, fn(i) { #(i.alias, i) }),
-        alias,
-      )
-    {
+    case c.find(scope.current.module_.imports, fn(i) { i.alias == alias }) {
       Ok(i) -> Ok(i)
       Error(_) -> Error("Unknown module alias: " <> alias)
     },
@@ -211,9 +209,9 @@ fn imported(alias: String, scope: Scope) -> Result(Loaded, String) {
 }
 
 fn local(bound: List(String), name: String) -> Bool {
-  case c.lookup(c.map(bound, fn(n) { #(n, Nil) }), name) {
-    Ok(_) -> True
-    Error(_) -> False
+  case bound {
+    [] -> False
+    [first, ..rest] -> first == name || local(rest, name)
   }
 }
 
@@ -239,14 +237,11 @@ fn value_in(
   external: Bool,
   entry: String,
 ) -> Result(String, String) {
-  let functions = c.map(m.module_.functions, fn(f) { #(f.name, f.public_) })
-  let constructors =
-    flatten(
-      c.map(m.module_.custom_types, fn(t) {
-        c.map(t.variants, fn(v) { #(v.name, t.public_) })
-      }),
-    )
-  case c.lookup(c.append(functions, constructors), name) {
+  let found = case c.find(m.module_.functions, fn(f) { f.name == name }) {
+    Ok(f) -> Ok(f.public_)
+    Error(_) -> constructor_public(m.module_.custom_types, name)
+  }
+  case found {
     Ok(public_) ->
       case external && !public_ {
         True -> Error("Private module member: " <> m.name <> "." <> name)
@@ -257,6 +252,20 @@ fn value_in(
         False, "Ok" -> Ok(prelude.ok_name())
         False, "Error" -> Ok(prelude.error_name())
         _, _ -> Error("Unknown name: " <> m.name <> "." <> name)
+      }
+  }
+}
+
+fn constructor_public(
+  types: List(a.CustomType),
+  name: String,
+) -> Result(Bool, String) {
+  case types {
+    [] -> Error("Item not found")
+    [t, ..rest] ->
+      case c.find(t.variants, fn(v) { v.name == name }) {
+        Ok(_) -> Ok(t.public_)
+        Error(_) -> constructor_public(rest, name)
       }
   }
 }
@@ -289,7 +298,7 @@ fn named_type(
   scope: Scope,
   active: List(#(String, Nil)),
 ) -> Result(a.Type, String) {
-  case c.lookup(c.map(m.module_.aliases, fn(t) { #(t.name, t) }), name) {
+  case c.find(m.module_.aliases, fn(t) { t.name == name }) {
     Ok(alias) -> {
       use _ <- c.then(case external && !alias.public_ {
         True -> Error("Private module type: " <> m.name <> "." <> name)
@@ -301,9 +310,7 @@ fn named_type(
     }
     Error(_) -> {
       use t <- c.then(
-        case
-          c.lookup(c.map(m.module_.custom_types, fn(t) { #(t.name, t) }), name)
-        {
+        case c.find(m.module_.custom_types, fn(t) { t.name == name }) {
           Ok(t) -> Ok(t)
           Error(_) ->
             case name == "Result" && !external {

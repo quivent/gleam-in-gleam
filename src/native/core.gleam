@@ -117,6 +117,18 @@ pub fn try_map(
   }
 }
 
+// Search existing immutable nodes; do not materialize a parallel key/value list.
+pub fn find(xs: List(a), predicate: fn(a) -> Bool) -> Result(a, String) {
+  case xs {
+    [] -> Error("Item not found")
+    [x, ..rest] ->
+      case predicate(x) {
+        True -> Ok(x)
+        False -> find(rest, predicate)
+      }
+  }
+}
+
 pub fn lookup(xs: List(#(String, a)), name: String) -> Result(a, String) {
   case xs {
     [] -> Error("Unknown name: " <> name)
