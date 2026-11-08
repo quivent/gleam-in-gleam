@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="28" viewBox="0 0 110 28" role="img" aria-label="source: Gleam">
+  <title>source: Gleam</title>
+  <rect width="110" height="28" rx="6" fill="#8b5cf6"/>
+  <path d="M6 0 H58 V28 H6 Q0 28 0 22 V6 Q0 0 6 0" fill="#243044"/>
+  <g fill="#fff" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11" text-anchor="middle">
+    <text x="29.2" y="18">source</text>
+    <text x="84.4" y="18">Gleam</text>
+  </g>
+</svg>

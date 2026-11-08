@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="28" viewBox="0 0 200 28" role="img" aria-label="third-party dependencies: 0">
+  <title>third-party dependencies: 0</title>
+  <rect width="200" height="28" rx="6" fill="#b45309"/>
+  <path d="M6 0 H174 V28 H6 Q0 28 0 22 V6 Q0 0 6 0" fill="#243044"/>
+  <g fill="#fff" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11" text-anchor="middle">
+    <text x="86.8" y="18">third-party dependencies</text>
+    <text x="186.8" y="18">0</text>
+  </g>
+</svg>
