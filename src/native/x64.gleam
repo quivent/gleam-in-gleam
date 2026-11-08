@@ -8,6 +8,7 @@ import native/definitions as d
 import native/equality as eq
 import native/equality_runtime as eq_runtime
 import native/heap
+import native/registers as r
 import native/string_runtime
 
 type State {
@@ -278,6 +279,89 @@ fn statement_mode(
 }
 
 fn expression(e: t.Typed, state: State) -> Generated {
+  case e.node {
+    t.BinaryNode(_, _, _) | t.UnaryNode(_, _) ->
+      case r.plan(e) {
+        Ok(code) -> {
+          use code <- c.then(register_code(code, state.env))
+          Ok(#(code, state))
+        }
+        Error(_) -> ordinary_expression(e, state)
+      }
+    _ -> ordinary_expression(e, state)
+  }
+}
+
+fn register_number(register: r.Register) -> Result(Int, String) {
+  case register {
+    r.Rax -> Ok(0)
+    r.Rcx -> Ok(1)
+    r.Rdx -> Ok(2)
+    r.Rdi -> Ok(7)
+    r.Flags -> Error("Flags cannot be a machine operand")
+  }
+}
+
+fn register_code(
+  code: List(r.Instruction),
+  env: List(#(String, Int)),
+) -> Result(List(asm.Part), String) {
+  case code {
+    [] -> Ok([])
+    [instruction, ..rest] -> {
+      use head <- c.then(register_instruction(instruction, env))
+      use tail <- c.then(register_code(rest, env))
+      Ok(c.append(head, tail))
+    }
+  }
+}
+
+fn register_instruction(
+  instruction: r.Instruction,
+  env: List(#(String, Int)),
+) -> Result(List(asm.Part), String) {
+  case instruction {
+    r.Constant(target, n) -> {
+      use target <- c.then(register_number(target))
+      Ok([raw(<<72, { 184 + target }, n:64-little>>)])
+    }
+    r.ReadLocal(target, name) -> {
+      use target <- c.then(register_number(target))
+      use offset <- c.then(c.lookup(env, name))
+      Ok([raw(<<72, 139, { 133 + target * 8 }, offset:32-little>>)])
+    }
+    r.Copy(source, target) -> {
+      use source <- c.then(register_number(source))
+      use target <- c.then(register_number(target))
+      Ok([raw(<<72, 137, { 192 + source * 8 + target }>>)])
+    }
+    r.Push(register) -> {
+      use register <- c.then(register_number(register))
+      Ok([raw(<<{ 80 + register }>>)])
+    }
+    r.Pop(register) -> {
+      use register <- c.then(register_number(register))
+      Ok([raw(<<{ 88 + register }>>)])
+    }
+    r.Calculate(operator, right, target) -> {
+      use right <- c.then(register_number(right))
+      use target <- c.then(register_number(target))
+      let bytes = case operator {
+        r.Add -> <<72, 1, { 192 + right * 8 + target }>>
+        r.Subtract -> <<72, 41, { 192 + right * 8 + target }>>
+        r.Multiply -> <<72, 15, 175, { 192 + target * 8 + right }>>
+      }
+      Ok([raw(bytes)])
+    }
+    r.Negate(register) -> {
+      use register <- c.then(register_number(register))
+      Ok([raw(<<72, 247, { 216 + register }>>)])
+    }
+    r.OverflowGuard -> Ok([branch(128, "rt:overflow")])
+  }
+}
+
+fn ordinary_expression(e: t.Typed, state: State) -> Generated {
   case e.node {
     t.IntegerNode(n) -> Ok(#([immediate(n)], state))
     t.BooleanNode(b) ->

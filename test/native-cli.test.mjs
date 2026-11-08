@@ -1,7 +1,7 @@
 import {test,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,readdirSync,mkdtempSync,mkdirSync,rmSync,existsSync,statSync,symlinkSync,readlinkSync} from 'node:fs';
-import {join} from 'node:path';
+import {join,relative} from 'node:path';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -61,7 +61,7 @@ after(()=>{
     listing+='\n'+section.name+'\n'+dumped.stdout.replaceAll(file,'native-cli-window-'+index+'.bin');
    }
    listing=listing.split('\n').map(line=>line.trimEnd()).join('\n');
-   writeFileSync(process.env.NATIVE_CLI_ASM,listing);disassembly={path:'evidence/native-cli-disassembly.txt',sha256:sha(listing),kind:'selected actual instruction windows'};
+   writeFileSync(process.env.NATIVE_CLI_ASM,listing);disassembly={path:relative(root,process.env.NATIVE_CLI_ASM),sha256:sha(listing),kind:'selected actual instruction windows'};
   }
   const sources=Object.fromEntries(readdirSync(join(root,'src/native')).filter(n=>n.endsWith('.gleam')).sort().map(n=>['src/native/'+n,sha(readFileSync(join(root,'src/native',n)))]));
   writeFileSync(process.env.NATIVE_CLI_RECEIPT,JSON.stringify({schema:'gleam-in-gleam.native-cli/1',observedAt:new Date().toISOString(),sourceSHA256:sources,buildBridgeSHA256:sha(readFileSync(join(root,'build-native.mjs'))),testSHA256:sha(readFileSync(fileURLToPath(import.meta.url))),shortIOHarnessSHA256:sha(readFileSync(join(root,'test/short-io-trace.py'))),artifact:{bytes:artifact.length,sha256:sha(artifact),dynamicLoader:headers.some(h=>h.kind===3),dynamicSegment:headers.some(h=>h.kind===2),nonExecutableStack:headers.some(h=>h.kind===0x6474e551&&h.flags===6)},observations,disassembly,limits:{sourceBytes:sourceLimit,arenaBytes:diagnosticManifest?.arenaCapacityBytes??arena_capacity()},diagnostic:Boolean(diagnosticManifest),selfHosting:false},null,2)+'\n');

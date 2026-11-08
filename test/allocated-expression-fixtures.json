@@ -1,0 +1,92 @@
+[
+  {
+    "name": "allocated-three-register-tree",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int)->Int {a+b*c} pub fn main()->Nil {echo f(4,5,6) Nil}"
+    },
+    "accepted": true,
+    "stdout": "34\n"
+  },
+  {
+    "name": "allocated-mixed-subtraction",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int,d:Int)->Int {a-b*c-d} pub fn main()->Nil {echo f(30,4,5,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "allocated-unary-product",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int)->Int {a+-b*c} pub fn main()->Nil {echo f(20,3,4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "allocated-repeated-local",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int)->Int {a+a*a-a*a} pub fn main()->Nil {echo f(7) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "allocated-wide-immediate",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int)->Int {a+2147483648*b} pub fn main()->Nil {echo f(9,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "6442450953\n"
+  },
+  {
+    "name": "allocated-call-effect-border",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo mark(2)+3*{4+mark(5)} Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n5\n29\n"
+  },
+  {
+    "name": "allocated-division-border",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int)->Int {a+b*c/2} pub fn main()->Nil {echo f(3,4,5) Nil}"
+    },
+    "accepted": true,
+    "stdout": "13\n"
+  },
+  {
+    "name": "allocated-nested-case-border",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int)->Int {a+case b {0->c*2 _->b*c}} pub fn main()->Nil {echo f(3,0,5) echo f(3,4,5) Nil}"
+    },
+    "accepted": true,
+    "stdout": "13\n23\n"
+  },
+  {
+    "name": "allocated-nested-spill-recovery",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a+{b*{c-{d+e}}}} pub fn main()->Nil {echo f(4,5,6,7,8) Nil}"
+    },
+    "accepted": true,
+    "stdout": "-41\n"
+  },
+  {
+    "name": "allocated-spilled-subtract-order",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a-{b-{c-{d-e}}}} pub fn main()->Nil {echo f(20,10,6,3,2) Nil}"
+    },
+    "accepted": true,
+    "stdout": "15\n"
+  }
+]
