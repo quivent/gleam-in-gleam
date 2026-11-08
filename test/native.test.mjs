@@ -545,3 +545,13 @@ test('deep instruction-span nesting is walked with an explicit pending stack',()
  for(let i=0;i<20000;i++)parts=toList([new Span(parts)]);
  const result=assemble(parts);assert.equal(result.isOk(),true,result[0]);assert.deepEqual([...result[0].rawBuffer],[0xc3]);
 });
+
+test('comparison cases consume flags without materializing and reloading a Boolean',()=>{
+ const source='fn choose(n:Int)->Int {case n%3<1 {True->11 False->22}} pub fn main()->Nil {echo choose(4) Nil}';
+ const result=run(source);assert.equal(result.status,0);assert.equal(result.stdout,'22\n');
+ const dir=mkdtempSync(join(tmpdir(),'gleam-case-flags-'));
+ try {
+  const image=Buffer.from(result.bytes),entry=Number(image.readBigUInt64LE(24)),ph=Number(image.readBigUInt64LE(32)),base=Number(image.readBigUInt64LE(ph+16));
+  const raw=join(dir,'code');writeFileSync(raw,image.subarray(entry-base));const listing=spawnSync('objdump',['-D','-b','binary','-m','i386:x86-64',raw],{encoding:'utf8'});assert.equal(listing.status,0,listing.stderr);assert.match(listing.stdout,/\bjge\b/);assert.doesNotMatch(listing.stdout,/\bsetl\b/);
+ } finally {rmSync(dir,{recursive:true,force:true});}
+});

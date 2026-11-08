@@ -1,0 +1,101 @@
+[
+  {
+    "name": "comparison-flags-equal",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n == 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n1\n"
+  },
+  {
+    "name": "comparison-flags-unequal",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n != 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n"
+  },
+  {
+    "name": "comparison-flags-less",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n < 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n"
+  },
+  {
+    "name": "comparison-flags-less-equal",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n <= 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n1\n"
+  },
+  {
+    "name": "comparison-flags-greater",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n > 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n2\n"
+  },
+  {
+    "name": "comparison-flags-greater-equal",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n >= 3 {True->1 False->2}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n1\n"
+  },
+  {
+    "name": "comparison-flags-false-first",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n%3<1 {False->7 _->9}} pub fn main()->Nil {echo pick(3) echo pick(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n7\n"
+  },
+  {
+    "name": "comparison-flags-effects",
+    "entry": "main",
+    "files": {
+      "main": "fn left()->Int {echo 1 4} fn right()->Int {echo 2 5} pub fn main()->Nil {case left()<right() {True->echo 3 False->echo 4} Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n3\n"
+  },
+  {
+    "name": "comparison-flags-untaken-overflow",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {case n>0 {True->7 False->{let max=9007199254740991*1024+1023 max+1}}} pub fn main()->Nil {echo pick(1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "comparison-flags-local-scope",
+    "entry": "main",
+    "files": {
+      "main": "fn pick(n:Int)->Int {let x=10 case n<3 {True->{let x=99 x} False->x}} pub fn main()->Nil {echo pick(2) echo pick(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "99\n10\n"
+  },
+  {
+    "name": "comparison-flags-tail-reentry",
+    "entry": "main",
+    "files": {
+      "main": "fn go(n:Int,a:Int)->Int {case n>0 {False->a True->go(n-1,a+n)}} pub fn main()->Nil {echo go(100000,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "5000050000\n"
+  }
+]

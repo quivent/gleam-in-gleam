@@ -613,6 +613,110 @@ fn case_code(
   mode: TailMode,
   state: State,
 ) -> Generated {
+  case comparison_case(subject, arms) {
+    Ok(#(left, right, false_condition, first, second)) ->
+      comparison_case_code(
+        left,
+        right,
+        false_condition,
+        first,
+        second,
+        mode,
+        state,
+      )
+    Error(_) -> ordinary_case(subject, arms, mode, state)
+  }
+}
+
+// Preserve a comparison as flags until its case consumer. No unselected arm is
+// evaluated, and guard/binding patterns retain ordinary pattern lowering.
+fn comparison_case(
+  subject: t.Typed,
+  arms: List(t.Arm),
+) -> Result(#(t.Typed, t.Typed, Int, t.Typed, t.Typed), String) {
+  case subject.node, arms {
+    t.BinaryNode(op, left, right),
+      [
+        t.Arm(a.BooleanPattern(value), a.NoGuard, first),
+        t.Arm(other, a.NoGuard, second),
+      ]
+    -> {
+      use _ <- c.then(case other {
+        a.DiscardPattern -> Ok(Nil)
+        a.BooleanPattern(alternate) if alternate != value -> Ok(Nil)
+        _ -> Error("Not complementary Boolean arms")
+      })
+      use _ <- c.then(case left.type_, right.type_ {
+        a.Integer, a.Integer -> Ok(Nil)
+        _, _ -> Error("Not integer comparison operands")
+      })
+      use condition <- c.then(case op {
+        "==" -> Ok(133)
+        "!=" -> Ok(132)
+        "<" -> Ok(141)
+        "<=" -> Ok(143)
+        ">" -> Ok(142)
+        ">=" -> Ok(140)
+        _ -> Error("Not a primitive comparison")
+      })
+      let condition = case value {
+        True -> condition
+        False ->
+          case condition % 2 {
+            0 -> condition + 1
+            _ -> condition - 1
+          }
+      }
+      Ok(#(left, right, condition, first, second))
+    }
+    _, _ -> Error("Not a direct comparison case")
+  }
+}
+
+fn comparison_case_code(
+  left: t.Typed,
+  right: t.Typed,
+  condition: Int,
+  first: t.Typed,
+  second: t.Typed,
+  mode: TailMode,
+  state: State,
+) -> Generated {
+  use #(left_code, state) <- c.then(expression(left, state))
+  use #(condition_code, state) <- c.then(binary_values(
+    left,
+    right,
+    left_code,
+    state,
+  ))
+  let #(alternate, state) = label(state)
+  let #(finish, state) = label(state)
+  let base_slots = state.slots
+  let env = state.env
+  use #(yes, state) <- c.then(tail_expression(first, mode, state))
+  let yes_slots = state.slots
+  let state = State(..state, env: env, slots: base_slots)
+  use #(no, state) <- c.then(tail_expression(second, mode, state))
+  Ok(#(
+    asm.join(condition_code, [
+      raw(<<72, 57, 193>>),
+      branch(condition, alternate),
+      ..asm.join(yes, [
+        jump(finish),
+        asm.Label(alternate),
+        ..asm.join(no, [asm.Label(finish)])
+      ])
+    ]),
+    reserve_slots(yes_slots, State(..state, env: env)),
+  ))
+}
+
+fn ordinary_case(
+  subject: t.Typed,
+  arms: List(t.Arm),
+  mode: TailMode,
+  state: State,
+) -> Generated {
   use #(code, state) <- c.then(expression(subject, state))
   let #(offset, state) = slot(state)
   let #(finish, state) = label(state)

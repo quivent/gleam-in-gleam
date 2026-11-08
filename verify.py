@@ -143,7 +143,8 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
+module_fixtures = (json.loads((ROOT / 'test/comparison-case-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/aliases-guards-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/strings-prelude-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/multi-pattern-fixtures.json').read_text())
