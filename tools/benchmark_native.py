@@ -19,6 +19,8 @@ parser.add_argument('baseline')
 parser.add_argument('candidate')
 parser.add_argument('receipt')
 parser.add_argument('--source-revision', default='40e68af')
+parser.add_argument('--compile-only', action='store_true')
+parser.add_argument('--expect-candidate-image', action='store_true')
 parser.add_argument('--repetitions', type=int, default=5)
 parser.add_argument('--iterations', type=int, default=4_000_000)
 args = parser.parse_args()
@@ -30,6 +32,7 @@ cpu = max(os.sched_getaffinity(0))
 cpu_model = next((line.split(':', 1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('model name')), 'unknown')
 receipt = dict(schema='gleam-in-gleam.native-benchmark/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    harnessSHA256=sha(Path(__file__).read_bytes()),
     environment=dict(kernel=platform.release(), machine=platform.machine(),
         cpuModel=cpu_model, pinnedChildCPU=cpu, affinity=sorted(os.sched_getaffinity(0)),
         loadBefore=list(os.getloadavg())),
@@ -125,6 +128,9 @@ try:
             assert result['stdout'] == '45\n'
             compiled_hashes[name] = hashes[0]
             receipt['qualifications'].append(dict(variant=name, producedCompilerSHA256=hashes[0], deterministic=True, versionStdout=version['stdout'], probeStdout=result['stdout'], probeSHA256=sha(output.read_bytes())))
+        if args.expect_candidate_image:
+            assert compiled_hashes['candidate'] == receipt['binaries']['candidate']['sha256'], 'Current-source self-build differs'
+            receipt['candidateSelfBuildByteIdentical'] = True
         n, split = args.iterations, args.iterations // 2
         common = f'pub fn main()->Nil {{echo go({n},0) Nil}}'
         workloads = {
@@ -134,7 +140,7 @@ try:
             'live-across-call': ('fn mix(n:Int)->Int {n*3+1} fn go(n:Int,a:Int)->Int {case n {0->a _->go(n-1,a+mix(n-1))}} ' + common, 3 * n * (n + 1) // 2 - 2 * n),
         }
         receipt['runtimeInputs'] = {}
-        for kind, (source, expected) in workloads.items():
+        for kind, (source, expected) in ({} if args.compile_only else workloads).items():
             root = directory / kind
             root.mkdir()
             (root / 'main.gleam').write_text(source)
