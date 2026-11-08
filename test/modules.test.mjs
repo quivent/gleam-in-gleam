@@ -11,7 +11,7 @@ import * as equalityOracle from '../build/dev/javascript/gleam_native/native/equ
 import * as typeOracle from '../build/dev/javascript/gleam_native/native/type_system.mjs';
 import * as astOracle from '../build/dev/javascript/gleam_native/native/ast.mjs';
 import * as coreOracle from '../build/dev/javascript/gleam_native/native/core.mjs';
-import {Source,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
+import {Source,PreparedSource,prepare,link} from '../build/dev/javascript/gleam_native/native/project.mjs';
 
 const fixtures=[...JSON.parse(readFileSync(new URL('./length-idiom-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./control-flow-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./allocated-call-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./allocated-expression-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./branch-slots-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./register-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./modules-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./aliases-guards-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./strings-prelude-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./multi-pattern-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./equality-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./pattern-alias-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./integer-coverage-fixtures.json',import.meta.url),'utf8')),...JSON.parse(readFileSync(new URL('./tail-calls-fixtures.json',import.meta.url),'utf8'))];
 function sources(files) {return toList(Object.entries(files).map(([name,text])=>new Source(name,new BitArray(Buffer.from(text)))));}
@@ -182,4 +182,29 @@ test('the actual native append preserves order and inputs on a bounded 10000-cel
  echo case nth(joined,10000) {Ok(n)->n Error(_)->0} echo length(xs) echo length(ys) Nil}`;
  const actual=run(compileSingle(new BitArray(Buffer.from(own+'\n'+driver))));
  assert.equal(actual.status,0);assert.equal(actual.stdout,'10002\n10000\n20001\n10000\n2\n');
+});
+
+// Prepared modules are the same immutable read snapshot, not a second registry.
+test('prepared module snapshots preserve imported program bytes and raw API compatibility',()=>{
+ for(const f of fixtures.filter(f=>f.accepted)) {
+  const raw=sources(f.files),cached=toList(raw.toArray().map(source=>{const r=prepare(source);assert.equal(r.isOk(),true,r[0]);return r[0][0];}));
+  const original=compile_project(f.entry||'main',raw),prepared=compile_project(f.entry||'main',cached);
+  assert.equal(prepared.isOk(),true,prepared[0]);assert.deepEqual(prepared[0].rawBuffer,original[0].rawBuffer,f.name);
+ }
+});
+test('prepare retains exact source bytes and parsed identity when reused',()=>{
+ const raw=new Source('main',new BitArray(Buffer.from('import other pub fn main()->Nil {other.f() Nil}'))),first=prepare(raw);
+ assert.equal(first.isOk(),true,first[0]);const [snapshot,imports]=first[0];assert.ok(snapshot instanceof PreparedSource);assert.equal(snapshot.name,'main');assert.equal(snapshot.content,raw.content);assert.deepEqual(imports.toArray(),['other']);
+ const again=prepare(snapshot);assert.equal(again.isOk(),true,again[0]);assert.equal(again[0][0].parsed,snapshot.parsed);assert.equal(again[0][0].content,raw.content);
+});
+test('mixed raw and prepared sources preserve unreachable raw content behavior',()=>{
+ const cached=prepare(new Source('main',new BitArray(Buffer.from('pub fn main()->Nil {echo 7 Nil}'))));assert.equal(cached.isOk(),true,cached[0]);
+ const r=compile_project('main',toList([cached[0][0],new Source('unused',new BitArray(Buffer.from('@ invalid syntax')))]));assert.equal(run(r).stdout,'7\n');
+});
+test('prepared module traversal retains cycle, visibility and duplicate-source checks',()=>{
+ for(const name of ['import-cycle','private-function-denied','private-type-denied','private-constructor-denied','unknown-member-denied']) {
+  const f=fixtures.find(f=>f.name===name),raw=sources(f.files),cached=toList(raw.toArray().map(source=>{const r=prepare(source);assert.equal(r.isOk(),true,r[0]);return r[0][0];}));
+  const before=compile_project('main',raw),after=compile_project('main',cached);assert.equal(after.isOk(),false);assert.equal(after[0],before[0],name);
+ }
+ const p=prepare(new Source('main',new BitArray(Buffer.from('pub fn main()->Nil {Nil}'))))[0][0];const duplicate=compile_project('main',toList([p,p]));assert.equal(duplicate.isOk(),false);assert.match(duplicate[0],/Duplicate module source/);
 });

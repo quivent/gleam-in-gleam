@@ -11,6 +11,9 @@ import native/type_system as types
 
 pub type Source {
   Source(name: String, content: BitArray)
+  // One immutable read snapshot, retaining its parse for dependency discovery
+  // and linking. Existing raw Source callers still parse only reachable modules.
+  PreparedSource(name: String, content: BitArray, parsed: a.Module)
 }
 
 type Loaded {
@@ -21,11 +24,28 @@ type Scope {
   Scope(current: Loaded, entry: String, modules: List(Loaded))
 }
 
-pub fn dependencies(source: BitArray) -> Result(List(String), String) {
-  use tokens <- c.then(lexer.lex(source))
-  use module_ <- c.then(parser.parse(tokens))
+fn parse_source(source: Source) -> Result(a.Module, String) {
+  case source {
+    PreparedSource(_, _, parsed) -> Ok(parsed)
+    Source(_, content) -> {
+      use tokens <- c.then(lexer.lex(content))
+      parser.parse(tokens)
+    }
+  }
+}
+
+pub fn prepare(source: Source) -> Result(#(Source, List(String)), String) {
+  use module_ <- c.then(parse_source(source))
   use _ <- c.then(validate_imports(module_.imports, []))
-  Ok(c.map(module_.imports, fn(i) { i.module_name }))
+  Ok(#(
+    PreparedSource(source.name, source.content, module_),
+    c.map(module_.imports, fn(i) { i.module_name }),
+  ))
+}
+
+pub fn dependencies(source: BitArray) -> Result(List(String), String) {
+  use #(_, imports) <- c.then(prepare(Source("", source)))
+  Ok(imports)
 }
 
 pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
@@ -66,8 +86,8 @@ pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
 
 fn source_index(
   sources: List(Source),
-  acc: List(#(String, BitArray)),
-) -> Result(List(#(String, BitArray)), String) {
+  acc: List(#(String, Source)),
+) -> Result(List(#(String, Source)), String) {
   case sources {
     [] -> Ok(acc)
     [source, ..rest] -> {
@@ -76,14 +96,14 @@ fn source_index(
         Ok(_) -> Error("Duplicate module source: " <> source.name)
         Error(_) -> Ok(Nil)
       })
-      source_index(rest, [#(source.name, source.content), ..acc])
+      source_index(rest, [#(source.name, source), ..acc])
     }
   }
 }
 
 fn visit(
   name: String,
-  sources: List(#(String, BitArray)),
+  sources: List(#(String, Source)),
   active: List(#(String, Nil)),
   done: List(Loaded),
 ) -> Result(List(Loaded), String) {
@@ -98,8 +118,7 @@ fn visit(
         Ok(source) -> Ok(source)
         Error(_) -> Error("Missing module source: " <> name)
       })
-      use tokens <- c.then(lexer.lex(source))
-      use module_ <- c.then(parser.parse(tokens))
+      use module_ <- c.then(parse_source(source))
       use _ <- c.then(validate_imports(module_.imports, []))
       use _ <- c.then(alias_headers(module_))
       use done <- c.then(visit_imports(
@@ -115,7 +134,7 @@ fn visit(
 
 fn visit_imports(
   imports: List(a.Import),
-  sources: List(#(String, BitArray)),
+  sources: List(#(String, Source)),
   active: List(#(String, Nil)),
   done: List(Loaded),
 ) -> Result(List(Loaded), String) {

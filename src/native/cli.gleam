@@ -119,12 +119,12 @@ pub fn with_source(state: State, result: Result(BitArray, String)) -> Request {
         Error(error) ->
           Finish(1, "Cannot read " <> name <> ".gleam: " <> error, True)
         Ok(content) ->
-          case compiler.dependencies(content) {
+          case project.prepare(project.Source(name, content)) {
             Error(error) -> Finish(1, "In " <> name <> ": " <> error, True)
-            Ok(dependencies) ->
+            Ok(#(source, dependencies)) ->
               next(
                 Loading(config, c.append(dependencies, rest), [
-                  project.Source(name, content),
+                  source,
                   ..sources
                 ]),
               )
