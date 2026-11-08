@@ -643,3 +643,18 @@ The compiler grows to 644,591 bytes because it includes its own recognizer.
 This is measured waste removal, not full heap liveness or complete Gleam support.
 Project linking is now the largest selected phase and is the next profiling target.
 Crew CLI updates remain with their separate owner. [Method and evidence](MEMORY.md).
+
+
+## Measure linking before changing its representation — 2026-11-08
+
+A narrower native trace divides the 121.7 MB linking phase into resolution 60.4 MB,
+lexing 47.9 MB, parsing 12.1 MB, definitions 1.0 MB and other work 0.37 MB. Within
+resolution, member lookup alone accounts for 35.3 MB exclusive of measured nested
+helpers. Its source rebuilds function/constructor lists for every lookup; module
+and local-name lookup repeat similar mapping. A second finding is independent:
+dependency discovery already lexes/parses all 27 modules, before linking repeats
+both. Each pass allocates 59.9 MB. These are allocation volumes, not retained data.
+The code generator and runtime remain unchanged. We preserved the detailed trace
+hash, additive summary and output verification, and paused the next rewrite to
+ask Jay for advice on lookup indexing, parse-once ownership and cursor/span input.
+See [MEMORY.md](MEMORY.md) for the complete breakdown and cautions.

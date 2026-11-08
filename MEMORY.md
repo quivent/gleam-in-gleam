@@ -116,3 +116,96 @@ code planning and checking also remain substantial. Definitions are collected th
 times, but their roughly 3 MB combined is a smaller opportunity. No GC, full heap
 liveness, whole-function allocator or complete source-language compatibility is
 claimed by this increment. Crew CLI changes belong to their separate owner.
+
+## Linking breakdown — investigation before the next rewrite
+
+The next trace uses the same frozen 27-module input, the qualified 644,591-byte
+compiler, and independently verifies the 637,775-byte output hash. No compiler
+logic changes were made. `--function` now selects exact native symbols for the
+development profiler while retaining its build root.
+
+[Phase receipt](evidence/linking-allocation-phases.json) and
+[additive detailed summary](evidence/linking-allocation-breakdown.json).
+The full 146,255-event trace remains under ignored `out/allocation-profile/`, with
+its SHA recorded in the summary. Counts below are observed function entries, not
+per-byte loop iteration counts. Totals use exclusive allocation where nested
+helpers would otherwise be counted twice. MB here means decimal megabytes.
+
+| Inside linking | Allocated bytes | Share |
+|---|---:|---:|
+| Name/import/type resolution | 60,433,512 | 49.6% |
+| Lexing | 47,853,432 | 39.3% |
+| Parsing | 12,053,240 | 9.9% |
+| Definitions collection | 1,018,944 | 0.8% |
+| Other linking work | 366,736 | 0.3% |
+| **Total** | **121,725,864** | **100%** |
+
+### Resolution: 60.4 MB
+
+| Selected path, excluding separately measured nested helpers | Entries | Bytes |
+|---|---:|---:|
+| Member/value lookup `value_in` | 5,616 | 35,302,152 |
+| Module lookup `module_by_name` | 4,645 | 8,249,520 |
+| Local-bound-name lookup `local` | 10,297 | 4,562,840 |
+| Import lookup `imported` | 5,118 | 2,818,896 |
+| Named type lookup `named_type` | 1,548 | 1,651,624 |
+| Internal name construction | 6,432 | 545,712 |
+| Remaining resolution work | 27 roots | 7,302,768 |
+
+Source inspection explains a concrete opportunity: `value_in` maps all module
+functions and constructors into name/publicity pairs, flattens/appends them, then
+looks up one name. Module lookup similarly maps every module to a name/module
+pair on each call; local-name lookup maps the whole bound list. These are repeated
+transient lookup representations. The measured totals include results and other
+helper costs too; they are not a prediction that every attributed byte can vanish.
+Direct traversal or a module-level reusable index are alternatives to evaluate.
+
+### Lexing: 47.9 MB per pass
+
+| Selected path | Allocated bytes |
+|---|---:|
+| Token scan/construction and remaining lexing | 20,916,160 |
+| Identifier scanning/string accumulation | 10,616,864 |
+| UTF-8 validation | 10,434,640 |
+| Whitespace scanning | 3,682,848 |
+| Quoted strings | 1,323,400 |
+| Numeric scanning | 530,584 |
+| Comments | 348,936 |
+
+The lexer walks suffix BitArray views, identifiers append one character at a
+time, and UTF-8 validation makes a preceding pass using suffix views as well.
+These are observed allocation paths, not measurements of retained token size.
+A source cursor/span representation and deferred identifier materialization are
+possible approaches; they require careful immutable lifetime and UTF-8 semantics.
+
+### A separate duplicate pass before linking
+
+There are **54 lexer calls and 54 parser calls**: 27 of each during dependency
+loading, then 27 again under linking. Both passes allocate the same measured
+amount: **59,906,672 bytes per lex/parse pass**, or **119,813,344 bytes combined**.
+The 59.9 MB before linking is outside the 121.7 MB linking total above. The CLI
+currently retains source bytes after discovering dependencies, not the parsed AST,
+and `visit` reparses those sources. A parse-once handoff could avoid repeated work;
+its actual savings must be measured because retained AST/state also has a cost.
+Do not introduce a second authoritative mutable source cache or bypass validation.
+
+### Decision before implementation
+
+The three candidates are: eliminate rebuilt lookup lists, retain parsed modules
+across dependency loading/linking, and replace repeated byte-tail/string-building
+work with cursor/span operations. None has been implemented by this investigation.
+Ask Jay for advice before choosing the next representation/lifetime change.
+
+For example, repeat the coarse trace with fresh output paths:
+
+```sh
+python3 tools/profile_native_allocations.py \
+  out/allocation-profile/optimized/symbols.json out/link-phases.json \
+  out/allocation-profile/optimized/compiler \
+  out/allocation-profile/current/source-snapshot/src out/link-rebuilt \
+  --expected-output-sha 58065cea325f468ea25f18fea3ca728781dafc43413e59586dabb8427885296e \
+  --function link@native/project --function lex@native/lexer \
+  --function parse@native/parser --function resolve_module@native/project \
+  --function collect@native/definitions --function source_index@native/project \
+  --function validate_imports@native/project --function alias_headers@native/project
+```

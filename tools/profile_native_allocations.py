@@ -24,6 +24,8 @@ parser.add_argument('compiler')
 parser.add_argument('source_root')
 parser.add_argument('new_output')
 parser.add_argument('--expected-output-sha')
+parser.add_argument('--function', action='append', default=[],
+                    help='Exact native symbol to trace (repeatable); replaces default phases, retaining build root')
 args = parser.parse_args()
 symbols = json.loads(Path(args.symbols).read_text())
 binary = Path(args.compiler).resolve()
@@ -32,6 +34,8 @@ assert not Path(args.new_output).exists()
 selected = ['build@native/cli_builder', 'link@native/project', 'module@native/check',
             'collect@native/definitions', 'generate_cli@native/x64',
             'plan_cli@native/x64', 'assemble@native/assembler', 'executable@native/elf']
+if args.function:
+    selected = list(dict.fromkeys(['build@native/cli_builder', *args.function]))
 entries = {f['start']: f['name'] for f in symbols['functions'] if f['name'] in selected}
 assert set(entries.values()) == set(selected), set(selected) - set(entries.values())
 capacity = symbols['arenaCapacityBytes']
