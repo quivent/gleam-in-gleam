@@ -1,0 +1,110 @@
+[
+  {
+    "name": "length-generic-renamed",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+1) _->n}} pub fn main()->Nil {echo walk(<<>>,7) echo walk(<<1,2,3>>,7) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n10\n"
+  },
+  {
+    "name": "length-reversed-parameters",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(n:Int,b:BitArray)->Int {case b {<<_,rest:bits>>->walk(n+1,rest) _->n}} pub fn main()->Nil {echo walk(-5,<<1,2,3>>) Nil}"
+    },
+    "accepted": true,
+    "stdout": "-2\n"
+  },
+  {
+    "name": "length-borrowed-alias",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+1) _->n}} fn tail(b:BitArray)->BitArray {case b {<<_,rest:bits>>->rest _-><<>>}} pub fn main()->Nil {let b=<<1,2,3,4>> echo walk(b,0) echo walk(tail(b),0) echo walk(b,1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n3\n5\n"
+  },
+  {
+    "name": "length-bytes-tail",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_:8,rest:bytes>>->walk(rest,n+1) _->n}} pub fn main()->Nil {echo walk(<<9,8>>,4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "6\n"
+  },
+  {
+    "name": "length-signed-discard",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_:8-signed,rest:bits>>->walk(rest,n+1) _->n}} pub fn main()->Nil {echo walk(<<255,128,0>>,4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "length-descriptor-entry",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+1) _->n}} pub fn main()->Nil {let f=walk echo f(<<1,2>>,9) Nil}"
+    },
+    "accepted": true,
+    "stdout": "11\n"
+  },
+  {
+    "name": "length-reject-increment-two",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+2) _->n}} pub fn main()->Nil {echo walk(<<1,2,3>>,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "6\n"
+  },
+  {
+    "name": "length-reject-base-change",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+1) _->n+1}} pub fn main()->Nil {echo walk(<<1,2,3>>,7) Nil}"
+    },
+    "accepted": true,
+    "stdout": "11\n"
+  },
+  {
+    "name": "length-reject-effect",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->{echo n walk(rest,n+1)} _->n}} pub fn main()->Nil {echo walk(<<1,2,3>>,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "0\n1\n2\n3\n"
+  },
+  {
+    "name": "length-reject-guard",
+    "entry": "main",
+    "files": {
+      "main": "fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>> if n<2->walk(rest,n+1) _->n}} pub fn main()->Nil {echo walk(<<1,2,3,4>>,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n"
+  },
+  {
+    "name": "length-reject-other-callee",
+    "entry": "main",
+    "files": {
+      "main": "fn other(_b:BitArray,n:Int)->Int {n+100} fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->other(rest,n+1) _->n}} pub fn main()->Nil {echo walk(<<1,2,3>>,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "101\n"
+  },
+  {
+    "name": "length-large-no-garbage",
+    "entry": "main",
+    "files": {
+      "main": "fn grow(n:Int,b:BitArray)->BitArray {case n {0->b _->grow(n-1,<<b:bits,b:bits>>)}} fn walk(b:BitArray,n:Int)->Int {case b {<<_,rest:bits>>->walk(rest,n+1) _->n}} pub fn main()->Nil {echo walk(grow(22,<<42>>),0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4194304\n"
+  }
+]

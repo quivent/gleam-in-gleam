@@ -8,6 +8,7 @@ import native/definitions as d
 import native/equality as eq
 import native/equality_runtime as eq_runtime
 import native/heap
+import native/loop_idioms
 import native/registers as r
 import native/string_runtime
 
@@ -206,9 +207,8 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
     [] -> Ok(#([], state))
     [f, ..rest] -> {
       let env = parameter_offsets(f.parameters, c.length(f.parameters), 0)
-      use #(body, state) <- c.then(statement_mode(
-        f.body,
-        SelfTail(f.name, c.length(f.parameters)),
+      use #(body, state) <- c.then(function_body(
+        f,
         State(..state, slots: 0, env: env),
       ))
       // The stack frame is known after allocating all locals, including branches.
@@ -229,6 +229,33 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
         state,
       ))
     }
+  }
+}
+
+fn function_body(function: t.Function, state: State) -> Generated {
+  case loop_idioms.recognize(function) {
+    Ok(loop_idioms.ByteCount(source, counter)) -> {
+      use source <- c.then(c.lookup(state.env, source))
+      use counter <- c.then(c.lookup(state.env, counter))
+      // All owned byte-array descriptors contain their byte length at +16.
+      // A pure +1-per-byte loop is length + initial counter, with identical
+      // signed-overflow behavior and no temporary suffix descriptors.
+      Ok(#(
+        [
+          load(source),
+          raw(<<72, 139, 64, 16>>),
+          raw(<<72, 139, 141, counter:32-little, 72, 1, 200>>),
+          branch(128, "rt:overflow"),
+        ],
+        state,
+      ))
+    }
+    Error(_) ->
+      statement_mode(
+        function.body,
+        SelfTail(function.name, c.length(function.parameters)),
+        state,
+      )
   }
 }
 

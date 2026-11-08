@@ -32,7 +32,7 @@ def sha(data):
 
 run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
-suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs', 'test/registers.test.mjs'],
+suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs', 'test/registers.test.mjs', 'test/loop-idioms.test.mjs'],
             env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / f'evidence/{PREFIX}-io-verification.json'),
                  'NATIVE_CLI_ASM': str(ROOT / f'evidence/{PREFIX}-disassembly.txt')})
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
@@ -155,7 +155,8 @@ module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/branch-slots-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/allocated-expression-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/allocated-call-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/control-flow-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/control-flow-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/length-idiom-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
