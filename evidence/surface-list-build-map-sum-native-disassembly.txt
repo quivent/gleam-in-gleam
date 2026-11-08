@@ -1,0 +1,239 @@
+
+surface-list-build-map-sum/code:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000000000 <.data>:
+   0:	e8 56 03 00 00       	call   0x35b
+   5:	e8 91 02 00 00       	call   0x29b
+   a:	31 ff                	xor    %edi,%edi
+   c:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  11:	0f 05                	syscall
+  13:	55                   	push   %rbp
+  14:	48 89 e5             	mov    %rsp,%rbp
+  17:	48 81 ec 10 00 00 00 	sub    $0x10,%rsp
+  1e:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+  25:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  2c:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  33:	48 3d 00 00 00 00    	cmp    $0x0,%rax
+  39:	0f 85 0c 00 00 00    	jne    0x4b
+  3f:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  46:	e9 6e 00 00 00       	jmp    0xb9
+  4b:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+  52:	48 b9 01 00 00 00 00 	movabs $0x1,%rcx
+  59:	00 00 00
+  5c:	48 29 c8             	sub    %rcx,%rax
+  5f:	0f 80 5e 02 00 00    	jo     0x2c3
+  65:	50                   	push   %rax
+  66:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+  6d:	50                   	push   %rax
+  6e:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  75:	50                   	push   %rax
+  76:	bf 20 00 00 00       	mov    $0x20,%edi
+  7b:	e8 15 03 00 00       	call   0x395
+  80:	5a                   	pop    %rdx
+  81:	59                   	pop    %rcx
+  82:	48 c7 00 20 00 00 00 	movq   $0x20,(%rax)
+  89:	48 c7 40 08 02 00 00 	movq   $0x2,0x8(%rax)
+  90:	00
+  91:	48 89 48 10          	mov    %rcx,0x10(%rax)
+  95:	48 89 50 18          	mov    %rdx,0x18(%rax)
+  99:	50                   	push   %rax
+  9a:	58                   	pop    %rax
+  9b:	48 89 85 10 00 00 00 	mov    %rax,0x10(%rbp)
+  a2:	58                   	pop    %rax
+  a3:	48 89 85 18 00 00 00 	mov    %rax,0x18(%rbp)
+  aa:	e9 6f ff ff ff       	jmp    0x1e
+  af:	e9 05 00 00 00       	jmp    0xb9
+  b4:	e9 0a 02 00 00       	jmp    0x2c3
+  b9:	c9                   	leave
+  ba:	c3                   	ret
+  bb:	55                   	push   %rbp
+  bc:	48 89 e5             	mov    %rsp,%rbp
+  bf:	48 81 ec 20 00 00 00 	sub    $0x20,%rsp
+  c6:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+  cd:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+  d4:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  db:	48 85 c0             	test   %rax,%rax
+  de:	0f 85 0c 00 00 00    	jne    0xf0
+  e4:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  eb:	e9 ab 00 00 00       	jmp    0x19b
+  f0:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+  f7:	48 85 c0             	test   %rax,%rax
+  fa:	0f 84 96 00 00 00    	je     0x196
+ 100:	48 8b 48 10          	mov    0x10(%rax),%rcx
+ 104:	48 8b 40 18          	mov    0x18(%rax),%rax
+ 108:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+ 10f:	48 89 c8             	mov    %rcx,%rax
+ 112:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+ 119:	48 8b 85 e8 ff ff ff 	mov    -0x18(%rbp),%rax
+ 120:	50                   	push   %rax
+ 121:	48 8b 85 f0 ff ff ff 	mov    -0x10(%rbp),%rax
+ 128:	48 b9 03 00 00 00 00 	movabs $0x3,%rcx
+ 12f:	00 00 00
+ 132:	48 0f af c1          	imul   %rcx,%rax
+ 136:	0f 80 87 01 00 00    	jo     0x2c3
+ 13c:	48 b9 01 00 00 00 00 	movabs $0x1,%rcx
+ 143:	00 00 00
+ 146:	48 01 c8             	add    %rcx,%rax
+ 149:	0f 80 74 01 00 00    	jo     0x2c3
+ 14f:	50                   	push   %rax
+ 150:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+ 157:	50                   	push   %rax
+ 158:	bf 20 00 00 00       	mov    $0x20,%edi
+ 15d:	e8 33 02 00 00       	call   0x395
+ 162:	5a                   	pop    %rdx
+ 163:	59                   	pop    %rcx
+ 164:	48 c7 00 20 00 00 00 	movq   $0x20,(%rax)
+ 16b:	48 c7 40 08 02 00 00 	movq   $0x2,0x8(%rax)
+ 172:	00
+ 173:	48 89 48 10          	mov    %rcx,0x10(%rax)
+ 177:	48 89 50 18          	mov    %rdx,0x18(%rax)
+ 17b:	50                   	push   %rax
+ 17c:	58                   	pop    %rax
+ 17d:	48 89 85 10 00 00 00 	mov    %rax,0x10(%rbp)
+ 184:	58                   	pop    %rax
+ 185:	48 89 85 18 00 00 00 	mov    %rax,0x18(%rbp)
+ 18c:	e9 35 ff ff ff       	jmp    0xc6
+ 191:	e9 05 00 00 00       	jmp    0x19b
+ 196:	e9 28 01 00 00       	jmp    0x2c3
+ 19b:	c9                   	leave
+ 19c:	c3                   	ret
+ 19d:	55                   	push   %rbp
+ 19e:	48 89 e5             	mov    %rsp,%rbp
+ 1a1:	48 81 ec 20 00 00 00 	sub    $0x20,%rsp
+ 1a8:	48 8b 85 18 00 00 00 	mov    0x18(%rbp),%rax
+ 1af:	48 89 85 f8 ff ff ff 	mov    %rax,-0x8(%rbp)
+ 1b6:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+ 1bd:	48 85 c0             	test   %rax,%rax
+ 1c0:	0f 85 0c 00 00 00    	jne    0x1d2
+ 1c6:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+ 1cd:	e9 68 00 00 00       	jmp    0x23a
+ 1d2:	48 8b 85 f8 ff ff ff 	mov    -0x8(%rbp),%rax
+ 1d9:	48 85 c0             	test   %rax,%rax
+ 1dc:	0f 84 53 00 00 00    	je     0x235
+ 1e2:	48 8b 48 10          	mov    0x10(%rax),%rcx
+ 1e6:	48 8b 40 18          	mov    0x18(%rax),%rax
+ 1ea:	48 89 85 e8 ff ff ff 	mov    %rax,-0x18(%rbp)
+ 1f1:	48 89 c8             	mov    %rcx,%rax
+ 1f4:	48 89 85 f0 ff ff ff 	mov    %rax,-0x10(%rbp)
+ 1fb:	48 8b 85 e8 ff ff ff 	mov    -0x18(%rbp),%rax
+ 202:	50                   	push   %rax
+ 203:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+ 20a:	48 8b 8d f0 ff ff ff 	mov    -0x10(%rbp),%rcx
+ 211:	48 01 c8             	add    %rcx,%rax
+ 214:	0f 80 a9 00 00 00    	jo     0x2c3
+ 21a:	50                   	push   %rax
+ 21b:	58                   	pop    %rax
+ 21c:	48 89 85 10 00 00 00 	mov    %rax,0x10(%rbp)
+ 223:	58                   	pop    %rax
+ 224:	48 89 85 18 00 00 00 	mov    %rax,0x18(%rbp)
+ 22b:	e9 78 ff ff ff       	jmp    0x1a8
+ 230:	e9 05 00 00 00       	jmp    0x23a
+ 235:	e9 89 00 00 00       	jmp    0x2c3
+ 23a:	c9                   	leave
+ 23b:	c3                   	ret
+ 23c:	55                   	push   %rbp
+ 23d:	48 89 e5             	mov    %rsp,%rbp
+ 240:	48 81 ec 00 00 00 00 	sub    $0x0,%rsp
+ 247:	48 b8 20 a1 07 00 00 	movabs $0x7a120,%rax
+ 24e:	00 00 00
+ 251:	50                   	push   %rax
+ 252:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+ 259:	00 00 00
+ 25c:	50                   	push   %rax
+ 25d:	e8 b1 fd ff ff       	call   0x13
+ 262:	48 81 c4 10 00 00 00 	add    $0x10,%rsp
+ 269:	50                   	push   %rax
+ 26a:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+ 271:	00 00 00
+ 274:	50                   	push   %rax
+ 275:	e8 41 fe ff ff       	call   0xbb
+ 27a:	48 81 c4 10 00 00 00 	add    $0x10,%rsp
+ 281:	50                   	push   %rax
+ 282:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+ 289:	00 00 00
+ 28c:	50                   	push   %rax
+ 28d:	e8 0b ff ff ff       	call   0x19d
+ 292:	48 81 c4 10 00 00 00 	add    $0x10,%rsp
+ 299:	c9                   	leave
+ 29a:	c3                   	ret
+ 29b:	55                   	push   %rbp
+ 29c:	48 89 e5             	mov    %rsp,%rbp
+ 29f:	48 81 ec 00 00 00 00 	sub    $0x0,%rsp
+ 2a6:	e8 91 ff ff ff       	call   0x23c
+ 2ab:	48 81 c4 00 00 00 00 	add    $0x0,%rsp
+ 2b2:	e8 31 00 00 00       	call   0x2e8
+ 2b7:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+ 2be:	00 00 00
+ 2c1:	c9                   	leave
+ 2c2:	c3                   	ret
+ 2c3:	bf 46 00 00 00       	mov    $0x46,%edi
+ 2c8:	b8 3c 00 00 00       	mov    $0x3c,%eax
+ 2cd:	0f 05                	syscall
+ 2cf:	50                   	push   %rax
+ 2d0:	48 8b 10             	mov    (%rax),%rdx
+ 2d3:	48 ff c2             	inc    %rdx
+ 2d6:	48 8d 70 08          	lea    0x8(%rax),%rsi
+ 2da:	bf 01 00 00 00       	mov    $0x1,%edi
+ 2df:	b8 01 00 00 00       	mov    $0x1,%eax
+ 2e4:	0f 05                	syscall
+ 2e6:	58                   	pop    %rax
+ 2e7:	c3                   	ret
+ 2e8:	55                   	push   %rbp
+ 2e9:	48 89 e5             	mov    %rsp,%rbp
+ 2ec:	48 83 ec 30          	sub    $0x30,%rsp
+ 2f0:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+ 2f4:	48 8d 75 f0          	lea    -0x10(%rbp),%rsi
+ 2f8:	c6 06 0a             	movb   $0xa,(%rsi)
+ 2fb:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 300:	45 31 c0             	xor    %r8d,%r8d
+ 303:	48 85 c0             	test   %rax,%rax
+ 306:	0f 8d 09 00 00 00    	jge    0x315
+ 30c:	48 f7 d8             	neg    %rax
+ 30f:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+ 315:	41 b9 0a 00 00 00    	mov    $0xa,%r9d
+ 31b:	31 d2                	xor    %edx,%edx
+ 31d:	49 f7 f1             	div    %r9
+ 320:	80 c2 30             	add    $0x30,%dl
+ 323:	48 ff ce             	dec    %rsi
+ 326:	88 16                	mov    %dl,(%rsi)
+ 328:	48 ff c1             	inc    %rcx
+ 32b:	48 85 c0             	test   %rax,%rax
+ 32e:	0f 85 e7 ff ff ff    	jne    0x31b
+ 334:	4d 85 c0             	test   %r8,%r8
+ 337:	0f 84 09 00 00 00    	je     0x346
+ 33d:	48 ff ce             	dec    %rsi
+ 340:	c6 06 2d             	movb   $0x2d,(%rsi)
+ 343:	48 ff c1             	inc    %rcx
+ 346:	48 89 ca             	mov    %rcx,%rdx
+ 349:	bf 01 00 00 00       	mov    $0x1,%edi
+ 34e:	b8 01 00 00 00       	mov    $0x1,%eax
+ 353:	0f 05                	syscall
+ 355:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+ 359:	c9                   	leave
+ 35a:	c3                   	ret
+ 35b:	b8 09 00 00 00       	mov    $0x9,%eax
+ 360:	31 ff                	xor    %edi,%edi
+ 362:	be 00 00 00 04       	mov    $0x4000000,%esi
+ 367:	ba 03 00 00 00       	mov    $0x3,%edx
+ 36c:	41 ba 22 00 00 00    	mov    $0x22,%r10d
+ 372:	49 c7 c0 ff ff ff ff 	mov    $0xffffffffffffffff,%r8
+ 379:	45 31 c9             	xor    %r9d,%r9d
+ 37c:	0f 05                	syscall
+ 37e:	48 85 c0             	test   %rax,%rax
+ 381:	0f 88 24 00 00 00    	js     0x3ab
+ 387:	49 89 c7             	mov    %rax,%r15
+ 38a:	49 89 c6             	mov    %rax,%r14
+ 38d:	49 81 c6 00 00 00 04 	add    $0x4000000,%r14
+ 394:	c3                   	ret
+ 395:	4c 89 f8             	mov    %r15,%rax
+ 398:	49 01 ff             	add    %rdi,%r15
+ 39b:	0f 82 0a 00 00 00    	jb     0x3ab
+ 3a1:	4d 39 f7             	cmp    %r14,%r15
+ 3a4:	0f 87 01 00 00 00    	ja     0x3ab
+ 3aa:	c3                   	ret
+ 3ab:	bf 47 00 00 00       	mov    $0x47,%edi
+ 3b0:	b8 3c 00 00 00       	mov    $0x3c,%eax
+ 3b5:	0f 05                	syscall

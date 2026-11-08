@@ -10,9 +10,9 @@ still incomplete.
 2. Stage 1 reads a frozen copy of all 28 actual compiler modules through the owned
    file runner and `--build-compiler`, producing stage 2.
 3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
-4. All three are 645,969 bytes with SHA256
-   `7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
-5. Stage 3 compiles 383 corpus cases: 263 accepted, 120 rejected. Every accepted
+4. All three are 653,202 bytes with SHA256
+   `1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c`.
+5. Stage 3 compiles 394 corpus cases: 274 accepted, 120 rejected. Every accepted
    output is byte-identical to bootstrap output and executes correctly. Rejections
    have controlled compiler exits and publish no output.
 6. A changed version literal in a separate source copy produces a different native
@@ -50,11 +50,11 @@ value equality, measured optimization/register allocation and targets remain ope
 
 ## Evidence
 
-* [Complete qualification](evidence/parsed-snapshot-qualification.json): 748 checks,
-  383 fresh independent upstream comparisons and all 16 native example runs.
-* [Native rebuilds and corpus](evidence/parsed-snapshot-native-rebuilds.json): exact
+* [Complete qualification](evidence/comparison-flags-qualification.json): 763 checks,
+  394 fresh independent upstream comparisons and all 16 native example runs.
+* [Native rebuilds and corpus](evidence/comparison-flags-native-rebuilds.json): exact
   sources, image hashes, source-sensitivity control and individual native cases.
-* [Native IO qualification](evidence/parsed-snapshot-io-verification.json): 59 targeted
+* [Native IO qualification](evidence/comparison-flags-io-verification.json): 59 targeted
   checks, actual short IO, errors, preservation and ELF headers.
 * [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
   initial stack/heap failures and measured fixes; snapshots are not peak stack.

@@ -411,6 +411,11 @@ effect-free unit-step recursion over a discarded byte/tail and unchanged base
 counter can become a descriptor-length load and checked addition. Guards, effects,
 other increments/base expressions or callees retain ordinary lowering.
 
+Instruction plans can share already-planned immutable spans. Joining spans does
+not copy their instruction lists. Closure helpers retain their bodies once; the
+assembler walks nested spans with an explicit pending stack, preserving global
+label offsets and instruction order without first flattening the whole plan.
+
 `native/assembler` resolves owned labels and relative displacements into bytes.
 `native/elf` emits ELF headers and executable payload directly. There is no external
 object-file linker or assembler invocation. Actual objdump output is inspection
@@ -546,3 +551,18 @@ The native target is not a POSIX/C library environment. Generated user programs 
 not acquire filesystem, socket or process facilities just because the compiler's
 own explicitly checked effect runner implements source/output IO. Compiler bootstrap
 and development commands are not language standard-library imports.
+
+### Deferred comparison materialization
+
+A complementary, unguarded Boolean case over a primitive integer comparison can
+consume the comparison's flags directly. The compiler evaluates both comparison
+operands in their original order, emits the comparison, and selects the arm with
+the appropriate signed/equality condition. It does not construct/store/reload a
+Boolean just to test it again. Reversed True/False arm order and wildcard fallback
+are handled explicitly. Ordinary Boolean values still materialize when required.
+
+The unselected arm is not evaluated. Guarded or binding patterns retain the
+ordinary path. Branch-local environments and maximum frame-slot reservation remain
+separate, and returned self-calls keep their tail context. This is deferred
+materialization within existing Gleam semantics, not unrestricted eager evaluation
+of effects or potentially overflowing arithmetic.

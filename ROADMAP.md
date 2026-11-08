@@ -24,13 +24,13 @@ compatibility score. The extension workstreams below remain incomplete.
 ## Verified starting point
 
 All 28 compiler modules rebuild through the native effect-runner entry. Stages
-1, 2 and 3 are byte-identical: 645,969 bytes, SHA256
-`7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f`.
-The stage-3 compiler passes 383 corpus cases; every accepted output matches the
-bootstrap bytes and executes correctly. Full qualification includes 748 tests,
-383 independent upstream comparisons, 16 examples and 59 native IO checks.
+1, 2 and 3 are byte-identical: 653,202 bytes, SHA256
+`1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c`.
+The stage-3 compiler passes 394 corpus cases; every accepted output matches the
+bootstrap bytes and executes correctly. Full qualification includes 763 tests,
+394 independent upstream comparisons, 16 examples and 59 native IO checks.
 See [the proof](SELF_HOSTING.md) and
-[qualification receipt](evidence/parsed-snapshot-qualification.json).
+[qualification receipt](evidence/comparison-flags-qualification.json).
 
 The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
 Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
@@ -51,7 +51,7 @@ receipts remain preserved under their original names.
    Deep non-tail recursion and arena exhaustion remain explicit limits.
 
 3. **Broader native-compiler testing — current corpus verified.**
-   All 383 positive/negative fixtures go through stage 3, with exact accepted
+   All 394 positive/negative fixtures go through stage 3, with exact accepted
    image/output comparisons. The separate upstream comparisons are independent.
    Expand this corpus alongside every new language/runtime feature.
 
@@ -59,7 +59,7 @@ receipts remain preserved under their original names.
    Two native self-rebuilds from the exact frozen source match the seed. A separate
    changed-source control produces the correctly changed compiler. Source hashes,
    stage images, native corpus and ELF observations are retained in
-   [the rebuild receipt](evidence/parsed-snapshot-native-rebuilds.json).
+   [the rebuild receipt](evidence/comparison-flags-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -86,8 +86,8 @@ receipts remain preserved under their original names.
    pattern/data/control-flow boundaries remain. Actual benchmarks are recorded in
    [BENCHMARKS.md](BENCHMARKS.md), with no conclusive broad speedup.
    Direct searches and retained parsed sources now reduce same-input rebuild
-   allocation to 228.9 MB and peak RSS to about 219 MiB; code planning is the next
-   measured allocation candidate. See [MEMORY.md](MEMORY.md) and [GUIDE.md](GUIDE.md).
+   allocation to 228.9 MB and peak RSS to about 219 MiB; instruction spans reduce planning from 83.0 to 28.8 MB
+   and same-input peak RSS further to 168.5 MiB. See [MEMORY.md](MEMORY.md) and [GUIDE.md](GUIDE.md).
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
    retaining correctness checks. Jay specifically requested look-ahead to avoid

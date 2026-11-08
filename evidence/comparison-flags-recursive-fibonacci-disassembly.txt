@@ -1,0 +1,109 @@
+
+comparison-flags-recursive-fibonacci/code:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000000000 <.data>:
+   0:	e8 bc 00 00 00       	call   0xc1
+   5:	31 ff                	xor    %edi,%edi
+   7:	b8 3c 00 00 00       	mov    $0x3c,%eax
+   c:	0f 05                	syscall
+   e:	55                   	push   %rbp
+   f:	48 89 e5             	mov    %rsp,%rbp
+  12:	48 81 ec 00 00 00 00 	sub    $0x0,%rsp
+  19:	48 8b 8d 10 00 00 00 	mov    0x10(%rbp),%rcx
+  20:	48 b8 02 00 00 00 00 	movabs $0x2,%rax
+  27:	00 00 00
+  2a:	48 39 c1             	cmp    %rax,%rcx
+  2d:	0f 8d 0c 00 00 00    	jge    0x3f
+  33:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  3a:	e9 5c 00 00 00       	jmp    0x9b
+  3f:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  46:	48 b9 01 00 00 00 00 	movabs $0x1,%rcx
+  4d:	00 00 00
+  50:	48 29 c8             	sub    %rcx,%rax
+  53:	0f 80 90 00 00 00    	jo     0xe9
+  59:	50                   	push   %rax
+  5a:	e8 af ff ff ff       	call   0xe
+  5f:	48 81 c4 08 00 00 00 	add    $0x8,%rsp
+  66:	50                   	push   %rax
+  67:	48 8b 85 10 00 00 00 	mov    0x10(%rbp),%rax
+  6e:	48 b9 02 00 00 00 00 	movabs $0x2,%rcx
+  75:	00 00 00
+  78:	48 29 c8             	sub    %rcx,%rax
+  7b:	0f 80 68 00 00 00    	jo     0xe9
+  81:	50                   	push   %rax
+  82:	e8 87 ff ff ff       	call   0xe
+  87:	48 81 c4 08 00 00 00 	add    $0x8,%rsp
+  8e:	48 89 c1             	mov    %rax,%rcx
+  91:	58                   	pop    %rax
+  92:	48 01 c8             	add    %rcx,%rax
+  95:	0f 80 4e 00 00 00    	jo     0xe9
+  9b:	c9                   	leave
+  9c:	c3                   	ret
+  9d:	55                   	push   %rbp
+  9e:	48 89 e5             	mov    %rsp,%rbp
+  a1:	48 81 ec 00 00 00 00 	sub    $0x0,%rsp
+  a8:	48 b8 23 00 00 00 00 	movabs $0x23,%rax
+  af:	00 00 00
+  b2:	50                   	push   %rax
+  b3:	e8 56 ff ff ff       	call   0xe
+  b8:	48 81 c4 08 00 00 00 	add    $0x8,%rsp
+  bf:	c9                   	leave
+  c0:	c3                   	ret
+  c1:	55                   	push   %rbp
+  c2:	48 89 e5             	mov    %rsp,%rbp
+  c5:	48 81 ec 00 00 00 00 	sub    $0x0,%rsp
+  cc:	e8 cc ff ff ff       	call   0x9d
+  d1:	48 81 c4 00 00 00 00 	add    $0x0,%rsp
+  d8:	e8 31 00 00 00       	call   0x10e
+  dd:	48 b8 00 00 00 00 00 	movabs $0x0,%rax
+  e4:	00 00 00
+  e7:	c9                   	leave
+  e8:	c3                   	ret
+  e9:	bf 46 00 00 00       	mov    $0x46,%edi
+  ee:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  f3:	0f 05                	syscall
+  f5:	50                   	push   %rax
+  f6:	48 8b 10             	mov    (%rax),%rdx
+  f9:	48 ff c2             	inc    %rdx
+  fc:	48 8d 70 08          	lea    0x8(%rax),%rsi
+ 100:	bf 01 00 00 00       	mov    $0x1,%edi
+ 105:	b8 01 00 00 00       	mov    $0x1,%eax
+ 10a:	0f 05                	syscall
+ 10c:	58                   	pop    %rax
+ 10d:	c3                   	ret
+ 10e:	55                   	push   %rbp
+ 10f:	48 89 e5             	mov    %rsp,%rbp
+ 112:	48 83 ec 30          	sub    $0x30,%rsp
+ 116:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+ 11a:	48 8d 75 f0          	lea    -0x10(%rbp),%rsi
+ 11e:	c6 06 0a             	movb   $0xa,(%rsi)
+ 121:	b9 01 00 00 00       	mov    $0x1,%ecx
+ 126:	45 31 c0             	xor    %r8d,%r8d
+ 129:	48 85 c0             	test   %rax,%rax
+ 12c:	0f 8d 09 00 00 00    	jge    0x13b
+ 132:	48 f7 d8             	neg    %rax
+ 135:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+ 13b:	41 b9 0a 00 00 00    	mov    $0xa,%r9d
+ 141:	31 d2                	xor    %edx,%edx
+ 143:	49 f7 f1             	div    %r9
+ 146:	80 c2 30             	add    $0x30,%dl
+ 149:	48 ff ce             	dec    %rsi
+ 14c:	88 16                	mov    %dl,(%rsi)
+ 14e:	48 ff c1             	inc    %rcx
+ 151:	48 85 c0             	test   %rax,%rax
+ 154:	0f 85 e7 ff ff ff    	jne    0x141
+ 15a:	4d 85 c0             	test   %r8,%r8
+ 15d:	0f 84 09 00 00 00    	je     0x16c
+ 163:	48 ff ce             	dec    %rsi
+ 166:	c6 06 2d             	movb   $0x2d,(%rsi)
+ 169:	48 ff c1             	inc    %rcx
+ 16c:	48 89 ca             	mov    %rcx,%rdx
+ 16f:	bf 01 00 00 00       	mov    $0x1,%edi
+ 174:	b8 01 00 00 00       	mov    $0x1,%eax
+ 179:	0f 05                	syscall
+ 17b:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+ 17f:	c9                   	leave
+ 180:	c3                   	ret

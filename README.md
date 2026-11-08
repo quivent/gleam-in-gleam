@@ -17,7 +17,7 @@
   <img src="docs/assets/target.svg" alt="Native target: Linux x86-64">
   <img src="docs/assets/dependencies.svg" alt="Third-party compiler/runtime dependencies: zero">
   <br>
-  <img src="docs/assets/checks.svg" alt="Qualified regression checks: 748 of 748">
+  <img src="docs/assets/checks.svg" alt="Qualified regression checks: 763 of 763">
   <img src="docs/assets/rebuilds.svg" alt="Two native rebuilds are byte-identical to the seed">
 </p>
 
@@ -44,12 +44,12 @@ native rebuilds are byte-identical to the seed.
 
 | Verified snapshot · 2026-11-08 | Result |
 |:---|---:|
-| Standalone compiler image | **645,969 bytes** |
-| Regression tests | **748 / 748 passed** |
-| Independent upstream comparisons | **383 cases** |
+| Standalone compiler image | **653,202 bytes** |
+| Regression tests | **763 / 763 passed** |
+| Independent upstream comparisons | **394 cases** |
 | Native self-rebuilds | **2, both byte-identical to the seed** |
 | Third-party compiler/runtime dependencies | **0** |
-| Same-input rebuild peak RSS, allocation trace | **218.5 MiB** |
+| Same-input peak RSS, instruction-span milestone | **168.5 MiB** |
 
 > [!IMPORTANT]
 > **Self-hosting is verified within the supported subset.** Full upstream Gleam
@@ -248,18 +248,18 @@ cmp out/stage2 out/stage3
 <details>
 <summary><strong>Exact qualified native image</strong></summary>
 
-**645,969 bytes**, with no dynamic loader or dynamic libraries and a non-executable
+**653,202 bytes**, with no dynamic loader or dynamic libraries and a non-executable
 stack. The seed and both native rebuilds have SHA256:
 
 ```text
-7bb657841b0505ce9d44dba875c5654cb7d3dee23a65968f205f22e8b29b0b5f
+1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c
 ```
 
-The stage-3 compiler also passes all **383 positive/negative corpus cases**.
+The stage-3 compiler also passes all **394 positive/negative corpus cases**.
 Accepted output matches bootstrap executable bytes and runs correctly; rejected
 input fails without publishing an executable.
 
-[Native rebuild receipt →](evidence/parsed-snapshot-native-rebuilds.json)
+[Native rebuild receipt →](evidence/comparison-flags-native-rebuilds.json)
 
 </details>
 
@@ -322,6 +322,7 @@ Assembly listings are inspection evidence, not an external compilation step.
 | Sibling-arm slot reuse | Reserve the maximum mutually exclusive branch footprint |
 | Scalar register allocation | Track values, flags, clobbers and real spills across supported scalar regions |
 | Call preservation | Save live values before arguments; preserve returns before restoring caller values |
+| Direct comparison cases | Consume integer comparison flags without storing/retesting an intermediate Boolean |
 | Scalar CFG joins | Use successor-aware liveness for supported comparisons, short circuits and cases |
 | Structural byte-count recognition | Replace an exact pure unit-step loop with a length load and checked addition |
 
@@ -351,11 +352,20 @@ evolves.
 | Before byte-count optimization | 409.2 MB | 390.8 MiB |
 | Pure byte-count rewrite | 338.7 MB | 323.6 MiB |
 | Direct lookup over existing lists | 288.9 MB | 275.9 MiB |
-| Retain and reuse parsed modules | **228.9 MB** | **218.5 MiB** |
+| Retain and reuse parsed modules | 228.9 MB | 218.5 MiB |
+| Share immutable instruction spans | **176.3 MB** | **168.5 MiB** |
 
-**44% fewer allocated bytes**, without a collector or new dependency. These are
+**56.9% fewer allocated bytes**, without a collector or new dependency. These are
 allocation volumes and observed resident memory—not measurements of reachable
 live objects or the arena's reserved capacity.
+
+### Generated-program progress
+
+A paired before/after run of direct comparison-flag lowering reduces branch/call
+CPU time **328 → 300 ms** and recursive Fibonacci **233 → 194 ms**. Unchanged
+recurrence/list controls remain within 0.5% CPU variation. GCC still leads the
+longer workloads; Node still leads branch/call in that cohort.
+[Checked external comparisons and actual ASM →](PERFORMANCE.md)
 
 ### Timing gets its own evidence
 
@@ -375,10 +385,10 @@ allocations do not automatically make generated programs execute faster.
 > These rebuild measurements describe compiling a fixed input. They do not rank
 > Gleam against other languages or establish a universal runtime speedup.
 
-The current native compiler is **645,969 bytes**. Working RAM, reserved arena size,
+The current native compiler is **653,202 bytes**. Working RAM, reserved arena size,
 and executable size are separate quantities.
 
-[Allocation investigation →](MEMORY.md) · [All timing samples and methodology →](BENCHMARKS.md)
+[Allocation investigation →](MEMORY.md) · [All timing samples and methodology →](BENCHMARKS.md) · [External native/Node/GCC baselines →](PERFORMANCE.md)
 
 [Back to index ↑](#index)
 
@@ -387,9 +397,9 @@ and executable size are separate quantities.
 ## 08 · Verification
 
 ```text
-   748 / 748    regression tests passed
-   383          independent upstream comparisons
-   383          cases through the rebuilt native compiler
+   763 / 763    regression tests passed
+   394          independent upstream comparisons
+   394          cases through the rebuilt native compiler
     16          native example programs
     59          CLI-specific checks
      9          complete guide examples compiled and executed
@@ -407,12 +417,12 @@ and changed-source/native self-hosting controls.
 
 | Evidence | Record |
 |:---|:---|
-| Full qualification | [Source hashes, tests and outcomes](evidence/parsed-snapshot-qualification.json) |
-| Native self-hosting | [Stages, image hashes and corpus](evidence/parsed-snapshot-native-rebuilds.json) |
-| Native CLI | [IO, fault injection and ELF checks](evidence/parsed-snapshot-io-verification.json) |
+| Full qualification | [Source hashes, tests and outcomes](evidence/comparison-flags-qualification.json) |
+| Native self-hosting | [Stages, image hashes and corpus](evidence/comparison-flags-native-rebuilds.json) |
+| Native CLI | [IO, fault injection and ELF checks](evidence/comparison-flags-io-verification.json) |
 | Memory | [Same-input allocation comparison](evidence/parsed-snapshot-allocation-reduction.json) |
 | Timing | [Repeated CPU, wall and RSS measurements](evidence/parsed-snapshot-benchmark.json) |
-| Language guide | [Nine actual native executions](evidence/parsed-snapshot-guide-execution.json) |
+| Language guide | [Nine actual native executions](evidence/comparison-flags-guide-execution.json) |
 
 Upstream Gleam is an independent development oracle. The native compiler does not
 invoke it during compilation. Initial failures and earlier milestones remain in
@@ -465,10 +475,9 @@ also have detailed limits, including coverage shapes, byte segments and guards.
 | Measured optimization | In progress; current increment qualified |
 | Additional targets and distribution | Open |
 
-The next measured allocation candidate is code planning—about **83 MB** on the
-frozen input. That concerns the compiler's intermediate instruction structures;
-generated-program runtime optimization is a separate dimension. This presentation
-update does not change compiler behavior.
+Code planning now shares immutable instruction spans: its allocation falls from
+**83.0 to 28.8 MB** on the frozen input, preserving identical emitted target bytes.
+Generated-program runtime optimization remains a separate dimension.
 
 [Roadmap and remaining work →](ROADMAP.md) · [Interactive eight-step roadmap →](docs/roadmap.html)
 
@@ -490,6 +499,7 @@ GitHub displays its source. [Preview instructions →](docs/README.md)
 | [ASM reference](ASM.md) | Native layouts, calling conventions and emitted instructions |
 | [Register allocation specification](REGISTER_SPILL_SPEC.md) | Liveness, register pressure, clobbers, spills and remaining boundaries |
 | [Memory investigation](MEMORY.md) | Phase traces, lookup/AST changes, allocation savings and caveats |
+| [External performance baselines](PERFORMANCE.md) | Checked native / Gleam-Node / GCC O2-O3 comparisons |
 | [Benchmark record](BENCHMARKS.md) | Repeated measurements, environment, raw samples and interpretation |
 | [Implementation journal](JOURNEY.md) | Decisions, discoveries, tradeoffs and the sequence of changes |
 | [Reliability record](FULL_SIZE_RELIABILITY_SPEC.md) | Initial full-size failures, investigation and bounded fixes |

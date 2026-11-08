@@ -167,3 +167,25 @@ frozen-target compiler hash as the preceding byte-count backend.
 [Lookup-only samples](evidence/lookup-search-benchmark.json),
 [combined samples](evidence/parsed-snapshot-benchmark.json),
 [allocation evidence](evidence/parsed-snapshot-allocation-reduction.json).
+
+## Instruction spans: explicit memory/speed tradeoff
+
+The span change is qualified at compiler source commit `9f5bb10`. Five alternating
+same-input self-build repeats observe median CPU **4.816 → 5.213 s (8.2% higher)**,
+wall **5.488 → 5.932 s (8.1% higher)**, and maximum RSS **224,128 → 172,672 KiB**.
+This is a memory improvement with a measured compilation-time cost, not a general
+speedup. Planning allocates less, while the assembler walks a new nested structure.
+The profile measures that allocation shift; it does not by itself isolate the CPU
+cost. The separate commit allows this representation tradeoff to be revised.
+
+[All samples](evidence/instruction-spans-benchmark.json),
+[allocation and output-byte proof](evidence/instruction-spans-comparison.json).
+
+## External baselines
+
+The first checked native / upstream Gleam-Node / GCC O2-O3 baseline is now recorded
+in [PERFORMANCE.md](PERFORMANCE.md). It includes compilation, generated-program
+execution, startup, list memory, artifact sizes, source hashes and actual ASM.
+The raw receipt preserves all 200 measured samples and the earlier failed harness
+attempts remain separate. This is a surface microbenchmark set, not a broad
+language ranking or GCC parity claim.

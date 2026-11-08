@@ -26,7 +26,7 @@
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "2a140ed7fb421f2ce70f333328b2705070d2933c",
+  "sourceRevision": "fa468e68e45a3d0e33cd188c67323490ec02bd77",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -35,8 +35,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/parsed-snapshot-qualification.json",
-  "ioVerification": "evidence/parsed-snapshot-io-verification.json",
+  "verification": "evidence/comparison-flags-qualification.json",
+  "ioVerification": "evidence/comparison-flags-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -74,15 +74,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/parsed-snapshot-io-verification.json"
+          "path": "evidence/comparison-flags-io-verification.json"
         },
         {
-          "label": "748 checks and 383 upstream comparisons",
-          "path": "evidence/parsed-snapshot-qualification.json"
+          "label": "763 checks and 394 upstream comparisons",
+          "path": "evidence/comparison-flags-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/parsed-snapshot-disassembly.txt"
+          "path": "evidence/comparison-flags-disassembly.txt"
         }
       ],
       "related": [],
@@ -128,7 +128,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/parsed-snapshot-native-rebuilds.json"
+          "path": "evidence/comparison-flags-native-rebuilds.json"
         }
       ],
       "related": [
@@ -142,11 +142,11 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "All 383 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
+      "summary": "All 394 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "748 regression checks and 383 fresh upstream comparisons are separately recorded.",
+        "763 regression checks and 394 fresh upstream comparisons are separately recorded.",
         "Stage 3 compiles 251 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
@@ -171,16 +171,16 @@
       ],
       "evidence": [
         {
-          "label": "383 native cases, individual outcomes",
-          "path": "evidence/parsed-snapshot-native-rebuilds.json"
+          "label": "394 native cases, individual outcomes",
+          "path": "evidence/comparison-flags-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/parsed-snapshot-project-upstream-checks.json"
+          "path": "evidence/comparison-flags-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/parsed-snapshot-upstream-checks.json"
+          "path": "evidence/comparison-flags-upstream-checks.json"
         }
       ],
       "related": [
@@ -194,13 +194,13 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 645,969-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 653,202-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
         "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 28 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7483110403dc80f7c757fab0a893add0089a367ca8b65.",
-        "The rebuilt image runs --version and qualifies the entire 383-case corpus with empty PATH.",
+        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7633110403dc80f7c757fab0a893add0089a367ca8b65.",
+        "The rebuilt image runs --version and qualifies the entire 394-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
       "acceptance": [
@@ -224,7 +224,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/parsed-snapshot-native-rebuilds.json"
+          "path": "evidence/comparison-flags-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/parsed-snapshot-project-upstream-checks.json"
+          "path": "evidence/comparison-flags-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -338,9 +338,9 @@
       "title": "Measured optimization",
       "scope": "extension",
       "status": "partial",
-      "statusLabel": "Partial · lookup and parse reuse measured",
+      "statusLabel": "Partial · direct comparison flags benchmarked",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Profile code-planning allocation next, with the current immutable frontend qualified; preserve separate rollback-friendly increments.",
+      "nextAction": "Use paired external runtime measurements to prioritize constant arithmetic, call/value placement and further deferred materialization.",
       "specMaturity": "Scalar CFG/calls qualified and benchmarked; general whole-function scope remains",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
@@ -358,7 +358,10 @@
         "Scalar comparisons, short-circuit expressions and supported two-arm cases now use successor-aware CFG liveness and real joins.",
         "Repeated benchmarks show no conclusive broad speedup; identical-code controls expose shared-host wall noise. Actual current-source self-build: 8.75 s median wall, 7.42 s CPU, 390.8 MiB peak RSS.",
         "On identical frozen input, structurally recognized byte counting reduces allocation 409,183,952 to 338,729,536 bytes and peak RSS 390.8 to 323.6 MiB, without GC. Earlier timing above remains historical.",
-        "Direct immutable lookup and parse-once handoff reduce same-input allocation further to 228,947,576 bytes and peak RSS to 218.5 MiB. Raw-source compatibility and unreachable-source behavior are tested."
+        "Direct immutable lookup and parse-once handoff reduce same-input allocation further to 228,947,576 bytes and peak RSS to 218.5 MiB. Raw-source compatibility and unreachable-source behavior are tested.",
+        "Immutable instruction spans reduce planning allocation 82,964,584 to 28,830,568 bytes and same-input peak RSS to 168.5 MiB; ordered nested traversal preserves exact output bytes.",
+        "Direct complementary Boolean cases consume integer-comparison flags; operand effects, untaken arms, overflow behavior, scope and tail reentry are independently tested.",
+        "Paired native CPU medians improve 327.907→299.503 ms for branch/call and 232.507→194.260 ms for Fibonacci; byte-identical recurrence/list controls remain within 0.5%. GCC still leads those longer workloads."
       ],
       "acceptance": [
         {
@@ -426,6 +429,26 @@
         {
           "label": "Frontend timing and RSS repeats",
           "path": "evidence/parsed-snapshot-benchmark.json"
+        },
+        {
+          "label": "Instruction-span allocation trace",
+          "path": "evidence/instruction-spans-allocation-phases.json"
+        },
+        {
+          "label": "751 tests and native rebuilds",
+          "path": "evidence/instruction-spans-qualification.json"
+        },
+        {
+          "label": "763 tests, 394 upstream cases and native fixed point",
+          "path": "evidence/comparison-flags-qualification.json"
+        },
+        {
+          "label": "External performance method and baseline",
+          "path": "PERFORMANCE.md"
+        },
+        {
+          "label": "Paired native-before/native-after/Node/GCC measurements",
+          "path": "evidence/comparison-flags-surface-baselines.json"
         }
       ],
       "related": [
@@ -481,16 +504,16 @@
     }
   ],
   "metrics": {
-    "tests": 748,
-    "upstream": 383,
+    "tests": 763,
+    "upstream": 394,
     "examples": 16,
-    "cliBytes": 645969,
+    "cliBytes": 653202,
     "sourceLimitBytes": 131072,
-    "observedAt": "2026-11-08T14:08:11.737079+00:00"
+    "observedAt": "2026-11-08T19:08:45.127780+00:00"
   },
   "evidenceSHA256": {
-    "evidence/parsed-snapshot-qualification.json": "de48baf62ed7b6bed018926ac70918b212a7c2042c60c9172cf96745ee0ff383",
-    "evidence/parsed-snapshot-io-verification.json": "30b721ff7a29f5387ff52575ac2c840ddb5a70f12f79526faf7bb4863a9c2d25"
+    "evidence/comparison-flags-qualification.json": "fd815064e8001f637a67e875916732e22f7533711f3593dfb8bd984a426642e9",
+    "evidence/comparison-flags-io-verification.json": "4036306529059a2040f1a2df0983e9dd1c23c0e9c2ef2cf31ffe87af3bbf88a3"
   }
 }</script>
 <script>

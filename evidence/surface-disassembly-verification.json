@@ -1,0 +1,103 @@
+{
+  "schema": "gleam-in-gleam.surface-disassembly/1",
+  "allArtifactsMatchMeasuredHashes": true,
+  "records": [
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "artifactSHA256": "a1b35563ae315fc9a496100020b6e02f507855a2232f640e0ba4026c4ed41e14",
+      "path": "evidence/surface-integer-recurrence-native-disassembly.txt",
+      "disassemblySHA256": "743db6d6319b92326720a1c7e9c254047a5366fb5a4ab12a076f774a59573334",
+      "scope": "Native raw ELF payload including trailing constants"
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "gcc-o2",
+      "artifactSHA256": "bee54f694d9fc8ad905ae106bfe393703f67937a8b98406f1fbf64d720a0146b",
+      "path": "evidence/surface-integer-recurrence-gcc-o2-disassembly.txt",
+      "disassemblySHA256": "f52c6de763c6e82963392c161933bccf989a8e9a2e4c61914860d1ecbc5f162c",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "gcc-o3",
+      "artifactSHA256": "bee54f694d9fc8ad905ae106bfe393703f67937a8b98406f1fbf64d720a0146b",
+      "path": "evidence/surface-integer-recurrence-gcc-o3-disassembly.txt",
+      "disassemblySHA256": "2e121d3e7c3e6970d7642d8ff685aac19eee1e6325aaa7d193ed19c08f599d4b",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "artifactSHA256": "3dd225696c462a104cef8c3c72bd2284ed772dea599e94da3385f9249cdd31ba",
+      "path": "evidence/surface-branch-call-native-disassembly.txt",
+      "disassemblySHA256": "09a364211336874ffcaf743cc9d81de4b1a2d89b516b04d34aa82e48141d6707",
+      "scope": "Native raw ELF payload including trailing constants"
+    },
+    {
+      "workload": "branch-call",
+      "variant": "gcc-o2",
+      "artifactSHA256": "1b69965e9780bce81843949cea689739226e7bb345bbfadf416fc885a3d0caed",
+      "path": "evidence/surface-branch-call-gcc-o2-disassembly.txt",
+      "disassemblySHA256": "ed524f16c0f4aa931d3f96c497bad008d81fb1dce446db91f770ac480fb75361",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "branch-call",
+      "variant": "gcc-o3",
+      "artifactSHA256": "1b69965e9780bce81843949cea689739226e7bb345bbfadf416fc885a3d0caed",
+      "path": "evidence/surface-branch-call-gcc-o3-disassembly.txt",
+      "disassemblySHA256": "922febef4f8871224b12ed5d98d49e04cc10c6e0bbb7a843824834decebc9fb4",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "artifactSHA256": "c6dade4712d7b579ffa5db11f49ecd2e81b47fe8e274ef6022840f6679a924c7",
+      "path": "evidence/surface-recursive-fibonacci-native-disassembly.txt",
+      "disassemblySHA256": "0145f2a07aea71fb1d8b0a06ce42c020e780039428075592d3627339dd625782",
+      "scope": "Native raw ELF payload including trailing constants"
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "gcc-o2",
+      "artifactSHA256": "19a5ee643c83f83d8556e3a0d96193bf3266bed66842a6a306dfea896f9ce42f",
+      "path": "evidence/surface-recursive-fibonacci-gcc-o2-disassembly.txt",
+      "disassemblySHA256": "859104eb9926534553af33e85a481fd6f6458de77a20c97ee6a5daa9b4441f1e",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "gcc-o3",
+      "artifactSHA256": "4f7191294f1d5a4e576fa07ef7441b6624b8681d1a17e45e0cf57fa0c8bfff6b",
+      "path": "evidence/surface-recursive-fibonacci-gcc-o3-disassembly.txt",
+      "disassemblySHA256": "0ef46c0159a52193754576e85a28fcaef33f60f43b08a00986a60bd640954133",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "artifactSHA256": "acbd8430ea6a9431933b51c0195ba7fd83c3c0080a40a01f963b34fa084b7ce5",
+      "path": "evidence/surface-list-build-map-sum-native-disassembly.txt",
+      "disassemblySHA256": "d630e922bcce40972e08ae4e3622ef4c5ef3879a3efb4f73266a8ccc3efc48e4",
+      "scope": "Native raw ELF payload including trailing constants"
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "gcc-o2",
+      "artifactSHA256": "397c32b010d86e56309881cf39bac80599b3123230577e24eed195649a9b452c",
+      "path": "evidence/surface-list-build-map-sum-gcc-o2-disassembly.txt",
+      "disassemblySHA256": "5bfd862972e3b2e94ed380fb40e048a50dc0d3f3c3c2a21fa99045eba7674761",
+      "scope": "GCC ELF text disassembly"
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "gcc-o3",
+      "artifactSHA256": "397c32b010d86e56309881cf39bac80599b3123230577e24eed195649a9b452c",
+      "path": "evidence/surface-list-build-map-sum-gcc-o3-disassembly.txt",
+      "disassemblySHA256": "9ca63dcf20ccd4289afc01177416288db12763014dcb1cc968a1c62a3a60bbf6",
+      "scope": "GCC ELF text disassembly"
+    }
+  ],
+  "textNormalization": "Trailing whitespace removed; instruction bytes and addresses unchanged"
+}

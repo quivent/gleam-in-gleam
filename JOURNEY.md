@@ -682,3 +682,44 @@ syntax/examples, exact supported semantics, module/AST/type-checking architectur
 ASM/register/runtime layout constraints, compiler API, limits and extension rules.
 All nine complete Gleam examples execute with checked outputs. Lookup and AST
 changes are separate commits so we can revise either when later evidence warrants.
+
+## Expose sequence ownership instead of copying plans — 2026-11-08
+
+The planner already knew each instruction sequence’s order and ownership. Its
+list representation nevertheless copied those sequences during composition.
+Immutable spans preserve that known structure directly through assembly.
+
+Previously joining planned fragments rebuilt list spines. Closure helpers were
+reversed and copied into a growing reversed instruction stream. The final program
+then copied large bodies again. Immutable `Span` parts now retain each body;
+joining shares longer spans, and helper ordering is separate from helper contents.
+The assembler's label/byte passes walk nested spans with an explicit pending stack.
+Existing instruction order, offsets and diagnostics remain authoritative.
+
+Same-input planning allocation falls 83.0 to 28.8 MB; assembly spends an additional
+1.45 MB traversing spans. Net allocation falls 228.9 to 176.3 MB and trace RSS 218.5
+to 168.5 MiB. All 263 accepted native corpus outputs remain byte-identical to the
+preceding compiler, as does the frozen target-compiler output. All 751 tests and
+383 upstream comparisons pass; two current-source native rebuilds remain exact.
+The standalone compiler is 647,417 bytes. Memory wins are not runtime speed claims;
+external baselines and self-build timings are separate measurements.
+
+## Defer Boolean materialization until its consumer — 2026-11-08
+
+Our branch baseline exposed a comparison turned into a Boolean, stored/reloaded,
+then tested again for a case. The new lowering keeps comparison flags until that
+consumer. It supports complementary unguarded Boolean arms over integer comparisons,
+including reversed order and wildcard fallback. It preserves ordered operand effects,
+selective arm execution, overflow traps, branch-local scopes and tail context.
+
+Qualification passes 763 tests and 394 upstream comparisons, with exact successive
+native self-rebuilds. A paired five-variant surface run compares the preceding
+native compiler, new native compiler, upstream Gleam/Node, GCC O2 and GCC O3.
+Branch/call CPU falls 327.907→299.503 ms; Fibonacci 232.507→194.260 ms. Unchanged
+recurrence/list code stays within 0.5% CPU variation. GCC still wins these longer
+workloads, and Node still wins branch/call. The compiler is 653,202 bytes.
+
+The preceding instruction-span change reduced memory but increased measured
+self-build CPU by 8.2%; it is documented as a tradeoff, not quietly called a speedup.
+Both changes are separately committed and can be revised. See PERFORMANCE.md for
+source/measurement contracts and BENCHMARKS.md for the retained self-build samples.

@@ -293,3 +293,41 @@ MiB**. The earlier trace measured 218.5 MiB; retain that run distinction. Alloca
 reductions do not translate proportionally into timing improvements. Other phases
 remain unchanged and the arena allocator itself is simple. [All samples and ranges](BENCHMARKS.md)
 are retained, including the separately measured lookup-only increment.
+
+## Instruction spans: carry a planned sequence once
+
+An already-planned instruction body has known order and ownership. Rebuilding
+its list spine to join it to another body adds no semantic information. The
+planner can preserve that structure directly through lowering and assembly.
+
+`assembler.Part` now admits `Span(List(Part))`. `assembler.join` shares longer
+immutable sequences and directly prepends tiny prefixes. X64 lowering composes
+those spans instead of repeatedly reversing/copying full lists. Closure helpers
+are retained once as spans in reverse helper order; final order is restored at
+program assembly. This does not reverse instructions inside an individual helper.
+Environment bindings and equality metadata retain their ordinary list semantics.
+
+Both assembler passes use an explicit pending-sequence stack. They walk nested
+spans in order, maintaining the same global byte offset, label namespace, duplicate
+label checks and signed relocation checks. There is no preliminary flattened plan
+copy. Output chunks still use the existing balanced byte concatenation.
+
+On the identical frozen 27-module input:
+
+| Allocation phase | Before | With instruction spans |
+|---|---:|---:|
+| Code planning | 82,964,584 B | 28,830,568 B |
+| Assembly | 30,210,408 B | 31,665,000 B |
+| Whole rebuild | 228,947,576 B | 176,268,104 B |
+| Peak RSS, trace | 223,744 KiB | 172,544 KiB |
+
+Planning allocation falls **65.3%**. Assembly spends an additional 1,454,592 bytes
+walking the explicit sequence structure; whole-build allocation still falls
+52,679,472 bytes (23.0%). Peak RSS is **168.5 MiB**, down from 218.5 MiB in the
+preceding trace. The emitted fixed-input target compiler remains byte-identical:
+`58065cea325f468ea25f18fea3ca728781dafc43413e59586dabb8427885296e`.
+
+This is a representation/memory result. It does not by itself establish a runtime
+speedup or make arbitrary effectful branches safe to evaluate eagerly. Gleam's
+existing evaluation order, short-circuiting and overflow behavior remain required.
+[Actual allocation trace](evidence/instruction-spans-allocation-phases.json).
