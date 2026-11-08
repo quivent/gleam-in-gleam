@@ -16,6 +16,7 @@ import resource
 import signal
 import struct
 import tempfile
+import time
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('symbols')
@@ -129,6 +130,7 @@ with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
             used = allocated(value)
             if frames and frames[-1]['returnAddress'] == address:
                 frame = frames.pop()
+                frame['observedWallSeconds'] = time.monotonic() - frame.pop('entryClock')
                 frame['exitAllocatedBytes'] = used
                 frame['inclusiveAllocatedBytes'] = used - frame['entryAllocatedBytes']
                 frame['exclusiveAllocatedBytes'] = frame['inclusiveAllocatedBytes'] - frame.pop('childrenBytes')
@@ -141,7 +143,7 @@ with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
                 with open(f'/proc/{pid}/mem', 'rb', buffering=0) as memory:
                     returned, = struct.unpack('<Q', os.pread(memory.fileno(), 8, value.rsp))
                 frame = dict(id=next_id, parent=frames[-1]['id'] if frames else None,
-                    function=entries[address], entryAllocatedBytes=used,
+                    function=entries[address], entryAllocatedBytes=used, entryClock=time.monotonic(),
                     returnAddress=returned, childrenBytes=0)
                 next_id += 1
                 frames.append(frame)

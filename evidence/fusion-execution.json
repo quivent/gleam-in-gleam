@@ -1,0 +1,24 @@
+{
+  "schema": "gta.fusion-execution/1",
+  "observedAt": "2026-11-08T23:57:40.953886+00:00",
+  "harnessSHA256": "8455a04b8b6ec70f778b89f8eb7da778e5eb55444b1a91f0d833f9d1294db1ba",
+  "compilerSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+  "sourceSHA256": {
+    "test/fusion_probe.gleam": "d3cac0d1657e15d8bcd2dea8d27d0594d3f5a78b5c2e0825f7ba57d8374f2b19",
+    "src/native/assembler.gleam": "df1a0748bb75d00b62688f00cf369f354f002de359712f5871c35d9e0179619d",
+    "src/native/core.gleam": "f150c7ded0ddf623276575687c53a9053bbbac3b777a21ee93384814ca7e25e5"
+  },
+  "complete": true,
+  "checks": [
+    "forward/backward relocation bytes",
+    "full-name hash collision safety",
+    "duplicate collision",
+    "first source-order missing target",
+    "UTF-8 labels",
+    "validation callback order and early exit"
+  ],
+  "nativeStdout": "True\nTrue\nTrue\nTrue\n1\n2\nTrue\n",
+  "upstreamValues": "True\nTrue\nTrue\nTrue\n1\n2\nTrue\n",
+  "programSHA256": "fe10c9ca73f5a98615334f8220181a43f21f56840ff3ac1ed390657114017f63",
+  "programBytes": 24745
+}

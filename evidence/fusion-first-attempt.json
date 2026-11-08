@@ -1,0 +1,13 @@
+{
+  "schema": "gta.compiler-experiment-attempt/1",
+  "candidate": "fused-layout AVL label index",
+  "regressionTests": {
+    "passed": 296,
+    "failed": 0
+  },
+  "debugBuild": "failed",
+  "error": "Node RangeError: Maximum call stack size exceeded in symbol_order",
+  "cause": "Result continuation obscured the tail call in development symbol traversal",
+  "correction": "Use explicit Result case with direct tail-recursive call; production layout already uses that form",
+  "compilerQualification": false
+}

@@ -49,6 +49,15 @@ pub fn dependencies(source: BitArray) -> Result(List(String), String) {
 }
 
 pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
+  use #(module_, _) <- c.then(link_with_context(entry, sources))
+  Ok(module_)
+}
+
+// Retain the validated definition context needed by both checking and emission.
+pub fn link_with_context(
+  entry: String,
+  sources: List(Source),
+) -> Result(#(a.Module, d.Context), String) {
   use _ <- c.then(valid_name(entry))
   use index <- c.then(source_index(sources, []))
   use modules <- c.then(visit(entry, index, [], []))
@@ -64,15 +73,15 @@ pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
     )
   use context <- c.then(d.collect(linked))
   use _ <- c.then(
-    c.try_map(modules, fn(m) {
-      c.try_map(m.module_.aliases, fn(alias) {
+    c.try_each(modules, fn(m) {
+      c.try_each(m.module_.aliases, fn(alias) {
         use body <- c.then(expand_alias(alias, Scope(m, entry, modules), []))
         use _ <- c.then(d.validate_type(
           body,
           d.Context(..context, function_parameters: alias.parameters),
         ))
         let used = types.variables([body])
-        c.try_map(alias.parameters, fn(n) {
+        c.try_each(alias.parameters, fn(n) {
           case local(used, n) {
             True -> Ok(Nil)
             False -> Error("Unused type alias parameter: " <> n)
@@ -81,7 +90,7 @@ pub fn link(entry: String, sources: List(Source)) -> Result(a.Module, String) {
       })
     }),
   )
-  Ok(linked)
+  Ok(#(linked, context))
 }
 
 fn source_index(

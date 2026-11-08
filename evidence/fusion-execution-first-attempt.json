@@ -1,0 +1,21 @@
+{
+  "schema": "gta.fusion-execution/1",
+  "observedAt": "2026-11-08T23:57:27.295359+00:00",
+  "harnessSHA256": "8455a04b8b6ec70f778b89f8eb7da778e5eb55444b1a91f0d833f9d1294db1ba",
+  "compilerSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+  "sourceSHA256": {
+    "test/fusion_probe.gleam": "89348a2a0de18589bfba6a688d8d9c47d2e5d70aa43381a56ef2433ce2ffa650",
+    "src/native/assembler.gleam": "df1a0748bb75d00b62688f00cf369f354f002de359712f5871c35d9e0179619d",
+    "src/native/core.gleam": "f150c7ded0ddf623276575687c53a9053bbbac3b777a21ee93384814ca7e25e5"
+  },
+  "complete": false,
+  "checks": [
+    "forward/backward relocation bytes",
+    "full-name hash collision safety",
+    "duplicate collision",
+    "first source-order missing target",
+    "UTF-8 labels",
+    "validation callback order and early exit"
+  ],
+  "failure": "AssertionError('In function main: Anonymous parameter needs an annotation or stronger type context\\n')"
+}

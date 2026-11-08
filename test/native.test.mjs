@@ -555,3 +555,39 @@ test('comparison cases consume flags without materializing and reloading a Boole
   const raw=join(dir,'code');writeFileSync(raw,image.subarray(entry-base));const listing=spawnSync('objdump',['-D','-b','binary','-m','i386:x86-64',raw],{encoding:'utf8'});assert.equal(listing.status,0,listing.stderr);assert.match(listing.stdout,/\bjge\b/);assert.doesNotMatch(listing.stdout,/\bsetl\b/);
  } finally {rmSync(dir,{recursive:true,force:true});}
 });
+
+test('fused assembler retains full names for colliding hashes and reverse symbol order',()=>{
+ // 65*33+97 == 66*33+64: these different names share the owned label hash.
+ const jump=name=>new Relative(new BitArray(Uint8Array.of(0xe9)),name);
+ const parts=toList([jump('B@'),new Label('Aa'),new Bytes(new BitArray(Uint8Array.of(0x90))),new Label('B@'),jump('Aa')]);
+ const result=assemble(parts);assert.equal(result.isOk(),true,result[0]);
+ const bytes=Buffer.from(result[0].rawBuffer);assert.equal(bytes.readInt32LE(1),1);assert.equal(bytes.readInt32LE(7),-6);
+ assert.deepEqual(assemblySymbols(parts)[0].toArray(),[['B@',6],['Aa',5]]);
+ const duplicate=assemble(toList([new Label('Aa'),new Label('B@'),new Label('Aa')]));assert.equal(duplicate.isOk(),false);assert.match(duplicate[0],/Duplicate assembly label: Aa/);
+ const missing=assemble(toList([new Label('Aa'),jump('B@')]));assert.equal(missing.isOk(),false);assert.match(missing[0],/Unknown name: B@/);
+});
+
+test('fused assembler preserves mixed relocation offsets across many indexed labels',()=>{
+ const count=8192,parts=[],expected=[];let offset=0;
+ for(let i=0;i<count;i++){
+  const name='label:'+i;parts.push(new Label(name));expected.unshift([name,offset]);
+  parts.push(new Bytes(new BitArray(Uint8Array.of(i%256))));offset++;
+  const opcode=i%2?Uint8Array.of(0x0f,0x85):Uint8Array.of(0xe9);
+  parts.push(new Relative(new BitArray(opcode),'label:'+((i+1)%count)));offset+=opcode.length+4;
+ }
+ const result=assemble(toList([new Span(toList(parts))]));assert.equal(result.isOk(),true,result[0]);
+ const bytes=Buffer.from(result[0].rawBuffer);assert.equal(bytes.length,offset);
+ const locations=new Map(expected);let position=0;
+ for(let i=0;i<count;i++){
+  assert.equal(bytes[position],i%256);position++;const opLength=i%2?2:1;
+  assert.equal(bytes.readInt32LE(position+opLength),locations.get('label:'+((i+1)%count))-(position+opLength+4));position+=opLength+4;
+ }
+ assert.deepEqual(assemblySymbols(toList(parts))[0].toArray(),expected);
+});
+
+
+test('fused relocation resolution retains the first source-order missing-target diagnostic',()=>{
+ const jump=name=>new Relative(new BitArray(Uint8Array.of(0xe9)),name);
+ const result=assemble(toList([jump('first-missing'),new Span(toList([jump('later-missing')]))]));
+ assert.equal(result.isOk(),false);assert.equal(result[0],'Unknown name: first-missing');
+});

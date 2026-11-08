@@ -99,13 +99,33 @@ pub fn type_name(t: a.Type) -> String {
 }
 
 pub fn module(module: a.Module) -> Result(List(Function), String) {
+  use _ <- c.then(headers(module))
+  use globals <- c.then(d.collect(module))
+  check_functions(module, globals)
+}
+
+pub fn module_with_context(
+  module: a.Module,
+  globals: d.Context,
+) -> Result(List(Function), String) {
+  use _ <- c.then(headers(module))
+  check_functions(module, globals)
+}
+
+fn headers(module: a.Module) -> Result(Nil, String) {
   use _ <- c.then(case module.imports, module.aliases {
     [], [] -> Ok(Nil)
     _, _ ->
       Error("Project imports/aliases must be resolved before type checking")
   })
   use _ <- c.then(signatures(module.functions, []))
-  use globals <- c.then(d.collect(module))
+  Ok(Nil)
+}
+
+fn check_functions(
+  module: a.Module,
+  globals: d.Context,
+) -> Result(List(Function), String) {
   use main <- c.then(c.lookup(globals.functions, "main"))
   case main.parameters {
     [] ->

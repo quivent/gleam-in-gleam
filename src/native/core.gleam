@@ -117,6 +117,22 @@ pub fn try_map(
   }
 }
 
+// Validation consumes outcomes directly, retaining only the first failure.
+// Do not allocate a list of successful values that the caller discards.
+pub fn try_each(
+  xs: List(a),
+  f: fn(a) -> Result(b, String),
+) -> Result(Nil, String) {
+  case xs {
+    [] -> Ok(Nil)
+    [x, ..rest] ->
+      case f(x) {
+        Error(e) -> Error(e)
+        Ok(_) -> try_each(rest, f)
+      }
+  }
+}
+
 // Search existing immutable nodes; do not materialize a parallel key/value list.
 pub fn find(xs: List(a), predicate: fn(a) -> Bool) -> Result(a, String) {
   case xs {

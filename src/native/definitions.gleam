@@ -37,9 +37,9 @@ pub fn collect(module: a.Module) -> Result(Context, String) {
       "",
     )
   use _ <- c.then(
-    c.try_map(constructors, fn(entry) {
+    c.try_each(constructors, fn(entry) {
       use owner <- c.then(c.lookup(context.custom_types, entry.1.owner))
-      c.try_map(entry.1.fields, fn(t) {
+      c.try_each(entry.1.fields, fn(t) {
         use _ <- c.then(validate_type_in(t, context, owner.parameters))
         case owner.public_ {
           True -> public_type(t, context)
@@ -49,19 +49,19 @@ pub fn collect(module: a.Module) -> Result(Context, String) {
     }),
   )
   use _ <- c.then(
-    c.try_map(module.functions, fn(f) {
+    c.try_each(module.functions, fn(f) {
       let scope =
         types.variables(
           c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]),
         )
       use _ <- c.then(
-        c.try_map(f.parameters, fn(p) { validate_type_in(p.1, context, scope) }),
+        c.try_each(f.parameters, fn(p) { validate_type_in(p.1, context, scope) }),
       )
       use _ <- c.then(validate_type_in(f.result, context, scope))
       use _ <- c.then(case f.public_ {
         True -> {
           use _ <- c.then(
-            c.try_map(f.parameters, fn(p) { public_type(p.1, context) }),
+            c.try_each(f.parameters, fn(p) { public_type(p.1, context) }),
           )
           public_type(f.result, context)
         }
@@ -203,13 +203,13 @@ fn validate_type_in(
     a.ListType(element) -> validate_type_in(element, context, params)
     a.TupleType(elements) -> {
       use _ <- c.then(
-        c.try_map(elements, fn(t) { validate_type_in(t, context, params) }),
+        c.try_each(elements, fn(t) { validate_type_in(t, context, params) }),
       )
       Ok(Nil)
     }
     a.FunctionType(arguments, result) -> {
       use _ <- c.then(
-        c.try_map(arguments, fn(t) { validate_type_in(t, context, params) }),
+        c.try_each(arguments, fn(t) { validate_type_in(t, context, params) }),
       )
       validate_type_in(result, context, params)
     }
@@ -233,7 +233,7 @@ fn validate_application(
     False -> Error("Type argument count mismatch: " <> name)
     True -> {
       use _ <- c.then(
-        c.try_map(args, fn(t) { validate_type_in(t, context, params) }),
+        c.try_each(args, fn(t) { validate_type_in(t, context, params) }),
       )
       Ok(Nil)
     }
@@ -261,12 +261,12 @@ fn parameter_names(
 fn public_type(type_: a.Type, context: Context) -> Result(Nil, String) {
   case type_ {
     a.FunctionType(params, result) -> {
-      use _ <- c.then(c.try_map(params, fn(t) { public_type(t, context) }))
+      use _ <- c.then(c.try_each(params, fn(t) { public_type(t, context) }))
       public_type(result, context)
     }
     a.AppliedType(name, args) -> {
       use _ <- c.then(public_type(a.NamedType(name), context))
-      use _ <- c.then(c.try_map(args, fn(t) { public_type(t, context) }))
+      use _ <- c.then(c.try_each(args, fn(t) { public_type(t, context) }))
       Ok(Nil)
     }
     a.NamedType(name) -> {
@@ -278,7 +278,7 @@ fn public_type(type_: a.Type, context: Context) -> Result(Nil, String) {
     }
     a.ListType(t) -> public_type(t, context)
     a.TupleType(types) -> {
-      use _ <- c.then(c.try_map(types, fn(t) { public_type(t, context) }))
+      use _ <- c.then(c.try_each(types, fn(t) { public_type(t, context) }))
       Ok(Nil)
     }
     _ -> Ok(Nil)

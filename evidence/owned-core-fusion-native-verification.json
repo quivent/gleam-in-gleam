@@ -1,0 +1,13 @@
+{
+  "source": "src/native/core.gleam",
+  "sourceSHA256": "f150c7ded0ddf623276575687c53a9053bbbac3b777a21ee93384814ca7e25e5",
+  "driver": "test/owned-core-driver.source",
+  "driverSHA256": "2c451661c941f16b12929bacc3843df291909a57d4c41569b2e9a277c0003197",
+  "executableSHA256": "f39c9f20c7c9f11936e6154e496edd6270e1c795feb7f0ab2b8bff0f9a979c8c",
+  "bytes": 12765,
+  "exitCode": 0,
+  "stdout": "3\n1234\nTrue\nTrue\n7\n3\n4\n9\nTrue\nTrue\n",
+  "oracle": "native test compares current upstream-compiled core function results",
+  "allSourceFunctionsCompiled": true,
+  "fullCompilerSelfHosting": false
+}
