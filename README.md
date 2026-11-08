@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 333 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 341 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **596,782 bytes**, SHA256
-`8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18`.
+The native image is **597,813 bytes**, SHA256
+`5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/leaf-register-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/branch-slots-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -663,9 +663,9 @@ No installed Crew/compiler executable or active session was replaced.
 
 ## Look-ahead and conservative register retention — 2026-11-08
 
-The current qualification passes **677 tests and 333 fresh upstream comparisons**.
+The leaf-register qualification passed **677 tests and 333 fresh upstream comparisons**.
 The rebuilt stage-3 compiler qualifies all 333 cases (213 accepted, 120 rejected).
-Both native self-rebuilds remain byte-identical to their seed; the current image
+Both native self-rebuilds remain byte-identical to their seed; that image
 is 596,782 bytes. See [qualification](evidence/leaf-register-qualification.json)
 and [rebuilds](evidence/leaf-register-native-rebuilds.json).
 
@@ -682,3 +682,24 @@ calls and whitespace. That input and failure are retained; token-end tracking no
 matches the new upstream cases. See [design and limits](REGISTER_SPILL_SPEC.md).
 The verifier defaults to current-* development receipts; GIG_VERIFY_PREFIX selects
 a separate milestone prefix so earlier evidence remains intact.
+
+## Sibling-arm local-slot reuse — 2026-11-08
+
+Case siblings now share local slots, reserving the maximum arm footprint while
+preserving outer variables, saved subjects and independent closure helper frames.
+On identical compiler source, 95 of 384 named function frames shrink: aggregate
+reserved bytes fall 36,800 → 26,112 (about 29%). This is a static sum, not dynamic
+peak stack/RSS. The lexer frame falls 880 → 208 bytes; the parser pattern routine
+944 → 192 bytes. Fixed-source executable length is unchanged.
+
+A controlled 64 KiB stack workload fails with the earlier 208-byte frame and
+succeeds with the new 32-byte frame. This is non-tail recursion with input 600,
+terminal arm 7 and exact result 180285, not arbitrary-input or timing evidence.
+[Both observations](evidence/branch-slots-small-stack.json) are retained.
+
+Current qualification: **687 tests, 341 fresh upstream comparisons**, and all 341
+cases through the rebuilt compiler. Two native self-rebuilds again match their
+seed. The current compiler is 597,813 bytes; no new runtime dependency.
+See [qualification](evidence/branch-slots-qualification.json),
+[fixed-source frames](evidence/branch-slots-frame-comparison.json) and
+[design/remaining allocator work](REGISTER_SPILL_SPEC.md).

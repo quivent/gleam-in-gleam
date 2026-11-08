@@ -1,7 +1,7 @@
 # Native CLI milestone
 
 Status: bounded implementation qualified in 59 targeted tests; full regression
-receipt in evidence/leaf-register-qualification.json. Target: standalone Linux x86-64, no Node,
+receipt in evidence/branch-slots-qualification.json. Target: standalone Linux x86-64, no Node,
 libc, external compiler, assembler, linker or VM at runtime.
 
 ## Command
@@ -72,14 +72,14 @@ headers. These are design references, not delivered dependencies.
 
 ## Qualified result
 
-The standalone image is 596,782 bytes, SHA256
-`8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18`.
-59 CLI-specific checks and the full 677-test/333-upstream-comparison run pass.
+The standalone image is 597,813 bytes, SHA256
+`5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a`.
+59 CLI-specific checks and the full 687-test/341-upstream-comparison run pass.
 All sixteen examples match bootstrap bytes and execute correctly. Actual short IO,
 interruptions, errors, existing-path preservation and ELF headers are retained in
-[evidence/leaf-register-io-verification.json](evidence/leaf-register-io-verification.json).
+[evidence/branch-slots-io-verification.json](evidence/branch-slots-io-verification.json).
 The native self-build runs twice and produces identical images; stage 3 qualifies
-all 333 corpus cases. See [SELF_HOSTING.md](SELF_HOSTING.md).
+all 341 corpus cases. See [SELF_HOSTING.md](SELF_HOSTING.md).
 
 The earlier 582,442-byte, 16 KiB CLI and initial failures remain under their original
 native-cli-* receipt names. New scale measurements are retained separately in

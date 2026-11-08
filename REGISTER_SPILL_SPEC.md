@@ -89,3 +89,34 @@ number; otherwise it begins a signed numeric token. Calls/closing delimiters,
 whitespace/newlines, comments, underscores, minus-negative and argument boundaries
 have independent upstream/runtime fixtures. The original failing source and both
 observations remain in evidence/leaf-register-initial-upstream-failure.json.
+
+## Sibling-arm stack slots
+
+Single- and multi-subject case arms are mutually exclusive. Save the slot count
+at arm entry (after common subjects), compile the pattern/guard/body, then compile
+its siblings from that same base. Return the maximum slot count across arms to
+reserve the complete function frame. Outer locals and subject slots remain below
+the shared base; positive parameter offsets are unchanged. Joins reserve the
+maximum rather than summing all sibling footprints.
+
+Only sibling-arm locals overlap. Locals are not reused after an entire case or
+within a single arm; pattern alternatives retain their existing conservative
+allocation. Closure captures are copied values in owned heap descriptors, never
+pointers to these local slots. Closure helper frames retain their separate scope.
+Guard failure and next-arm jumps may overwrite the previous arm's dead locals.
+
+Regression coverage includes outer values used after the join, escaped captures,
+failed guards, nested cases, multi-arm canonical bindings, returned heap values
+and direct tail loops. Actual instruction tests check a representative single-case
+frame is 32 bytes and a multi-case frame is 48 bytes, reserving the largest arm.
+Fresh full upstream/native IO/self-rebuild qualification remains mandatory.
+This is bounded stack-slot reuse, not whole-function liveness/register allocation.
+
+Qualified: 687 regression checks, 341 fresh upstream comparisons and the complete
+341-case rebuilt-native corpus. Two successive native self-rebuilds match their
+seed. Fixed-source frame totals drop 36,800 to 26,112 bytes across 384 named
+functions (95 shrink). This is not a dynamic stack measurement. The separate
+64 KiB non-tail recursion comparison succeeds with a 32-byte frame where the
+historical 208-byte frame fails; both exact image/source identities are retained.
+Receipts: evidence/branch-slots-qualification.json,
+evidence/branch-slots-frame-comparison.json, evidence/branch-slots-small-stack.json.

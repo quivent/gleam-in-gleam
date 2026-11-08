@@ -521,4 +521,18 @@ and 451 static named-function instructions. The image is 334 bytes smaller;
 frame-memory counts are unchanged. Actual ASM and identities are in
 [evidence/leaf-register-comparison.json](evidence/leaf-register-comparison.json).
 The newer compiler's own added implementation changes its size separately.
-General allocation, live intervals and spill-slot reuse are not implemented.
+General allocation and live intervals are not implemented by that leaf increment.
+
+## Sibling-case frame reservation
+
+Each single/multi-case arm starts after the shared subjects and existing outer
+locals. Emit its pattern/guard/body, remember its slot high-water mark, and compile
+siblings from the same initial slot count. The join reserves the maximum of those
+marks. All frame offsets remain RBP-relative and 16-byte frame rounding is unchanged.
+No outer/subject slot is reused, no helper frame is merged, and copied heap captures
+cannot retain a pointer to a recycled local. Alternative rows keep their earlier
+conservative allocation. There is no general whole-function liveness pass here.
+
+Actual fixed-source frame reservations and the 208→32-byte non-tail workload are
+recorded in evidence/branch-slots-frame-comparison.json and
+evidence/branch-slots-small-stack.json. Neither record is a timing benchmark.

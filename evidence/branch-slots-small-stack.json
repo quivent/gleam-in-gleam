@@ -1,0 +1,38 @@
+{
+  "schema": "gleam-in-gleam.branch-stack-comparison/1",
+  "observedAt": "2026-11-08T03:05:29.055Z",
+  "source": "fn f(n:Int)->Int {case n {0->{let a=n+1 let b=a+2 let c=b+3 c} 1->{let a=n+1 let b=a+2 let c=b+3 c} 2->{let a=n+1 let b=a+2 let c=b+3 c} 3->{let a=n+1 let b=a+2 let c=b+3 c} 4->{let a=n+1 let b=a+2 let c=b+3 c} 5->{let a=n+1 let b=a+2 let c=b+3 c} 6->{let a=n+1 let b=a+2 let c=b+3 c} 7->{let a=n+1 let b=a+2 let c=b+3 c} _->n+f(n-1)}} pub fn main()->Nil {echo f(600) Nil}",
+  "sourceSHA256": "7fc104e91f2b8b6036436b2d92a5ed61fd09253fd0d01ec8fc692eedfecec94f",
+  "stackLimitBytes": 65536,
+  "coreLimitBytes": 0,
+  "cpuLimitSeconds": 5,
+  "recursion": "non-tail n+f(n-1), start 600, terminal arm 7",
+  "observations": [
+    {
+      "label": "before",
+      "compilerSHA256": "8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18",
+      "programSHA256": "27e454c8ecf3ae6ccf4faa6401c77dc364daabb76fe2059e4e49cfc87c019659",
+      "frameBytes": 208,
+      "compileExit": 0,
+      "runExit": null,
+      "signal": "SIGSEGV",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "after",
+      "compilerSHA256": "5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a",
+      "programSHA256": "16302a3564f97915c4bd32f4674fd216cd4d1d6b6fb34a4f65efcda2bd06cf58",
+      "frameBytes": 32,
+      "compileExit": 0,
+      "runExit": 0,
+      "signal": null,
+      "stdout": "180285\n",
+      "stderr": ""
+    }
+  ],
+  "limitations": [
+    "One bounded non-tail recursion workload, not arbitrary-input reliability or a timing benchmark",
+    "Only sibling-local frame space is reused; no general register allocator"
+  ]
+}

@@ -1,0 +1,2372 @@
+{
+  "schema": "gleam-in-gleam.branch-frame-comparison/1",
+  "observedAt": "2026-11-08T03:04:21.910711+00:00",
+  "targetSourceRevision": "db47d6142b85e6e02812a5bdff82225c26581101",
+  "identicalTargetSource": true,
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "9ac6398edfa75092b6e7092093bc5feff4100d2a435601fa36ccc3a7a39d0fc0"
+  },
+  "before": {
+    "artifact": {
+      "bytes": 596782,
+      "sha256": "8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18"
+    },
+    "emitterSHA256": {
+      "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+      "src/native/x64.gleam": "9ac6398edfa75092b6e7092093bc5feff4100d2a435601fa36ccc3a7a39d0fc0",
+      "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4"
+    },
+    "namedFrameBytesSum": 36800
+  },
+  "after": {
+    "artifact": {
+      "bytes": 596782,
+      "sha256": "cd69f2c9971f5952bf135733b27f08b76517455ca0b946679a92b6012e6c7503"
+    },
+    "emitterSHA256": {
+      "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+      "src/native/x64.gleam": "00cf4f4ffe50af45520160b49718982acc391668c45c8bbb8bc5c374f512e096",
+      "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4"
+    },
+    "namedFrameBytesSum": 26112
+  },
+  "namedFunctions": 384,
+  "changedFunctions": 95,
+  "frameByteSumSaved": 10688,
+  "functions": [
+    {
+      "name": "without_alias@native/ast",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "then@native/core",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "reverse@native/core",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "reverse_into@native/core",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "append@native/core",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "length@native/core",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "nth@native/core",
+      "beforeBytes": 80,
+      "afterBytes": 48,
+      "savedBytes": 32
+    },
+    {
+      "name": "join@native/core",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "uppercase_name@native/core",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "discarded_name@native/core",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "count@native/core",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "map@native/core",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "try_map@native/core",
+      "beforeBytes": 80,
+      "afterBytes": 64,
+      "savedBytes": 16
+    },
+    {
+      "name": "lookup@native/core",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "put@native/core",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "decimal@native/core",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "character@native/core",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "concat@native/core",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "concat_round@native/core",
+      "beforeBytes": 96,
+      "afterBytes": 80,
+      "savedBytes": 16
+    },
+    {
+      "name": "bytes@native/core",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "byte_length@native/core",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "byte_count@native/core",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "mode@native/bit_options",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "integer_mode@native/bit_options",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "read@native/bit_options",
+      "beforeBytes": 128,
+      "afterBytes": 48,
+      "savedBytes": 80
+    },
+    {
+      "name": "usage@native/bit_options",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "result_name@native/prelude",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "ok_name@native/prelude",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "error_name@native/prelude",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "result_type@native/prelude",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "name@native/type_system",
+      "beforeBytes": 176,
+      "afterBytes": 48,
+      "savedBytes": 128
+    },
+    {
+      "name": "merge@native/type_system",
+      "beforeBytes": 224,
+      "afterBytes": 80,
+      "savedBytes": 144
+    },
+    {
+      "name": "merge_many@native/type_system",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "infer@native/type_system",
+      "beforeBytes": 256,
+      "afterBytes": 80,
+      "savedBytes": 176
+    },
+    {
+      "name": "infer_many@native/type_system",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "substitute@native/type_system",
+      "beforeBytes": 96,
+      "afterBytes": 32,
+      "savedBytes": 64
+    },
+    {
+      "name": "apply@native/type_system",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "variables@native/type_system",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "collect_variables@native/type_system",
+      "beforeBytes": 160,
+      "afterBytes": 80,
+      "savedBytes": 80
+    },
+    {
+      "name": "bindings@native/type_system",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "collect@native/definitions",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "type_index@native/definitions",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor_index@native/definitions",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "variants@native/definitions",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "field_labels@native/definitions",
+      "beforeBytes": 96,
+      "afterBytes": 48,
+      "savedBytes": 48
+    },
+    {
+      "name": "validate_type@native/definitions",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "validate_type_in@native/definitions",
+      "beforeBytes": 128,
+      "afterBytes": 32,
+      "savedBytes": 96
+    },
+    {
+      "name": "validate_application@native/definitions",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "parameter_names@native/definitions",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "public_type@native/definitions",
+      "beforeBytes": 64,
+      "afterBytes": 32,
+      "savedBytes": 32
+    },
+    {
+      "name": "complete@native/coverage",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "matrix@native/coverage",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "wild@native/coverage",
+      "beforeBytes": 96,
+      "afterBytes": 64,
+      "savedBytes": 32
+    },
+    {
+      "name": "all_first_wild@native/coverage",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "default_rows@native/coverage",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "choices@native/coverage",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "constructors@native/coverage",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor_choices@native/coverage",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "each_choice@native/coverage",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "specialize@native/coverage",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "select@native/coverage",
+      "beforeBytes": 176,
+      "afterBytes": 64,
+      "savedBytes": 112
+    },
+    {
+      "name": "plan@native/equality",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "find@native/equality",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "visit@native/equality",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "replace@native/equality",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "shape@native/equality",
+      "beforeBytes": 144,
+      "afterBytes": 48,
+      "savedBytes": 96
+    },
+    {
+      "name": "children@native/equality",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "nominal@native/equality",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "variants@native/equality",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_names@native/free_names",
+      "beforeBytes": 288,
+      "afterBytes": 80,
+      "savedBytes": 208
+    },
+    {
+      "name": "patterns@native/free_names",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "names@native/free_names",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "add@native/free_names",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "statements@native/free_names",
+      "beforeBytes": 80,
+      "afterBytes": 64,
+      "savedBytes": 16
+    },
+    {
+      "name": "expressions@native/free_names",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "expression@native/free_names",
+      "beforeBytes": 496,
+      "afterBytes": 96,
+      "savedBytes": 400
+    },
+    {
+      "name": "case_arms@native/free_names",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_arms@native/free_names",
+      "beforeBytes": 96,
+      "afterBytes": 96,
+      "savedBytes": 0
+    },
+    {
+      "name": "order@native/labels",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "assign@native/labels",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "find_label@native/labels",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "index@native/labels",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "complete@native/labels",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "plain@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "equal@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "merge_type@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "type_name@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "module@native/check",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "signatures@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "unique_parameters@native/check",
+      "beforeBytes": 80,
+      "afterBytes": 64,
+      "savedBytes": 16
+    },
+    {
+      "name": "function@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "statements@native/check",
+      "beforeBytes": 112,
+      "afterBytes": 80,
+      "savedBytes": 32
+    },
+    {
+      "name": "expression@native/check",
+      "beforeBytes": 384,
+      "afterBytes": 48,
+      "savedBytes": 336
+    },
+    {
+      "name": "case_expression@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "expression_expected@native/check",
+      "beforeBytes": 96,
+      "afterBytes": 32,
+      "savedBytes": 64
+    },
+    {
+      "name": "context_arguments@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "prepare_arguments@native/check",
+      "beforeBytes": 112,
+      "afterBytes": 112,
+      "savedBytes": 0
+    },
+    {
+      "name": "finish_arguments@native/check",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "lambda@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "lambda_types@native/check",
+      "beforeBytes": 112,
+      "afterBytes": 96,
+      "savedBytes": 16
+    },
+    {
+      "name": "resolved@native/check",
+      "beforeBytes": 96,
+      "afterBytes": 48,
+      "savedBytes": 48
+    },
+    {
+      "name": "all_resolved@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "all_parameter_names@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "unique_lambda_names@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "lower_parameters@native/check",
+      "beforeBytes": 112,
+      "afterBytes": 112,
+      "savedBytes": 0
+    },
+    {
+      "name": "actual_captures@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "binary_type@native/check",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "source_arguments@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "named_call@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "indirect_source_call@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_variant@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "known_bindings@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor_type_arguments@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "field_access@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "field_constructors@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "consistent_fields@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "resolve_pattern@native/check",
+      "beforeBytes": 176,
+      "afterBytes": 48,
+      "savedBytes": 128
+    },
+    {
+      "name": "resolve_fields@native/check",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_bindings@native/check",
+      "beforeBytes": 256,
+      "afterBytes": 48,
+      "savedBytes": 208
+    },
+    {
+      "name": "checked_field_bindings@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "tuple_bindings@native/check",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "list_bindings@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "list_element_type@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "branch_type@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "case_exhaustive@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "covers@native/check",
+      "beforeBytes": 272,
+      "afterBytes": 160,
+      "savedBytes": 112
+    },
+    {
+      "name": "covers_known@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "tuple_covers@native/check",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "exhaustive@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "exhaustive_primitive@native/check",
+      "beforeBytes": 176,
+      "afterBytes": 128,
+      "savedBytes": 48
+    },
+    {
+      "name": "fields_cover@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "any_cover@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "variants_cover@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "tag_cover@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "record_update@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "update_fields@native/check",
+      "beforeBytes": 128,
+      "afterBytes": 128,
+      "savedBytes": 0
+    },
+    {
+      "name": "infer_ready@native/check",
+      "beforeBytes": 112,
+      "afterBytes": 112,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_segment_type@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_patterns@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "guard_source@native/check",
+      "beforeBytes": 208,
+      "afterBytes": 96,
+      "savedBytes": 112
+    },
+    {
+      "name": "unguarded@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_case@native/check",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "check_row@native/check",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "row_known@native/check",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "common_bindings@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "merge_environments@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "coverage_rows@native/check",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_branch_type@native/check",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "executable@native/elf",
+      "beforeBytes": 496,
+      "afterBytes": 496,
+      "savedBytes": 0
+    },
+    {
+      "name": "valid@native/utf8",
+      "beforeBytes": 272,
+      "afterBytes": 48,
+      "savedBytes": 224
+    },
+    {
+      "name": "lex@native/lexer",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "fail@native/lexer",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "scan@native/lexer",
+      "beforeBytes": 880,
+      "afterBytes": 208,
+      "savedBytes": 672
+    },
+    {
+      "name": "whitespace@native/lexer",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "comment@native/lexer",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "identifier@native/lexer",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "number@native/lexer",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "quoted@native/lexer",
+      "beforeBytes": 240,
+      "afterBytes": 80,
+      "savedBytes": 160
+    },
+    {
+      "name": "punctuation@native/lexer",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "error@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "expect@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "name@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "type_@native/parser",
+      "beforeBytes": 752,
+      "afterBytes": 176,
+      "savedBytes": 576
+    },
+    {
+      "name": "parse@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "functions@native/parser",
+      "beforeBytes": 128,
+      "afterBytes": 48,
+      "savedBytes": 80
+    },
+    {
+      "name": "declaration@native/parser",
+      "beforeBytes": 96,
+      "afterBytes": 48,
+      "savedBytes": 48
+    },
+    {
+      "name": "type_parameters@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "variants@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "field_definition@native/parser",
+      "beforeBytes": 96,
+      "afterBytes": 96,
+      "savedBytes": 0
+    },
+    {
+      "name": "parameters@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "annotation@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "statements@native/parser",
+      "beforeBytes": 128,
+      "afterBytes": 48,
+      "savedBytes": 80
+    },
+    {
+      "name": "expression@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "postfix@native/parser",
+      "beforeBytes": 288,
+      "afterBytes": 96,
+      "savedBytes": 192
+    },
+    {
+      "name": "separated@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "precedence@native/parser",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "infix@native/parser",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "prefix@native/parser",
+      "beforeBytes": 848,
+      "afterBytes": 128,
+      "savedBytes": 720
+    },
+    {
+      "name": "arguments@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "argument@native/parser",
+      "beforeBytes": 176,
+      "afterBytes": 176,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "alias_name@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_atom@native/parser",
+      "beforeBytes": 944,
+      "afterBytes": 192,
+      "savedBytes": 752
+    },
+    {
+      "name": "lambda_parameter@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "use_parameters@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor_patterns@native/parser",
+      "beforeBytes": 128,
+      "afterBytes": 96,
+      "savedBytes": 32
+    },
+    {
+      "name": "pattern_field@native/parser",
+      "beforeBytes": 176,
+      "afterBytes": 176,
+      "savedBytes": 0
+    },
+    {
+      "name": "list_expression@native/parser",
+      "beforeBytes": 96,
+      "afterBytes": 48,
+      "savedBytes": 48
+    },
+    {
+      "name": "list_pattern@native/parser",
+      "beforeBytes": 176,
+      "afterBytes": 96,
+      "savedBytes": 80
+    },
+    {
+      "name": "case_subjects@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_row@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "alternative_rows@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_arms@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "simple_case@native/parser",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "simple_arms@native/parser",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_segments@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_options@native/parser",
+      "beforeBytes": 256,
+      "afterBytes": 176,
+      "savedBytes": 80
+    },
+    {
+      "name": "import_path@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "last_path@native/parser",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "string_binding@native/parser",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "dependencies@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "link@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "source_index@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "visit@native/project",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "visit_imports@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "validate_imports@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "valid_name@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "valid_path@native/project",
+      "beforeBytes": 64,
+      "afterBytes": 32,
+      "savedBytes": 32
+    },
+    {
+      "name": "valid_part@native/project",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "flatten@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "internal@native/project",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "module_by_name@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "imported@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "local@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "is_module@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "value_in@native/project",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "qualified_value@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "value@native/project",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "named_type@native/project",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "type_@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "type_with@native/project",
+      "beforeBytes": 96,
+      "afterBytes": 32,
+      "savedBytes": 64
+    },
+    {
+      "name": "expand_alias@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "annotation@native/project",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "resolve_module@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "statements@native/project",
+      "beforeBytes": 80,
+      "afterBytes": 48,
+      "savedBytes": 32
+    },
+    {
+      "name": "arguments@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "expression@native/project",
+      "beforeBytes": 368,
+      "afterBytes": 48,
+      "savedBytes": 320
+    },
+    {
+      "name": "pattern@native/project",
+      "beforeBytes": 240,
+      "afterBytes": 80,
+      "savedBytes": 160
+    },
+    {
+      "name": "pattern_fields@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "alias_headers@native/project",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "unique_type_names@native/project",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "alias_parameters@native/project",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "assemble@native/assembler",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "symbols@native/assembler",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "locate@native/assembler",
+      "beforeBytes": 112,
+      "afterBytes": 48,
+      "savedBytes": 64
+    },
+    {
+      "name": "emit@native/assembler",
+      "beforeBytes": 176,
+      "afterBytes": 112,
+      "savedBytes": 64
+    },
+    {
+      "name": "source_capacity@native/cli_limits",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "arena_capacity@native/cli_limits",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "raw@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "label@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "jump@native/cli_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "branch@native/cli_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "call@native/cli_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "addr@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "ld@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "st@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "lea@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "imm@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "cmp@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "sys@native/cli_runtime",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "prologue@native/cli_runtime",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "ret@native/cli_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "constructor@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "signature@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate_with_limit@native/cli_runtime",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "entry@native/cli_runtime",
+      "beforeBytes": 960,
+      "afterBytes": 960,
+      "savedBytes": 0
+    },
+    {
+      "name": "c_string@native/cli_runtime",
+      "beforeBytes": 400,
+      "afterBytes": 400,
+      "savedBytes": 0
+    },
+    {
+      "name": "from_c@native/cli_runtime",
+      "beforeBytes": 560,
+      "afterBytes": 560,
+      "savedBytes": 0
+    },
+    {
+      "name": "argv@native/cli_runtime",
+      "beforeBytes": 432,
+      "afterBytes": 432,
+      "savedBytes": 0
+    },
+    {
+      "name": "result_constructor@native/cli_runtime",
+      "beforeBytes": 160,
+      "afterBytes": 160,
+      "savedBytes": 0
+    },
+    {
+      "name": "read_file@native/cli_runtime",
+      "beforeBytes": 864,
+      "afterBytes": 864,
+      "savedBytes": 0
+    },
+    {
+      "name": "read_errors@native/cli_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "error_labels@native/cli_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "write_all@native/cli_runtime",
+      "beforeBytes": 128,
+      "afterBytes": 128,
+      "savedBytes": 0
+    },
+    {
+      "name": "write_file@native/cli_runtime",
+      "beforeBytes": 352,
+      "afterBytes": 352,
+      "savedBytes": 0
+    },
+    {
+      "name": "messages@native/cli_runtime",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "message_list@native/cli_runtime",
+      "beforeBytes": 112,
+      "afterBytes": 112,
+      "savedBytes": 0
+    },
+    {
+      "name": "raw@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "branch@native/equality_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "jump@native/equality_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "call@native/equality_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "label@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "uses_strings@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "any_text@native/equality_runtime",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "generate@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "flatten@native/equality_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "enter@native/equality_runtime",
+      "beforeBytes": 144,
+      "afterBytes": 144,
+      "savedBytes": 0
+    },
+    {
+      "name": "guards@native/equality_runtime",
+      "beforeBytes": 128,
+      "afterBytes": 128,
+      "savedBytes": 0
+    },
+    {
+      "name": "vr_true@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "vr_false@native/equality_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "finish@native/equality_runtime",
+      "beforeBytes": 128,
+      "afterBytes": 128,
+      "savedBytes": 0
+    },
+    {
+      "name": "fields@native/equality_runtime",
+      "beforeBytes": 224,
+      "afterBytes": 224,
+      "savedBytes": 0
+    },
+    {
+      "name": "helper@native/equality_runtime",
+      "beforeBytes": 816,
+      "afterBytes": 512,
+      "savedBytes": 304
+    },
+    {
+      "name": "dispatch@native/equality_runtime",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "variant_fields@native/equality_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "bits@native/equality_runtime",
+      "beforeBytes": 448,
+      "afterBytes": 448,
+      "savedBytes": 0
+    },
+    {
+      "name": "runtime@native/heap",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "runtime_with_capacity@native/heap",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "runtime_sized@native/heap",
+      "beforeBytes": 736,
+      "afterBytes": 736,
+      "savedBytes": 0
+    },
+    {
+      "name": "raw@native/string_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "branch@native/string_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "call@native/string_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate@native/string_runtime",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "include@native/string_runtime",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "compare@native/string_runtime",
+      "beforeBytes": 448,
+      "afterBytes": 448,
+      "savedBytes": 0
+    },
+    {
+      "name": "prologue@native/string_runtime",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "allocate@native/string_runtime",
+      "beforeBytes": 432,
+      "afterBytes": 432,
+      "savedBytes": 0
+    },
+    {
+      "name": "finish@native/string_runtime",
+      "beforeBytes": 96,
+      "afterBytes": 96,
+      "savedBytes": 0
+    },
+    {
+      "name": "concat@native/string_runtime",
+      "beforeBytes": 416,
+      "afterBytes": 416,
+      "savedBytes": 0
+    },
+    {
+      "name": "drop@native/string_runtime",
+      "beforeBytes": 304,
+      "afterBytes": 304,
+      "savedBytes": 0
+    },
+    {
+      "name": "raw@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "jump@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "call@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "branch@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "load@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "store@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "immediate@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "label@native/x64",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "slot@native/x64",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "add_string@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate_with@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "plan_with@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "generate_cli@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "plan_cli@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "plan_cli_with_limit@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "plan_program@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "function_list@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "parameter_offsets@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "statements@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "statement_mode@native/x64",
+      "beforeBytes": 96,
+      "afterBytes": 48,
+      "savedBytes": 48
+    },
+    {
+      "name": "expression@native/x64",
+      "beforeBytes": 400,
+      "afterBytes": 80,
+      "savedBytes": 320
+    },
+    {
+      "name": "tail_expression@native/x64",
+      "beforeBytes": 112,
+      "afterBytes": 64,
+      "savedBytes": 48
+    },
+    {
+      "name": "tail_parameters@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "case_code@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "descriptor@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "capture_values@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "capture_stores@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "closure@native/x64",
+      "beforeBytes": 96,
+      "afterBytes": 96,
+      "savedBytes": 0
+    },
+    {
+      "name": "capture_locals@native/x64",
+      "beforeBytes": 160,
+      "afterBytes": 160,
+      "savedBytes": 0
+    },
+    {
+      "name": "arguments@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "binary@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "register_leaf@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "leaf_in_rcx@native/x64",
+      "beforeBytes": 176,
+      "afterBytes": 80,
+      "savedBytes": 96
+    },
+    {
+      "name": "binary_values@native/x64",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "operation@native/x64",
+      "beforeBytes": 752,
+      "afterBytes": 480,
+      "savedBytes": 272
+    },
+    {
+      "name": "case_arms@native/x64",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "render_echo@native/x64",
+      "beforeBytes": 608,
+      "afterBytes": 368,
+      "savedBytes": 240
+    },
+    {
+      "name": "tuple_fields@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "object@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "cons_cells@native/x64",
+      "beforeBytes": 288,
+      "afterBytes": 288,
+      "savedBytes": 0
+    },
+    {
+      "name": "pattern_code@native/x64",
+      "beforeBytes": 608,
+      "afterBytes": 144,
+      "savedBytes": 464
+    },
+    {
+      "name": "field_tags@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "tuple_pattern@native/x64",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "list_pattern@native/x64",
+      "beforeBytes": 304,
+      "afterBytes": 240,
+      "savedBytes": 64
+    },
+    {
+      "name": "runtime@native/x64",
+      "beforeBytes": 1216,
+      "afterBytes": 1216,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_array@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "save_bit_values@native/x64",
+      "beforeBytes": 96,
+      "afterBytes": 64,
+      "savedBytes": 32
+    },
+    {
+      "name": "bit_lengths@native/x64",
+      "beforeBytes": 288,
+      "afterBytes": 144,
+      "savedBytes": 144
+    },
+    {
+      "name": "write_bit_values@native/x64",
+      "beforeBytes": 336,
+      "afterBytes": 160,
+      "savedBytes": 176
+    },
+    {
+      "name": "write_integer_bytes@native/x64",
+      "beforeBytes": 144,
+      "afterBytes": 144,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_pattern@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "bit_pattern_size@native/x64",
+      "beforeBytes": 208,
+      "afterBytes": 112,
+      "savedBytes": 96
+    },
+    {
+      "name": "bit_pattern_fields@native/x64",
+      "beforeBytes": 960,
+      "afterBytes": 640,
+      "savedBytes": 320
+    },
+    {
+      "name": "read_integer_bytes@native/x64",
+      "beforeBytes": 144,
+      "afterBytes": 144,
+      "savedBytes": 0
+    },
+    {
+      "name": "string_helper@native/x64",
+      "beforeBytes": 16,
+      "afterBytes": 16,
+      "savedBytes": 0
+    },
+    {
+      "name": "string_prefix@native/x64",
+      "beforeBytes": 160,
+      "afterBytes": 160,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_case@native/x64",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "save_subjects@native/x64",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "binding_slots@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "multi_arms@native/x64",
+      "beforeBytes": 112,
+      "afterBytes": 112,
+      "savedBytes": 0
+    },
+    {
+      "name": "alternative_code@native/x64",
+      "beforeBytes": 64,
+      "afterBytes": 64,
+      "savedBytes": 0
+    },
+    {
+      "name": "row_code@native/x64",
+      "beforeBytes": 80,
+      "afterBytes": 80,
+      "savedBytes": 0
+    },
+    {
+      "name": "copy_bindings@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "equality_target@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 32,
+      "savedBytes": 16
+    },
+    {
+      "name": "equality_index@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "equality_helpers@native/x64",
+      "beforeBytes": 48,
+      "afterBytes": 48,
+      "savedBytes": 0
+    },
+    {
+      "name": "build@native/cli_builder",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "compile@native/compiler",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "dependencies@native/compiler",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "compile_project@native/compiler",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "main",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "usage",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    },
+    {
+      "name": "with_arguments",
+      "beforeBytes": 240,
+      "afterBytes": 80,
+      "savedBytes": 160
+    },
+    {
+      "name": "configure",
+      "beforeBytes": 64,
+      "afterBytes": 48,
+      "savedBytes": 16
+    },
+    {
+      "name": "entry_name",
+      "beforeBytes": 112,
+      "afterBytes": 64,
+      "savedBytes": 48
+    },
+    {
+      "name": "loaded",
+      "beforeBytes": 32,
+      "afterBytes": 32,
+      "savedBytes": 0
+    },
+    {
+      "name": "next",
+      "beforeBytes": 112,
+      "afterBytes": 80,
+      "savedBytes": 32
+    },
+    {
+      "name": "with_source",
+      "beforeBytes": 112,
+      "afterBytes": 96,
+      "savedBytes": 16
+    },
+    {
+      "name": "with_output",
+      "beforeBytes": 32,
+      "afterBytes": 16,
+      "savedBytes": 16
+    },
+    {
+      "name": "temporary_name",
+      "beforeBytes": 0,
+      "afterBytes": 0,
+      "savedBytes": 0
+    }
+  ],
+  "limitations": [
+    "Static frame reservations across named functions, not dynamic peak stack or RSS",
+    "Closure helpers excluded from named function totals",
+    "Fixed target source comparison distinct from new compiler implementation image growth"
+  ]
+}

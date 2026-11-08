@@ -526,3 +526,24 @@ again byte-identical. Current native image: 596,782 bytes,
 SHA256 8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18. The original first self-hosting receipts
 remain intact; leaf-register-* records this new increment. No runtime dependency,
 installed Crew executable or unrelated process was added or replaced.
+
+## Sharing stack slots across sibling arms — 2026-11-08
+
+The next bounded allocation fix follows control-flow exclusivity: sibling case
+arms share local slots, retaining the maximum frame requirement. Outer locals,
+subjects, canonical bindings and copied closure captures remain protected; tests
+exercise nested branches, failed guards, escaped closures, heap values and tail
+parameter replacement. No whole-function allocator or new runtime is introduced.
+
+On identical db47d61 compiler source, 95 of 384 named frames shrink. Their aggregate
+reservation falls from 36,800 to 26,112 bytes; the lexer drops 880→208 and parser
+pattern routine 944→192. Executable length is unchanged for that fixed source.
+A separate actual 64 KiB stack run shows non-tail input 600/terminal arm 7 fails
+with the previous 208-byte frame but returns 180285 with the new 32-byte frame.
+The initial signal is preserved alongside the success; neither is a speed claim.
+
+Full qualification passes 687 tests, 341 fresh upstream comparisons and all 341
+native corpus cases. Two native self-rebuilds remain exact. Current image:
+597,813 bytes, SHA256 5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a. The own implementation
+adds source/code even though fixed target frames shrink. Earlier milestone evidence
+remains unchanged; branch-slots-* records this increment separately.
