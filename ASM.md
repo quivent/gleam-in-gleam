@@ -536,3 +536,29 @@ conservative allocation. There is no general whole-function liveness pass here.
 Actual fixed-source frame reservations and the 208→32-byte non-tail workload are
 recorded in evidence/branch-slots-frame-comparison.json and
 evidence/branch-slots-small-stack.json. Neither record is a timing benchmark.
+
+## Typed integer-region allocation and flags
+
+native/registers.gleam owns a closed instruction representation. Register uses and
+definitions include Flags; backward liveness removes only dead materializations
+and copies. Checked arithmetic and OverflowGuard are never removed, even when a
+later multiply by zero makes a result irrelevant.
+
+RAX/RCX/RDX form the allocation pool. Left evaluates before right; right receives
+the remaining registers. At exhaustion, push left, evaluate right, pop into RDI,
+operate there and copy back. RDI is reserved recovery scratch, not an allocatable
+persistent value. R14/R15 and RBP/RSP are excluded. Single-expression grouping
+blocks may join a region; calls, division, effects, bindings and cases do not.
+No register lifetime is extended across unknown calls or general control flow.
+
+The owned lowerer emits MOV immediate/load/copy, PUSH/POP, ADD/SUB/IMUL/NEG and
+JO rt:overflow. Every arithmetic operation is followed immediately by JO before
+later operand work. Two-register ModRM encodings identify source and destination
+explicitly, preserving noncommutative subtraction and nested spill recovery.
+Actual tests inspect three-register code, necessary spills and overflow branches.
+
+On the identical db47d61 source, this increment removes 15 static push/pop pairs,
+54 named-function instructions and 116 image bytes. Frame-memory counts are
+unchanged. The added planner source is separate from this fixed-input comparison.
+Evidence: integer-regions-comparison.json and integer-regions-seeded-oracle.json
+under evidence/. This is not a runtime benchmark or whole-function allocator.

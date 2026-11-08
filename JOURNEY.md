@@ -547,3 +547,27 @@ native corpus cases. Two native self-rebuilds remain exact. Current image:
 597,813 bytes, SHA256 5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a. The own implementation
 adds source/code even though fixed target frames shrink. Earlier milestone evidence
 remains unchanged; branch-slots-* records this increment separately.
+
+## Typed regions, liveness and actual register spills — 2026-11-08
+
+We introduced an owned typed machine plan for call-free integer expressions,
+including explicit register uses/definitions and condition Flags. A three-register
+pool retains nested values; higher pressure spills and recovers them through a
+reserved scratch register. Backward liveness removes dead moves while retaining
+traps and stack balance. Calls/control flow stay outside: whole-function CFG
+allocation is still unfinished. Compiler logic remains Gleam with no new package.
+
+Independent stress validation generates 100 expressions in one program and checks
+BigInt expectations, upstream execution and actual native output/bytes. 68 regions
+spill, maximum operand pressure seven. A separate overflow-before-zero test ensures
+apparently dead arithmetic cannot lose its trap. The fixed compiler-source image
+shrinks 116 bytes, with 15 fewer push/pop pairs and 54 fewer static instructions;
+this is modest emitted-code evidence, not a speed benchmark.
+
+Full qualification passes 702 tests and 351 fresh upstream comparisons, all 351
+rebuilt-native corpus cases and two exact native self-rebuilds. Current compiler:
+613,842 bytes, SHA256 df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b. Its new implementation
+naturally adds source/code beyond that fixed-target saving. An old hardcoded
+disassembly receipt path was corrected; 59 IO tests were rerun with unchanged
+compiler source/image and the initial receipt preserved. Earlier milestone
+receipts remain intact under their original names.

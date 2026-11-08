@@ -26,7 +26,7 @@
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "59f6506cf124fdeb71f0d683251257e27445c735",
+  "sourceRevision": "c2a8639254bad5dff39aeb410dee113646f0fefd",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -35,8 +35,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/branch-slots-qualification.json",
-  "ioVerification": "evidence/branch-slots-io-verification.json",
+  "verification": "evidence/integer-regions-qualification.json",
+  "ioVerification": "evidence/integer-regions-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -74,15 +74,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/branch-slots-io-verification.json"
+          "path": "evidence/integer-regions-io-verification.json"
         },
         {
-          "label": "687 checks and 341 upstream comparisons",
-          "path": "evidence/branch-slots-qualification.json"
+          "label": "702 checks and 351 upstream comparisons",
+          "path": "evidence/integer-regions-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/branch-slots-disassembly.txt"
+          "path": "evidence/integer-regions-disassembly.txt"
         }
       ],
       "related": [],
@@ -128,7 +128,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/branch-slots-native-rebuilds.json"
+          "path": "evidence/integer-regions-native-rebuilds.json"
         }
       ],
       "related": [
@@ -142,12 +142,12 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "All 341 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
+      "summary": "All 351 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "687 regression checks and 341 fresh upstream comparisons are separately recorded.",
-        "Stage 3 compiles 221 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
+        "702 regression checks and 351 fresh upstream comparisons are separately recorded.",
+        "Stage 3 compiles 231 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
       ],
@@ -171,16 +171,16 @@
       ],
       "evidence": [
         {
-          "label": "341 native cases, individual outcomes",
-          "path": "evidence/branch-slots-native-rebuilds.json"
+          "label": "351 native cases, individual outcomes",
+          "path": "evidence/integer-regions-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/branch-slots-project-upstream-checks.json"
+          "path": "evidence/integer-regions-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/branch-slots-upstream-checks.json"
+          "path": "evidence/integer-regions-upstream-checks.json"
         }
       ],
       "related": [
@@ -194,13 +194,13 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 597,813-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 613,842-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 26 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a.",
-        "The rebuilt image runs --version and qualifies the entire 341-case corpus with empty PATH.",
+        "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 27 actual compiler modules are read through the native IO path.",
+        "Stages 1, 2 and 3 have the same SHA256: df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b.",
+        "The rebuilt image runs --version and qualifies the entire 351-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
       "acceptance": [
@@ -224,7 +224,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/branch-slots-native-rebuilds.json"
+          "path": "evidence/integer-regions-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/branch-slots-project-upstream-checks.json"
+          "path": "evidence/integer-regions-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -338,10 +338,10 @@
       "title": "Measured optimization",
       "scope": "extension",
       "status": "partial",
-      "statusLabel": "Partial · registers and sibling slots",
+      "statusLabel": "Partial · region register allocation",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Define instruction use/def/clobber metadata and liveness before extending register lifetimes or reusing slots across general joins.",
-      "specMaturity": "Leaf registers and sibling-slot reuse qualified; general allocator still outlined",
+      "nextAction": "Extend typed instruction effects to calls and control-flow blocks before whole-function CFG liveness and allocation.",
+      "specMaturity": "Typed integer regions and sibling-slot reuse qualified; whole-function CFG remains",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
         "Separate cold/warm compilation, runtime execution, allocation/peak memory and artifact-size measurements.",
@@ -350,7 +350,9 @@
         "Jay requested look-ahead and register spilling. Keep evaluation order and overflow traps; preserve live values across internal calls and Linux syscall RCX/R11 clobbers.",
         "R14/R15 remain reserved arena registers. Internal calls use the owned stack ABI, not an assumed SysV convention. Static instruction counts are not dynamic performance evidence.",
         "Leaf RHS look-ahead eliminates 260 static push/pop pairs and 451 instructions on fixed source; frame traffic remains unchanged. This is not a full allocator or runtime speed claim.",
-        "Sibling-arm slots reserve the maximum branch footprint: fixed-source named frame totals fall 36,800 to 26,112 bytes; no peak-stack or speed claim."
+        "Sibling-arm slots reserve the maximum branch footprint: fixed-source named frame totals fall 36,800 to 26,112 bytes; no peak-stack or speed claim.",
+        "Typed integer regions now use explicit register/flags liveness, three-register allocation and nested spills; calls/control flow remain boundaries.",
+        "A seeded 100-expression program agrees with BigInt and upstream; 68 regions spill, maximum operand pressure seven."
       ],
       "acceptance": [
         {
@@ -372,20 +374,20 @@
       ],
       "evidence": [
         {
-          "label": "Fixed-source frame reservations",
+          "label": "702 tests and native self-rebuilds",
+          "path": "evidence/integer-regions-qualification.json"
+        },
+        {
+          "label": "Seeded independent stress oracle",
+          "path": "evidence/integer-regions-seeded-oracle.json"
+        },
+        {
+          "label": "Fixed-source instruction comparison",
+          "path": "evidence/integer-regions-comparison.json"
+        },
+        {
+          "label": "Earlier sibling-frame evidence",
           "path": "evidence/branch-slots-frame-comparison.json"
-        },
-        {
-          "label": "Actual 64 KiB non-tail stack comparison",
-          "path": "evidence/branch-slots-small-stack.json"
-        },
-        {
-          "label": "687 checks and full native rebuilds",
-          "path": "evidence/branch-slots-qualification.json"
-        },
-        {
-          "label": "Earlier leaf spill comparison",
-          "path": "evidence/leaf-register-comparison.json"
         }
       ],
       "related": [
@@ -441,16 +443,16 @@
     }
   ],
   "metrics": {
-    "tests": 687,
-    "upstream": 341,
+    "tests": 702,
+    "upstream": 351,
     "examples": 16,
-    "cliBytes": 597813,
+    "cliBytes": 613842,
     "sourceLimitBytes": 131072,
-    "observedAt": "2026-11-08T03:06:33.761172+00:00"
+    "observedAt": "2026-11-08T03:21:15.414610+00:00"
   },
   "evidenceSHA256": {
-    "evidence/branch-slots-qualification.json": "27fa4bde5ca91ef5081ce8dd1e17c89160673a2e5ca4ab1fe61d0e734413afd0",
-    "evidence/branch-slots-io-verification.json": "289794ae5c12b9b985d16546539e3d3f4f7bd826d9000ffe6288ca2a6c5a77c5"
+    "evidence/integer-regions-qualification.json": "b81508113d9e0b7c864d5e1251b681dd1bb86138a3040c041faf23aa44fd4974",
+    "evidence/integer-regions-io-verification.json": "e8238e415d55bf582cf74b0beed0c7f6a69d26ac863454c239a0f1818febc940"
   }
 }</script>
 <script>

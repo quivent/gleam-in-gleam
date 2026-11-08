@@ -29,12 +29,13 @@ spills. Existing locals/parameters still occupy their original slots.
 ## Register and boundary contract
 
 R14/R15 are reserved arena end/cursor. RBP/RSP define the owned frame/stack ABI.
-The accumulator is RAX; RCX is the left-operand scratch value at operator entry.
+Legacy lowering uses RAX for the accumulator/right operand and RCX for the left.
+Typed regions below use explicit instruction operands instead.
 No retained RCX value survives an unknown call in this increment. Internal calls
 do not automatically follow SysV preserved-register rules. Linux syscall clobbers
 RCX/R11; helper bodies must be inspected before extending a live register range.
 
-Future register allocation needs an explicit owned instruction representation,
+Whole-function register allocation still needs an extended owned instruction representation,
 use/def and clobber sets, control-flow liveness, interference or live intervals,
 reserved-register exclusions and spill-slot reuse. Loop joins, closures/captures,
 tail parameter replacement, helpers and syscalls all need tests. No speculative
@@ -120,3 +121,60 @@ functions (95 shrink). This is not a dynamic stack measurement. The separate
 historical 208-byte frame fails; both exact image/source identities are retained.
 Receipts: evidence/branch-slots-qualification.json,
 evidence/branch-slots-frame-comparison.json, evidence/branch-slots-small-stack.json.
+
+## Typed integer regions and liveness
+
+The next increment adds native/registers.gleam, an owned typed instruction plan
+for checked Int addition/subtraction/multiplication/negation. Constants, local
+reads and single-expression grouping blocks are admitted. Calls, effects,
+bindings, case branches, division and other operations retain the old lowering.
+Only an eligible region is replaced; it returns its value in RAX at the boundary.
+
+The pool is RAX/RCX/RDX. Recursively allocate the left subtree first, then the right
+from the remaining registers. With one available register, push the completed
+left value, compute right, pop left into reserved RDI, execute the operation and
+copy its result back. RDI is never allocated as a persistent value. Nested spills
+may reuse RDI only after each inner result is copied back. R14/R15, RBP/RSP and
+unknown caller-preserved assumptions are excluded from allocation.
+
+Instruction variants describe constants, local reads, copies, push/pop, arithmetic,
+negation and overflow guards. Explicit uses/definitions include condition Flags.
+Backward straight-line liveness computes uses union (live-out minus definitions).
+The actual emission pipeline uses it to remove dead materializations and copies.
+Arithmetic, overflow guards and push/pop are always retained: dead result values
+do not authorize removing traps, changing trap order or unbalancing the stack.
+Every arithmetic instruction is immediately followed by its overflow guard before
+later operand work. No effectful operation can enter the typed region.
+
+This is real expression-region allocation and liveness, not whole-function CFG
+allocation. General joins, calls, callee conventions, live intervals and lifetime
+reuse across those boundaries remain explicit future work. Raw instruction bytes
+outside typed regions remain barriers until their effects are represented.
+
+Regression coverage includes actual three-register arithmetic without spills,
+nested spill recovery with noncommutative operations, flags liveness, dead copies,
+overflow before multiplication by zero, effect/call/control-flow fallback,
+wide literals and exact native rebuild/corpus qualification.
+
+The seeded independent stress oracle generates 100 expressions in one program,
+keeps every intermediate within exact +/- (2^53-1), and compares native output,
+upstream output and BigInt expectations. 68 regions spill, with maximum fixed-order
+operand pressure seven. The native executable also matches bootstrap bytes.
+This complements separately tested overflow behavior; it is not a speed benchmark.
+The fixed compiler-source comparison removes 15 push/pop pairs, 54 named-function
+instructions and 116 image bytes. That excludes the added planner implementation.
+Receipts: evidence/integer-regions-seeded-oracle.json and
+evidence/integer-regions-comparison.json.
+
+Qualified region increment: 702 regression tests, 351 fresh upstream comparisons,
+351 rebuilt-native corpus cases and two exact native self-rebuilds. The seeded
+oracle is separate. The IO receipt path now derives from its actual disassembly
+output instead of a historical hardcoded filename; all 59 IO tests were rerun
+with identical compiler source/image, and the initial receipt is retained.
+
+Repeat the separate seeded oracle after building the generated JS bootstrap and
+a native compiler (development tools only):
+
+```sh
+node tools/verify_register_regions.mjs out/gleam-native out/register-region-oracle.json
+```

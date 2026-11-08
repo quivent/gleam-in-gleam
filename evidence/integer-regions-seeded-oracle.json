@@ -1,0 +1,620 @@
+{
+  "schema": "gleam-in-gleam.seeded-register-regions/1",
+  "observedAt": "2026-11-08T03:20:32.978Z",
+  "seed": 1779033703,
+  "count": 100,
+  "source": "fn f_0(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{b + {a * c}} * {e - {d * e}}}}\nfn f_1(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{e + {{d * {a + b}} + {b * b}}}}\nfn f_2(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{b * d} * d} + {{a + e} + {e + b}}} * {{{e - b} * {b + b}} * {{b + c} * {e * d}}}} + b}}\nfn f_3(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{e - c} - {e + a}} * a} + {{{e - c} * {b + a}} - e}} + {{{{a - a} - {a + c}} - b} - {{{b * c} - {d * b}} - {{e * e} * b}}}} * {e + {{{{c * a} * d} + {{a * a} + {b - b}}} + {d * a}}}}}\nfn f_4(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_5(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_6(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{e * e} - {c - b}} - {a - {a - e}}} + {{{b * e} * {a - e}} + e}} * {a + {{{b - e} * {d + d}} * {{a * b} - {e + c}}}}}}\nfn f_7(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{e * {b - a}} + b} - {{{b + {c - e}} + {{e + c} + {d - b}}} * c}} + {{d * {{{a + e} - {d + b}} - {{c + e} * {d * d}}}} - {{{e * {b * b}} - {{d + c} - b}} - d}}}}\nfn f_8(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{d - c} * {b - d}} * d}}\nfn f_9(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_10(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{a * a} - {b + c}} - e} + {{{e - a} + {b + b}} * {{b - d} * d}}} - {{{{c + a} * {b * e}} + {{a * d} - b}} - {{{c - a} * d} - a}}}}\nfn f_11(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{a + {{b + b} * a}} + {{{b - b} + {c - b}} + {{a - d} - {b + a}}}} * {{{{d - a} - {b + c}} + {{e - e} - {a + d}}} * {{{b * a} + {c - d}} - {{c + a} + {b - b}}}}} * {{{{{c * a} + {d * e}} - {{b - d} * {a - a}}} - {c * {{c + a} - b}}} * {{{{e * d} - {a * d}} - {{d + d} + {a * e}}} * {{{d * b} * {e - b}} * {{e - b} * a}}}}}}\nfn f_12(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{a - {e + e}} + d}}\nfn f_13(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{b + a} + {d * b}} - {{d - c} + c}} + {{{e - c} + {c + b}} - {e + e}}}}\nfn f_14(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_15(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c * c}}\nfn f_16(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{e - e} * {{d * c} * {b - b}}}}\nfn f_17(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{d + e} * {a * e}} + c} - {{{b - b} + {c + a}} + {b * {b - a}}}}}\nfn f_18(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{a * c} * {e * e}} - {e + {c * b}}} - {{{b * d} * {c * c}} + {{d + e} * {d - c}}}} + {c + {{{b * e} - {e + d}} + {c + {e - e}}}}}}\nfn f_19(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_20(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a - {{b + d} * {c * d}}}}\nfn f_21(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{c * a} + {e * c}} * {{a - b} - c}} * {{{a * e} * {a * d}} * {{d - b} + {b - e}}}}}\nfn f_22(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_23(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{c * c} + {{{{d + e} - {c * c}} - {{c - c} + {a - d}}} + d}} * {{{{{d - e} + d} - c} + {{{d * e} - {c + b}} * c}} + {{d + {{e + d} * {a - a}}} + {{{d * e} + {b * c}} - {{b - a} * e}}}}}}\nfn f_24(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{d - {a - a}} - {c * {b - c}}}}\nfn f_25(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e * e} + a} - {d - {{d - d} + {c - a}}}}}\nfn f_26(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a - {{e - {{a - a} * b}} * {{{d - e} - {c - c}} - {{c - e} + b}}}}}\nfn f_27(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{c * d} + {c * a}} - {{d * c} - {a - d}}} * {{{c * b} + e} + {{c * b} + {c + a}}}} * {{{{d + c} + {c + d}} - {{a + e} - c}} - {{{a + d} * {d - a}} - {{b - e} + {d * c}}}}} * e}}\nfn f_28(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{d * e} + d} - {a - {c + e}}}}\nfn f_29(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c * {c - {d + {a - b}}}}}\nfn f_30(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_31(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e * {{{e + e} - {d - b}} - {{d - e} * {b * b}}}} - {{{b + {c * e}} * {{e + e} - {d - d}}} * {{{b - a} - {c * d}} + {{b - a} - {e - d}}}}} * {{{{{c + b} * {e * c}} - {{e + c} * e}} + {{{e + d} - {c - b}} * {b * {b - b}}}} - {{{c - {a + e}} * e} + {{{b + a} * {c - c}} * {{e - e} * {a + a}}}}}}}\nfn f_32(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e - c} * {c - b}} - {{e * e} - {c * c}}}}\nfn f_33(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{c + e} * {d * c}} * d} - a}}\nfn f_34(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{a - d} + {e - e}} * {{c - b} * {d * a}}} - {e + {{b - a} - {a * d}}}} + {e - {c + {{c + a} * {c - a}}}}}}\nfn f_35(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{a * c} * {{{{b * {a * c}} - {{d + c} - {e - b}}} - {{b + {a * b}} + {a + {c + c}}}} * {{{{a * e} + {b - d}} * {{c + e} - {a + b}}} * {{b + {d * b}} * {{e + d} + {b * b}}}}}}}\nfn f_36(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e + c} - a} - {{a * a} + {b + d}}}}\nfn f_37(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{e - {{{b + e} - d} - {b - {b - e}}}}}\nfn f_38(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a + d}}\nfn f_39(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_40(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a * {d + {b * e}}}}\nfn f_41(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_42(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_43(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{e * a} - {b + c}} * {e + {d - e}}} * c} * {d * a}} - {{{{{b - d} + {e - d}} * {{b + a} + {d * c}}} - {{{c * b} * d} - b}} * {{d - a} * {{{d * c} * {b * d}} + {{a * a} * e}}}}}}\nfn f_44(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{a * e} + {c * b}} * {c + b}}}\nfn f_45(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_46(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{b - {{e * e} + {d - d}}} - c} * {c + {{{d * c} * {b + b}} + d}}}}\nfn f_47(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_48(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e - b} - {a + c}} - {{c - d} * {c * e}}}}\nfn f_49(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{a - e} * {a * a}} - b} * {{{e - d} - {b + b}} * {{b * a} * {a + e}}}}}\nfn f_50(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{a + {{{a - c} * e} + {c - {b * a}}}} + {{{{b + d} + {e * d}} - {{b * c} * {a * a}}} - {{d - {e - a}} - e}}}}\nfn f_51(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_52(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_53(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{d + {{b + c} + {b - b}}} * {{{d + b} + {b * e}} + {{e * d} * {c * c}}}}}\nfn f_54(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c - {{{a - {c * d}} * {{a * b} + c}} + {{{b * d} * {a - d}} + {{c * b} * {b - a}}}}}}\nfn f_55(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{d - d} * {c * d}} * {{d - a} * b}} - {d * {{d + e} + {e + b}}}} * {{a * {{a - b} - {a * d}}} - {{{a * e} * {b - a}} - {{c - b} - {b + a}}}}} + {{{e * b} - a} - {{{{b * d} * {a + e}} * {{c + a} + {b + e}}} + e}}}}\nfn f_56(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{c + d} - {b * a}} * b}}\nfn f_57(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_58(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{b + {{{e - d} * {d + c}} + {{d - b} * {b - b}}}} * {d - {{d - e} - {{d + c} * {a - c}}}}}}\nfn f_59(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{d * {{{{b - a} - {{e + e} - {d * e}}} + {{{d + c} - d} + {{b * a} * c}}} * d}}}\nfn f_60(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_61(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{b + d} - {e + c}} - b} * {{{a - e} * {a + a}} - c}}}\nfn f_62(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e + {{b * b} - {d * d}}} * e} - b}}\nfn f_63(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{e * {{e - c} * a}} - {b * {e + {d + a}}}} + {{{{a - c} + d} * b} + {c * {{d - e} * {d + e}}}}} * {{{{{e - e} - {c + c}} - {c - {b * d}}} * {b + {{d - c} + {d - d}}}} - {{e + {{b + c} * {b + c}}} - {{{d * c} + {a - a}} - {b - {a + d}}}}}}}\nfn f_64(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_65(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{d - {{{b + b} * d} * {{b * d} * {a - d}}}}}\nfn f_66(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{a + b} - {{a * b} * {e * d}}} - {{{b - b} - {e - d}} - {{a - c} - {c - b}}}} + {{{{e * c} * {e + c}} + d} + {{e + e} - {{b + d} + {a + c}}}}}}\nfn f_67(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{d - {{c - c} * {b - b}}} + {c * a}} * {{{{a - c} * {d + e}} + a} - {{{a - d} + b} - a}}} - {{{{{a + d} - c} + {{e * d} + {c - c}}} - {{{e + b} - {c - c}} * {{d + c} + {d - c}}}} + {e - {{{d - a} - {c * a}} * {b - {a - a}}}}}}}\nfn f_68(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{c * e} - {c + c}} + e}}\nfn f_69(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{d + {{{c * e} + {c - c}} - {{e + e} * {e * c}}}}}\nfn f_70(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{d - c} + {c - e}} + {{c * c} * c}} * d} - {{{{e * a} - {b + c}} - {a + {e * b}}} + {{{b * a} * {b * e}} + a}}}}\nfn f_71(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{a * e} + {b * a}} - {e * {d * e}}} - {{{a - d} * {b * a}} - {{c - d} - {e - e}}}} - e} + {{e - {b - {{d + d} * {e * d}}}} * {{{d - {d + b}} + {{d * a} * {a + b}}} + {{{b - e} * {d + d}} * a}}}}}\nfn f_72(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_73(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_74(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{d * {{c * b} + {{e + a} * {b * b}}}} + {{{{a * c} * {d + b}} * {a * {d + a}}} + {{{a - b} * {c - c}} + {a + {e - a}}}}}}\nfn f_75(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{a - c} * {d - a}} + d} + {d + {{c - b} + a}}} - d} * {c - e}}}\nfn f_76(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_77(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{c + a} + a} + {{c - b} - {d - c}}} - {{{b - b} + {e - c}} * {{e + d} * e}}}}\nfn f_78(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{b + e} - {c + a}} + {{b + d} - {e + a}}} + {{{e * b} - {c + a}} * {{b - b} * {c * e}}}} - a}}\nfn f_79(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{a * a} - {e + e}} - {{c + c} * {a - d}}} * e} + {{{e - e} - {{e - d} * a}} - {{{d - e} + {e + d}} * {b * {a - e}}}}} - {{{{{b * e} - {d * a}} * {{c * b} - {e - d}}} * d} * {{b - {{b - c} + a}} - {{{d * b} * {e + c}} * {{c * e} - {c - b}}}}}}}\nfn f_80(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{d + d} - {d - b}} * a}}\nfn f_81(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{d * e} - {d + a}} - {{c - c} - {d + c}}} + c}}\nfn f_82(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{c - b} + {e * {{{e + e} + {a * c}} + {{c - d} - {a + b}}}}}}\nfn f_83(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a + {{{{{e + c} * {a - c}} - {{e * e} - {a - c}}} - {{{e + b} - {a * e}} * b}} - {e * {c - {{c - b} * {e - a}}}}}}}\nfn f_84(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{b + e}}\nfn f_85(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{e * d} - {e - b}} + a} - {a - {{b * d} - {b * b}}}}}\nfn f_86(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c + {{{e + {d - d}} * {b - e}} - {{{c * c} + {e + e}} + {b - c}}}}}\nfn f_87(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{b * a} + {b - b}} * {{b * c} * {e + e}}} + {{{b - b} - {e - a}} - {{e - d} * {b * a}}}} * {{{{c - e} + {c - a}} * {{b + d} * {e - c}}} + {{{a - c} * {b - c}} - {{e * c} + c}}}} * b}}\nfn f_88(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{a + d} * {c - d}} * {e * {a + e}}}}\nfn f_89(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_90(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{e + {{d * e} + {b + d}}} - {{e * {d + e}} - a}} - {d - {{a - {a - a}} - b}}}}\nfn f_91(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{c + {a + d}} - c} * {{{e + d} * {e + d}} + {{c - d} + {a + c}}}} * {{{{e - e} - {b - e}} + {c - {e * a}}} * a}} * {c + {e - {{{a + e} + a} + d}}}}}\nfn f_92(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{d * {{b - e} - {a + a}}}}\nfn f_93(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a - {a - c}}}\nfn f_94(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{d * {{{{b - a} + {a - b}} * {{d - d} + b}} + {{{e + c} * {d - d}} * {d + {a + b}}}}}}\nfn f_95(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{e + {{{{{a - c} - e} - {{e - c} + {c * b}}} - d} + {{{c + {a - c}} - a} - {{e + {e + b}} + {{e * e} + {b - d}}}}}}}\nfn f_96(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{d - b} + {a + a}} * {{b * a} + {b - c}}}}\nfn f_97(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{c - {{d + d} + {a - d}}} * {{{e + d} + {d - b}} * {{d + d} - {d + e}}}}}\nfn f_98(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{c * d} * {e + c}} * {{a + d} + {d - e}}} - b} + {{{{d * e} + {c * b}} - {{d + b} * b}} - {{{c + a} + {c - c}} * {{e * c} + {c + b}}}}}}\nfn f_99(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{{e * b} * {a - b}} - e} - {e * {{d + c} - a}}} + {{e * {{b - a} + {a * a}}} - {{{b * e} - {b + d}} * b}}} + {{{{{d * b} * {d + e}} * {{a + c} * {e * e}}} + {{{b - d} * {e - a}} + {e + c}}} + {{{c + {c - d}} - a} * e}}}}\npub fn main()->Nil {echo f_0(2,-3,4,-2,1)\necho f_1(2,-3,4,-2,1)\necho f_2(2,-3,4,-2,1)\necho f_3(2,-3,4,-2,1)\necho f_4(2,-3,4,-2,1)\necho f_5(2,-3,4,-2,1)\necho f_6(2,-3,4,-2,1)\necho f_7(2,-3,4,-2,1)\necho f_8(2,-3,4,-2,1)\necho f_9(2,-3,4,-2,1)\necho f_10(2,-3,4,-2,1)\necho f_11(2,-3,4,-2,1)\necho f_12(2,-3,4,-2,1)\necho f_13(2,-3,4,-2,1)\necho f_14(2,-3,4,-2,1)\necho f_15(2,-3,4,-2,1)\necho f_16(2,-3,4,-2,1)\necho f_17(2,-3,4,-2,1)\necho f_18(2,-3,4,-2,1)\necho f_19(2,-3,4,-2,1)\necho f_20(2,-3,4,-2,1)\necho f_21(2,-3,4,-2,1)\necho f_22(2,-3,4,-2,1)\necho f_23(2,-3,4,-2,1)\necho f_24(2,-3,4,-2,1)\necho f_25(2,-3,4,-2,1)\necho f_26(2,-3,4,-2,1)\necho f_27(2,-3,4,-2,1)\necho f_28(2,-3,4,-2,1)\necho f_29(2,-3,4,-2,1)\necho f_30(2,-3,4,-2,1)\necho f_31(2,-3,4,-2,1)\necho f_32(2,-3,4,-2,1)\necho f_33(2,-3,4,-2,1)\necho f_34(2,-3,4,-2,1)\necho f_35(2,-3,4,-2,1)\necho f_36(2,-3,4,-2,1)\necho f_37(2,-3,4,-2,1)\necho f_38(2,-3,4,-2,1)\necho f_39(2,-3,4,-2,1)\necho f_40(2,-3,4,-2,1)\necho f_41(2,-3,4,-2,1)\necho f_42(2,-3,4,-2,1)\necho f_43(2,-3,4,-2,1)\necho f_44(2,-3,4,-2,1)\necho f_45(2,-3,4,-2,1)\necho f_46(2,-3,4,-2,1)\necho f_47(2,-3,4,-2,1)\necho f_48(2,-3,4,-2,1)\necho f_49(2,-3,4,-2,1)\necho f_50(2,-3,4,-2,1)\necho f_51(2,-3,4,-2,1)\necho f_52(2,-3,4,-2,1)\necho f_53(2,-3,4,-2,1)\necho f_54(2,-3,4,-2,1)\necho f_55(2,-3,4,-2,1)\necho f_56(2,-3,4,-2,1)\necho f_57(2,-3,4,-2,1)\necho f_58(2,-3,4,-2,1)\necho f_59(2,-3,4,-2,1)\necho f_60(2,-3,4,-2,1)\necho f_61(2,-3,4,-2,1)\necho f_62(2,-3,4,-2,1)\necho f_63(2,-3,4,-2,1)\necho f_64(2,-3,4,-2,1)\necho f_65(2,-3,4,-2,1)\necho f_66(2,-3,4,-2,1)\necho f_67(2,-3,4,-2,1)\necho f_68(2,-3,4,-2,1)\necho f_69(2,-3,4,-2,1)\necho f_70(2,-3,4,-2,1)\necho f_71(2,-3,4,-2,1)\necho f_72(2,-3,4,-2,1)\necho f_73(2,-3,4,-2,1)\necho f_74(2,-3,4,-2,1)\necho f_75(2,-3,4,-2,1)\necho f_76(2,-3,4,-2,1)\necho f_77(2,-3,4,-2,1)\necho f_78(2,-3,4,-2,1)\necho f_79(2,-3,4,-2,1)\necho f_80(2,-3,4,-2,1)\necho f_81(2,-3,4,-2,1)\necho f_82(2,-3,4,-2,1)\necho f_83(2,-3,4,-2,1)\necho f_84(2,-3,4,-2,1)\necho f_85(2,-3,4,-2,1)\necho f_86(2,-3,4,-2,1)\necho f_87(2,-3,4,-2,1)\necho f_88(2,-3,4,-2,1)\necho f_89(2,-3,4,-2,1)\necho f_90(2,-3,4,-2,1)\necho f_91(2,-3,4,-2,1)\necho f_92(2,-3,4,-2,1)\necho f_93(2,-3,4,-2,1)\necho f_94(2,-3,4,-2,1)\necho f_95(2,-3,4,-2,1)\necho f_96(2,-3,4,-2,1)\necho f_97(2,-3,4,-2,1)\necho f_98(2,-3,4,-2,1)\necho f_99(2,-3,4,-2,1)\nNil}",
+  "sourceSHA256": "c029451296287818b718e074aa894c76c48b1617806954ef5a4117476c4d8742",
+  "compilerSHA256": "df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b",
+  "programSHA256": "2aea2477779fcb9eb2f2730e9ee387d2870b09774e3043d638c3b5b029b698b5",
+  "bytes": 31993,
+  "upstreamCompiler": "gleam 1.19.2",
+  "independentBigIntExpected": true,
+  "upstreamStdoutMatches": true,
+  "nativeStdoutMatches": true,
+  "byteIdenticalToBootstrap": true,
+  "spillingRegions": 68,
+  "coverage": [
+    {
+      "name": "f_0",
+      "expected": "15",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_1",
+      "expected": "12",
+      "operandPressure": 4,
+      "staticSpills": 2
+    },
+    {
+      "name": "f_2",
+      "expected": "-531",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_3",
+      "expected": "-30",
+      "operandPressure": 6,
+      "staticSpills": 16
+    },
+    {
+      "name": "f_4",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_5",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_6",
+      "expected": "1566",
+      "operandPressure": 6,
+      "staticSpills": 9
+    },
+    {
+      "name": "f_7",
+      "expected": "-14",
+      "operandPressure": 6,
+      "staticSpills": 17
+    },
+    {
+      "name": "f_8",
+      "expected": "-12",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_9",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_10",
+      "expected": "1",
+      "operandPressure": 4,
+      "staticSpills": 9
+    },
+    {
+      "name": "f_11",
+      "expected": "-1382400",
+      "operandPressure": 6,
+      "staticSpills": 36
+    },
+    {
+      "name": "f_12",
+      "expected": "-2",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_13",
+      "expected": "3",
+      "operandPressure": 4,
+      "staticSpills": 2
+    },
+    {
+      "name": "f_14",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_15",
+      "expected": "16",
+      "operandPressure": 2,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_16",
+      "expected": "0",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_17",
+      "expected": "-19",
+      "operandPressure": 5,
+      "staticSpills": 3
+    },
+    {
+      "name": "f_18",
+      "expected": "-77",
+      "operandPressure": 6,
+      "staticSpills": 11
+    },
+    {
+      "name": "f_19",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_20",
+      "expected": "-38",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_21",
+      "expected": "288",
+      "operandPressure": 5,
+      "staticSpills": 4
+    },
+    {
+      "name": "f_22",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_23",
+      "expected": "224",
+      "operandPressure": 6,
+      "staticSpills": 19
+    },
+    {
+      "name": "f_24",
+      "expected": "26",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_25",
+      "expected": "7",
+      "operandPressure": 5,
+      "staticSpills": 3
+    },
+    {
+      "name": "f_26",
+      "expected": "5",
+      "operandPressure": 5,
+      "staticSpills": 8
+    },
+    {
+      "name": "f_27",
+      "expected": "1428",
+      "operandPressure": 6,
+      "staticSpills": 14
+    },
+    {
+      "name": "f_28",
+      "expected": "-1",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_29",
+      "expected": "4",
+      "operandPressure": 5,
+      "staticSpills": 2
+    },
+    {
+      "name": "f_30",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_31",
+      "expected": "-76",
+      "operandPressure": 7,
+      "staticSpills": 35
+    },
+    {
+      "name": "f_32",
+      "expected": "-6",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_33",
+      "expected": "78",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_34",
+      "expected": "-127",
+      "operandPressure": 6,
+      "staticSpills": 8
+    },
+    {
+      "name": "f_35",
+      "expected": "-26496",
+      "operandPressure": 7,
+      "staticSpills": 23
+    },
+    {
+      "name": "f_36",
+      "expected": "4",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_37",
+      "expected": "2",
+      "operandPressure": 5,
+      "staticSpills": 2
+    },
+    {
+      "name": "f_38",
+      "expected": "0",
+      "operandPressure": 2,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_39",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_40",
+      "expected": "-10",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_41",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_42",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_43",
+      "expected": "7952",
+      "operandPressure": 6,
+      "staticSpills": 16
+    },
+    {
+      "name": "f_44",
+      "expected": "-10",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_45",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_46",
+      "expected": "-400",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_47",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_48",
+      "expected": "-26",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_49",
+      "expected": "-1134",
+      "operandPressure": 5,
+      "staticSpills": 4
+    },
+    {
+      "name": "f_50",
+      "expected": "53",
+      "operandPressure": 5,
+      "staticSpills": 9
+    },
+    {
+      "name": "f_51",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_52",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_53",
+      "expected": "40",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_54",
+      "expected": "-60",
+      "operandPressure": 6,
+      "staticSpills": 10
+    },
+    {
+      "name": "f_55",
+      "expected": "-294",
+      "operandPressure": 6,
+      "staticSpills": 21
+    },
+    {
+      "name": "f_56",
+      "expected": "-24",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_57",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_58",
+      "expected": "-9",
+      "operandPressure": 6,
+      "staticSpills": 9
+    },
+    {
+      "name": "f_59",
+      "expected": "-116",
+      "operandPressure": 5,
+      "staticSpills": 8
+    },
+    {
+      "name": "f_60",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_61",
+      "expected": "0",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_62",
+      "expected": "9",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_63",
+      "expected": "987",
+      "operandPressure": 7,
+      "staticSpills": 24
+    },
+    {
+      "name": "f_64",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_65",
+      "expected": "-290",
+      "operandPressure": 5,
+      "staticSpills": 3
+    },
+    {
+      "name": "f_66",
+      "expected": "0",
+      "operandPressure": 6,
+      "staticSpills": 11
+    },
+    {
+      "name": "f_67",
+      "expected": "79",
+      "operandPressure": 7,
+      "staticSpills": 22
+    },
+    {
+      "name": "f_68",
+      "expected": "-3",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_69",
+      "expected": "-6",
+      "operandPressure": 5,
+      "staticSpills": 4
+    },
+    {
+      "name": "f_70",
+      "expected": "-144",
+      "operandPressure": 5,
+      "staticSpills": 7
+    },
+    {
+      "name": "f_71",
+      "expected": "495",
+      "operandPressure": 6,
+      "staticSpills": 20
+    },
+    {
+      "name": "f_72",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_73",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_74",
+      "expected": "-29",
+      "operandPressure": 6,
+      "staticSpills": 12
+    },
+    {
+      "name": "f_75",
+      "expected": "45",
+      "operandPressure": 4,
+      "staticSpills": 2
+    },
+    {
+      "name": "f_76",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_77",
+      "expected": "18",
+      "operandPressure": 4,
+      "staticSpills": 4
+    },
+    {
+      "name": "f_78",
+      "expected": "-18",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_79",
+      "expected": "-2808",
+      "operandPressure": 7,
+      "staticSpills": 24
+    },
+    {
+      "name": "f_80",
+      "expected": "-10",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_81",
+      "expected": "4",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_82",
+      "expected": "24",
+      "operandPressure": 6,
+      "staticSpills": 7
+    },
+    {
+      "name": "f_83",
+      "expected": "-34",
+      "operandPressure": 7,
+      "staticSpills": 13
+    },
+    {
+      "name": "f_84",
+      "expected": "-2",
+      "operandPressure": 2,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_85",
+      "expected": "-9",
+      "operandPressure": 5,
+      "staticSpills": 3
+    },
+    {
+      "name": "f_86",
+      "expected": "-11",
+      "operandPressure": 5,
+      "staticSpills": 7
+    },
+    {
+      "name": "f_87",
+      "expected": "-39609",
+      "operandPressure": 5,
+      "staticSpills": 15
+    },
+    {
+      "name": "f_88",
+      "expected": "0",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_89",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_90",
+      "expected": "4",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_91",
+      "expected": "0",
+      "operandPressure": 5,
+      "staticSpills": 11
+    },
+    {
+      "name": "f_92",
+      "expected": "16",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_93",
+      "expected": "4",
+      "operandPressure": 3,
+      "staticSpills": 0
+    },
+    {
+      "name": "f_94",
+      "expected": "0",
+      "operandPressure": 6,
+      "staticSpills": 9
+    },
+    {
+      "name": "f_95",
+      "expected": "16",
+      "operandPressure": 7,
+      "staticSpills": 13
+    },
+    {
+      "name": "f_96",
+      "expected": "-65",
+      "operandPressure": 4,
+      "staticSpills": 1
+    },
+    {
+      "name": "f_97",
+      "expected": "0",
+      "operandPressure": 5,
+      "staticSpills": 5
+    },
+    {
+      "name": "f_98",
+      "expected": "64",
+      "operandPressure": 6,
+      "staticSpills": 11
+    },
+    {
+      "name": "f_99",
+      "expected": "-33",
+      "operandPressure": 5,
+      "staticSpills": 22
+    }
+  ],
+  "limits": "Every intermediate value is within exact +/- (2^53-1); overflow tested separately, no speed claim"
+}

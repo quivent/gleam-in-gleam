@@ -23,14 +23,14 @@ compatibility score. The extension workstreams below remain incomplete.
 
 ## Verified starting point
 
-All 26 compiler modules rebuild through the native effect-runner entry. Stages
-1, 2 and 3 are byte-identical: 597,813 bytes, SHA256
-`5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a`.
-The stage-3 compiler passes 341 corpus cases; every accepted output matches the
-bootstrap bytes and executes correctly. Full qualification includes 687 tests,
-341 independent upstream comparisons, 16 examples and 59 native IO checks.
+All 27 compiler modules rebuild through the native effect-runner entry. Stages
+1, 2 and 3 are byte-identical: 613,842 bytes, SHA256
+`df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b`.
+The stage-3 compiler passes 351 corpus cases; every accepted output matches the
+bootstrap bytes and executes correctly. Full qualification includes 702 tests,
+351 independent upstream comparisons, 16 examples and 59 native IO checks.
 See [the proof](SELF_HOSTING.md) and
-[qualification receipt](evidence/branch-slots-qualification.json).
+[qualification receipt](evidence/integer-regions-qualification.json).
 
 The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
 Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
@@ -51,7 +51,7 @@ receipts remain preserved under their original names.
    Deep non-tail recursion and arena exhaustion remain explicit limits.
 
 3. **Broader native-compiler testing — current corpus verified.**
-   All 341 positive/negative fixtures go through stage 3, with exact accepted
+   All 351 positive/negative fixtures go through stage 3, with exact accepted
    image/output comparisons. The separate upstream comparisons are independent.
    Expand this corpus alongside every new language/runtime feature.
 
@@ -59,7 +59,7 @@ receipts remain preserved under their original names.
    Two native self-rebuilds from the exact frozen source match the seed. A separate
    changed-source control produces the correctly changed compiler. Source hashes,
    stage images, native corpus and ELF observations are retained in
-   [the rebuild receipt](evidence/branch-slots-native-rebuilds.json).
+   [the rebuild receipt](evidence/integer-regions-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -76,10 +76,12 @@ receipts remain preserved under their original names.
 
 7. **Measured optimization after correctness — first bounded increment verified.**
    Leaf operand look-ahead removes 260 static push/pop pairs and 451 instructions
-   on fixed source; calls retain their spills. General register allocation,
-   liveness and broader spill-slot reuse remain open in [the spec](REGISTER_SPILL_SPEC.md).
+   on fixed source; calls retain their spills. Whole-function register allocation,
+   control-flow liveness and broader spill-slot reuse remain open in [the spec](REGISTER_SPILL_SPEC.md).
    Sibling case arms also share their local slots; fixed-source named frame sums
    fall about 29%. The recorded 64 KiB non-tail workload now succeeds.
+   Typed integer regions now allocate three registers, spill on pressure and use
+   explicit register/flags liveness. Calls and control flow remain boundaries.
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
    retaining correctness checks. Jay specifically requested look-ahead to avoid

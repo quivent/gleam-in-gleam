@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 341 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 351 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **597,813 bytes**, SHA256
-`5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a`.
+The native image is **613,842 bytes**, SHA256
+`df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/branch-slots-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/integer-regions-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -697,9 +697,35 @@ succeeds with the new 32-byte frame. This is non-tail recursion with input 600,
 terminal arm 7 and exact result 180285, not arbitrary-input or timing evidence.
 [Both observations](evidence/branch-slots-small-stack.json) are retained.
 
-Current qualification: **687 tests, 341 fresh upstream comparisons**, and all 341
+Sibling-slot qualification: **687 tests, 341 fresh upstream comparisons**, and all 341
 cases through the rebuilt compiler. Two native self-rebuilds again match their
-seed. The current compiler is 597,813 bytes; no new runtime dependency.
+seed. That compiler was 597,813 bytes; no new runtime dependency.
 See [qualification](evidence/branch-slots-qualification.json),
 [fixed-source frames](evidence/branch-slots-frame-comparison.json) and
 [design/remaining allocator work](REGISTER_SPILL_SPEC.md).
+
+## Typed integer-region allocation — 2026-11-08
+
+Call-free checked integer expressions now use an owned typed instruction plan.
+Explicit uses/definitions include condition flags; backward liveness removes dead
+moves while retaining arithmetic traps. The allocator uses RAX/RCX/RDX and spills
+to the machine stack when the region exceeds that pool, with RDI reserved for
+recovery. Left-to-right evaluation and immediate overflow checks remain intact.
+Calls, effects and control flow retain their old lowering. This is expression-
+region allocation, not whole-function control-flow liveness.
+
+Current qualification: **702 tests and 351 fresh upstream comparisons**. The rebuilt
+native compiler qualifies all 351 corpus cases, and both native self-rebuilds are
+byte-identical. A separate seeded 100-expression program agrees with independent
+BigInt results and upstream: 68 regions spill, maximum operand pressure seven,
+and native bytes match bootstrap. These 100 expressions are not counted as 100
+additional compilation cases in the 351-case corpus.
+
+The fixed compiler-source comparison removes 15 push/pop pairs, 54 static named-
+function instructions and 116 image bytes. The current compiler itself is
+613,842 bytes because it includes the new planner implementation.
+No runtime speed or whole-function allocation claim follows from these results.
+See [qualification](evidence/integer-regions-qualification.json),
+[seeded oracle](evidence/integer-regions-seeded-oracle.json),
+[static comparison](evidence/integer-regions-comparison.json) and
+[design](REGISTER_SPILL_SPEC.md).

@@ -7,12 +7,12 @@ still incomplete.
 ## Exact observed chain
 
 1. The upstream Gleam/JavaScript bootstrap emits stage 1, our native compiler.
-2. Stage 1 reads a frozen copy of all 26 actual compiler modules through the owned
+2. Stage 1 reads a frozen copy of all 27 actual compiler modules through the owned
    file runner and `--build-compiler`, producing stage 2.
 3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
-4. All three are 597,813 bytes with SHA256
-   `5c2573e87bd01e7c70c430fcd5304cfe83f4df23e09e87991aacfaaf3656836a`.
-5. Stage 3 compiles 341 corpus cases: 221 accepted, 120 rejected. Every accepted
+4. All three are 613,842 bytes with SHA256
+   `df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b`.
+5. Stage 3 compiles 351 corpus cases: 231 accepted, 120 rejected. Every accepted
    output is byte-identical to bootstrap output and executes correctly. Rejections
    have controlled compiler exits and publish no output.
 6. A changed version literal in a separate source copy produces a different native
@@ -50,11 +50,11 @@ value equality, measured optimization/register allocation and targets remain ope
 
 ## Evidence
 
-* [Complete qualification](evidence/branch-slots-qualification.json): 687 checks,
-  341 fresh independent upstream comparisons and all 16 native example runs.
-* [Native rebuilds and corpus](evidence/branch-slots-native-rebuilds.json): exact
+* [Complete qualification](evidence/integer-regions-qualification.json): 702 checks,
+  351 fresh independent upstream comparisons and all 16 native example runs.
+* [Native rebuilds and corpus](evidence/integer-regions-native-rebuilds.json): exact
   sources, image hashes, source-sensitivity control and individual native cases.
-* [Native IO qualification](evidence/branch-slots-io-verification.json): 59 targeted
+* [Native IO qualification](evidence/integer-regions-io-verification.json): 59 targeted
   checks, actual short IO, errors, preservation and ELF headers.
 * [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
   initial stack/heap failures and measured fixes; snapshots are not peak stack.
@@ -70,6 +70,11 @@ allocation and broader spill-slot reuse remain open in [the spec](REGISTER_SPILL
 First-milestone evidence remains under self-hosting-*; later qualification is
 separately retained under leaf-register-* and branch-slots-*.
 
-Sibling-case locals now reuse slots with a maximum frame reservation; full liveness
+Sibling-case locals now reuse slots with a maximum frame reservation; whole-function liveness
 and allocation remain open. A real bounded non-tail recursion comparison and fixed-
 source frame measurements are retained under branch-slots-*.
+
+Typed integer regions now use register allocation and backward liveness with
+explicit flags and real spills. Calls/control flow remain region boundaries;
+whole-function CFG allocation remains open. Current evidence is separately
+retained under integer-regions-*, including a seeded 100-expression oracle.

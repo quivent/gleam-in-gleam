@@ -1,0 +1,66 @@
+{
+  "schema": "gleam-in-gleam.roadmap-ui-verification/1",
+  "observedAt": "2026-11-08T03:24:38.690Z",
+  "browser": "156.0.8078.4",
+  "pageMode": "offline file URL",
+  "observations": [
+    {
+      "check": "eight stages, evidence-derived metrics, subjective estimate and next-step default",
+      "passed": true
+    },
+    {
+      "check": "core/extension filters, full-spec search, no-results and next-focus navigation",
+      "passed": true
+    },
+    {
+      "check": "keyboard tab navigation and ARIA panel/selection behavior",
+      "passed": true
+    },
+    {
+      "check": "local review persistence; note text remains inert and never changes verified progress",
+      "passed": true
+    },
+    {
+      "check": "export contains personal annotations and provenance, not fabricated verification/status",
+      "passed": true
+    },
+    {
+      "check": "320/390/768px layouts have no horizontal overflow; touch review works",
+      "passed": true
+    },
+    {
+      "check": "malformed saved review recovers with a visible warning",
+      "passed": true
+    },
+    {
+      "check": "storage-denied mode still supports in-memory review and export",
+      "passed": true
+    },
+    {
+      "check": "no-JavaScript fallback links to the complete text roadmap",
+      "passed": true
+    },
+    {
+      "check": "no browser script errors and no external HTTP requests",
+      "passed": true
+    }
+  ],
+  "sourceSHA256": {
+    "docs/roadmap.html": "2a309d4eda96b1d236f439781123bbc683dbba506349b347e761f1a4b85dcab0",
+    "docs/roadmap.template.html": "7744afcad95d5f6917a384960b88ed315827fd4ab220d027d78e38297a0c9b44",
+    "docs/roadmap.json": "32de9de8f64af417130e6dbdfd384fb5ccf2a8a86c4ccff2245f4ee4c7b59179",
+    "tools/render_roadmap.py": "98491bf92bfc4fb9862f57ce5c04c1e6317790f80a3e6aa8d09818478ced67af",
+    "FULL_SIZE_RELIABILITY_SPEC.md": "2514867c9120b116f86bf221e4e0a1c09933b9f90c0e8c95613c7d8628e877e2",
+    "test/roadmap-browser.mjs": "f1ff7240d252be65de6744bdef472a7f636ecc64b1c1a4ad300dc845b6ead709"
+  },
+  "screenshots": {
+    "desktop": {
+      "path": "out/roadmap-preview/desktop.png",
+      "sha256": "50438d65965e2689ec2073e1a657ec22a510ccd4babf5c10511a0797d9838fc7"
+    },
+    "mobile": {
+      "path": "out/roadmap-preview/mobile.png",
+      "sha256": "8bf96a1e91728c6c6347801eda5c3ba5f8da55fffd571235f32062842ec3eb51"
+    }
+  }
+}
