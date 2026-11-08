@@ -224,14 +224,24 @@ pub fn character(n: Int) -> String {
 }
 
 pub fn concat(xs: List(BitArray)) -> BitArray {
-  // Balanced concatenation can replace this when the native list runtime lands.
-  concat_into(xs, <<>>)
+  // Merge adjacent chunks in rounds. Each payload is copied O(log chunks)
+  // times, rather than copying the entire growing prefix for every chunk.
+  case xs {
+    [] -> <<>>
+    [only] -> only
+    _ -> concat(concat_round(xs, []))
+  }
 }
 
-fn concat_into(xs: List(BitArray), acc: BitArray) -> BitArray {
+fn concat_round(
+  xs: List(BitArray),
+  reversed: List(BitArray),
+) -> List(BitArray) {
   case xs {
-    [] -> acc
-    [x, ..rest] -> concat_into(rest, <<acc:bits, x:bits>>)
+    [] -> reverse(reversed)
+    [only] -> reverse([only, ..reversed])
+    [left, right, ..rest] ->
+      concat_round(rest, [<<left:bits, right:bits>>, ..reversed])
   }
 }
 

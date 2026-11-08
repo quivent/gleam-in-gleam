@@ -1,6 +1,7 @@
 // Owned Linux x86-64 effect runner. No foreign code or external assembler.
 import native/assembler as asm
 import native/ast as a
+import native/cli_limits
 import native/core as c
 import native/definitions as d
 import native/prelude
@@ -92,6 +93,20 @@ fn signature(
 pub fn generate(
   context: d.Context,
 ) -> Result(#(List(asm.Part), List(asm.Part)), String) {
+  generate_with_limit(context, cli_limits.source_capacity())
+}
+
+// Development callers may explicitly choose a larger diagnostic bound.
+// Production builds always use generate's qualified limit.
+pub fn generate_with_limit(
+  context: d.Context,
+  source_limit: Int,
+) -> Result(#(List(asm.Part), List(asm.Part)), String) {
+  use _ <- c.then(case source_limit >= 16_384 && source_limit <= 1_048_576 {
+    True -> Ok(Nil)
+    False ->
+      Error("Diagnostic source limit must be between 16384 and 1048576 bytes")
+  })
   let request = a.NamedType("Request")
   let state = a.NamedType("State")
   let string = a.StringType
@@ -158,14 +173,17 @@ pub fn generate(
         c.append(
           argv(),
           c.append(
-            read_file(),
+            read_file(source_limit),
             c.append(
               write_all(),
               c.append(
                 write_file(),
                 c.append(
                   result_constructor("ok", ok.tag),
-                  c.append(result_constructor("error", error.tag), messages()),
+                  c.append(
+                    result_constructor("error", error.tag),
+                    messages(source_limit),
+                  ),
                 ),
               ),
             ),
@@ -387,7 +405,7 @@ fn result_constructor(name: String, tag: Int) -> List(asm.Part) {
   ]
 }
 
-fn read_file() -> List(asm.Part) {
+fn read_file(source_limit: Int) -> List(asm.Part) {
   [
     label("read"),
     prologue(272),
@@ -455,7 +473,7 @@ fn read_file() -> List(asm.Part) {
     ld(0, -208),
     cmp(0, 0),
     branch(140, "read:large"),
-    cmp(0, 16_384),
+    cmp(0, source_limit),
     branch(135, "read:large"),
     st(0, -40),
     raw(<<72, 131, 192, 48, 72, 131, 224, 248, 72, 137, 199>>),
@@ -718,7 +736,15 @@ fn write_file() -> List(asm.Part) {
   ]
 }
 
-fn messages() -> List(asm.Part) {
+fn messages(source_limit: Int) -> List(asm.Part) {
+  let limit_message = case source_limit == cli_limits.source_capacity() {
+    True ->
+      "Source exceeds "
+      <> c.decimal(source_limit / 1024)
+      <> " KiB native CLI limit"
+    False ->
+      "Source exceeds diagnostic " <> c.decimal(source_limit) <> " byte limit"
+  }
   message_list([
     #(
       "arguments",
@@ -734,7 +760,7 @@ fn messages() -> List(asm.Part) {
     #("read:close_error", "Source descriptor close failed"),
     #("read:stat_error", "Cannot stat source"),
     #("read:regular", "Source is not a regular file"),
-    #("read:large", "Source exceeds 16 KiB native CLI limit"),
+    #("read:large", limit_message),
     #("read:read_error", "Source read failed"),
     #("read:changed", "Source size changed during read"),
     #("write:path", "Output path exceeds 4095 bytes"),

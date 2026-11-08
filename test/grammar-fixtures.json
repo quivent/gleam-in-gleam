@@ -1,0 +1,386 @@
+[
+  {
+    "name": "known-local-variant",
+    "source": "type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }",
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "zero-field-is-not-callable",
+    "source": "pub type A { Zero } pub fn main() -> A { Zero() }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "private-type-in-public-api",
+    "source": "type A { Zero } pub fn main() -> A { Zero }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "unknown-variant-let",
+    "source": "type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "custom-result-names",
+    "source": "type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }",
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "missing-variant",
+    "source": "type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "wrong-field-type",
+    "source": "pub type A { One(Int) } pub fn main() -> A { One(True) }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "nested-constructor-not-refined",
+    "source": "type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "generic-repeated-parameter",
+    "source": "type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "generic-argument-mismatch",
+    "source": "type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "label-declaration-order",
+    "source": "type Pair { Pair(first: Int,second: Int) } pub fn main() -> Nil { let p = Pair(second: echo 2,first: echo 1) echo p.first echo p.second Nil }",
+    "accepted": true,
+    "stdout": "1\n2\n1\n2\n"
+  },
+  {
+    "name": "generic-record",
+    "source": "type Box(a) { Box(value: a,count: Int) } pub fn main() -> Nil { let box = Box(count: 2,value: 7) let Box(value:,..) = box echo value echo box.count Nil }",
+    "accepted": true,
+    "stdout": "7\n2\n"
+  },
+  {
+    "name": "record-offset-mismatch",
+    "source": "type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "record-template-mismatch",
+    "source": "type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "label-positional-order",
+    "source": "type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "generic-function-instantiation",
+    "source": "fn identity(x: a) -> a { x } pub fn main() -> Nil { echo identity(7) echo identity(True) Nil }",
+    "accepted": true,
+    "stdout": "7\nTrue\n"
+  },
+  {
+    "name": "higher-order-function",
+    "source": "fn inc(x: Int) -> Int { x+1 } fn apply(f: fn(a) -> b,x: a) -> b { f(x) } pub fn main() -> Nil { echo apply(inc,7) Nil }",
+    "accepted": true,
+    "stdout": "8\n"
+  },
+  {
+    "name": "indirect-evaluation-order",
+    "source": "fn add(a: Int,b: Int) -> Int { a+b } fn target() -> fn(Int,Int) -> Int { echo 1 add } pub fn main() -> Nil { echo target()(echo 2,echo 3) Nil }",
+    "accepted": true,
+    "stdout": "1\n2\n3\n5\n"
+  },
+  {
+    "name": "generic-rigid-body",
+    "source": "fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "generic-self-recursion",
+    "source": "fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "generic-mutual-recursion",
+    "source": "fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }",
+    "accepted": true,
+    "stdout": ""
+  },
+  {
+    "name": "private-function-type",
+    "source": "type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "returned-closure-capture",
+    "source": "fn make(n: Int) -> fn(Int) -> Int { fn(x) { n+x } } pub fn main() -> Nil { let f=make(7) echo f(3) Nil }",
+    "accepted": true,
+    "stdout": "10\n"
+  },
+  {
+    "name": "nested-closure-capture",
+    "source": "fn make(n: Int) -> fn(Int) -> fn(Int) -> Int { fn(x) { fn(y) { n+x+y } } } pub fn main() -> Nil { let outer=make(7) let inner=outer(2) echo inner(3) Nil }",
+    "accepted": true,
+    "stdout": "12\n"
+  },
+  {
+    "name": "use-callback-scope",
+    "source": "fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let offset=2 let value={ use x <- run(7) x+offset } echo value Nil }",
+    "accepted": true,
+    "stdout": "9\n"
+  },
+  {
+    "name": "use-tuple-pattern",
+    "source": "fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let value={ use #(x,y) <- run(#(2,3)) x+y } echo value Nil }",
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "use-lazy-continuation",
+    "source": "fn skip(_next: fn() -> Int) -> Int { 7 } pub fn main() -> Nil { let value={ use <- skip() echo 999 9 } echo value Nil }",
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "closure-wrong-return",
+    "source": "fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "use-refutable-pattern",
+    "source": "fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "discarded-callable",
+    "source": "fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "closure-case-context",
+    "source": "fn make(n: Int,b: Bool) -> fn(Int) -> Int { case b { True -> fn(x) { n+x } False -> fn(x) { n-x } } } pub fn main() -> Nil { let f=make(7,True) echo f(3) Nil }",
+    "accepted": true,
+    "stdout": "10\n"
+  },
+  {
+    "name": "update-evaluation-order",
+    "source": "type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }",
+    "accepted": true,
+    "stdout": "1\n6\n4\n7\n5\n"
+  },
+  {
+    "name": "update-type-change",
+    "source": "type Box(a) { Box(value: a) } pub fn main() -> Nil { let a=Box(1) let b=Box(..a,value: True) echo b.value Nil }",
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "update-unsafe-variant",
+    "source": "type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "update-known-variant",
+    "source": "type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }",
+    "accepted": true,
+    "stdout": "2\n"
+  },
+  {
+    "name": "update-empty",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a) echo b.x Nil }",
+    "accepted": true,
+    "stdout": "1\n"
+  },
+  {
+    "name": "update-partial-type-change-rejected",
+    "source": "type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "update-unknown-label",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "update-original-effects",
+    "source": "type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }",
+    "accepted": true,
+    "stdout": "9\n2\n3\n"
+  },
+  {
+    "name": "update-zero-field-invalid",
+    "source": "pub type R { R } pub fn main() -> R { let r=R R(..r) }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "update-phantom-type-change",
+    "source": "type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }",
+    "accepted": true,
+    "stdout": "3\n"
+  },
+  {
+    "name": "update-lambda-retained-context",
+    "source": "type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }",
+    "accepted": true,
+    "stdout": "5\n"
+  },
+  {
+    "name": "bits-signed-and-truncation",
+    "source": "pub fn main() -> Nil { case <<257,-1,65537:16-little>> { <<a,b,c:16-little>> -> {echo a echo b echo c Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "1\n255\n1\n"
+  },
+  {
+    "name": "bits-signed-pattern",
+    "source": "pub fn main() -> Nil { case <<255>> { <<n:signed>> -> {echo n Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "-1\n"
+  },
+  {
+    "name": "bits-concat-order",
+    "source": "pub fn main() -> Nil { let a=<<{echo 1 7},{echo 2 <<8,9>>}:bits,{echo 3 99}:0>> case a { <<x,y,z>> -> {echo x echo y echo z Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "1\n2\n7\n8\n9\n"
+  },
+  {
+    "name": "bits-full-tail",
+    "source": "pub fn main() -> Nil { let <<tail:bits>>=<<1,2>> case tail { <<x,y>> -> {echo x echo y Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "1\n2\n"
+  },
+  {
+    "name": "bits-exact-length-guard",
+    "source": "fn f(a: BitArray) -> Int { case a { <<_,_,_>> -> 3 <<1,2>> -> 2 <<>> -> 0 _ -> 9 } } pub fn main() -> Nil { echo f(<<>>) echo f(<<1>>) echo f(<<1,2>>) echo f(<<1,2,3,4>>) Nil }",
+    "accepted": true,
+    "stdout": "0\n9\n2\n9\n"
+  },
+  {
+    "name": "bits-64-safe-range",
+    "source": "pub fn main() -> Nil { case <<-2:64-little,1000000:64>> { <<a:64-little-signed,b:64>> -> {echo a echo b Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "-2\n1000000\n"
+  },
+  {
+    "name": "bits-64-literal-discard",
+    "source": "pub fn main() -> Nil { let a=<<-1:64>> echo case a { <<-1:64>> -> 9 <<_:64>> -> 1 _ -> 0 } Nil }",
+    "accepted": true,
+    "stdout": "1\n"
+  },
+  {
+    "name": "bits-mismatching-literals",
+    "source": "pub fn main() -> Nil { echo case <<255>> { <<256>> -> 9 <<-1>> -> 8 <<255:signed>> -> 7 <<-1:signed>> -> 1 _ -> 0 } Nil }",
+    "accepted": true,
+    "stdout": "1\n"
+  },
+  {
+    "name": "bits-unsigned-pattern",
+    "source": "pub fn main() -> Nil { case <<255>> { <<n:unsigned>> -> {echo n Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "255\n"
+  },
+  {
+    "name": "bits-options-size",
+    "source": "pub fn main() -> Nil { case <<4660:int-size(16)-little>> { <<n:unsigned-int-little-size(16)>> -> {echo n Nil} _ -> Nil } }",
+    "accepted": true,
+    "stdout": "4660\n"
+  },
+  {
+    "name": "bits-empty",
+    "source": "pub fn main() -> Nil { echo case <<>> { <<>> -> 1 _ -> 0 } Nil }",
+    "accepted": true,
+    "stdout": "1\n"
+  },
+  {
+    "name": "bits-wrong-segment-type",
+    "source": "pub fn main() -> Nil { let _a=<<True>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-wrong-concat-type",
+    "source": "pub fn main() -> Nil { let _a=<<1:bits>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-pattern-only-sign",
+    "source": "pub fn main() -> Nil { let _a=<<1:signed>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-pattern-only-bytes",
+    "source": "pub fn main() -> Nil { let _a=<<<<1>>:bytes>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-duplicate-size",
+    "source": "pub fn main() -> Nil { let _a=<<1:8-16>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-duplicate-endian",
+    "source": "pub fn main() -> Nil { let _a=<<1:big-little>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-zero-pattern-size",
+    "source": "fn f(a: BitArray) -> Int { case a { <<x:0>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-unsized-tail-last",
+    "source": "fn f(a: BitArray) -> Int { case a { <<r:bits,x>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-nonexhaustive",
+    "source": "fn f(a: BitArray) -> Int { case a { <<>> -> 0 <<_,rest:bits>> -> 1 } } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-refutable-bytes-tail",
+    "source": "fn f(a: BitArray) -> BitArray { let <<tail:bytes>>=a tail } pub fn main() -> Nil { Nil }",
+    "accepted": false,
+    "stdout": ""
+  },
+  {
+    "name": "bits-unbraced-expression",
+    "source": "pub fn main() -> Nil { let _a=<<1+2>> Nil }",
+    "accepted": false,
+    "stdout": ""
+  }
+]

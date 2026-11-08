@@ -30,9 +30,9 @@ def sha(data):
 
 run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
-suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs'],
-            env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / 'evidence/native-cli-io-verification.json'),
-                 'NATIVE_CLI_ASM': str(ROOT / 'evidence/native-cli-disassembly.txt')})
+suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs'],
+            env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / 'evidence/self-hosting-io-verification.json'),
+                 'NATIVE_CLI_ASM': str(ROOT / 'evidence/self-hosting-disassembly.txt')})
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
 passed = int(re.search(r'^# pass (\d+)$', suite.stdout, re.M)[1])
 failed = int(re.search(r'^# fail (\d+)$', suite.stdout, re.M)[1])
@@ -86,7 +86,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
             # Preserve a stable path in the listing, not a disposable temp name.
             listing = listing.replace(str(raw), f'{name}-code.bin')
             listing = '\n'.join(line.rstrip() for line in listing.splitlines()) + '\n'
-            listing_name = 'functions-descriptor' if name == 'functions' else name
+            listing_name = 'self-hosting-' + ('functions-descriptor' if name == 'functions' else name)
             disassemblies.append(dict(tool=run(['objdump', '--version']).stdout.splitlines()[0],
                                entryAddress=hex(entry), rawCodeSHA256=sha(raw.read_bytes()),
                                includesTrailingStaticData=True,
@@ -102,72 +102,8 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-qualification-') as tmp:
                                  cwd=ROOT, capture_output=True, text=True, timeout=10)
         assert refused.returncode != 0 and output.read_bytes() == before
 
-oracle_cases = [
-    ('known-local-variant', 'type A { Zero One(Int) } pub fn main() -> Nil { let a = One(7) let One(x) = a echo x Nil }', True, '7\n'),
-    ('zero-field-is-not-callable', 'pub type A { Zero } pub fn main() -> A { Zero() }', False, ''),
-    ('private-type-in-public-api', 'type A { Zero } pub fn main() -> A { Zero }', False, ''),
-    ('unknown-variant-let', 'type A { Zero One(Int) } fn read(a: A) -> Int { let One(x) = a x } pub fn main() -> Nil { Nil }', False, ''),
-    ('custom-result-names', 'type Result { Ok(Int) Error(String) } pub fn main() -> Nil { let Ok(x) = Ok(7) echo x Nil }', True, '7\n'),
-    ('missing-variant', 'type A { First Second } fn read(a: A) -> Int { case a { First -> 1 } } pub fn main() -> Nil { Nil }', False, ''),
-    ('wrong-field-type', 'pub type A { One(Int) } pub fn main() -> A { One(True) }', False, ''),
-    ('nested-constructor-not-refined', 'type A { Zero One(Int) } type B { B(A) } pub fn main() -> Int { let B(One(x)) = B(One(1)) x }', False, ''),
-    ('generic-repeated-parameter', 'type Same(a) { Same(a,a) } pub fn main() -> Nil { let x = Same(1,True) Nil }', False, ''),
-    ('generic-argument-mismatch', 'type Box(a) { Box(a) } fn take(x: Box(Bool)) -> Nil { Nil } pub fn main() -> Nil { take(Box(1)) }', False, ''),
-    ('label-declaration-order', 'type Pair { Pair(first: Int,second: Int) } pub fn main() -> Nil { let p = Pair(second: echo 2,first: echo 1) echo p.first echo p.second Nil }', True, '1\n2\n1\n2\n'),
-    ('generic-record', 'type Box(a) { Box(value: a,count: Int) } pub fn main() -> Nil { let box = Box(count: 2,value: 7) let Box(value:,..) = box echo value echo box.count Nil }', True, '7\n2\n'),
-    ('record-offset-mismatch', 'type V { A(x: Int,y: Bool) B(y: Bool,x: Int) } fn read(v: V) -> Int { v.x } pub fn main() -> Nil { Nil }', False, ''),
-    ('record-template-mismatch', 'type V(a) { A(x: a) B(x: Int) } fn read(v: V(Int)) -> Int { v.x } pub fn main() -> Nil { Nil }', False, ''),
-    ('label-positional-order', 'type Pair { Pair(x: Int,y: Int) } pub fn main() -> Nil { let p = Pair(y: 2,1) Nil }', False, ''),
-    ('generic-function-instantiation', 'fn identity(x: a) -> a { x } pub fn main() -> Nil { echo identity(7) echo identity(True) Nil }', True, '7\nTrue\n'),
-    ('higher-order-function', 'fn inc(x: Int) -> Int { x+1 } fn apply(f: fn(a) -> b,x: a) -> b { f(x) } pub fn main() -> Nil { echo apply(inc,7) Nil }', True, '8\n'),
-    ('indirect-evaluation-order', 'fn add(a: Int,b: Int) -> Int { a+b } fn target() -> fn(Int,Int) -> Int { echo 1 add } pub fn main() -> Nil { echo target()(echo 2,echo 3) Nil }', True, '1\n2\n3\n5\n'),
-    ('generic-rigid-body', 'fn f(x: a) -> a { 1 } pub fn main() -> Nil { Nil }', False, ''),
-    ('generic-self-recursion', 'fn f(x: a) -> Int { f([x]) } pub fn main() -> Nil { Nil }', False, ''),
-    ('generic-mutual-recursion', 'fn f(x: a) -> Int { g([x]) } fn g(y: b) -> Int { f(y) } pub fn main() -> Nil { Nil }', True, ''),
-    ('private-function-type', 'type Private { Private } pub fn expose(f: fn(Private) -> Int) -> Nil { Nil } pub fn main() -> Nil { Nil }', False, ''),
-    ('returned-closure-capture', 'fn make(n: Int) -> fn(Int) -> Int { fn(x) { n+x } } pub fn main() -> Nil { let f=make(7) echo f(3) Nil }', True, '10\n'),
-    ('nested-closure-capture', 'fn make(n: Int) -> fn(Int) -> fn(Int) -> Int { fn(x) { fn(y) { n+x+y } } } pub fn main() -> Nil { let outer=make(7) let inner=outer(2) echo inner(3) Nil }', True, '12\n'),
-    ('use-callback-scope', 'fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let offset=2 let value={ use x <- run(7) x+offset } echo value Nil }', True, '9\n'),
-    ('use-tuple-pattern', 'fn run(x: a,next: fn(a) -> b) -> b { next(x) } pub fn main() -> Nil { let value={ use #(x,y) <- run(#(2,3)) x+y } echo value Nil }', True, '5\n'),
-    ('use-lazy-continuation', 'fn skip(_next: fn() -> Int) -> Int { 7 } pub fn main() -> Nil { let value={ use <- skip() echo 999 9 } echo value Nil }', True, '7\n'),
-    ('closure-wrong-return', 'fn run(f: fn(Int) -> Bool) -> Nil { Nil } pub fn main() -> Nil { run(fn(x) { x+1 }) }', False, ''),
-    ('use-refutable-pattern', 'fn run(n: Int,f: fn(Int) -> Int) -> Int { f(n) } pub fn main() -> Int { use 1 <- run(1) 1 }', False, ''),
-    ('discarded-callable', 'fn f(_g: fn() -> Int) -> Int { _g() } pub fn main() -> Nil { Nil }', False, ''),
-    ('closure-case-context', 'fn make(n: Int,b: Bool) -> fn(Int) -> Int { case b { True -> fn(x) { n+x } False -> fn(x) { n-x } } } pub fn main() -> Nil { let f=make(7,True) echo f(3) Nil }', True, '10\n'),
-    ('update-evaluation-order', 'type R { R(a: Int,b: Int) } fn old() -> R { echo 1 R(2,3) } pub fn main() -> Nil { let r=R(..old(),b: {echo 4 5},a: {echo 6 7}) echo r.a echo r.b Nil }', True, '1\n6\n4\n7\n5\n'),
-    ('update-type-change', 'type Box(a) { Box(value: a) } pub fn main() -> Nil { let a=Box(1) let b=Box(..a,value: True) echo b.value Nil }', True, 'True\n'),
-    ('update-unsafe-variant', 'type R { A(x: Int) B(x: Int) } fn update(r:R) -> R { A(..r,x:2) } pub fn main() -> Nil { Nil }', False, ''),
-    ('update-known-variant', 'type R { A(x: Int) B(x: Int) } pub fn main() -> Nil { let a=A(1) let b=A(..a,x:2) echo b.x Nil }', True, '2\n'),
-    ('update-empty', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a) echo b.x Nil }', True, '1\n'),
-    ('update-partial-type-change-rejected', 'type R(a) { R(x: a,y: a) } pub fn main() -> Nil { let a=R(1,2) let b=R(..a,x:True) Nil }', False, ''),
-    ('update-unknown-label', 'type R { R(x: Int) } pub fn main() -> Nil { let a=R(1) let b=R(..a,y:2) Nil }', False, ''),
-    ('update-original-effects', 'type R { R(x: Int) } pub fn main() -> Nil { let p=R(2) let q=R(..{echo 9 p},x:3) echo p.x echo q.x Nil }', True, '9\n2\n3\n'),
-    ('update-zero-field-invalid', 'pub type R { R } pub fn main() -> R { let r=R R(..r) }', False, ''),
-    ('update-phantom-type-change', 'type R(a) { R(x: Int) } fn change(r: R(Int)) -> R(Bool) { R(..r,x:3) } pub fn main() -> Nil { let r: R(Int)=R(1) let q=change(r) echo q.x Nil }', True, '3\n'),
-    ('update-lambda-retained-context', 'type R(a) { R(f: fn(a) -> Int,x: a) } pub fn main() -> Nil { let p=R(fn(x: Int){x+1},3) let q=R(..p,f:fn(x){x+2}) let f=q.f echo f(q.x) Nil }', True, '5\n'),
-    ('bits-signed-and-truncation', 'pub fn main() -> Nil { case <<257,-1,65537:16-little>> { <<a,b,c:16-little>> -> {echo a echo b echo c Nil} _ -> Nil } }', True, '1\n255\n1\n'),
-    ('bits-signed-pattern', 'pub fn main() -> Nil { case <<255>> { <<n:signed>> -> {echo n Nil} _ -> Nil } }', True, '-1\n'),
-    ('bits-concat-order', 'pub fn main() -> Nil { let a=<<{echo 1 7},{echo 2 <<8,9>>}:bits,{echo 3 99}:0>> case a { <<x,y,z>> -> {echo x echo y echo z Nil} _ -> Nil } }', True, '1\n2\n7\n8\n9\n'),
-    ('bits-full-tail', 'pub fn main() -> Nil { let <<tail:bits>>=<<1,2>> case tail { <<x,y>> -> {echo x echo y Nil} _ -> Nil } }', True, '1\n2\n'),
-    ('bits-exact-length-guard', 'fn f(a: BitArray) -> Int { case a { <<_,_,_>> -> 3 <<1,2>> -> 2 <<>> -> 0 _ -> 9 } } pub fn main() -> Nil { echo f(<<>>) echo f(<<1>>) echo f(<<1,2>>) echo f(<<1,2,3,4>>) Nil }', True, '0\n9\n2\n9\n'),
-    ('bits-64-safe-range', 'pub fn main() -> Nil { case <<-2:64-little,1000000:64>> { <<a:64-little-signed,b:64>> -> {echo a echo b Nil} _ -> Nil } }', True, '-2\n1000000\n'),
-    ('bits-64-literal-discard', 'pub fn main() -> Nil { let a=<<-1:64>> echo case a { <<-1:64>> -> 9 <<_:64>> -> 1 _ -> 0 } Nil }', True, '1\n'),
-    ('bits-mismatching-literals', 'pub fn main() -> Nil { echo case <<255>> { <<256>> -> 9 <<-1>> -> 8 <<255:signed>> -> 7 <<-1:signed>> -> 1 _ -> 0 } Nil }', True, '1\n'),
-    ('bits-unsigned-pattern', 'pub fn main() -> Nil { case <<255>> { <<n:unsigned>> -> {echo n Nil} _ -> Nil } }', True, '255\n'),
-    ('bits-options-size', 'pub fn main() -> Nil { case <<4660:int-size(16)-little>> { <<n:unsigned-int-little-size(16)>> -> {echo n Nil} _ -> Nil } }', True, '4660\n'),
-    ('bits-empty', 'pub fn main() -> Nil { echo case <<>> { <<>> -> 1 _ -> 0 } Nil }', True, '1\n'),
-    ('bits-wrong-segment-type', 'pub fn main() -> Nil { let _a=<<True>> Nil }', False, ''),
-    ('bits-wrong-concat-type', 'pub fn main() -> Nil { let _a=<<1:bits>> Nil }', False, ''),
-    ('bits-pattern-only-sign', 'pub fn main() -> Nil { let _a=<<1:signed>> Nil }', False, ''),
-    ('bits-pattern-only-bytes', 'pub fn main() -> Nil { let _a=<<<<1>>:bytes>> Nil }', False, ''),
-    ('bits-duplicate-size', 'pub fn main() -> Nil { let _a=<<1:8-16>> Nil }', False, ''),
-    ('bits-duplicate-endian', 'pub fn main() -> Nil { let _a=<<1:big-little>> Nil }', False, ''),
-    ('bits-zero-pattern-size', 'fn f(a: BitArray) -> Int { case a { <<x:0>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', False, ''),
-    ('bits-unsized-tail-last', 'fn f(a: BitArray) -> Int { case a { <<r:bits,x>> -> x _ -> 0 } } pub fn main() -> Nil { Nil }', False, ''),
-    ('bits-nonexhaustive', 'fn f(a: BitArray) -> Int { case a { <<>> -> 0 <<_,rest:bits>> -> 1 } } pub fn main() -> Nil { Nil }', False, ''),
-    ('bits-refutable-bytes-tail', 'fn f(a: BitArray) -> BitArray { let <<tail:bytes>>=a tail } pub fn main() -> Nil { Nil }', False, ''),
-    ('bits-unbraced-expression', 'pub fn main() -> Nil { let _a=<<1+2>> Nil }', False, ''),
-]
+oracle_cases = [(f['name'], f['source'], f['accepted'], f['stdout'])
+                for f in json.loads((ROOT / 'test/grammar-fixtures.json').read_text())]
 oracle_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as tmp:
     for name, source, accepted, expected in oracle_cases:
@@ -211,7 +147,8 @@ module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/multi-pattern-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/equality-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/pattern-alias-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/integer-coverage-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/integer-coverage-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/tail-calls-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
@@ -254,9 +191,9 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr.replace(str(project), '<oracle>')))
-(evidence / 'native-cli-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
+(evidence / 'self-hosting-project-upstream-checks.json').write_text(json.dumps(module_results, indent=2) + '\n')
 
-(evidence / 'native-cli-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
+(evidence / 'self-hosting-upstream-checks.json').write_text(json.dumps(oracle_results, indent=2) + '\n')
 
 trace_script = f"""
 import {{readFileSync}} from 'node:fs';
@@ -292,7 +229,7 @@ with tempfile.TemporaryDirectory(prefix='gleam-owned-core-native-') as tmp:
                       exitCode=observed.returncode, stdout=observed.stdout,
                       oracle='native test compares current upstream-compiled core function results',
                       allSourceFunctionsCompiled=True, fullCompilerSelfHosting=False)
-(evidence / 'owned-core-native-cli-native-verification.json').write_text(json.dumps(owned_core, indent=2) + '\n')
+(evidence / 'owned-core-self-hosting-native-verification.json').write_text(json.dumps(owned_core, indent=2) + '\n')
 
 def owned_project_receipt(entry, modules, driver_name, expected):
     driver = (ROOT / driver_name).read_bytes()
@@ -319,26 +256,32 @@ owned_types = owned_project_receipt('native/type_system', ['native/type_system',
                     'test/owned-type-system-driver.source', 'Box(Int)\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n')
 owned_equality = owned_project_receipt('native/equality', ['native/equality','native/definitions','native/type_system','native/core','native/ast','native/prelude'],
                     'test/owned-equality-driver.source', '3\n0\n')
-(evidence / 'owned-type-system-native-cli-native-verification.json').write_text(json.dumps(owned_types, indent=2) + '\n')
-(evidence / 'owned-equality-native-cli-native-verification.json').write_text(json.dumps(owned_equality, indent=2) + '\n')
+(evidence / 'owned-type-system-self-hosting-native-verification.json').write_text(json.dumps(owned_types, indent=2) + '\n')
+(evidence / 'owned-equality-self-hosting-native-verification.json').write_text(json.dumps(owned_equality, indent=2) + '\n')
 
 # Run the entire owned compiler API natively; execute and compare its emitted ELF.
-run(['node', 'test/probe-compiler-api.mjs', 'evidence/complete-api-native-cli-probe.json'])
-native_compiler_api = json.loads((evidence / 'complete-api-native-cli-probe.json').read_text())
+run(['node', 'test/probe-compiler-api.mjs', 'evidence/complete-api-self-hosting-probe.json'])
+native_compiler_api = json.loads((evidence / 'complete-api-self-hosting-probe.json').read_text())
 assert native_compiler_api.get('nativeCompilationVerified') is True, native_compiler_api
 assert len(native_compiler_api['nativePrograms']) == 2
 for path, expected_hash in native_compiler_api['sourceSHA256'].items():
     assert sha((ROOT / path).read_bytes()) == expected_hash, path
 
-native_cli = json.loads((evidence / 'native-cli-io-verification.json').read_text())
+native_cli = json.loads((evidence / 'self-hosting-io-verification.json').read_text())
 assert not native_cli['artifact']['dynamicLoader'] and not native_cli['artifact']['dynamicSegment']
 assert native_cli['artifact']['nonExecutableStack']
 for path, expected_hash in native_cli['sourceSHA256'].items():
     assert sha((ROOT / path).read_bytes()) == expected_hash, path
 assert any(v['kind'] == 'actual-short-io' and v['positiveShortReads'] > 0 and v['positiveShortWrites'] > 0 for v in native_cli['observations'])
 
+run(['node', 'tools/verify_self_hosting.mjs', 'evidence/self-hosting-native-rebuilds.json'])
+self_host = json.loads((evidence / 'self-hosting-native-rebuilds.json').read_text())
+assert self_host['selfHosting'] and self_host['sourceSHA256'] == sources
+assert self_host['stages'][0]['sha256'] == native_cli['artifact']['sha256']
+assert self_host['nativeCorpusSummary']['total'] == len(oracle_results) + len(module_results)
+
 receipt = dict(
-    schema='gleam-in-gleam.native-cli-verification/1',
+    schema='gleam-in-gleam.self-hosting-qualification/1',
     observedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     bootstrapCompiler=run([gleam, '--version']).stdout.strip(),
     bootstrapNode=run(['node', '--version']).stdout.strip(),
@@ -352,11 +295,11 @@ receipt = dict(
     examples=examples,
     disassemblies=disassemblies,
     upstreamAcceptanceChecks=dict(total=len(oracle_results), agreed=len(oracle_results),
-                                  path='evidence/native-cli-upstream-checks.json'),
+                                  path='evidence/self-hosting-upstream-checks.json'),
     bitArrayRepresentation='arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice',
     bitArraySubset='byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails',
     projectCompilation=dict(sourceLanguage='Gleam', imports='local module aliases and qualified values/types/constructors', namespace='unlexable module-qualified internal names', dependencyOrder='deterministic DFS postorder, cycles rejected, shared modules linked once', nativeLinker='owned Gleam relocation emitter, no external linker', selectiveImports=False),
-    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/native-cli-project-upstream-checks.json'),
+    projectUpstreamChecks=dict(total=len(module_results), agreed=len(module_results), path='evidence/self-hosting-project-upstream-checks.json'),
     totalFreshUpstreamComparisons=len(oracle_results)+len(module_results),
     linkedExampleSymbols=module_trace,
     exactSingleModuleEquivalenceFixture='nested-path-default-alias (native test)',
@@ -384,28 +327,32 @@ receipt = dict(
     guards='restricted pure expressions, typed Bool; failed alternative guard retries alternatives then later arms; guarded arms do not prove exhaustiveness',
     functionValueRepresentation='arena descriptor: size, tag0, code pointer, copied captures',
     compilerRunsNatively=True,
-    nativeCompilerAPI=dict(path='evidence/complete-api-native-cli-probe.json',
+    nativeCompilerAPI=dict(path='evidence/complete-api-self-hosting-probe.json',
                            bytes=native_compiler_api['artifact']['bytes'],
                            emittedPrograms=len(native_compiler_api['nativePrograms']),
                            byteIdenticalToBootstrap=True,
                            nativeCLI=False),
-    nativeCLI=dict(path="evidence/native-cli-io-verification.json",
-                   artifact=native_cli["artifact"],sourceLimitBytes=16384,
+    nativeCLI=dict(path="evidence/self-hosting-io-verification.json",
+                   artifact=native_cli["artifact"],sourceLimitBytes=native_cli["limits"]["sourceBytes"],
+                   compilerArenaBytes=native_cli["limits"]["arenaBytes"],
                    sourceConvention="module path relative to explicit root or cwd",
                    syscallBoundary="typed pure Gleam request state machine + owned Linux effect runner",
                    disassembly=native_cli["disassembly"]),
-    selfHosting=False,
+    selfHosting=True,
+    selfHostingProof="evidence/self-hosting-native-rebuilds.json",
+    nativeCorpus=self_host["nativeCorpusSummary"],
+    tailCalls="direct returned self calls in blocks and cases; arguments evaluated before parameter replacement",
     fullGleamCompatibility=False,
     nativeTarget='linux-x86_64',
     externalCodegenTools=[],
-    limitations=['Subset compiler; bootstrap still uses upstream Gleam and Node',
+    limitations=['Self-hosted subset compiler; initial bootstrap uses upstream Gleam and Node',
                  'No polymorphic named function values/labelled function calls/selective imports or package resolution yet; guard construction remains unsupported',
                  'Anonymous parameters require annotations or a sufficiently resolved expected function type',
-                 'Bounded native CLI: 16 KiB per source; no collection or native tail-call elimination; full-size self-rebuild remains unproved',
+                 'Bounded native CLI: 128 KiB per source, 512 MiB compiler arena; ordinary emitted programs retain 64 MiB; no GC or mutual/indirect TCO',
                  'Erased stored-field/function equality, compound printing and full coverage are not implemented; equality graphs are bounded to 128 shape nodes',
                  'Unaligned/dynamic-size/float and UTF8 codepoint pattern segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70',
                  'Fixed-width integer and diagnostic formatting limitations documented in README'],
 )
-(evidence / 'native-cli-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
-(evidence / 'native-cli-test-output.tap').write_text(suite.stdout)
+(evidence / 'self-hosting-qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(evidence / 'self-hosting-test-output.tap').write_text(suite.stdout)
 print(json.dumps({k: v for k, v in receipt.items() if k != 'sourceSHA256'}, indent=2))

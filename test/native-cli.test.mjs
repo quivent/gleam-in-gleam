@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import {source_capacity,arena_capacity} from '../build/dev/javascript/gleam_native/native/cli_limits.mjs';
 import {fileURLToPath} from 'node:url';
 import {compile_project} from '../build/dev/javascript/gleam_native/native/compiler.mjs';
 import {link,Source} from '../build/dev/javascript/gleam_native/native/project.mjs';
@@ -12,11 +13,13 @@ import {BitArray,toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import {collect} from '../build/dev/javascript/gleam_native/native/definitions.mjs';
 import {generate as runtimePlan} from '../build/dev/javascript/gleam_native/native/cli_runtime.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),workspace=mkdtempSync(join(tmpdir(),'gleam-native-cli-'));
-const binary=join(workspace,'compiler'),observations=[];
+const binary=process.env.NATIVE_CLI_TEST_BINARY||join(workspace,'compiler'),observations=[];
+const sourceLimit=Number(process.env.NATIVE_CLI_TEST_SOURCE_LIMIT||source_capacity());
+const diagnosticManifest=process.env.NATIVE_CLI_TEST_BUILD_MANIFEST?JSON.parse(readFileSync(process.env.NATIVE_CLI_TEST_BUILD_MANIFEST,'utf8')):null;
 const sha=data=>createHash('sha256').update(data).digest('hex');
-const built=spawnSync(process.execPath,[join(root,'build-native.mjs'),binary],{encoding:'utf8',timeout:60000});
-assert.equal(built.status,0,built.stderr);
+if(!process.env.NATIVE_CLI_TEST_BINARY){const built=spawnSync(process.execPath,[join(root,'build-native.mjs'),binary],{encoding:'utf8',timeout:60000});assert.equal(built.status,0,built.stderr);}
 const artifact=readFileSync(binary);
+if(diagnosticManifest){assert.equal(createHash("sha256").update(artifact).digest("hex"),diagnosticManifest.artifact.sha256);assert.equal(sourceLimit,diagnosticManifest.sourceCapBytes);for(const [p,h]of Object.entries(diagnosticManifest.sourceSHA256))assert.equal(createHash("sha256").update(readFileSync(join(root,p))).digest("hex"),h,p);}
 function command(args,cwd,extra={}){
  const result=spawnSync(binary,args,{cwd,env:{...process.env,PATH:''},encoding:'utf8',timeout:15000,...extra});
  assert.ifError(result.error);return result;
@@ -61,7 +64,7 @@ after(()=>{
    writeFileSync(process.env.NATIVE_CLI_ASM,listing);disassembly={path:'evidence/native-cli-disassembly.txt',sha256:sha(listing),kind:'selected actual instruction windows'};
   }
   const sources=Object.fromEntries(readdirSync(join(root,'src/native')).filter(n=>n.endsWith('.gleam')).sort().map(n=>['src/native/'+n,sha(readFileSync(join(root,'src/native',n)))]));
-  writeFileSync(process.env.NATIVE_CLI_RECEIPT,JSON.stringify({schema:'gleam-in-gleam.native-cli/1',observedAt:new Date().toISOString(),sourceSHA256:sources,buildBridgeSHA256:sha(readFileSync(join(root,'build-native.mjs'))),testSHA256:sha(readFileSync(fileURLToPath(import.meta.url))),shortIOHarnessSHA256:sha(readFileSync(join(root,'test/short-io-trace.py'))),artifact:{bytes:artifact.length,sha256:sha(artifact),dynamicLoader:headers.some(h=>h.kind===3),dynamicSegment:headers.some(h=>h.kind===2),nonExecutableStack:headers.some(h=>h.kind===0x6474e551&&h.flags===6)},observations,disassembly,selfHosting:false},null,2)+'\n');
+  writeFileSync(process.env.NATIVE_CLI_RECEIPT,JSON.stringify({schema:'gleam-in-gleam.native-cli/1',observedAt:new Date().toISOString(),sourceSHA256:sources,buildBridgeSHA256:sha(readFileSync(join(root,'build-native.mjs'))),testSHA256:sha(readFileSync(fileURLToPath(import.meta.url))),shortIOHarnessSHA256:sha(readFileSync(join(root,'test/short-io-trace.py'))),artifact:{bytes:artifact.length,sha256:sha(artifact),dynamicLoader:headers.some(h=>h.kind===3),dynamicSegment:headers.some(h=>h.kind===2),nonExecutableStack:headers.some(h=>h.kind===0x6474e551&&h.flags===6)},observations,disassembly,limits:{sourceBytes:sourceLimit,arenaBytes:diagnosticManifest?.arenaCapacityBytes??arena_capacity()},diagnostic:Boolean(diagnosticManifest),selfHosting:false},null,2)+'\n');
  }
  rmSync(workspace,{recursive:true,force:true});
 });
@@ -114,7 +117,7 @@ for(const kind of ['symlink-file','symlink-directory','directory','fifo','oversi
  if(kind==='symlink-directory'){symlinkSync(dir,join(dir,'link'));source='link/main.gleam';}
  if(kind==='directory'){mkdirSync(join(dir,'folder.gleam'));source='folder.gleam';}
  if(kind==='fifo'){assert.equal(spawnSync('/usr/bin/mkfifo',[join(dir,'pipe.gleam')]).status,0);source='pipe.gleam';}
- if(kind==='oversized')writeFileSync(join(dir,'main.gleam'),Buffer.alloc(16385,32));
+ if(kind==='oversized')writeFileSync(join(dir,'main.gleam'),Buffer.alloc(sourceLimit+1,32));
  if(kind==='missing-root')sourceRoot=join(dir,'missing');
  if(kind==='missing-source')source='missing.gleam';
  const result=command([source,output,'--source-root',sourceRoot],dir);failure(result);assert.equal(existsSync(output),false);noTemporary(dir);
@@ -185,9 +188,9 @@ test('concurrent publishers produce one complete executable and preserve no-repl
  observations.push({kind:'concurrent-publish',statuses:[0,1],byteIdentical:true});
 });
 
-test('native CLI compiles a full 16 KiB whitespace-heavy source and rejects the next byte',()=>{
- const program='pub fn main() -> Nil {echo 7 Nil}',source=' '.repeat(16384-program.length)+program;
+test('native CLI compiles its declared whitespace-heavy source limit and rejects the next byte',()=>{
+ const program='pub fn main() -> Nil {echo 7 Nil}',source=' '.repeat(sourceLimit-program.length)+program;
  const files={main:source},dir=fixture(files),output=join(dir,'app');success(command(['main.gleam',output],dir),output,reference(files),'7\n');
- writeFileSync(join(dir,'main.gleam'),source+' ');const refused=command(['main.gleam',join(dir,'too-large')],dir);failure(refused);assert.match(refused.stderr,/16 KiB/);assert.equal(existsSync(join(dir,'too-large')),false);
- observations.push({kind:'source-byte-boundary',acceptedBytes:16384,rejectedBytes:16385});
+ writeFileSync(join(dir,'main.gleam'),source+' ');const refused=command(['main.gleam',join(dir,'too-large')],dir);failure(refused);assert.match(refused.stderr,/limit/);assert.equal(existsSync(join(dir,'too-large')),false);
+ observations.push({kind:'source-byte-boundary',acceptedBytes:sourceLimit,rejectedBytes:sourceLimit+1});
 });

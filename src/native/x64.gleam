@@ -1,6 +1,7 @@
 import native/assembler as asm
 import native/ast as a
 import native/check as t
+import native/cli_limits
 import native/cli_runtime
 import native/core as c
 import native/definitions as d
@@ -16,6 +17,7 @@ type State {
     env: List(#(String, Int)),
     data: List(asm.Part),
     needs_heap: Bool,
+    // Reverse instruction stream: append only the newly emitted helper.
     closures: List(asm.Part),
     strings: List(String),
     globals: d.Context,
@@ -25,6 +27,13 @@ type State {
 
 type Generated =
   Result(#(List(asm.Part), State), String)
+
+// Tail context is passed explicitly. Closures and ordinary operands use NoTail,
+// so an enclosing function's reentry can never leak into a helper's frame.
+type TailMode {
+  NoTail
+  SelfTail(name: String, arity: Int)
+}
 
 fn raw(bytes: BitArray) -> asm.Part {
   asm.Bytes(bytes)
@@ -84,7 +93,15 @@ pub fn generate_with(
   functions: List(t.Function),
   globals: d.Context,
 ) -> Result(BitArray, String) {
-  generate_program(functions, globals, False, [], [])
+  use parts <- c.then(plan_with(functions, globals))
+  asm.assemble(parts)
+}
+
+pub fn plan_with(
+  functions: List(t.Function),
+  globals: d.Context,
+) -> Result(List(asm.Part), String) {
+  plan_program(functions, globals, False, [], [], 67_108_864)
 }
 
 // Explicit effect-runner entrypoint; ordinary language programs keep their ABI.
@@ -92,17 +109,47 @@ pub fn generate_cli(
   functions: List(t.Function),
   globals: d.Context,
 ) -> Result(BitArray, String) {
-  use #(entry, runtime) <- c.then(cli_runtime.generate(globals))
-  generate_program(functions, globals, True, entry, runtime)
+  use parts <- c.then(plan_cli(functions, globals))
+  asm.assemble(parts)
 }
 
-fn generate_program(
+pub fn plan_cli(
+  functions: List(t.Function),
+  globals: d.Context,
+) -> Result(List(asm.Part), String) {
+  use #(entry, runtime) <- c.then(cli_runtime.generate(globals))
+  plan_program(
+    functions,
+    globals,
+    True,
+    entry,
+    runtime,
+    cli_limits.arena_capacity(),
+  )
+}
+
+// Explicit diagnostic build path, separate from the production CLI entry.
+pub fn plan_cli_with_limit(
+  functions: List(t.Function),
+  globals: d.Context,
+  source_limit: Int,
+  arena_capacity: Int,
+) -> Result(List(asm.Part), String) {
+  use #(entry, runtime) <- c.then(cli_runtime.generate_with_limit(
+    globals,
+    source_limit,
+  ))
+  plan_program(functions, globals, True, entry, runtime, arena_capacity)
+}
+
+fn plan_program(
   functions: List(t.Function),
   globals: d.Context,
   cli: Bool,
   cli_entry: List(asm.Part),
   cli_code: List(asm.Part),
-) -> Result(BitArray, String) {
+  arena_capacity: Int,
+) -> Result(List(asm.Part), String) {
   use #(bodies, state) <- c.then(function_list(
     functions,
     State(0, 0, [], [], cli, [], [], globals, []),
@@ -112,10 +159,10 @@ fn generate_program(
     True -> [call("rt:heap_init")]
     False -> []
   }
-  let heap_runtime = case state.needs_heap {
-    True -> heap.runtime()
-    False -> []
-  }
+  use heap_runtime <- c.then(case state.needs_heap {
+    True -> heap.runtime_with_capacity(arena_capacity)
+    False -> Ok([])
+  })
   let entry = case cli {
     True -> cli_entry
     False ->
@@ -128,7 +175,7 @@ fn generate_program(
     c.append(
       entry,
       c.append(
-        c.append(c.append(bodies, state.closures), equality_code),
+        c.append(c.append(bodies, c.reverse(state.closures)), equality_code),
         c.append(
           c.append(cli_code, runtime()),
           c.append(
@@ -141,7 +188,7 @@ fn generate_program(
         ),
       ),
     )
-  asm.assemble(parts)
+  Ok(parts)
 }
 
 fn function_list(functions: List(t.Function), state: State) -> Generated {
@@ -149,8 +196,9 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
     [] -> Ok(#([], state))
     [f, ..rest] -> {
       let env = parameter_offsets(f.parameters, c.length(f.parameters), 0)
-      use #(body, state) <- c.then(statements(
+      use #(body, state) <- c.then(statement_mode(
         f.body,
+        SelfTail(f.name, c.length(f.parameters)),
         State(..state, slots: 0, env: env),
       ))
       // The stack frame is known after allocating all locals, including branches.
@@ -161,7 +209,12 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
         [
           asm.Label("fn:" <> f.name),
           prologue,
-          ..c.append(body, [raw(<<201, 195>>), ..tail])
+          asm.Label("fn:loop:" <> f.name),
+          ..c.append(body, [
+            raw(<<201, 195>>),
+            asm.Label("fn:end:" <> f.name),
+            ..tail
+          ])
         ],
         state,
       ))
@@ -184,12 +237,20 @@ fn parameter_offsets(
 }
 
 fn statements(xs: List(t.Statement), state: State) -> Generated {
+  statement_mode(xs, NoTail, state)
+}
+
+fn statement_mode(
+  xs: List(t.Statement),
+  mode: TailMode,
+  state: State,
+) -> Generated {
   case xs {
     [] -> Ok(#([immediate(0)], state))
-    [t.Evaluate(e)] -> expression(e, state)
+    [t.Evaluate(e)] -> tail_expression(e, mode, state)
     [t.Evaluate(e), ..rest] -> {
       use #(code, state) <- c.then(expression(e, state))
-      use #(tail, state) <- c.then(statements(rest, state))
+      use #(tail, state) <- c.then(statement_mode(rest, mode, state))
       Ok(#(c.append(code, tail), state))
     }
     [t.Bind(pat, e), ..rest] -> {
@@ -201,7 +262,7 @@ fn statements(xs: List(t.Statement), state: State) -> Generated {
         "rt:match",
         state,
       ))
-      use #(tail, state) <- c.then(statements(rest, state))
+      use #(tail, state) <- c.then(statement_mode(rest, mode, state))
       Ok(#(c.append(code, [store(offset), ..c.append(bindings, tail)]), state))
     }
   }
@@ -326,23 +387,75 @@ fn expression(e: t.Typed, state: State) -> Generated {
       use #(code, state) <- c.then(statements(body, state))
       Ok(#(code, State(..state, env: env)))
     }
-    t.MultiCaseNode(subjects, arms) -> multi_case(subjects, arms, state)
-    t.CaseNode(subject, arms) -> {
-      use #(code, state) <- c.then(expression(subject, state))
-      let #(offset, state) = slot(state)
-      let #(finish, state) = label(state)
-      use #(matches, state) <- c.then(case_arms(arms, offset, finish, state))
-      Ok(#(
-        c.append(code, [store(offset), ..c.append(matches, [asm.Label(finish)])]),
-        state,
-      ))
-    }
+    t.MultiCaseNode(subjects, arms) -> multi_case(subjects, arms, NoTail, state)
+    t.CaseNode(subject, arms) -> case_code(subject, arms, NoTail, state)
     t.EchoNode(inner) -> {
       use #(code, state) <- c.then(expression(inner, state))
       let #(print, state) = render_echo(inner.type_, state)
       Ok(#(c.append(code, print), state))
     }
   }
+}
+
+fn tail_expression(e: t.Typed, mode: TailMode, state: State) -> Generated {
+  case mode {
+    NoTail -> expression(e, state)
+    SelfTail(self, arity) ->
+      case e.node {
+        t.CallNode(name, args) if name == self -> {
+          use _ <- c.then(case c.length(args) == arity {
+            True -> Ok(Nil)
+            False -> Error("Internal self-tail-call arity mismatch")
+          })
+          // Evaluate every argument left to right before modifying ANY parameter.
+          // Popping in reverse order matches the existing stack argument ABI.
+          use #(code, state) <- c.then(arguments(args, state))
+          Ok(#(
+            c.append(
+              code,
+              c.append(tail_parameters(arity, 0), [jump("fn:loop:" <> self)]),
+            ),
+            state,
+          ))
+        }
+        t.BlockNode(body) -> {
+          let env = state.env
+          use #(code, state) <- c.then(statement_mode(body, mode, state))
+          Ok(#(code, State(..state, env: env)))
+        }
+        t.CaseNode(subject, arms) -> case_code(subject, arms, mode, state)
+        t.MultiCaseNode(subjects, arms) ->
+          multi_case(subjects, arms, mode, state)
+        _ -> expression(e, state)
+      }
+  }
+}
+
+fn tail_parameters(remaining: Int, index: Int) -> List(asm.Part) {
+  case remaining {
+    0 -> []
+    _ -> [
+      raw(<<88>>),
+      store(16 + index * 8),
+      ..tail_parameters(remaining - 1, index + 1)
+    ]
+  }
+}
+
+fn case_code(
+  subject: t.Typed,
+  arms: List(t.Arm),
+  mode: TailMode,
+  state: State,
+) -> Generated {
+  use #(code, state) <- c.then(expression(subject, state))
+  let #(offset, state) = slot(state)
+  let #(finish, state) = label(state)
+  use #(matches, state) <- c.then(case_arms(arms, offset, finish, mode, state))
+  Ok(#(
+    c.append(code, [store(offset), ..c.append(matches, [asm.Label(finish)])]),
+    state,
+  ))
 }
 
 fn descriptor(
@@ -417,7 +530,7 @@ fn closure(
       ..helper_state,
       env: outer_env,
       slots: outer_slots,
-      closures: c.append(helper_state.closures, helper),
+      closures: c.append(c.reverse(helper), helper_state.closures),
     )
   descriptor(entry, captures, state)
 }
@@ -560,6 +673,7 @@ fn case_arms(
   arms: List(t.Arm),
   subject: Int,
   finish: String,
+  mode: TailMode,
   state: State,
 ) -> Generated {
   case arms {
@@ -583,9 +697,9 @@ fn case_arms(
           ))
         }
       })
-      use #(body, state) <- c.then(expression(arm.body, state))
+      use #(body, state) <- c.then(tail_expression(arm.body, mode, state))
       let state = State(..state, env: env)
-      use #(tail, state) <- c.then(case_arms(rest, subject, finish, state))
+      use #(tail, state) <- c.then(case_arms(rest, subject, finish, mode, state))
       Ok(#(
         c.append(
           c.append(condition_code, guard),
@@ -1402,11 +1516,12 @@ fn string_prefix(
 fn multi_case(
   subjects: List(t.Typed),
   arms: List(t.MultiArm),
+  mode: TailMode,
   state: State,
 ) -> Generated {
   use #(evaluate, saved, state) <- c.then(save_subjects(subjects, state))
   let #(finish, state) = label(state)
-  use #(body, state) <- c.then(multi_arms(arms, saved, finish, state))
+  use #(body, state) <- c.then(multi_arms(arms, saved, finish, mode, state))
   Ok(#(c.append(evaluate, c.append(body, [asm.Label(finish)])), state))
 }
 
@@ -1443,6 +1558,7 @@ fn multi_arms(
   arms: List(t.MultiArm),
   subjects: List(Int),
   finish: String,
+  mode: TailMode,
   state: State,
 ) -> Generated {
   case arms {
@@ -1462,14 +1578,16 @@ fn multi_arms(
         next_arm,
         state,
       ))
-      use #(body, state) <- c.then(expression(
+      use #(body, state) <- c.then(tail_expression(
         arm.body,
+        mode,
         State(..state, env: c.append(canonical, outer)),
       ))
       use #(tail, state) <- c.then(multi_arms(
         rest,
         subjects,
         finish,
+        mode,
         State(..state, env: outer),
       ))
       Ok(#(

@@ -12,6 +12,12 @@ pub fn assemble(parts: List(Part)) -> Result(BitArray, String) {
   Ok(c.concat(chunks))
 }
 
+// Exact byte offsets for development traces and instruction-level qualification.
+// Labels emit no bytes; the normal assembler remains the sole byte emitter.
+pub fn symbols(parts: List(Part)) -> Result(List(#(String, Int)), String) {
+  locate(parts, 0, [])
+}
+
 fn locate(
   parts: List(Part),
   offset: Int,

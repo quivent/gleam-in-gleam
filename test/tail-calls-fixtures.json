@@ -1,0 +1,183 @@
+[
+  {
+    "name": "tail-accumulator",
+    "entry": "main",
+    "files": {
+      "main": "fn count(n:Int,a:Int)->Int {case n {0->a _->count(n-1,a+n)}} pub fn main()->Nil {echo count(10000,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "50005000\n"
+  },
+  {
+    "name": "tail-simultaneous-swap",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int,b:Int)->Int {case n {0->a*10+b _->f(n-1,b,a)}} pub fn main()->Nil {echo f(10001,3,7) Nil}"
+    },
+    "accepted": true,
+    "stdout": "73\n"
+  },
+  {
+    "name": "tail-dependent-arguments",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int,b:Int)->Int {case n {0->a _->f(n-1,b,a+b)}} pub fn main()->Nil {echo f(20,0,1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "6765\n"
+  },
+  {
+    "name": "tail-argument-effects",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} fn f(n:Int,a:Int,b:Int)->Nil {case n {0->{echo a echo b Nil} _->f(mark(n-1),mark(b),mark(a))}} pub fn main()->Nil {f(2,10,20) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n20\n10\n0\n10\n20\n10\n20\n"
+  },
+  {
+    "name": "tail-block-shadow",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n {0->a _->{let a=a+1 {let b=a*2 f(n-1,b)}}}} pub fn main()->Nil {echo f(5,1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "94\n"
+  },
+  {
+    "name": "tail-guarded-loop",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n {x if x>0->f(x-1,a+x) _->a}} pub fn main()->Nil {echo f(100,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "5050\n"
+  },
+  {
+    "name": "tail-multi-alternative-guard",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n,n%2 {0,_->a x,0 | x,1 if x>0->f(x-1,a+x) _,_->a}} pub fn main()->Nil {echo f(13,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "91\n"
+  },
+  {
+    "name": "tail-saved-capture-values",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,acc:List(fn()->Int))->List(fn()->Int) {case n {0->acc _->{let hold=n f(n-1,[fn(){hold},..acc])}}} pub fn main()->Nil {case f(3,[]) {[a,b,c]->{echo a() echo b() echo c() Nil} _->Nil} Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n3\n"
+  },
+  {
+    "name": "tail-closure-boundary",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->7 _->{let thunk=fn(){f(n-1)} thunk()}}} pub fn main()->Nil {echo f(8) Nil}"
+    },
+    "accepted": true,
+    "stdout": "7\n"
+  },
+  {
+    "name": "tail-echo-not-tail",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->9 _->echo f(n-1)}} pub fn main()->Nil {echo f(3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "9\n9\n9\n9\n"
+  },
+  {
+    "name": "tail-non-tail-fibonacci",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->0 1->1 _->f(n-1)+f(n-2)}} pub fn main()->Nil {echo f(12) Nil}"
+    },
+    "accepted": true,
+    "stdout": "144\n"
+  },
+  {
+    "name": "tail-named-descriptor",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n {0->a _->f(n-1,a+1)}} pub fn main()->Nil {let value=f echo value(10000,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "10000\n"
+  },
+  {
+    "name": "tail-mutual-not-self",
+    "entry": "main",
+    "files": {
+      "main": "fn even(n:Int)->Bool {case n {0->True _->odd(n-1)}} fn odd(n:Int)->Bool {case n {0->False _->even(n-1)}} pub fn main()->Nil {echo even(101) Nil}"
+    },
+    "accepted": true,
+    "stdout": "False\n"
+  },
+  {
+    "name": "tail-non-tail-argument",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->0 _->f(f(n-1))+1}} pub fn main()->Nil {echo f(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4\n"
+  },
+  {
+    "name": "tail-bind-not-tail",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n {0->a _->{let answer=f(n-1,a+1) answer+1}}} pub fn main()->Nil {echo f(100,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "200\n"
+  },
+  {
+    "name": "tail-generic-pointer",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,value:a)->a {case n {0->value _->f(n-1,value)}} pub fn main()->Nil {echo f(10000,[3,4])==[3,4] Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "tail-local-call-shadow",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,f:fn(Int)->Int)->Int {f(n)} fn plus(n:Int)->Int {n+10} pub fn main()->Nil {echo f(3,plus) Nil}"
+    },
+    "accepted": true,
+    "stdout": "13\n"
+  },
+  {
+    "name": "tail-short-circuit-preserved",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Bool {case n {0->True _->False || f(n-1)}} pub fn main()->Nil {echo f(100) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "tail-zero-arity",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {case True {True->Nil False->main()}}"
+    },
+    "accepted": true,
+    "stdout": ""
+  },
+  {
+    "name": "tail-qualified-import",
+    "entry": "main",
+    "files": {
+      "main": "import helper pub fn main()->Nil {echo helper.loop(10000,0) Nil}",
+      "helper": "pub fn loop(n:Int,a:Int)->Int {case n {0->a _->loop(n-1,a+1)}}"
+    },
+    "accepted": true,
+    "stdout": "10000\n"
+  }
+]

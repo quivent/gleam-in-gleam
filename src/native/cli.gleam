@@ -1,10 +1,11 @@
 // Pure CLI policy. The owned native runtime interprets Request values.
+import native/cli_builder
 import native/compiler
 import native/core as c
 import native/project
 
 pub type Config {
-  Config(root: String, entry: String, output: String)
+  Config(root: String, entry: String, output: String, build_compiler: Bool)
 }
 
 pub type State {
@@ -23,7 +24,7 @@ pub fn main() -> Request {
 }
 
 pub fn usage() -> String {
-  "Usage: gleam-native SOURCE.gleam NEW_OUTPUT [--source-root DIRECTORY]"
+  "Usage: gleam-native SOURCE.gleam NEW_OUTPUT [--source-root DIRECTORY]\n       gleam-native --build-compiler NEW_OUTPUT [--source-root DIRECTORY]"
 }
 
 pub fn with_arguments(args: List(String)) -> Request {
@@ -31,19 +32,32 @@ pub fn with_arguments(args: List(String)) -> Request {
     ["--help"] -> Finish(0, usage(), False)
     ["--version"] ->
       Finish(0, "gleam-native 0.1.0 (Linux x86-64; experimental)", False)
-    [source, output] -> configure(source, output, ".")
-    [source, output, "--source-root", root] -> configure(source, output, root)
+    ["--build-compiler", output] ->
+      configure("native/cli.gleam", output, "src", True)
+    ["--build-compiler", output, "--source-root", root] ->
+      configure("native/cli.gleam", output, root, True)
+    [source, output] -> configure(source, output, ".", False)
+    [source, output, "--source-root", root] ->
+      configure(source, output, root, False)
     _ -> Finish(2, usage(), True)
   }
 }
 
-fn configure(source: String, output: String, root: String) -> Request {
+fn configure(
+  source: String,
+  output: String,
+  root: String,
+  build_compiler: Bool,
+) -> Request {
   case root == "" || output == "" {
     True -> Finish(2, "Source root and output must not be empty", True)
     False ->
       case entry_name(<<source:utf8>>, "", True) {
         Error(error) -> Finish(2, error, True)
-        Ok(entry) -> next(Loading(Config(root, entry, output), [entry], []))
+        Ok(entry) ->
+          next(
+            Loading(Config(root, entry, output, build_compiler), [entry], []),
+          )
       }
   }
 }
@@ -74,11 +88,16 @@ fn loaded(name: String, sources: List(project.Source)) -> Bool {
 fn next(state: State) -> Request {
   let Loading(config, pending, sources) = state
   case pending {
-    [] ->
-      case compiler.compile_project(config.entry, c.reverse(sources)) {
+    [] -> {
+      let result = case config.build_compiler {
+        True -> cli_builder.build(c.reverse(sources))
+        False -> compiler.compile_project(config.entry, c.reverse(sources))
+      }
+      case result {
         Ok(bytes) -> WriteExecutable(config.output, bytes)
         Error(error) -> Finish(1, error, True)
       }
+    }
     [name, ..rest] ->
       case loaded(name, sources) {
         True -> next(Loading(config, rest, sources))
