@@ -1,0 +1,47 @@
+{
+  "schema": "gta.benchmark-ledger/1",
+  "displayName": "GTA via Gleam \u2014 self-hosted",
+  "fixedNativeBaseline": {
+    "sourceRevision": "9f5bb10644b6983bba05d3aa589d1c20a1fd0d40",
+    "compilerSHA256": "0010766b8315588632215d33367a50ea9cfde1109723b3d1a687c0487d591621",
+    "bytes": 647417
+  },
+  "active": "comparison-flags",
+  "cohorts": [
+    {
+      "id": "comparison-flags",
+      "sourceRevision": "fa468e68e45a3d0e33cd188c67323490ec02bd77",
+      "receipt": "evidence/comparison-flags-surface-baselines.json",
+      "baselineVariant": "native-before",
+      "currentVariant": "native",
+      "qualification": "evidence/comparison-flags-qualification.json"
+    }
+  ],
+  "hostingComparison": "evidence/bootstrap-hosting-baseline.json",
+  "compilerExperiments": [
+    {
+      "label": "Byte-count rewrite",
+      "receipt": "evidence/byte-count-benchmark.json"
+    },
+    {
+      "label": "Direct lookup",
+      "receipt": "evidence/lookup-search-benchmark.json"
+    },
+    {
+      "label": "Lookup + retained AST",
+      "receipt": "evidence/parsed-snapshot-benchmark.json"
+    },
+    {
+      "label": "Instruction spans",
+      "receipt": "evidence/instruction-spans-benchmark.json"
+    }
+  ],
+  "rules": [
+    "Never reset the fixed native baseline silently; retain its exact image hash and source revision",
+    "Positive percentage is a reduction in cost: 100*(baseline-candidate)/baseline",
+    "Use paired same-input samples in one cohort; do not splice medians across runs",
+    "CPU, wall, RSS, allocated volume, compiler image size and generated image size are separate metrics",
+    "Exclude startup from the suite CPU geometric-mean score; disclose unchanged-code controls and regressions",
+    "Append qualified cohorts and retain raw samples; no hand-edited benchmark figures in README"
+  ]
+}

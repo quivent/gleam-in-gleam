@@ -1,0 +1,767 @@
+{
+  "schema": "gta.bootstrap-comparison/1",
+  "observedAt": "2026-11-08T21:49:19.435303+00:00",
+  "complete": true,
+  "harnessSHA256": "092ed7e4e599116677934f9c0ca7bca7c36d717a7b029de675ecf8d3fed7c2af",
+  "bridgeSHA256": "2b256317511589241a8414ad3fb04010c4d3bbbd5831d080d91900fa94b31934",
+  "inputReceipt": "evidence/comparison-flags-surface-baselines.json",
+  "inputReceiptSHA256": "39d8f0cd0702ffc1e30c5aa84c367828b5a372e981b4f93c09e71f53bcaab25a",
+  "nativeCompiler": {
+    "bytes": 653202,
+    "sha256": "1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c"
+  },
+  "compilerSourceSHA256": {
+    "src/native/assembler.gleam": "d319b152d174b3c956f982b9e11610a1103fe01e2765bf3264d5a54addb581b6",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "ce53fc048e7c8c42a1b19d3247f89cdd6c79159d8042ac6bd5ff04affc62b5ec",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "e1e17f8df4b77e9a2c30f58044206f3acd61e37fcef702d5268f3cb8b78760fc",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+    "src/native/loop_idioms.gleam": "115db1fe1f47a1f51d1bf5ddaa982503818635fe51798a186485d12b5e244cba",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "3598b551d62d4c99de34faf6cafc72c909db2441c5483d67b557a7db9958e13b",
+    "src/native/registers.gleam": "22c505f7b5e73d5eca6c016c32b718398fc5d51c13357cba67d9a05fe7646ca6",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "7736070c44b670cdba440b248232c19d59972ef82ef82fe63040c2dbb27e0453"
+  },
+  "pinnedCPU": 3,
+  "loadBefore": [
+    7.40869140625,
+    7.03662109375,
+    6.79052734375
+  ],
+  "repetitions": 5,
+  "methodology": "Same qualified compiler logic, Node-hosted bridge versus native self-hosted CLI; fresh process/output each time; one warm-up then alternating repeats; compilation only",
+  "limitations": [
+    "Node lane is current compiler logic under the earlier hosting architecture, not a recreated historical code version",
+    "Host IO/source preparation differs; outputs must be byte-identical",
+    "OS caches uncontrolled; one shared host; no cold-cache or language-ranking claim"
+  ],
+  "samples": [
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "repetition": 0,
+      "wallSeconds": 0.184813888,
+      "userSeconds": 0.1466,
+      "systemSeconds": 0.032252,
+      "peakRSSKiB": 57472,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "repetition": 0,
+      "wallSeconds": 0.004200608,
+      "userSeconds": 0.000896,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 640,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "repetition": 1,
+      "wallSeconds": 0.004735399,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.000907,
+      "peakRSSKiB": 640,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "repetition": 1,
+      "wallSeconds": 0.191753711,
+      "userSeconds": 0.153878,
+      "systemSeconds": 0.022126,
+      "peakRSSKiB": 57480,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "repetition": 2,
+      "wallSeconds": 0.158989523,
+      "userSeconds": 0.124398,
+      "systemSeconds": 0.029093,
+      "peakRSSKiB": 57492,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "repetition": 2,
+      "wallSeconds": 0.003142499,
+      "userSeconds": 0.000993,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 640,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "repetition": 3,
+      "wallSeconds": 0.002478776,
+      "userSeconds": 0.000872,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 640,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "repetition": 3,
+      "wallSeconds": 0.182122672,
+      "userSeconds": 0.136971,
+      "systemSeconds": 0.034489,
+      "peakRSSKiB": 58240,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "repetition": 4,
+      "wallSeconds": 0.221570651,
+      "userSeconds": 0.159526,
+      "systemSeconds": 0.026435,
+      "peakRSSKiB": 58112,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "repetition": 4,
+      "wallSeconds": 0.003475574,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001042,
+      "peakRSSKiB": 640,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "repetition": 0,
+      "wallSeconds": 0.306262853,
+      "userSeconds": 0.184107,
+      "systemSeconds": 0.032309,
+      "peakRSSKiB": 58160,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "repetition": 0,
+      "wallSeconds": 0.004005407,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001337,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "repetition": 1,
+      "wallSeconds": 0.002934432,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001218,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "repetition": 1,
+      "wallSeconds": 0.31931991,
+      "userSeconds": 0.175425,
+      "systemSeconds": 0.02607,
+      "peakRSSKiB": 58880,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "repetition": 2,
+      "wallSeconds": 0.306443094,
+      "userSeconds": 0.175438,
+      "systemSeconds": 0.02791,
+      "peakRSSKiB": 58044,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "repetition": 2,
+      "wallSeconds": 0.006775517,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001327,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "repetition": 3,
+      "wallSeconds": 0.0041569,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001234,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "repetition": 3,
+      "wallSeconds": 0.286598631,
+      "userSeconds": 0.176435,
+      "systemSeconds": 0.031725,
+      "peakRSSKiB": 58880,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "repetition": 4,
+      "wallSeconds": 0.215581236,
+      "userSeconds": 0.169808,
+      "systemSeconds": 0.032773,
+      "peakRSSKiB": 58476,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "repetition": 4,
+      "wallSeconds": 0.006051546,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001226,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "repetition": 0,
+      "wallSeconds": 0.249471365,
+      "userSeconds": 0.186448,
+      "systemSeconds": 0.030074,
+      "peakRSSKiB": 58788,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "repetition": 0,
+      "wallSeconds": 0.00555543,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.00154,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "repetition": 1,
+      "wallSeconds": 0.007646285,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001409,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "repetition": 1,
+      "wallSeconds": 0.215621672,
+      "userSeconds": 0.168841,
+      "systemSeconds": 0.028972,
+      "peakRSSKiB": 58792,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "repetition": 2,
+      "wallSeconds": 0.229836814,
+      "userSeconds": 0.183044,
+      "systemSeconds": 0.022883,
+      "peakRSSKiB": 59520,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "repetition": 2,
+      "wallSeconds": 0.006404484,
+      "userSeconds": 0.001291,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "repetition": 3,
+      "wallSeconds": 0.004624767,
+      "userSeconds": 0.00132,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "repetition": 3,
+      "wallSeconds": 0.233022172,
+      "userSeconds": 0.172577,
+      "systemSeconds": 0.027771,
+      "peakRSSKiB": 58736,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "repetition": 4,
+      "wallSeconds": 0.200623874,
+      "userSeconds": 0.170129,
+      "systemSeconds": 0.028857,
+      "peakRSSKiB": 58784,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "repetition": 4,
+      "wallSeconds": 0.003188447,
+      "userSeconds": 0.000681,
+      "systemSeconds": 0.000681,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "repetition": 0,
+      "wallSeconds": 0.188969828,
+      "userSeconds": 0.166707,
+      "systemSeconds": 0.019965,
+      "peakRSSKiB": 58008,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "repetition": 0,
+      "wallSeconds": 0.012452642,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001016,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "repetition": 1,
+      "wallSeconds": 0.008122761,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001108,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "repetition": 1,
+      "wallSeconds": 0.253040797,
+      "userSeconds": 0.15465,
+      "systemSeconds": 0.031126,
+      "peakRSSKiB": 58752,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "repetition": 2,
+      "wallSeconds": 0.194720873,
+      "userSeconds": 0.153149,
+      "systemSeconds": 0.026196,
+      "peakRSSKiB": 58364,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "repetition": 2,
+      "wallSeconds": 0.003986009,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001105,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "repetition": 3,
+      "wallSeconds": 0.002982227,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.00104,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "repetition": 3,
+      "wallSeconds": 0.179098174,
+      "userSeconds": 0.14839,
+      "systemSeconds": 0.025721,
+      "peakRSSKiB": 58028,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "repetition": 4,
+      "wallSeconds": 0.166961414,
+      "userSeconds": 0.141525,
+      "systemSeconds": 0.023919,
+      "peakRSSKiB": 58752,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "repetition": 4,
+      "wallSeconds": 0.003633617,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.000916,
+      "peakRSSKiB": 768,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "repetition": 0,
+      "wallSeconds": 0.164423829,
+      "userSeconds": 0.138601,
+      "systemSeconds": 0.022763,
+      "peakRSSKiB": 60160,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "repetition": 0,
+      "wallSeconds": 0.009429583,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001373,
+      "peakRSSKiB": 896,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "repetition": 1,
+      "wallSeconds": 0.004839041,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001249,
+      "peakRSSKiB": 896,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "repetition": 1,
+      "wallSeconds": 0.201325892,
+      "userSeconds": 0.1608,
+      "systemSeconds": 0.028434,
+      "peakRSSKiB": 60204,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "repetition": 2,
+      "wallSeconds": 0.225824481,
+      "userSeconds": 0.188947,
+      "systemSeconds": 0.019889,
+      "peakRSSKiB": 60276,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "repetition": 2,
+      "wallSeconds": 0.003292639,
+      "userSeconds": 0.001204,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 896,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "repetition": 3,
+      "wallSeconds": 0.003586323,
+      "userSeconds": 0.0,
+      "systemSeconds": 0.001146,
+      "peakRSSKiB": 896,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "repetition": 3,
+      "wallSeconds": 0.268997482,
+      "userSeconds": 0.200995,
+      "systemSeconds": 0.031982,
+      "peakRSSKiB": 60672,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "repetition": 4,
+      "wallSeconds": 0.22205453,
+      "userSeconds": 0.193573,
+      "systemSeconds": 0.024818,
+      "peakRSSKiB": 60056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "repetition": 4,
+      "wallSeconds": 0.008555954,
+      "userSeconds": 0.00154,
+      "systemSeconds": 0.0,
+      "peakRSSKiB": 896,
+      "exitCode": 0,
+      "timedOut": false
+    }
+  ],
+  "summaries": [
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "medianCPUSeconds": 0.176004,
+      "medianWallSeconds": 0.184813888,
+      "minWallSeconds": 0.158989523,
+      "maxWallSeconds": 0.221570651,
+      "maxPeakRSSKiB": 58240
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "medianCPUSeconds": 0.000907,
+      "medianWallSeconds": 0.003475574,
+      "minWallSeconds": 0.002478776,
+      "maxWallSeconds": 0.004735399,
+      "maxPeakRSSKiB": 640
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "medianCPUSeconds": 0.203348,
+      "medianWallSeconds": 0.306262853,
+      "minWallSeconds": 0.215581236,
+      "maxWallSeconds": 0.31931991,
+      "maxPeakRSSKiB": 58880
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "medianCPUSeconds": 0.001234,
+      "medianWallSeconds": 0.0041569,
+      "minWallSeconds": 0.002934432,
+      "maxWallSeconds": 0.006775517,
+      "maxPeakRSSKiB": 768
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "medianCPUSeconds": 0.200348,
+      "medianWallSeconds": 0.229836814,
+      "minWallSeconds": 0.200623874,
+      "maxWallSeconds": 0.249471365,
+      "maxPeakRSSKiB": 59520
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "medianCPUSeconds": 0.001362,
+      "medianWallSeconds": 0.00555543,
+      "minWallSeconds": 0.003188447,
+      "maxWallSeconds": 0.007646285,
+      "maxPeakRSSKiB": 768
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "medianCPUSeconds": 0.179345,
+      "medianWallSeconds": 0.188969828,
+      "minWallSeconds": 0.166961414,
+      "maxWallSeconds": 0.253040797,
+      "maxPeakRSSKiB": 58752
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "medianCPUSeconds": 0.00104,
+      "medianWallSeconds": 0.003986009,
+      "minWallSeconds": 0.002982227,
+      "maxWallSeconds": 0.012452642,
+      "maxPeakRSSKiB": 768
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "medianCPUSeconds": 0.208836,
+      "medianWallSeconds": 0.22205453,
+      "minWallSeconds": 0.164423829,
+      "maxWallSeconds": 0.268997482,
+      "maxPeakRSSKiB": 60672
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "medianCPUSeconds": 0.001249,
+      "medianWallSeconds": 0.004839041,
+      "minWallSeconds": 0.003292639,
+      "maxWallSeconds": 0.009429583,
+      "maxPeakRSSKiB": 896
+    }
+  ],
+  "qualified": [
+    {
+      "workload": "startup",
+      "variant": "bootstrap-node",
+      "artifactSHA256": "d6595210eb0a0ef7c6e42c23459b1706735e9947522fbd67d69104c5c2c05154",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "startup",
+      "variant": "native",
+      "artifactSHA256": "d6595210eb0a0ef7c6e42c23459b1706735e9947522fbd67d69104c5c2c05154",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "bootstrap-node",
+      "artifactSHA256": "a1b35563ae315fc9a496100020b6e02f507855a2232f640e0ba4026c4ed41e14",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "integer-recurrence",
+      "variant": "native",
+      "artifactSHA256": "a1b35563ae315fc9a496100020b6e02f507855a2232f640e0ba4026c4ed41e14",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "branch-call",
+      "variant": "bootstrap-node",
+      "artifactSHA256": "fc56b2036b70b23e6e0315d71d9c1515469bc588007da5050877b23709e6ed4f",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "branch-call",
+      "variant": "native",
+      "artifactSHA256": "fc56b2036b70b23e6e0315d71d9c1515469bc588007da5050877b23709e6ed4f",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "bootstrap-node",
+      "artifactSHA256": "5c61fafc4335cb26556c1ea9bc2c4fe413165e5b6c72d87fc59c190c68cfbe8f",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "recursive-fibonacci",
+      "variant": "native",
+      "artifactSHA256": "5c61fafc4335cb26556c1ea9bc2c4fe413165e5b6c72d87fc59c190c68cfbe8f",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "bootstrap-node",
+      "artifactSHA256": "acbd8430ea6a9431933b51c0195ba7fd83c3c0080a40a01f963b34fa084b7ce5",
+      "expectedResultVerified": true
+    },
+    {
+      "workload": "list-build-map-sum",
+      "variant": "native",
+      "artifactSHA256": "acbd8430ea6a9431933b51c0195ba7fd83c3c0080a40a01f963b34fa084b7ce5",
+      "expectedResultVerified": true
+    }
+  ],
+  "loadAfter": [
+    7.64697265625,
+    7.1015625,
+    6.81494140625
+  ]
+}

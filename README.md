@@ -341,6 +341,65 @@ remain reserved arena registers. There is **no GC or arena growth yet**.
 
 ## 07 · Memory & performance
 
+<!-- GTA_BENCHMARK_LEDGER_START -->
+### GTA via Gleam — living benchmark ledger
+
+**Self-hosted native compiler · last measured 2026-11-08 · 763 regression checks passed.**
+
+Frozen native baseline: `9f5bb10` (647,417 B). Current measured code: `fa468e6` (653,202 B).
+Baseline changes must be explicit; the ledger retains each qualified cohort and exact image hash.
+
+**Generated-program runtime.** Median CPU milliseconds; positive percentages reduce cost. `≈` marks changes under 1%, not a statistical confidence claim.
+
+| Workload | Previous native CPU | GTA CPU | CPU reduction | Wall reduction | Target-size reduction |
+|:---|---:|---:|---:|---:|---:|
+| Startup control | 0.362 ms | 0.354 ms | ↑ +2.21% | ↑ +6.12% | ≈ +0.00% |
+| Integer recurrence · 20M | 322.359 ms | 323.890 ms | ≈ -0.47% | ↓ -1.21% | ≈ +0.00% |
+| Branch + call · 20M | 327.907 ms | 299.503 ms | ↑ +8.66% | ↑ +8.26% | ↑ +6.58% |
+| Fibonacci · n=35 | 232.507 ms | 194.260 ms | ↑ +16.45% | ↑ +9.26% | ↑ +9.22% |
+| List build/map/sum · 500K | 48.786 ms | 48.921 ms | ≈ -0.28% | ↑ +24.12% | ≈ +0.00% |
+
+**Suite CPU:** 1.068× the baseline throughput, or **+6.36% less CPU** (geometric mean of the four longer workload ratios; startup excluded). This summary does not replace the per-workload regressions/controls above.
+
+**Earlier hosting architecture versus self-hosting.** The same qualified compiler logic runs under the Node bootstrap and as native GTA. These are compilation measurements, including startup; output ELF bytes and results match. This is not an older source revision.
+
+| Compile workload | Node-hosted CPU | Self-hosted GTA CPU | CPU reduction | Wall reduction | Peak-RSS reduction |
+|:---|---:|---:|---:|---:|---:|
+| Startup control | 176.004 ms | 0.907 ms | ↑ +99.48% | ↑ +98.12% | ↑ +98.90% |
+| Integer recurrence · 20M | 203.348 ms | 1.234 ms | ↑ +99.39% | ↑ +98.64% | ↑ +98.70% |
+| Branch + call · 20M | 200.348 ms | 1.362 ms | ↑ +99.32% | ↑ +97.58% | ↑ +98.71% |
+| Fibonacci · n=35 | 179.345 ms | 1.040 ms | ↑ +99.42% | ↑ +97.89% | ↑ +98.69% |
+| List build/map/sum · 500K | 208.836 ms | 1.249 ms | ↑ +99.40% | ↑ +97.82% | ↑ +98.52% |
+
+Tiny-input hosting gains are dominated by launch/module initialization. They do not establish whole-project compilation speedups.
+
+**Compiler self-build optimization history.** Each row is its own paired experiment on frozen source; percentages are not chained across different runs.
+
+| Experiment | CPU before → after | CPU reduction | Wall reduction | Peak-RSS reduction |
+|:---|---:|---:|---:|---:|
+| Byte-count rewrite | 7.522 → 5.015 s | ↑ +33.34% | ↑ +31.48% | ↑ +17.18% |
+| Direct lookup | 5.016 → 4.867 s | ↑ +2.96% | ↑ +8.24% | ↑ +14.72% |
+| Lookup + retained AST | 4.833 → 4.730 s | ↑ +2.13% | ≈ -0.94% | ↑ +32.37% |
+| Instruction spans | 4.816 → 5.213 s | ↓ -8.24% | ↓ -8.10% | ↑ +22.96% |
+
+**External references — same runtime cohort.** CPU ratios below 1× favor GTA; above 1× favor the reference. These compare supported workloads, not complete language implementations.
+
+| Workload | GTA / upstream Gleam-Node CPU | GTA / GCC O2 CPU | GTA / GCC O3 CPU |
+|:---|---:|---:|---:|
+| Startup control | 0.006× | 0.328× | 0.311× |
+| Integer recurrence · 20M | 0.556× | 2.106× | 2.109× |
+| Branch + call · 20M | 1.599× | 4.688× | 4.664× |
+| Fibonacci · n=35 | 0.393× | 2.555× | 2.727× |
+| List build/map/sum · 500K | 0.140× | 2.499× | 2.476× |
+
+Every runtime/compile table uses five measured repeats after a warm-up; CPU affinity is pinned, source/results are checked, and fresh processes include startup. Shared-host noise and allocator/runtime differences remain material. The regression count is correctness evidence, not another benchmark score.
+
+[Raw paired samples](evidence/comparison-flags-surface-baselines.json) · [Hosting samples](evidence/bootstrap-hosting-baseline.json) · [Full interpretation](PERFORMANCE.md) · [Ledger configuration](benchmarks/ledger.json)
+
+Regenerate with `python3 tools/render_benchmark_ledger.py`; `--check` rejects stale README figures. Append a qualified cohort and rerun against the frozen native image to track the next optimization.
+
+<!-- GTA_BENCHMARK_LEDGER_END -->
+
 ### Remove unnecessary allocation before adding collection
 
 Every stage below rebuilds the **same frozen 27-module input**. Allocation traces
