@@ -72,7 +72,7 @@ test('backward liveness removes dead materializations but retains overflow check
 test('non-call effects, branches and division remain explicit allocation boundaries',()=>{
  assert.equal(integerPlan('a+f(1,2,3,4,5)').isOk(),true);
  assert.equal(integerPlan('a+{echo b b}').isOk(),false);
- assert.equal(integerPlan('a+case b {0->c _->d}').isOk(),false);
+ assert.equal(integerPlan('a+case b {x if x>0->c _->d}').isOk(),false);
  assert.equal(integerPlan('a+b/c').isOk(),false);
 });
 
@@ -96,4 +96,20 @@ test('nested calls copy their result before restoring two live pool values',()=>
 test('overflow in an earlier call argument stops later argument effects',()=>{
  const source='fn mark(n:Int)->Int {echo n n} fn g(a:Int,b:Int)->Int {a+b} pub fn main()->Nil {let max=9007199254740991*1024+1023 echo g(max+1,mark(9)) Nil}',dir=mkdtempSync(join(tmpdir(),'gleam-call-argument-trap-'));
  try{const path=join(dir,'app');writeFileSync(path,unwrap(compile(new BitArray(Buffer.from(source)))).rawBuffer,{mode:0o755});const result=spawnSync(path,[],{encoding:'utf8'});assert.equal(result.status,70);assert.equal(result.signal,null);assert.equal(result.stdout,'');}finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('CFG joins retain definitions used on either successor',()=>{
+ const a=new registers.Rax(),c=new registers.Rcx(),d=new registers.Rdx(),code=toList([new registers.ReadLocal(c,'a'),new registers.ReadLocal(d,'b'),new registers.ReadLocal(a,'flag'),new registers.JumpZero(a,'else'),new registers.Copy(c,a),new registers.Jump('join'),new registers.Mark('else'),new registers.Copy(d,a),new registers.Mark('join')]);
+ const rows=unwrap(registers.analyze(code)).toArray(),out=rows[3].live_out.toArray().map(r=>r.constructor.name).sort();assert.deepEqual(out,['Rcx','Rdx']);const kept=registers.eliminate_dead_moves(code).toArray();assert.equal(kept.filter(i=>i instanceof registers.ReadLocal).length,3);
+});
+test('CFG liveness reaches a backedge fixed point and rejects invalid labels',()=>{
+ const a=new registers.Rax(),c=new registers.Rcx(),d=new registers.Rdx(),code=toList([new registers.Constant(c,1),new registers.Mark('loop'),new registers.Constant(d,1),new registers.Calculate(new registers.Add(),d,c),new registers.OverflowGuard(),new registers.JumpZero(a,'exit'),new registers.Jump('loop'),new registers.Mark('exit'),new registers.Copy(c,a)]);
+ const rows=unwrap(registers.analyze(code)).toArray();assert.deepEqual(rows[1].live_in.toArray().map(r=>r.constructor.name).sort(),['Rax','Rcx']);assert.equal(registers.analyze(toList([new registers.Jump('missing')])).isOk(),false);assert.equal(registers.analyze(toList([new registers.Mark('x'),new registers.Mark('x')])).isOk(),false);
+});
+test('an unselected conditional branch cannot execute an overflow trap',()=>{
+ const source='pub fn main()->Nil {let max=9007199254740991*1024+1023 echo case False {True->max+1 False->7} echo False && {max+1>0} Nil}',dir=mkdtempSync(join(tmpdir(),'gleam-cfg-trap-'));
+ try{const path=join(dir,'app');writeFileSync(path,unwrap(compile(new BitArray(Buffer.from(source)))).rawBuffer,{mode:0o755});const result=spawnSync(path,[],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);assert.equal(result.stdout,'7\nFalse\n');}finally{rmSync(dir,{recursive:true,force:true});}
+});
+test('conditional regions emit distinct real branch labels within one function',()=>{
+ const asm=body('fn f(n:Int)->Int {let a=case n>0 {True->3 False->4} let b=case n<10 {True->5 False->6} a+b} pub fn main()->Nil {echo f(4) Nil}','f');assert.equal((asm.match(/\bje\b/g)||[]).length,2);assert.equal((asm.match(/\bjmp\b/g)||[]).length,2);
 });

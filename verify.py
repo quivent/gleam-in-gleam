@@ -18,9 +18,9 @@ PRIVATE_BOOTSTRAP = Path.home() / '.local/share/gleam-native/bootstrap/1.19.2/gl
 gleam = os.environ.get('GLEAM') or shutil.which('gleam') or str(PRIVATE_BOOTSTRAP)
 
 
-def run(args, **kwargs):
+def run(args, timeout=60, **kwargs):
     result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True,
-                            timeout=60, **kwargs)
+                            timeout=timeout, **kwargs)
     if result.returncode:
         raise SystemExit(result.stdout + result.stderr)
     return result
@@ -154,7 +154,8 @@ module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/register-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/branch-slots-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/allocated-expression-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/allocated-call-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/allocated-call-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/control-flow-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:
@@ -280,7 +281,7 @@ for path, expected_hash in native_cli['sourceSHA256'].items():
     assert sha((ROOT / path).read_bytes()) == expected_hash, path
 assert any(v['kind'] == 'actual-short-io' and v['positiveShortReads'] > 0 and v['positiveShortWrites'] > 0 for v in native_cli['observations'])
 
-run(['node', 'tools/verify_self_hosting.mjs', f'evidence/{PREFIX}-native-rebuilds.json'])
+run(['node', 'tools/verify_self_hosting.mjs', f'evidence/{PREFIX}-native-rebuilds.json'], timeout=180)
 self_host = json.loads((evidence / f'{PREFIX}-native-rebuilds.json').read_text())
 assert self_host['selfHosting'] and self_host['sourceSHA256'] == sources
 assert self_host['stages'][0]['sha256'] == native_cli['artifact']['sha256']

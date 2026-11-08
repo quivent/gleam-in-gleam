@@ -1,0 +1,92 @@
+[
+  {
+    "name": "cfg-live-outer-call",
+    "entry": "main",
+    "files": {
+      "main": "fn yes(n:Int)->Bool {echo n n>0} fn mark(n:Int)->Int {echo n n+1} fn f(a:Int,n:Int)->Int {a+case yes(n) {True->mark(4) False->mark(5)}} pub fn main()->Nil {echo f(100,-1) echo f(100,1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "-1\n5\n106\n1\n4\n105\n"
+  },
+  {
+    "name": "cfg-boolean-reverse",
+    "entry": "main",
+    "files": {
+      "main": "fn yes(n:Int)->Bool {echo n n>0} pub fn main()->Nil {echo case yes(2) {False->9 True->7} echo case yes(-2) {True->7 _->9} Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n7\n-2\n9\n"
+  },
+  {
+    "name": "cfg-two-joins",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {let a=case n>0 {True->3 False->4} let b=case n<10 {True->5 False->6} a+b} pub fn main()->Nil {echo f(4) echo f(-1) echo f(20) Nil}"
+    },
+    "accepted": true,
+    "stdout": "8\n9\n9\n"
+  },
+  {
+    "name": "cfg-short-circuit-effects",
+    "entry": "main",
+    "files": {
+      "main": "fn yes(n:Int)->Bool {echo n n>0} pub fn main()->Nil {echo True || yes(9) echo False && yes(8) echo False || yes(7) echo True && yes(6) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nFalse\n7\nTrue\n6\nTrue\n"
+  },
+  {
+    "name": "cfg-int-literal-default",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo 10+case mark(2) {2->3 _->4} echo 10+case mark(5) {2->3 _->4} Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n13\n5\n14\n"
+  },
+  {
+    "name": "cfg-nested-conditionals",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int)->Int {10+case a>0 {True->case b>0 {True->a+b False->a-b} False->case b>0 {True->b-a False->a*b}}} pub fn main()->Nil {echo f(3,4) echo f(3,-4) echo f(-3,4) echo f(-3,-4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "17\n17\n17\n22\n"
+  },
+  {
+    "name": "cfg-boolean-spill-byte-register",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Bool,b:Bool,c:Bool,d:Bool,e:Bool)->Bool {a=={b=={c=={d==e}}}} pub fn main()->Nil {echo f(True,False,True,False,True) Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\n"
+  },
+  {
+    "name": "cfg-wide-signed-comparison",
+    "entry": "main",
+    "files": {
+      "main": "pub fn main()->Nil {echo -9007199254740991<2147483648 echo 9007199254740991>=2147483648 echo 3<=3 echo 4>3 echo 4!=3 echo 4==4 Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\nTrue\nTrue\nTrue\nTrue\n"
+  },
+  {
+    "name": "cfg-case-argument-effects",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} fn f(a:Int,b:Int)->Int {a*10+b} pub fn main()->Nil {echo f(case mark(1)>0 {True->mark(2) False->mark(3)},case mark(-1)>0 {True->mark(4) False->mark(5)}) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n-1\n5\n25\n"
+  },
+  {
+    "name": "cfg-unmodeled-pattern-fallback",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {x if x>0->x+1 0->8 _->9}} pub fn main()->Nil {echo f(2) echo f(0) echo f(-1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n8\n9\n"
+  }
+]

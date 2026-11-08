@@ -280,10 +280,18 @@ fn statement_mode(
 
 fn expression(e: t.Typed, state: State) -> Generated {
   case e.node {
-    t.BinaryNode(_, _, _) | t.UnaryNode(_, _) | t.CallNode(_, _) ->
+    t.BinaryNode(_, _, _)
+    | t.UnaryNode(_, _)
+    | t.CallNode(_, _)
+    | t.CaseNode(_, _) ->
       case r.plan(e) {
         Ok(code) -> {
-          use code <- c.then(register_code(code, state.env))
+          let #(region, state) = label(state)
+          use code <- c.then(register_code(
+            code,
+            state.env,
+            "reg:" <> region <> ":",
+          ))
           Ok(#(code, state))
         }
         Error(_) -> ordinary_expression(e, state)
@@ -305,12 +313,13 @@ fn register_number(register: r.Register) -> Result(Int, String) {
 fn register_code(
   code: List(r.Instruction),
   env: List(#(String, Int)),
+  prefix: String,
 ) -> Result(List(asm.Part), String) {
   case code {
     [] -> Ok([])
     [instruction, ..rest] -> {
-      use head <- c.then(register_instruction(instruction, env))
-      use tail <- c.then(register_code(rest, env))
+      use head <- c.then(register_instruction(instruction, env, prefix))
+      use tail <- c.then(register_code(rest, env, prefix))
       Ok(c.append(head, tail))
     }
   }
@@ -319,6 +328,7 @@ fn register_code(
 fn register_instruction(
   instruction: r.Instruction,
   env: List(#(String, Int)),
+  prefix: String,
 ) -> Result(List(asm.Part), String) {
   case instruction {
     r.Constant(target, n) -> {
@@ -350,14 +360,45 @@ fn register_instruction(
         r.Add -> <<72, 1, { 192 + right * 8 + target }>>
         r.Subtract -> <<72, 41, { 192 + right * 8 + target }>>
         r.Multiply -> <<72, 15, 175, { 192 + target * 8 + right }>>
+        _ -> <<72, 57, { 192 + right * 8 + target }>>
       }
-      Ok([raw(bytes)])
+      let suffix = case operator {
+        r.Add | r.Subtract | r.Multiply -> <<>>
+        _ -> {
+          let condition = case operator {
+            r.Equal -> 148
+            r.NotEqual -> 149
+            r.Less -> 156
+            r.LessEqual -> 158
+            r.Greater -> 159
+            r.GreaterEqual -> 157
+            _ -> 148
+          }
+          <<
+            64,
+            15,
+            condition,
+            { 192 + target },
+            72,
+            15,
+            182,
+            { 192 + target * 9 },
+          >>
+        }
+      }
+      Ok([raw(<<bytes:bits, suffix:bits>>)])
     }
     r.Negate(register) -> {
       use register <- c.then(register_number(register))
       Ok([raw(<<72, 247, { 216 + register }>>)])
     }
     r.OverflowGuard -> Ok([branch(128, "rt:overflow")])
+    r.Mark(name) -> Ok([asm.Label(prefix <> name)])
+    r.Jump(name) -> Ok([jump(prefix <> name)])
+    r.JumpZero(value, name) -> {
+      use value <- c.then(register_number(value))
+      Ok([raw(<<72, 133, { 192 + value * 9 }>>), branch(132, prefix <> name)])
+    }
     r.NamedCall(name, argument_count) -> {
       let cleanup = argument_count * 8
       Ok([call("fn:" <> name), raw(<<72, 129, 196, cleanup:32-little>>)])
