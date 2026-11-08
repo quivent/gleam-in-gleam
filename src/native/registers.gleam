@@ -1,5 +1,5 @@
-// Owned straight-line machine plan. No calls or arbitrary byte instructions can
-// enter this region; surrounding code receives only its final RAX value.
+// Owned straight-line machine plan. Named calls have an explicit clobber and
+// stack-argument contract. Surrounding code receives only the final RAX value.
 import native/ast as a
 import native/check as t
 import native/core as c
@@ -28,6 +28,7 @@ pub type Instruction {
   Calculate(operator: Operator, right: Register, target: Register)
   Negate(Register)
   OverflowGuard
+  NamedCall(name: String, argument_count: Int)
 }
 
 type Tree {
@@ -35,13 +36,18 @@ type Tree {
   Local(String)
   Unary(Tree)
   Binary(Operator, Tree, Tree)
+  DirectCall(String, List(Tree))
 }
 
 // Unsupported regions retain the existing lowering, not an inferred clobber set.
 pub fn plan(value: t.Typed) -> Result(List(Instruction), String) {
   use tree <- c.then(recognize(value))
-  use code <- c.then(allocate(tree, [Rax, Rcx, Rdx]))
+  use code <- c.then(allocate(tree, pool()))
   Ok(eliminate_dead_moves(code))
+}
+
+fn pool() -> List(Register) {
+  [Rax, Rcx, Rdx]
 }
 
 fn recognize(value: t.Typed) -> Result(Tree, String) {
@@ -50,6 +56,10 @@ fn recognize(value: t.Typed) -> Result(Tree, String) {
       case value.node {
         t.IntegerNode(n) -> Ok(Literal(n))
         t.VariableNode(name) -> Ok(Local(name))
+        t.CallNode(name, arguments) -> {
+          use arguments <- c.then(recognize_arguments(arguments))
+          Ok(DirectCall(name, arguments))
+        }
         // A single-expression block is grouping, with no local lifetime or
         // effect boundary. Any binding/multiple-statement block stays outside.
         t.BlockNode([t.Evaluate(child)]) -> recognize(child)
@@ -62,15 +72,26 @@ fn recognize(value: t.Typed) -> Result(Tree, String) {
             "+" -> Ok(Add)
             "-" -> Ok(Subtract)
             "*" -> Ok(Multiply)
-            _ -> Error("Outside the call-free integer region")
+            _ -> Error("Outside the supported integer region")
           })
           use left <- c.then(recognize(left))
           use right <- c.then(recognize(right))
           Ok(Binary(operator, left, right))
         }
-        _ -> Error("Outside the call-free integer region")
+        _ -> Error("Outside the supported integer region")
       }
-    _ -> Error("Outside the call-free integer region")
+    _ -> Error("Outside the supported integer region")
+  }
+}
+
+fn recognize_arguments(arguments: List(t.Typed)) -> Result(List(Tree), String) {
+  case arguments {
+    [] -> Ok([])
+    [value, ..rest] -> {
+      use value <- c.then(recognize(value))
+      use tail <- c.then(recognize_arguments(rest))
+      Ok([value, ..tail])
+    }
   }
 }
 
@@ -79,11 +100,25 @@ fn allocate(
   available: List(Register),
 ) -> Result(List(Instruction), String) {
   case available {
-    [] -> Error("Outside the call-free integer region")
+    [] -> Error("Outside the supported integer region")
     [target, ..remaining] ->
       case tree {
         Literal(n) -> Ok([Constant(target, n)])
         Local(name) -> Ok([ReadLocal(target, name)])
+        DirectCall(name, arguments) -> {
+          // The occupied prefix contains ancestor values still needed after the
+          // call. Save it BEFORE evaluating arguments, which may themselves call.
+          let saved = without(pool(), available)
+          use arguments_code <- c.then(allocate_arguments(arguments))
+          Ok(c.append(
+            push_registers(saved),
+            c.append(arguments_code, [
+              NamedCall(name, c.length(arguments)),
+              Copy(Rax, target),
+              ..pop_registers(c.reverse(saved))
+            ]),
+          ))
+        }
         Unary(child) -> {
           use code <- c.then(allocate(child, available))
           Ok(c.append(code, [Negate(target), OverflowGuard]))
@@ -122,9 +157,47 @@ fn allocate(
   }
 }
 
+fn allocate_arguments(
+  arguments: List(Tree),
+) -> Result(List(Instruction), String) {
+  case arguments {
+    [] -> Ok([])
+    [value, ..rest] -> {
+      // Previous arguments and saved caller values are already on the stack.
+      // Each new argument may use the whole register pool, in source order.
+      use code <- c.then(allocate(value, pool()))
+      use tail <- c.then(allocate_arguments(rest))
+      Ok(c.append(code, [Push(Rax), ..tail]))
+    }
+  }
+}
+
+fn push_registers(registers: List(Register)) -> List(Instruction) {
+  case registers {
+    [] -> []
+    [register, ..rest] -> [Push(register), ..push_registers(rest)]
+  }
+}
+
+fn pop_registers(registers: List(Register)) -> List(Instruction) {
+  case registers {
+    [] -> []
+    [register, ..rest] -> [Pop(register), ..pop_registers(rest)]
+  }
+}
+
+// All allocatable registers, recovery scratch and condition flags are volatile
+// across an unknown named callee. R14/R15/RBP/RSP are outside the value pool.
+pub fn clobbers(instruction: Instruction) -> List(Register) {
+  case instruction {
+    NamedCall(_, _) -> [Rax, Rcx, Rdx, Rdi, Flags]
+    _ -> []
+  }
+}
+
 pub fn uses(instruction: Instruction) -> List(Register) {
   case instruction {
-    Constant(_, _) | ReadLocal(_, _) | Pop(_) -> []
+    Constant(_, _) | ReadLocal(_, _) | Pop(_) | NamedCall(_, _) -> []
     Copy(source, _) | Push(source) | Negate(source) -> [source]
     Calculate(_, right, target) -> [right, target]
     OverflowGuard -> [Flags]
@@ -139,6 +212,7 @@ pub fn definitions(instruction: Instruction) -> List(Register) {
     | Pop(target) -> [target]
     Negate(target) | Calculate(_, _, target) -> [target, Flags]
     Push(_) | OverflowGuard -> []
+    NamedCall(_, _) -> clobbers(instruction)
   }
 }
 

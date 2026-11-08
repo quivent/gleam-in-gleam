@@ -25,13 +25,13 @@ test('leaf integer operands allocate RAX and RCX without a temporary stack spill
  assert.match(asm,/mov\s+0x18\(%rbp\),%rax/);assert.match(asm,/mov\s+0x10\(%rbp\),%rcx/);
  assert.doesNotMatch(asm,/push\s+%rax|pop\s+%rcx/);assert.match(asm,/sub\s+%rcx,%rax/);
 });
-test('compound left result is retained only after its call before a leaf RHS',()=>{
+test('a root call result stays in RAX while the leaf RHS uses RCX',()=>{
  const asm=body('fn g()->Int {7} fn f(a:Int)->Int {g()+a} pub fn main()->Nil {echo f(4) Nil}','f');
- assert.match(asm,/call/);assert.match(asm,/mov\s+%rax,%rcx/);assert.doesNotMatch(asm,/push\s+%rax|pop\s+%rcx/);
+ assert.match(asm,/call[\s\S]*mov\s+0x10\(%rbp\),%rcx[\s\S]*add\s+%rcx,%rax/);assert.doesNotMatch(asm,/push\s+%rax|pop\s+%rcx/);
 });
-test('a right-hand call keeps the spill across scratch-register clobbers',()=>{
+test('a right-hand call restores its saved outer operand after copying the return value',()=>{
  const asm=body('fn g()->Int {case 3 {x->x*7}} fn f(a:Int)->Int {a+g()} pub fn main()->Nil {echo f(4) Nil}','f');
- assert.match(asm,/push\s+%rax[\s\S]*call[\s\S]*pop\s+%rcx[\s\S]*add\s+%rcx,%rax/);
+ assert.match(asm,/push\s+%rax[\s\S]*call[\s\S]*mov\s+%rax,%rcx[\s\S]*pop\s+%rax[\s\S]*add\s+%rcx,%rax/);
 });
 test('register retention preserves checked overflow before any echo',()=>{
  const source='pub fn main()->Nil {let max=9007199254740991*1024+1023 echo max+1 Nil}',dir=mkdtempSync(join(tmpdir(),'gleam-register-overflow-'));
@@ -69,8 +69,8 @@ test('backward liveness removes dead materializations but retains overflow check
  const operation=new registers.Calculate(new registers.Add(),c,r),live=registers.live_before(operation,toList([r,flags])).toArray().map(r=>r.constructor.name).sort();assert.deepEqual(live,['Rax','Rcx']);
  const checked=toList([new registers.Constant(r,1),new registers.Constant(c,2),operation,new registers.OverflowGuard(),new registers.Constant(r,3)]),kept=registers.eliminate_dead_moves(checked).toArray();assert.ok(kept.some(i=>i instanceof registers.Calculate));assert.ok(kept.some(i=>i instanceof registers.OverflowGuard));
 });
-test('calls and effects are explicit unsupported allocation regions',()=>{
- assert.equal(integerPlan('a+f(1,2,3,4,5)').isOk(),false);
+test('non-call effects, branches and division remain explicit allocation boundaries',()=>{
+ assert.equal(integerPlan('a+f(1,2,3,4,5)').isOk(),true);
  assert.equal(integerPlan('a+{echo b b}').isOk(),false);
  assert.equal(integerPlan('a+case b {0->c _->d}').isOk(),false);
  assert.equal(integerPlan('a+b/c').isOk(),false);
@@ -81,4 +81,19 @@ test('allocated regions preserve overflow even when a later multiply yields zero
  try{const path=join(dir,'app');writeFileSync(path,unwrap(compile(new BitArray(Buffer.from(source)))).rawBuffer,{mode:0o755});const result=spawnSync(path,[],{encoding:'utf8'});assert.equal(result.status,70);assert.equal(result.stdout,'');assert.equal(result.signal,null);}
  finally{rmSync(dir,{recursive:true,force:true});}
  const asm=body('fn f(a:Int,b:Int,c:Int)->Int {{a+b}*c} pub fn main()->Nil {echo f(1,2,3) Nil}','f');assert.match(asm,/add\s+%rcx,%rax[\s\S]*jo[\s\S]*imul/);
+});
+
+test('named calls declare every allocatable register and flags clobbered',()=>{
+ const call=new registers.NamedCall('g',2),names=values=>values.toArray().map(v=>v.constructor.name).sort();
+ assert.deepEqual(names(registers.clobbers(call)),['Flags','Rax','Rcx','Rdi','Rdx']);assert.deepEqual(names(registers.definitions(call)),names(registers.clobbers(call)));assert.deepEqual(registers.uses(call).toArray(),[]);
+ assert.deepEqual(registers.live_before(call,toList([new registers.Rax(),new registers.Rcx()])).toArray(),[]);
+ const kept=registers.eliminate_dead_moves(toList([new registers.Constant(new registers.Rcx(),99),call,new registers.Constant(new registers.Rax(),7)])).toArray();assert.ok(kept.some(i=>i instanceof registers.NamedCall));assert.equal(kept.some(i=>i instanceof registers.Constant&&i.value===99),false);
+});
+test('nested calls copy their result before restoring two live pool values',()=>{
+ const code=unwrap(integerPlan('a+{b*f(1,2,3,4,5)}')).toArray(),index=code.findIndex(i=>i instanceof registers.NamedCall);assert.equal(code[index].argument_count,5);
+ assert.ok(code[index+1] instanceof registers.Copy);assert.ok(code[index+1].target instanceof registers.Rdx);assert.ok(code[index+2] instanceof registers.Pop);assert.ok(code[index+2][0] instanceof registers.Rcx);assert.ok(code[index+3][0] instanceof registers.Rax);
+});
+test('overflow in an earlier call argument stops later argument effects',()=>{
+ const source='fn mark(n:Int)->Int {echo n n} fn g(a:Int,b:Int)->Int {a+b} pub fn main()->Nil {let max=9007199254740991*1024+1023 echo g(max+1,mark(9)) Nil}',dir=mkdtempSync(join(tmpdir(),'gleam-call-argument-trap-'));
+ try{const path=join(dir,'app');writeFileSync(path,unwrap(compile(new BitArray(Buffer.from(source)))).rawBuffer,{mode:0o755});const result=spawnSync(path,[],{encoding:'utf8'});assert.equal(result.status,70);assert.equal(result.signal,null);assert.equal(result.stdout,'');}finally{rmSync(dir,{recursive:true,force:true});}
 });

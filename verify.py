@@ -153,7 +153,8 @@ module_fixtures = (json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/tail-calls-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/register-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/branch-slots-fixtures.json').read_text())
-                   + json.loads((ROOT / 'test/allocated-expression-fixtures.json').read_text()))
+                   + json.loads((ROOT / 'test/allocated-expression-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/allocated-call-fixtures.json').read_text()))
 module_results = []
 with tempfile.TemporaryDirectory(prefix='gleam-native-module-oracle-') as tmp:
     for fixture in module_fixtures:

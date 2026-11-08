@@ -1,0 +1,93 @@
+[
+  {
+    "name": "call-live-one",
+    "entry": "main",
+    "files": {
+      "main": "fn g()->Int {case 3 {x->x*7}} fn f(a:Int)->Int {a+g()} pub fn main()->Nil {echo f(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "25\n"
+  },
+  {
+    "name": "call-live-two-heap-clobber",
+    "entry": "main",
+    "files": {
+      "main": "fn g(n:Int)->Int {let xs=[n,n+1] case xs {[a,b]->{echo a a+b} _->0}} fn f(a:Int,b:Int)->Int {a+b*g(3)} pub fn main()->Nil {echo f(100,10) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n170\n"
+  },
+  {
+    "name": "call-argument-evaluation-order",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} fn g(a:Int,b:Int)->Int {a*10+b} pub fn main()->Nil {echo 100+g(mark(2),mark(3)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n3\n123\n"
+  },
+  {
+    "name": "call-nested-arguments",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} fn g(a:Int,b:Int)->Int {echo a echo b a*10+b} pub fn main()->Nil {echo 100+g(mark(1),g(mark(2),mark(3))) Nil}"
+    },
+    "accepted": true,
+    "stdout": "1\n2\n3\n2\n3\n1\n23\n133\n"
+  },
+  {
+    "name": "call-noncommutative-result",
+    "entry": "main",
+    "files": {
+      "main": "fn g(n:Int)->Int {echo n n+3} pub fn main()->Nil {echo 100-{4*g(5)} Nil}"
+    },
+    "accepted": true,
+    "stdout": "5\n68\n"
+  },
+  {
+    "name": "call-spill-around-nested-pressure",
+    "entry": "main",
+    "files": {
+      "main": "fn g(n:Int)->Int {echo n n+1} fn f(a:Int,b:Int,c:Int,d:Int)->Int {a+{b*{c-{d+g(3)}}}} pub fn main()->Nil {echo f(100,2,10,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n106\n"
+  },
+  {
+    "name": "call-module-int-target",
+    "entry": "main",
+    "files": {
+      "main": "import helper pub fn main()->Nil {echo 10+helper.inc(3) Nil}",
+      "helper": "pub fn inc(n:Int)->Int {n+1}"
+    },
+    "accepted": true,
+    "stdout": "14\n"
+  },
+  {
+    "name": "call-indirect-fallback",
+    "entry": "main",
+    "files": {
+      "main": "fn inc(n:Int)->Int {echo n n+1} fn f(k:fn(Int)->Int,a:Int)->Int {a+k(3)} pub fn main()->Nil {echo f(inc,10) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n14\n"
+  },
+  {
+    "name": "call-noninteger-argument-fallback",
+    "entry": "main",
+    "files": {
+      "main": "fn g(s:String)->Int {case s {\"yes\"->7 _->0}} pub fn main()->Nil {echo 3+g(\"yes\") Nil}"
+    },
+    "accepted": true,
+    "stdout": "10\n"
+  },
+  {
+    "name": "call-lhs-effects-before-rhs",
+    "entry": "main",
+    "files": {
+      "main": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo mark(2)+{mark(3)*mark(4)} Nil}"
+    },
+    "accepted": true,
+    "stdout": "2\n3\n4\n14\n"
+  }
+]

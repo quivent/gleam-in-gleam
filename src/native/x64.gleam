@@ -280,7 +280,7 @@ fn statement_mode(
 
 fn expression(e: t.Typed, state: State) -> Generated {
   case e.node {
-    t.BinaryNode(_, _, _) | t.UnaryNode(_, _) ->
+    t.BinaryNode(_, _, _) | t.UnaryNode(_, _) | t.CallNode(_, _) ->
       case r.plan(e) {
         Ok(code) -> {
           use code <- c.then(register_code(code, state.env))
@@ -358,6 +358,10 @@ fn register_instruction(
       Ok([raw(<<72, 247, { 216 + register }>>)])
     }
     r.OverflowGuard -> Ok([branch(128, "rt:overflow")])
+    r.NamedCall(name, argument_count) -> {
+      let cleanup = argument_count * 8
+      Ok([call("fn:" <> name), raw(<<72, 129, 196, cleanup:32-little>>)])
+    }
   }
 }
 
