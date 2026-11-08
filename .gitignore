@@ -1,2 +1,21 @@
+# Generated compiler/bootstrap outputs
 /build/
 /out/
+/node_modules/
+
+# Local caches and temporary files
+/.cache/
+/tmp/
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+/.ssh/
+/.secrets/
+*.pem
+*.key
