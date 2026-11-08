@@ -1,0 +1,341 @@
+{
+  "schema": "gta.original-gleam-compilation/1",
+  "observedAt": "2026-11-08T23:36:03.151034+00:00",
+  "complete": true,
+  "harnessSHA256": "23c9e280b26216774b17f683986f1521727c90aed001758911797cb768a88a47",
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "d319b152d174b3c956f982b9e11610a1103fe01e2765bf3264d5a54addb581b6",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "ce53fc048e7c8c42a1b19d3247f89cdd6c79159d8042ac6bd5ff04affc62b5ec",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "e1e17f8df4b77e9a2c30f58044206f3acd61e37fcef702d5268f3cb8b78760fc",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+    "src/native/loop_idioms.gleam": "115db1fe1f47a1f51d1bf5ddaa982503818635fe51798a186485d12b5e244cba",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "3598b551d62d4c99de34faf6cafc72c909db2441c5483d67b557a7db9958e13b",
+    "src/native/registers.gleam": "22c505f7b5e73d5eca6c016c32b718398fc5d51c13357cba67d9a05fe7646ca6",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "7736070c44b670cdba440b248232c19d59972ef82ef82fe63040c2dbb27e0453"
+  },
+  "sourceModules": 28,
+  "sourceBytes": 270280,
+  "nativeCompiler": {
+    "bytes": 653202,
+    "sha256": "1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c"
+  },
+  "upstreamCompiler": {
+    "version": "gleam 1.19.2",
+    "sha256": "659fdb7be27b7c00602fca107d35a1a30bca130fed264586debfabfd763ffb10"
+  },
+  "environment": {
+    "kernel": "6.8.0-147-generic",
+    "pinnedCPU": 3,
+    "loadBefore": [
+      11.25,
+      8.36328125,
+      7.384765625
+    ],
+    "loadAfter": [
+      10.70458984375,
+      8.64697265625,
+      7.525390625
+    ]
+  },
+  "methodology": {
+    "repetitions": 5,
+    "warmupsPerVariant": 1,
+    "order": "Alternating, reversed on odd repetitions",
+    "compile": "Fresh project/output/build directory each run; same frozen 28 source modules; OS caches uncontrolled",
+    "measurement": "Small C parent: monotonic wall and wait4 CPU/RSS; one pinned CPU",
+    "targets": "Original upstream Gleam emits JavaScript modules; GTA emits standalone native compiler ELF; target work differs"
+  },
+  "limitations": [
+    "Upstream has no native ELF backend, so this is same-source end-to-end compilation, not identical backend work",
+    "Compilation excludes executing the generated programs and excludes compiling either compiler tool itself",
+    "The JavaScript output is qualified by a separately executed native-code-generation probe; that execution is not in compilation timings",
+    "Single shared host; fresh builds with warm OS caches, not cold-cache tests"
+  ],
+  "samples": [
+    {
+      "variant": "original-gleam",
+      "repetition": 0,
+      "wallSeconds": 0.785432114,
+      "userSeconds": 0.435652,
+      "systemSeconds": 0.153992,
+      "peakRSSKiB": 45204,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "gta",
+      "repetition": 0,
+      "wallSeconds": 6.170255589,
+      "userSeconds": 5.346577,
+      "systemSeconds": 0.191077,
+      "peakRSSKiB": 177408,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "gta",
+      "repetition": 1,
+      "wallSeconds": 6.724522081,
+      "userSeconds": 5.548708,
+      "systemSeconds": 0.179819,
+      "peakRSSKiB": 177408,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "original-gleam",
+      "repetition": 1,
+      "wallSeconds": 0.668078438,
+      "userSeconds": 0.424177,
+      "systemSeconds": 0.138473,
+      "peakRSSKiB": 45200,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "original-gleam",
+      "repetition": 2,
+      "wallSeconds": 0.787837189,
+      "userSeconds": 0.428571,
+      "systemSeconds": 0.146672,
+      "peakRSSKiB": 45132,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "gta",
+      "repetition": 2,
+      "wallSeconds": 6.3229653,
+      "userSeconds": 5.174653,
+      "systemSeconds": 0.184709,
+      "peakRSSKiB": 177408,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "gta",
+      "repetition": 3,
+      "wallSeconds": 5.637201293,
+      "userSeconds": 5.271401,
+      "systemSeconds": 0.161467,
+      "peakRSSKiB": 177408,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "original-gleam",
+      "repetition": 3,
+      "wallSeconds": 0.773287384,
+      "userSeconds": 0.4373,
+      "systemSeconds": 0.14968,
+      "peakRSSKiB": 45172,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "original-gleam",
+      "repetition": 4,
+      "wallSeconds": 0.708556737,
+      "userSeconds": 0.439742,
+      "systemSeconds": 0.159361,
+      "peakRSSKiB": 45232,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "gta",
+      "repetition": 4,
+      "wallSeconds": 6.521254997,
+      "userSeconds": 5.526944,
+      "systemSeconds": 0.174447,
+      "peakRSSKiB": 177408,
+      "exitCode": 0,
+      "timedOut": false
+    }
+  ],
+  "summaries": [
+    {
+      "variant": "original-gleam",
+      "medianCPUSeconds": 0.5869800000000001,
+      "medianWallSeconds": 0.773287384,
+      "minWallSeconds": 0.668078438,
+      "maxWallSeconds": 0.787837189,
+      "maxPeakRSSKiB": 45232
+    },
+    {
+      "variant": "gta",
+      "medianCPUSeconds": 5.537654,
+      "medianWallSeconds": 6.3229653,
+      "minWallSeconds": 5.637201293,
+      "maxWallSeconds": 6.724522081,
+      "maxPeakRSSKiB": 177408
+    }
+  ],
+  "artifacts": {
+    "gta": {
+      "kind": "standalone ELF",
+      "bytes": 653202,
+      "sha256": "1068e2110485d9e37a3e479fb87a0d5f9ace8c3aca0bf9ecd3194cff3468056c"
+    },
+    "original-gleam": {
+      "kind": "JavaScript modules; Node runtime excluded",
+      "bytes": 867378,
+      "files": {
+        "gleam_native/gleam.mjs": {
+          "bytes": 32,
+          "sha256": "9c181aeb462fa80608297e3190111dde0c1ddaf75b77459c168528a21ef33c1e"
+        },
+        "gleam_native/native/assembler.mjs": {
+          "bytes": 6499,
+          "sha256": "ec4bbdcc6f3217d6cc0e850a330f9164e47e4ffbeb5588f2f8cce3e0478eac3f"
+        },
+        "gleam_native/native/ast.mjs": {
+          "bytes": 32711,
+          "sha256": "333e2931778ad937d5a7f69a5113537a0d6b2f20c860290f65df000fd30ef52e"
+        },
+        "gleam_native/native/bit_options.mjs": {
+          "bytes": 5182,
+          "sha256": "d227789c45aa6eace50629fa54cc0997dcd0863c3d7dee3954a39916fec48b20"
+        },
+        "gleam_native/native/check.mjs": {
+          "bytes": 107189,
+          "sha256": "c26cc7f235e8f45c2153fe3d5232b26b36ef25569ddb522ad05bf5feee2226bc"
+        },
+        "gleam_native/native/cli.mjs": {
+          "bytes": 11711,
+          "sha256": "29bcef9c9c99cbc09c5e237c820324354a77e82abfaef6f99a4862b535409444"
+        },
+        "gleam_native/native/cli_builder.mjs": {
+          "bytes": 825,
+          "sha256": "acd02fba874254089e9cbb6fc7de8d03762de8bc2ff792d1c766e55fd9951506"
+        },
+        "gleam_native/native/cli_limits.mjs": {
+          "bytes": 116,
+          "sha256": "7916088103797e2c2b1b9995ae3ca60176302adad5b3b9117d1af4e493db3a99"
+        },
+        "gleam_native/native/cli_runtime.mjs": {
+          "bytes": 179788,
+          "sha256": "8a92fefc54b5bedcca5ce6aa4e514481d39525b63923cdeb83343ac184a90d72"
+        },
+        "gleam_native/native/compiler.mjs": {
+          "bytes": 1199,
+          "sha256": "5ed6c18efed6651dbcd25ded4b2271c83458d2f33aad94eccdcac7c6bfea16ec"
+        },
+        "gleam_native/native/core.mjs": {
+          "bytes": 9275,
+          "sha256": "99223fdbb98a9f681a3d9d3b88c06df101a653c08858bc89c65c2c91c5ecdbf1"
+        },
+        "gleam_native/native/coverage.mjs": {
+          "bytes": 10800,
+          "sha256": "3d70e559bab9d1227f999096997a45bb71fa9480226add0553cf5ca1341892b8"
+        },
+        "gleam_native/native/definitions.mjs": {
+          "bytes": 16949,
+          "sha256": "abfb151fe8327a1f7708b1c329bcdc4da4ffd4b3ddcc21e6b07ce58f9a3f7a25"
+        },
+        "gleam_native/native/elf.mjs": {
+          "bytes": 1161,
+          "sha256": "21e841f5a68320eb4f5dfdae6170e964715c9e1ff8e4153f3f88cfb02ffab130"
+        },
+        "gleam_native/native/equality.mjs": {
+          "bytes": 9946,
+          "sha256": "b587ffa564b5815189f80ba50396defc32a4c87ade6c17873511f36f781c2092"
+        },
+        "gleam_native/native/equality_runtime.mjs": {
+          "bytes": 10592,
+          "sha256": "1e74069300819304170cfbc9439145691722e68bb7492e6273083cc3f161adea"
+        },
+        "gleam_native/native/free_names.mjs": {
+          "bytes": 8473,
+          "sha256": "8939d65702fda540ea9a62e0fe652884786371650db7421d93693e8d24280f65"
+        },
+        "gleam_native/native/heap.mjs": {
+          "bytes": 1793,
+          "sha256": "a85d31b462087317f247286b4049a39c5998d42ef2c6b8ebe57afb6096751f01"
+        },
+        "gleam_native/native/labels.mjs": {
+          "bytes": 3954,
+          "sha256": "16c754d32144366701d75c5d3e206d168ee366f8d8df18ce4b78a72bfda4ecc5"
+        },
+        "gleam_native/native/lexer.mjs": {
+          "bytes": 28956,
+          "sha256": "faed22ce89bad2b09b2b41b5e8957f0723a69850c11ccc6e03ccfb3e2c6203ac"
+        },
+        "gleam_native/native/loop_idioms.mjs": {
+          "bytes": 9206,
+          "sha256": "bb0929ff952734dc786af11139897ade4ae9afab41f68e4512cb572687bee04a"
+        },
+        "gleam_native/native/parser.mjs": {
+          "bytes": 144315,
+          "sha256": "25777811cf95c68ad28217acde408c07ac351a9a27e79785aec95f1a399abe6f"
+        },
+        "gleam_native/native/prelude.mjs": {
+          "bytes": 916,
+          "sha256": "e81ed001dd373d57ab80b35f1127b4bbbef752b902ebabffd61f45ce190334e7"
+        },
+        "gleam_native/native/project.mjs": {
+          "bytes": 45271,
+          "sha256": "2d584dce3cc697f64042bd06971a85e852dbc592d9282e3f021cb6b50018fea1"
+        },
+        "gleam_native/native/registers.mjs": {
+          "bytes": 43512,
+          "sha256": "646d6469a6bc7cf5fa6fd6c7d244af000882911302d4a87f6478143332273945"
+        },
+        "gleam_native/native/string_runtime.mjs": {
+          "bytes": 6442,
+          "sha256": "27804945442f60785104a639948b277d9ee51a02fa4ca158b9f3d1f5ee742400"
+        },
+        "gleam_native/native/type_system.mjs": {
+          "bytes": 12558,
+          "sha256": "81e1f8f5e0ae0725425ec9f7b8ac01282f734ca362c5b93915b0a7b19de0f859"
+        },
+        "gleam_native/native/utf8.mjs": {
+          "bytes": 5708,
+          "sha256": "5ceae5d9ad0b25f8d8df5122a6a82a476b9a8df9fa775c76c73dc73d9201e7dc"
+        },
+        "gleam_native/native/x64.mjs": {
+          "bytes": 111512,
+          "sha256": "28997e7a6878fd9f97f653f8a99caecf77da7ce6bb7696f3254f91b591d4824d"
+        },
+        "prelude.mjs": {
+          "bytes": 40787,
+          "sha256": "90bdfff5f22caa4e0df1f831e0f754eb31d1425230a4f3725e5a5be846aef9ee"
+        }
+      }
+    }
+  },
+  "qualifications": [
+    {
+      "variant": "original-gleam",
+      "compiledModules": 28,
+      "generatedCompilerProbeStdout": "45\n",
+      "probeSHA256": "0e7e9435f25a5961f9fb5e2c5c243da027678c6cc1fd46008ffb8e9a4d39eca4",
+      "probeOutsideTimedBuild": true
+    },
+    {
+      "variant": "gta",
+      "selfBuildByteIdentical": true,
+      "versionStdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n"
+    }
+  ]
+}

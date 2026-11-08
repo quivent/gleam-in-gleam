@@ -43,5 +43,7 @@
     "CPU, wall, RSS, allocated volume, compiler image size and generated image size are separate metrics",
     "Exclude startup from the suite CPU geometric-mean score; disclose unchanged-code controls and regressions",
     "Append qualified cohorts and retain raw samples; no hand-edited benchmark figures in README"
-  ]
+  ],
+  "primaryComparison": "Original upstream Gleam CLI compilation: JavaScript output versus GTA native ELF",
+  "originalFullCompilation": "evidence/original-gleam-full-compilation.json"
 }

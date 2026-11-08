@@ -723,3 +723,19 @@ The preceding instruction-span change reduced memory but increased measured
 self-build CPU by 8.2%; it is documented as a tradeoff, not quietly called a speedup.
 Both changes are separately committed and can be revised. See PERFORMANCE.md for
 source/measurement contracts and BENCHMARKS.md for the retained self-build samples.
+
+
+## Compare with the original compiler explicitly — 2026-11-09
+
+The primary README comparison now means upstream Gleam 1.19.2 compilation, not
+the previous native compiler or our Node-hosted bootstrap. Existing small-source
+samples are kept separate from a new full-source cohort. Five alternating fresh
+builds compile the same frozen 28 modules to each tool's supported target.
+
+Original Gleam emits JavaScript with 0.587 s median CPU; GTA emits the native
+compiler with 5.538 s CPU. The original compiler is about 9.43x faster on this larger
+build, despite GTA's tiny-file startup advantage. Target/backend work differs,
+and the README exposes both the negative full-source percentage and small-file
+results. The native self-build is exact; original-Gleam output is deterministic
+and its generated compiler passes a separately executed native-program probe.
+This is measurement of an actual gap, not a replacement for correctness evidence.

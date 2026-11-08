@@ -344,12 +344,28 @@ remain reserved arena registers. There is **no GC or arena growth yet**.
 <!-- GTA_BENCHMARK_LEDGER_START -->
 ### GTA via Gleam — living benchmark ledger
 
-**Self-hosted native compiler · last measured 2026-11-08 · 763 regression checks passed.**
+**Self-hosted native compiler · 763 regression checks passed.**
 
-Frozen native baseline: `9f5bb10` (647,417 B). Current measured code: `fa468e6` (653,202 B).
-Baseline changes must be explicit; the ledger retains each qualified cohort and exact image hash.
+**Primary comparison: original upstream Gleam compilation.** The original Gleam CLI is `gleam 1.19.2`. It emits JavaScript; GTA emits native ELF. The source is identical within each paired experiment, but target/backend work differs. This is the original compiler, not our Node-hosted bootstrap.
 
-**Generated-program runtime.** Median CPU milliseconds; positive percentages reduce cost. `≈` marks changes under 1%, not a statistical confidence claim.
+**Full-source headline:** original Gleam **0.587 s CPU**, GTA **5.538 s CPU** — GTA uses **9.43×** the CPU on this build. Measured 2026-11-08.
+
+| Source/workload | Original Gleam CPU | GTA CPU | CPU reduction | Original wall → GTA wall | Wall reduction |
+|:---|---:|---:|---:|---:|---:|
+| Startup control | 10.456 ms | 0.968 ms | ↑ +90.74% | 36.669 → 4.251 ms | ↑ +88.41% |
+| Integer recurrence · 20M | 11.510 ms | 1.178 ms | ↑ +89.77% | 38.370 → 5.392 ms | ↑ +85.95% |
+| Branch + call · 20M | 11.319 ms | 1.380 ms | ↑ +87.81% | 33.211 → 7.369 ms | ↑ +77.81% |
+| Fibonacci · n=35 | 11.007 ms | 1.164 ms | ↑ +89.42% | 32.839 → 5.799 ms | ↑ +82.34% |
+| List build/map/sum · 500K | 12.295 ms | 1.570 ms | ↑ +87.23% | 37.636 → 6.003 ms | ↑ +84.05% |
+| **Full compiler · 28 modules** | **0.587 s** | **5.538 s** | **↓ -843.41%** | **0.773 → 6.323 s** | **↓ -717.67%** |
+
+Full-source maximum RSS: original Gleam **44.2 MiB**, GTA **173.2 MiB**. The full-source row has its own paired cohort; do not combine its timings with the tiny-program cohort. Positive reduction favors GTA; a negative percentage exposes a regression. Read the larger-source result alongside the tiny-input startup advantage.
+
+[Full-source raw samples](evidence/original-gleam-full-compilation.json) · [Small-source raw samples](evidence/comparison-flags-surface-baselines.json)
+
+**Secondary comparison: generated-program runtime against our previous native version.** Frozen native baseline: `9f5bb10` (647,417 B). Current measured code: `fa468e6` (653,202 B). This tracks optimization of our own generated code; it is separate from original-Gleam compilation speed.
+
+Median CPU milliseconds; positive percentages reduce cost. `≈` marks changes under 1%, not a statistical confidence claim.
 
 | Workload | Previous native CPU | GTA CPU | CPU reduction | Wall reduction | Target-size reduction |
 |:---|---:|---:|---:|---:|---:|

@@ -39,11 +39,37 @@ for w in labels:
 speed=math.exp(sum(math.log(x) for x in ratios)/len(ratios))
 lines=['<!-- GTA_BENCHMARK_LEDGER_START -->',
  '### GTA via Gleam — living benchmark ledger','',
- f'**Self-hosted native compiler · last measured {r["observedAt"][:10]} · {q["tests"]["passed"]} regression checks passed.**','',
+ f'**Self-hosted native compiler · {q["tests"]["passed"]} regression checks passed.**','',
+ '**Primary comparison: original upstream Gleam compilation.** '
+ f'The original Gleam CLI is `{r["tools"]["gleam"]}`. '
+ 'It emits JavaScript; GTA emits native ELF. The source is identical within each paired experiment, '
+ 'but target/backend work differs. This is the original compiler, not our Node-hosted bootstrap.','',
+ '| Source/workload | Original Gleam CPU | GTA CPU | CPU reduction | Original wall → GTA wall | Wall reduction |',
+ '|:---|---:|---:|---:|---:|---:|']
+for w in labels:
+ a,b=row(w,'gleam-js','compile'),row(w,after,'compile')
+ lines.append(f'| {labels[w]} | {a["medianCPUSeconds"]*1000:.3f} ms | {b["medianCPUSeconds"]*1000:.3f} ms | {pct(gain(a["medianCPUSeconds"],b["medianCPUSeconds"]))} | {a["medianWallSeconds"]*1000:.3f} → {b["medianWallSeconds"]*1000:.3f} ms | {pct(gain(a["medianWallSeconds"],b["medianWallSeconds"]))} |')
+full=read(cfg['originalFullCompilation']);assert full['complete'] and full['sourceModules']==28
+for x in full['summaries']:
+ samples=[v for v in full['samples'] if v['variant']==x['variant']];assert len(samples)>=5
+ assert abs(statistics.median(v['userSeconds']+v['systemSeconds'] for v in samples)-x['medianCPUSeconds'])<1e-12
+fa=next(x for x in full['summaries'] if x['variant']=='original-gleam');fb=next(x for x in full['summaries'] if x['variant']=='gta')
+lines.insert(7, f'**Full-source headline:** original Gleam **{fa["medianCPUSeconds"]:.3f} s CPU**, GTA **{fb["medianCPUSeconds"]:.3f} s CPU** — GTA uses **{fb["medianCPUSeconds"]/fa["medianCPUSeconds"]:.2f}×** the CPU on this build. Measured {full["observedAt"][:10]}.')
+lines.insert(8, '')
+lines.append(f'| **Full compiler · 28 modules** | **{fa["medianCPUSeconds"]:.3f} s** | **{fb["medianCPUSeconds"]:.3f} s** | **{pct(gain(fa["medianCPUSeconds"],fb["medianCPUSeconds"]))}** | **{fa["medianWallSeconds"]:.3f} → {fb["medianWallSeconds"]:.3f} s** | **{pct(gain(fa["medianWallSeconds"],fb["medianWallSeconds"]))}** |')
+lines+=['',
+ f'Full-source maximum RSS: original Gleam **{fa["maxPeakRSSKiB"]/1024:.1f} MiB**, '
+ f'GTA **{fb["maxPeakRSSKiB"]/1024:.1f} MiB**. '
+ 'The full-source row has its own paired cohort; do not combine its timings with the tiny-program cohort. '
+ 'Positive reduction favors GTA; a negative percentage exposes a regression. '
+ 'Read the larger-source result alongside the tiny-input startup advantage.','',
+ '[Full-source raw samples](evidence/original-gleam-full-compilation.json) · '
+ '[Small-source raw samples](evidence/comparison-flags-surface-baselines.json)','',
+ '**Secondary comparison: generated-program runtime against our previous native version.** '
  f'Frozen native baseline: `{cfg["fixedNativeBaseline"]["sourceRevision"][:7]}` ({cfg["fixedNativeBaseline"]["bytes"]:,} B). '
- f'Current measured code: `{cohort["sourceRevision"][:7]}` ({r["nativeCompiler"]["bytes"]:,} B).',
- 'Baseline changes must be explicit; the ledger retains each qualified cohort and exact image hash.','',
- '**Generated-program runtime.** Median CPU milliseconds; positive percentages reduce cost. '
+ f'Current measured code: `{cohort["sourceRevision"][:7]}` ({r["nativeCompiler"]["bytes"]:,} B). '
+ 'This tracks optimization of our own generated code; it is separate from original-Gleam compilation speed.','',
+ 'Median CPU milliseconds; positive percentages reduce cost. '
  '`≈` marks changes under 1%, not a statistical confidence claim.','',
  '| Workload | Previous native CPU | GTA CPU | CPU reduction | Wall reduction | Target-size reduction |',
  '|:---|---:|---:|---:|---:|---:|']

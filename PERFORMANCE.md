@@ -4,6 +4,43 @@ Measured on 2026-11-08. These are small, reproducible comparisons on one shared
 Linux/Icelake host, with all results checked. They establish a baseline for this
 compiler, not a language-wide ranking or a claim of GCC performance parity.
 
+## Primary comparison: original upstream Gleam compilation
+
+This comparison uses the original **Gleam 1.19.2 compiler**, not our previous
+native version and not our own compiler running under Node.
+
+Five alternating measured repeats after a warm-up compile the same frozen
+**28 modules / 270,280 source bytes**. Every trial has a fresh build directory.
+The original compiler emits JavaScript; self-hosted GTA emits native ELF. Their
+backend work and supported-language scope differ, so the result is a practical
+same-source build baseline rather than an identical-backend contest.
+
+| Full compiler source | Original Gleam → JS | GTA → native ELF |
+|---|---:|---:|
+| Median CPU | **0.587 s** | **5.538 s** |
+| Median elapsed | **0.773 s** | **6.323 s** |
+| Elapsed min–max | 0.668–0.788 s | 5.637–6.725 s |
+| Maximum RSS | 44.2 MiB | 173.3 MiB |
+| Generated payload | 867,378 JS bytes, Node excluded | 653,202 standalone ELF bytes |
+
+On this larger source set, original Gleam is about **9.43× faster by CPU** and
+**8.18× by elapsed time**. The tiny-source compilation rows measured earlier favor
+GTA, so startup behavior must not be extrapolated to whole-project compilation.
+The README's primary compilation table now includes both sizes of workload, with
+percentage changes calculated from raw receipts.
+
+Every GTA self-build matches the qualified native compiler hash. Every upstream
+build emits the complete set of 28 JavaScript modules deterministically. An untimed
+probe imports that freshly compiled compiler implementation, emits a native test
+program and executes it with the expected output 45. That qualification step is
+not included in original-Gleam compilation timing.
+
+[Full-source raw samples, input hashes and qualification](evidence/original-gleam-full-compilation.json).
+
+```sh
+python3 tools/benchmark_upstream_compile.py out/gleam-native out/original-gleam.json
+```
+
 ## What ran
 
 | Variant | Implementation |
