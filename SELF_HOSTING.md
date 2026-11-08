@@ -32,6 +32,8 @@ comparisons. All fifteen older example hashes remain unchanged. The two native
 compiler output/execute checks are recorded separately from that test count in
 `evidence/integers-coverage-verification.json` and its linked API proof.
 
+The full prioritized backlog and acceptance evidence are in [ROADMAP.md](ROADMAP.md).
+
 ## Next acceptance steps
 
 1. Supply an owned native compiler CLI for arguments/source files, keeping the

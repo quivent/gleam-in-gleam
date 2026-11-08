@@ -11,6 +11,8 @@ driver exercises the actual compiler source on two embedded programs, checks its
 emitted ELF bytes against the bootstrap implementation, and executes both outputs.
 The ordinary file-based CLI still uses the separated JavaScript bootstrap.
 
+The prioritized remaining work and completion criteria are in [ROADMAP.md](ROADMAP.md).
+
 ## What actually runs
 
 Current bootstrap:
