@@ -1,0 +1,1169 @@
+{
+  "schema": "gleam-in-gleam.seeded-register-regions/1",
+  "observedAt": "2026-11-08T12:28:36.510Z",
+  "seed": 1779033703,
+  "count": 100,
+  "callsMode": true,
+  "branchesMode": true,
+  "callCountKind": "static across both paths",
+  "effectObservations": 271,
+  "source": "fn touch(n:Int)->Int {echo n n+1} fn mix(a:Int,b:Int)->Int {echo a echo b a-b}\nfn f_0(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix({case d > 0 {True -> c False -> a} * case d > 0 {True -> e False -> b}},case touch(a) > 0 {True -> {b + c} False -> b})}}\nfn f_1(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case case {mix(d,a) + case c > 0 {True -> e False -> a}} > 0 {True -> {{d + c} + {b * b}} False -> {case d > 0 {True -> d False -> a} + {b + e}}} > 0 {True -> touch(case case a > 0 {True -> a False -> c} > 0 {True -> a False -> {c - e}}) False -> {b + e}}}}\nfn f_2(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(case a > 0 {True -> {{case e > 0 {True -> e False -> d} * case b > 0 {True -> e False -> d}} - {{a - b} - case b > 0 {True -> a False -> e}}} False -> touch(d)})}}\nfn f_3(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case case a > 0 {True -> case b > 0 {True -> c False -> e} False -> case a > 0 {True -> d False -> a}} > 0 {True -> e False -> case a > 0 {True -> a False -> {b - b}}}}}\nfn f_4(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix(b,{mix(a,b) + case c > 0 {True -> b False -> e}}) > 0 {True -> {e * {a * {b - e}}} False -> touch(touch(case b > 0 {True -> a False -> d}))}}}\nfn f_5(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(case {touch(a) * {mix(d,e) + mix(e,e)}} > 0 {True -> {case c > 0 {True -> c False -> {b + a}} + {touch(d) * {d + e}}} False -> {{touch(b) + {d + b}} - b}})}}\nfn f_6(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_7(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{touch({mix(c,d) * {d + e}}) - a}}}\nfn f_8(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(touch(case {e + case b > 0 {True -> c False -> a}} > 0 {True -> touch(d) False -> {case c > 0 {True -> e False -> c} + c}}),touch(case d > 0 {True -> case {d * b} > 0 {True -> b False -> d} False -> touch({c + c})}))}}\nfn f_9(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {e}}\nfn f_10(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{case {b + b} > 0 {True -> {e - e} False -> touch(b)} + b} + e}}}\nfn f_11(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(touch(case touch(touch(e)) > 0 {True -> d False -> mix(case d > 0 {True -> b False -> a},case c > 0 {True -> d False -> d})}),{e * {{e * {d * b}} * mix(c,mix(d,d))}})}}\nfn f_12(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{b * case d > 0 {True -> c False -> d}} + {touch(b) + c}}}}\nfn f_13(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case touch({{c + b} - case b > 0 {True -> b False -> e}}) > 0 {True -> a False -> case b > 0 {True -> case case a > 0 {True -> b False -> e} > 0 {True -> mix(a,d) False -> mix(c,b)} False -> case case b > 0 {True -> a False -> c} > 0 {True -> {c + a} False -> case c > 0 {True -> e False -> e}}}}}}\nfn f_14(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{case case b > 0 {True -> e False -> a} > 0 {True -> case a > 0 {True -> c False -> a} False -> {e - a}} * {{d - e} - d}} * case case touch(e) > 0 {True -> touch(d) False -> case b > 0 {True -> b False -> b}} > 0 {True -> {a * {b + c}} False -> touch({c * a})}} + touch({touch(case e > 0 {True -> c False -> e}) - case case c > 0 {True -> c False -> c} > 0 {True -> {e + d} False -> case c > 0 {True -> a False -> a}}})}}}\nfn f_15(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case {e - d} > 0 {True -> {d - e} False -> mix(c,a)} - case c > 0 {True -> {b + d} False -> {b - b}}}}}\nfn f_16(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_17(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(touch(b))}}\nfn f_18(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {touch(a) + {a * d}} > 0 {True -> {case e > 0 {True -> c False -> d} - case a > 0 {True -> b False -> c}} False -> c}}}\nfn f_19(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_20(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{mix(touch({c - c}),d) - touch({{e + d} * {a - a}})} + {{case touch(e) > 0 {True -> {b - d} False -> {a + d}} * {{c * b} + case b > 0 {True -> b False -> a}}} * d}}}}\nfn f_21(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_22(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case b > 0 {True -> mix(case {b - d} > 0 {True -> {a + e} False -> c},case mix(d,d) > 0 {True -> {e - e} False -> case a > 0 {True -> c False -> d}}) False -> case case d > 0 {True -> b False -> {c - e}} > 0 {True -> c False -> {{c + e} * case b > 0 {True -> c False -> e}}}}}}\nfn f_23(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{mix(case touch(mix(d,c)) > 0 {True -> touch(a) False -> {touch(e) - e}},case {{b + c} + touch(d)} > 0 {True -> touch({e + a}) False -> c}) - case touch(case case a > 0 {True -> a False -> d} > 0 {True -> case b > 0 {True -> e False -> c} False -> {c - e}}) > 0 {True -> {case mix(e,a) > 0 {True -> {a - a} False -> mix(b,b)} * {mix(d,d) - mix(d,e)}} False -> e}}}}\nfn f_24(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({{d - b} - case b > 0 {True -> b False -> c}})}}\nfn f_25(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({{case d > 0 {True -> c False -> e} - case e > 0 {True -> d False -> d}} - case case b > 0 {True -> a False -> e} > 0 {True -> touch(c) False -> e}})}}\nfn f_26(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_27(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {a + {c - b}} > 0 {True -> case {e + d} > 0 {True -> {a * a} False -> {a * b}} False -> b}}}\nfn f_28(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{b + touch(c)} + mix(e,case b > 0 {True -> c False -> b})} - case a > 0 {True -> case touch(c) > 0 {True -> a False -> {b - c}} False -> {{c * b} * {e - c}}}}}}\nfn f_29(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(case {touch(touch(c)) * a} > 0 {True -> touch({{e * d} * {e - c}}) False -> case e > 0 {True -> case touch(c) > 0 {True -> d False -> case e > 0 {True -> c False -> b}} False -> e}},touch({c * {d - e}}))}}\nfn f_30(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_31(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case touch(b) > 0 {True -> case {case d > 0 {True -> c False -> b} + {b * b}} > 0 {True -> case b > 0 {True -> {a - a} False -> touch(c)} False -> case {a - e} > 0 {True -> {d + b} False -> {a - b}}} False -> {b * {case b > 0 {True -> e False -> e} * touch(b)}}}}}\nfn f_32(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{a * {a + touch(d)}} - e} * case touch(case {c - b} > 0 {True -> mix(b,a) False -> d}) > 0 {True -> {mix({b * b},touch(d)) - {mix(e,e) - b}} False -> touch(case {e * a} > 0 {True -> {a * a} False -> touch(d)})}}}}\nfn f_33(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({{b * a} - case a > 0 {True -> b False -> a}})}}\nfn f_34(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix({mix(touch(c),d) * e},touch(touch(case e > 0 {True -> e False -> e})))}}\nfn f_35(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_36(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {e}}\nfn f_37(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(mix(mix({c + b},{a * b}),{{d * c} + touch(d)}),c)}}\nfn f_38(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{touch(mix(d,b)) * mix({e + b},c)} - case touch({c + a}) > 0 {True -> touch({a * a}) False -> b}} - {touch(case mix(b,b) > 0 {True -> {e * e} False -> {a * a}}) * case {{a * c} + a} > 0 {True -> {{d - c} + {c + c}} False -> a}}}}}\nfn f_39(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case d > 0 {True -> a False -> {d * a}} + b}}}\nfn f_40(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(case touch({c + b}) > 0 {True -> {touch(e) * case c > 0 {True -> e False -> d}} False -> {{c - a} - {a * e}}})}}\nfn f_41(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{touch({touch(b) * d}) * case touch({e + a}) > 0 {True -> touch(case e > 0 {True -> b False -> d}) False -> mix({e + b},e)}} * {{{{e - e} - {a + e}} - mix(case e > 0 {True -> d False -> e},{a + b})} - {mix(e,a) - mix(case e > 0 {True -> a False -> b},a)}}}}}\nfn f_42(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case case {b + c} > 0 {True -> {e * d} False -> e} > 0 {True -> mix({c - d},{a * a}) False -> {b - touch(e)}}}}\nfn f_43(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case {{b * b} * b} > 0 {True -> touch(d) False -> e} + touch({touch(a) - touch(d)})}}}\nfn f_44(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(b)}}\nfn f_45(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {a}}\nfn f_46(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {b - mix({d * d},{b * e})} > 0 {True -> {touch(e) - c} False -> {touch(touch(e)) * b}}}}\nfn f_47(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({a - {{{a * e} + {c * d}} * e}})}}\nfn f_48(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {touch(e) - case a > 0 {True -> a False -> a}} > 0 {True -> b False -> {{a - a} - case e > 0 {True -> d False -> a}}}}}\nfn f_49(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_50(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {a}}\nfn f_51(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{c - {{d * e} - case b > 0 {True -> e False -> b}}}}}\nfn f_52(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case {c + mix(e,a)} > 0 {True -> {touch(d) - mix(b,b)} False -> e} - case {{a * c} + touch(c)} > 0 {True -> a False -> {b - touch(c)}}}}}\nfn f_53(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(case {{{e - e} - {a * d}} - {touch(a) * case b > 0 {True -> b False -> a}}} > 0 {True -> mix(b,{{e - d} - {c + b}}) False -> {touch(case d > 0 {True -> d False -> e}) + case a > 0 {True -> {c + a} False -> case e > 0 {True -> d False -> b}}}})}}\nfn f_54(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{d + touch({c + a})}}}\nfn f_55(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{touch({c + a}) + {case mix(d,e) > 0 {True -> {d * c} False -> d} * touch({d - e})}}}}\nfn f_56(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_57(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{b + case touch(c) > 0 {True -> {b * c} False -> {e - c}}}}}\nfn f_58(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(mix({case b > 0 {True -> a False -> e} - case d > 0 {True -> d False -> a}},touch(mix(b,e))))}}\nfn f_59(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix(case {case d > 0 {True -> c False -> c} + case a > 0 {True -> e False -> b}} > 0 {True -> {touch(d) * {b + e}} False -> d},{mix(case c > 0 {True -> d False -> b},{c - c}) + touch(touch(c))}) > 0 {True -> {{case case b > 0 {True -> c False -> c} > 0 {True -> case a > 0 {True -> a False -> c} False -> case d > 0 {True -> d False -> b}} - mix(touch(b),mix(d,a))} * mix(case {b - d} > 0 {True -> touch(a) False -> touch(e)},{mix(a,d) + {d - b}})} False -> case {e * mix(e,{e * c})} > 0 {True -> {{touch(d) + case b > 0 {True -> d False -> e}} - {{a * c} + {e * d}}} False -> b}}}}\nfn f_60(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {d * {d - b}} > 0 {True -> case touch(a) > 0 {True -> e False -> {b * a}} False -> {c * touch(b)}}}}\nfn f_61(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{mix(case b > 0 {True -> a False -> b},{c - e}) - c} + case mix(touch(b),{c - e}) > 0 {True -> a False -> d}}}}\nfn f_62(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_63(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({d + {d * e}})}}\nfn f_64(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix({mix(d,a) * {c - b}},{{b * b} + {b - b}}) > 0 {True -> {{{b + e} * case a > 0 {True -> e False -> b}} - mix({b + b},{b - b})} False -> case {{b + d} * b} > 0 {True -> touch(touch(b)) False -> {a - case c > 0 {True -> c False -> b}}}}}}\nfn f_65(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{{e - touch(e)} - a} - case {touch(d) + b} > 0 {True -> {{b * e} * case c > 0 {True -> b False -> b}} False -> {{c * c} * {a + e}}}} - b}}}\nfn f_66(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(a)}}\nfn f_67(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case case {b * {a * b}} > 0 {True -> touch(case a > 0 {True -> c False -> a}) False -> case {d - d} > 0 {True -> mix(a,a) False -> {d * d}}} > 0 {True -> touch(a) False -> {{touch(a) * {a * e}} - case case e > 0 {True -> d False -> e} > 0 {True -> touch(b) False -> {e * d}}}}}}\nfn f_68(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(case touch(case a > 0 {True -> case d > 0 {True -> b False -> c} False -> case a > 0 {True -> e False -> a}}) > 0 {True -> case c > 0 {True -> {c - c} False -> case touch(b) > 0 {True -> {e - e} False -> touch(c)}} False -> e},{{case {e * d} > 0 {True -> touch(a) False -> case e > 0 {True -> e False -> d}} * touch({b - e})} + c})}}\nfn f_69(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case {touch(d) + {c + a}} > 0 {True -> e False -> {mix(a,b) * {d + d}}}}}\nfn f_70(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case case mix(a,a) > 0 {True -> c False -> touch(d)} > 0 {True -> case a > 0 {True -> touch(a) False -> e} False -> {{e * d} + case c > 0 {True -> b False -> b}}} + {{touch(e) + {b + e}} + case case d > 0 {True -> c False -> a} > 0 {True -> {b + b} False -> mix(b,b)}}}}}\nfn f_71(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{case touch(e) > 0 {True -> c False -> a} + mix({d + d},{e + a})} + {{{e * d} - {d + e}} - e}} + {case {case a > 0 {True -> a False -> c} - a} > 0 {True -> b False -> {case c > 0 {True -> c False -> e} + c}} - {c * case {d + d} > 0 {True -> {b + d} False -> {c + a}}}}}}}\nfn f_72(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix({{c + d} + {a * a}},case e > 0 {True -> {a + e} False -> d})}}\nfn f_73(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix(case case e > 0 {True -> b False -> e} > 0 {True -> {a * c} False -> touch(e)},a) > 0 {True -> touch(mix(mix(e,b),c)) False -> {{{b - a} - {c * c}} * mix(touch(b),e)}}}}\nfn f_74(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(case touch(c) > 0 {True -> mix({case d > 0 {True -> d False -> c} - {e - a}},{mix(b,c) + a}) False -> case {case b > 0 {True -> e False -> e} - mix(d,c)} > 0 {True -> {case d > 0 {True -> b False -> a} + {e - b}} False -> {touch(e) - case a > 0 {True -> c False -> c}}}},case case touch(case e > 0 {True -> b False -> e}) > 0 {True -> {{d - e} - case b > 0 {True -> d False -> e}} False -> case {e + b} > 0 {True -> case e > 0 {True -> c False -> e} False -> case b > 0 {True -> a False -> d}}} > 0 {True -> case {b * b} > 0 {True -> case {c - b} > 0 {True -> {e + d} False -> b} False -> case {c * a} > 0 {True -> case b > 0 {True -> a False -> b} False -> {c - e}}} False -> {touch(case b > 0 {True -> b False -> b}) * {mix(b,e) - {a + e}}}})}}\nfn f_75(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix(e,{a * d}) > 0 {True -> case case c > 0 {True -> e False -> b} > 0 {True -> case b > 0 {True -> b False -> d} False -> touch(b)} False -> {{c - e} - {e * a}}}}}\nfn f_76(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case touch(touch(touch(b))) > 0 {True -> {case mix(a,e) > 0 {True -> touch(a) False -> touch(a)} * mix(touch(a),b)} False -> e}}}\nfn f_77(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case touch(d) > 0 {True -> {{case {e + e} > 0 {True -> {e - c} False -> {c * c}} * {touch(d) + touch(c)}} * e} False -> b}}}\nfn f_78(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({touch(a) + e})}}\nfn f_79(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{case mix(case e > 0 {True -> d False -> b},e) > 0 {True -> touch(e) False -> case {a * d} > 0 {True -> mix(d,e) False -> d}} - case touch(case b > 0 {True -> c False -> e}) > 0 {True -> mix(touch(a),case c > 0 {True -> b False -> c}) False -> case {d - a} > 0 {True -> {a * c} False -> mix(a,e)}}}}}\nfn f_80(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {e}}\nfn f_81(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_82(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{touch(touch({c - a})) * {mix({e + a},c) - {{b - a} + {d - c}}}}}}\nfn f_83(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {c}}\nfn f_84(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(c)}}\nfn f_85(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case mix(mix({d * b},touch(c)),case case b > 0 {True -> b False -> e} > 0 {True -> case e > 0 {True -> a False -> c} False -> case e > 0 {True -> d False -> b}}) > 0 {True -> c False -> {e - case case a > 0 {True -> e False -> c} > 0 {True -> {d + b} False -> touch(d)}}}}}\nfn f_86(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {d}}\nfn f_87(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix(case e > 0 {True -> d False -> {a + c}},touch({a - c}))}}\nfn f_88(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{touch(touch(e)) * case case c > 0 {True -> e False -> b} > 0 {True -> c False -> {e + b}}} + {touch({d * c}) * touch(mix(d,d))}}}}\nfn f_89(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{{case c > 0 {True -> e False -> c} - {c - b}} * c} + touch(c)} * {{a + touch(e)} + {case touch(a) > 0 {True -> case c > 0 {True -> b False -> a} False -> case c > 0 {True -> d False -> d}} * {{e - b} + b}}}}}}\nfn f_90(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{touch({c + e}) + {{e - a} - b}}}}\nfn f_91(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{e * b}}}\nfn f_92(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{{{case a > 0 {True -> d False -> c} * case d > 0 {True -> a False -> c}} + e} + case {case d > 0 {True -> b False -> b} - d} > 0 {True -> mix({e - a},{b * c}) False -> {a * {e - c}}}} * touch(a)}}}\nfn f_93(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch({touch(c) + touch(c)})}}\nfn f_94(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {mix({{touch(b) * mix(b,b)} * b},{b * e})}}\nfn f_95(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {a}}\nfn f_96(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {case a > 0 {True -> mix(case a > 0 {True -> c False -> e},{e * d}) False -> mix({b + e},touch(a))}}}\nfn f_97(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {touch(b)}}\nfn f_98(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{e * {touch({case b > 0 {True -> c False -> c} * mix(a,c)}) + a}}}}\nfn f_99(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {0 + {{{b * {a - b}} - mix({e - a},c)}}}\npub fn main()->Nil {echo f_0(2,-3,4,-2,1)\necho f_1(2,-3,4,-2,1)\necho f_2(2,-3,4,-2,1)\necho f_3(2,-3,4,-2,1)\necho f_4(2,-3,4,-2,1)\necho f_5(2,-3,4,-2,1)\necho f_6(2,-3,4,-2,1)\necho f_7(2,-3,4,-2,1)\necho f_8(2,-3,4,-2,1)\necho f_9(2,-3,4,-2,1)\necho f_10(2,-3,4,-2,1)\necho f_11(2,-3,4,-2,1)\necho f_12(2,-3,4,-2,1)\necho f_13(2,-3,4,-2,1)\necho f_14(2,-3,4,-2,1)\necho f_15(2,-3,4,-2,1)\necho f_16(2,-3,4,-2,1)\necho f_17(2,-3,4,-2,1)\necho f_18(2,-3,4,-2,1)\necho f_19(2,-3,4,-2,1)\necho f_20(2,-3,4,-2,1)\necho f_21(2,-3,4,-2,1)\necho f_22(2,-3,4,-2,1)\necho f_23(2,-3,4,-2,1)\necho f_24(2,-3,4,-2,1)\necho f_25(2,-3,4,-2,1)\necho f_26(2,-3,4,-2,1)\necho f_27(2,-3,4,-2,1)\necho f_28(2,-3,4,-2,1)\necho f_29(2,-3,4,-2,1)\necho f_30(2,-3,4,-2,1)\necho f_31(2,-3,4,-2,1)\necho f_32(2,-3,4,-2,1)\necho f_33(2,-3,4,-2,1)\necho f_34(2,-3,4,-2,1)\necho f_35(2,-3,4,-2,1)\necho f_36(2,-3,4,-2,1)\necho f_37(2,-3,4,-2,1)\necho f_38(2,-3,4,-2,1)\necho f_39(2,-3,4,-2,1)\necho f_40(2,-3,4,-2,1)\necho f_41(2,-3,4,-2,1)\necho f_42(2,-3,4,-2,1)\necho f_43(2,-3,4,-2,1)\necho f_44(2,-3,4,-2,1)\necho f_45(2,-3,4,-2,1)\necho f_46(2,-3,4,-2,1)\necho f_47(2,-3,4,-2,1)\necho f_48(2,-3,4,-2,1)\necho f_49(2,-3,4,-2,1)\necho f_50(2,-3,4,-2,1)\necho f_51(2,-3,4,-2,1)\necho f_52(2,-3,4,-2,1)\necho f_53(2,-3,4,-2,1)\necho f_54(2,-3,4,-2,1)\necho f_55(2,-3,4,-2,1)\necho f_56(2,-3,4,-2,1)\necho f_57(2,-3,4,-2,1)\necho f_58(2,-3,4,-2,1)\necho f_59(2,-3,4,-2,1)\necho f_60(2,-3,4,-2,1)\necho f_61(2,-3,4,-2,1)\necho f_62(2,-3,4,-2,1)\necho f_63(2,-3,4,-2,1)\necho f_64(2,-3,4,-2,1)\necho f_65(2,-3,4,-2,1)\necho f_66(2,-3,4,-2,1)\necho f_67(2,-3,4,-2,1)\necho f_68(2,-3,4,-2,1)\necho f_69(2,-3,4,-2,1)\necho f_70(2,-3,4,-2,1)\necho f_71(2,-3,4,-2,1)\necho f_72(2,-3,4,-2,1)\necho f_73(2,-3,4,-2,1)\necho f_74(2,-3,4,-2,1)\necho f_75(2,-3,4,-2,1)\necho f_76(2,-3,4,-2,1)\necho f_77(2,-3,4,-2,1)\necho f_78(2,-3,4,-2,1)\necho f_79(2,-3,4,-2,1)\necho f_80(2,-3,4,-2,1)\necho f_81(2,-3,4,-2,1)\necho f_82(2,-3,4,-2,1)\necho f_83(2,-3,4,-2,1)\necho f_84(2,-3,4,-2,1)\necho f_85(2,-3,4,-2,1)\necho f_86(2,-3,4,-2,1)\necho f_87(2,-3,4,-2,1)\necho f_88(2,-3,4,-2,1)\necho f_89(2,-3,4,-2,1)\necho f_90(2,-3,4,-2,1)\necho f_91(2,-3,4,-2,1)\necho f_92(2,-3,4,-2,1)\necho f_93(2,-3,4,-2,1)\necho f_94(2,-3,4,-2,1)\necho f_95(2,-3,4,-2,1)\necho f_96(2,-3,4,-2,1)\necho f_97(2,-3,4,-2,1)\necho f_98(2,-3,4,-2,1)\necho f_99(2,-3,4,-2,1)\nNil}",
+  "sourceSHA256": "a2297483d7f722ab4b3d7060c8056eeb51047d86124f9154304aa5f9577fa1ab",
+  "compilerSHA256": "3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65",
+  "programSHA256": "f86972fe8600d5ea71b96cf8843126e592b66fe3918ea6dcc751949ba242ad58",
+  "bytes": 35220,
+  "upstreamCompiler": "gleam 1.19.2",
+  "independentBigIntExpected": true,
+  "upstreamStdoutMatches": true,
+  "nativeStdoutMatches": true,
+  "byteIdenticalToBootstrap": true,
+  "spillingRegions": 80,
+  "coverage": [
+    {
+      "name": "f_0",
+      "expected": "-7",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2",
+        "-6",
+        "1"
+      ]
+    },
+    {
+      "name": "f_1",
+      "expected": "-2",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "2"
+      ]
+    },
+    {
+      "name": "f_2",
+      "expected": "-5",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-6"
+      ]
+    },
+    {
+      "name": "f_3",
+      "expected": "1",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_4",
+      "expected": "0",
+      "operandPressure": 4,
+      "staticSpills": 3,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "2",
+        "-3",
+        "-3",
+        "2",
+        "-2",
+        "-1"
+      ]
+    },
+    {
+      "name": "f_5",
+      "expected": "-3",
+      "operandPressure": 4,
+      "staticSpills": 6,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "2",
+        "-2",
+        "1",
+        "1",
+        "1",
+        "-3",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_6",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_7",
+      "expected": "-7",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "4",
+        "-2",
+        "-6"
+      ]
+    },
+    {
+      "name": "f_8",
+      "expected": "-10",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "-2",
+        "-1",
+        "8",
+        "9",
+        "0",
+        "10"
+      ]
+    },
+    {
+      "name": "f_9",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_10",
+      "expected": "-4",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_11",
+      "expected": "-25",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "1",
+        "2",
+        "-2",
+        "-2",
+        "-2",
+        "4",
+        "0",
+        "-1",
+        "24"
+      ]
+    },
+    {
+      "name": "f_12",
+      "expected": "8",
+      "operandPressure": 3,
+      "staticSpills": 5,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_13",
+      "expected": "2",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "0"
+      ]
+    },
+    {
+      "name": "f_14",
+      "expected": "-29",
+      "operandPressure": 4,
+      "staticSpills": 8,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "1",
+        "-2",
+        "8",
+        "4",
+        "6"
+      ]
+    },
+    {
+      "name": "f_15",
+      "expected": "2",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 1,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_16",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_17",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_18",
+      "expected": "4",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "2"
+      ]
+    },
+    {
+      "name": "f_19",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_20",
+      "expected": "-18",
+      "operandPressure": 4,
+      "staticSpills": 11,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "0",
+        "1",
+        "-2",
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "f_21",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_22",
+      "expected": "4",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_23",
+      "expected": "-3",
+      "operandPressure": 4,
+      "staticSpills": 7,
+      "namedCalls": 12,
+      "expectedEffects": [
+        "-2",
+        "4",
+        "-6",
+        "1",
+        "-2",
+        "1",
+        "4",
+        "4",
+        "1",
+        "2",
+        "-3",
+        "-3",
+        "-2",
+        "-2",
+        "-2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_24",
+      "expected": "-2",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_25",
+      "expected": "-1",
+      "operandPressure": 2,
+      "staticSpills": 3,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "4",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_26",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_27",
+      "expected": "-6",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_28",
+      "expected": "4",
+      "operandPressure": 4,
+      "staticSpills": 6,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "4",
+        "1",
+        "-3",
+        "4"
+      ]
+    },
+    {
+      "name": "f_29",
+      "expected": "18",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "4",
+        "5",
+        "6",
+        "-12",
+        "7",
+        "-11"
+      ]
+    },
+    {
+      "name": "f_30",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_31",
+      "expected": "6",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_32",
+      "expected": "5",
+      "operandPressure": 4,
+      "staticSpills": 6,
+      "namedCalls": 8,
+      "expectedEffects": [
+        "-2",
+        "-3",
+        "2",
+        "-5",
+        "4"
+      ]
+    },
+    {
+      "name": "f_33",
+      "expected": "-2",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_34",
+      "expected": "4",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "4",
+        "5",
+        "-2",
+        "1",
+        "2",
+        "7",
+        "3"
+      ]
+    },
+    {
+      "name": "f_35",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_36",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_37",
+      "expected": "12",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "1",
+        "-6",
+        "-2",
+        "7",
+        "-9",
+        "16",
+        "4"
+      ]
+    },
+    {
+      "name": "f_38",
+      "expected": "-27",
+      "operandPressure": 5,
+      "staticSpills": 10,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "-2",
+        "-3",
+        "1",
+        "-2",
+        "4",
+        "6",
+        "4",
+        "-3",
+        "-3",
+        "4"
+      ]
+    },
+    {
+      "name": "f_39",
+      "expected": "-7",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_40",
+      "expected": "3",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "1",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "f_41",
+      "expected": "10",
+      "operandPressure": 4,
+      "staticSpills": 15,
+      "namedCalls": 8,
+      "expectedEffects": [
+        "-3",
+        "4",
+        "3",
+        "-3",
+        "-2",
+        "-1",
+        "1",
+        "2",
+        "2",
+        "2"
+      ]
+    },
+    {
+      "name": "f_42",
+      "expected": "-5",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_43",
+      "expected": "6",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "2",
+        "-2",
+        "4"
+      ]
+    },
+    {
+      "name": "f_44",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_45",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_46",
+      "expected": "-9",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "4",
+        "-3",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "f_47",
+      "expected": "9",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "8"
+      ]
+    },
+    {
+      "name": "f_48",
+      "expected": "2",
+      "operandPressure": 2,
+      "staticSpills": 3,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_49",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_50",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_51",
+      "expected": "3",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_52",
+      "expected": "-3",
+      "operandPressure": 3,
+      "staticSpills": 7,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "1",
+        "2",
+        "-2",
+        "-3",
+        "-3",
+        "4"
+      ]
+    },
+    {
+      "name": "f_53",
+      "expected": "9",
+      "operandPressure": 3,
+      "staticSpills": 5,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "2",
+        "1",
+        "8"
+      ]
+    },
+    {
+      "name": "f_54",
+      "expected": "5",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "6"
+      ]
+    },
+    {
+      "name": "f_55",
+      "expected": "11",
+      "operandPressure": 4,
+      "staticSpills": 6,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "6",
+        "-2",
+        "1",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_56",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_57",
+      "expected": "-15",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "4"
+      ]
+    },
+    {
+      "name": "f_58",
+      "expected": "3",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "-3",
+        "1",
+        "-4",
+        "-1",
+        "-3",
+        "2"
+      ]
+    },
+    {
+      "name": "f_59",
+      "expected": "-3",
+      "operandPressure": 4,
+      "staticSpills": 8,
+      "namedCalls": 14,
+      "expectedEffects": [
+        "-2",
+        "-2",
+        "0",
+        "4",
+        "5",
+        "2",
+        "4",
+        "1",
+        "4"
+      ]
+    },
+    {
+      "name": "f_60",
+      "expected": "-8",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_61",
+      "expected": "-12",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "3",
+        "-3",
+        "-2",
+        "3"
+      ]
+    },
+    {
+      "name": "f_62",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_63",
+      "expected": "-3",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-4"
+      ]
+    },
+    {
+      "name": "f_64",
+      "expected": "-1",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "-2",
+        "2",
+        "-28",
+        "9",
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_65",
+      "expected": "-48",
+      "operandPressure": 4,
+      "staticSpills": 5,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "1",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_66",
+      "expected": "3",
+      "operandPressure": 1,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "2"
+      ]
+    },
+    {
+      "name": "f_67",
+      "expected": "3",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "4",
+        "2"
+      ]
+    },
+    {
+      "name": "f_68",
+      "expected": "-1",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "4",
+        "-4",
+        "0",
+        "1"
+      ]
+    },
+    {
+      "name": "f_69",
+      "expected": "1",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_70",
+      "expected": "-11",
+      "operandPressure": 4,
+      "staticSpills": 9,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "2",
+        "2",
+        "-2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_71",
+      "expected": "-21",
+      "operandPressure": 5,
+      "staticSpills": 13,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "1",
+        "-4",
+        "3"
+      ]
+    },
+    {
+      "name": "f_72",
+      "expected": "3",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "6",
+        "3"
+      ]
+    },
+    {
+      "name": "f_73",
+      "expected": "63",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "1",
+        "2",
+        "2",
+        "-3",
+        "-2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_74",
+      "expected": "-4",
+      "operandPressure": 4,
+      "staticSpills": 6,
+      "namedCalls": 9,
+      "expectedEffects": [
+        "4",
+        "-3",
+        "4",
+        "5",
+        "-5",
+        "-3",
+        "-3",
+        "-3",
+        "1",
+        "10",
+        "14"
+      ]
+    },
+    {
+      "name": "f_75",
+      "expected": "-2",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "1",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_76",
+      "expected": "1",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 8,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-1"
+      ]
+    },
+    {
+      "name": "f_77",
+      "expected": "-3",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_78",
+      "expected": "5",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2",
+        "4"
+      ]
+    },
+    {
+      "name": "f_79",
+      "expected": "-8",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "-2",
+        "1",
+        "1",
+        "2",
+        "3",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_80",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_81",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_82",
+      "expected": "40",
+      "operandPressure": 5,
+      "staticSpills": 7,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "2",
+        "3",
+        "3",
+        "4"
+      ]
+    },
+    {
+      "name": "f_83",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_84",
+      "expected": "5",
+      "operandPressure": 1,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "4"
+      ]
+    },
+    {
+      "name": "f_85",
+      "expected": "6",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "4",
+        "6",
+        "5",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "f_86",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_87",
+      "expected": "-1",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "-2",
+        "-1"
+      ]
+    },
+    {
+      "name": "f_88",
+      "expected": "5",
+      "operandPressure": 3,
+      "staticSpills": 8,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "1",
+        "2",
+        "-8",
+        "-2",
+        "-2",
+        "0"
+      ]
+    },
+    {
+      "name": "f_89",
+      "expected": "-19",
+      "operandPressure": 5,
+      "staticSpills": 13,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "4",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "f_90",
+      "expected": "8",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "5"
+      ]
+    },
+    {
+      "name": "f_91",
+      "expected": "-3",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_92",
+      "expected": "-39",
+      "operandPressure": 4,
+      "staticSpills": 7,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2"
+      ]
+    },
+    {
+      "name": "f_93",
+      "expected": "11",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "4",
+        "4",
+        "10"
+      ]
+    },
+    {
+      "name": "f_94",
+      "expected": "3",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "-3",
+        "-3",
+        "0",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_95",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_96",
+      "expected": "6",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "4",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_97",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_98",
+      "expected": "-5",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2",
+        "4",
+        "-8"
+      ]
+    },
+    {
+      "name": "f_99",
+      "expected": "-10",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-1",
+        "4"
+      ]
+    }
+  ],
+  "limits": "Every intermediate value is within exact +/- (2^53-1); overflow tested separately, no speed claim"
+}

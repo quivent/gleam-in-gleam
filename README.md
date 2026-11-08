@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 361 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 371 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **617,676 bytes**, SHA256
-`38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e`.
+The native image is **637,999 bytes**, SHA256
+`3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/named-calls-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/control-flow-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -740,7 +740,7 @@ stack ABI. After the call and argument cleanup, copy the RAX result to its assig
 register before restoring saved operands in reverse order. Calls remain effectful
 and cannot be deleted when their result is dead.
 
-Current qualification: **715 tests and 361 fresh upstream comparisons**. The rebuilt
+The named-call qualification passed **715 tests and 361 fresh upstream comparisons**. The rebuilt
 compiler qualifies all 361 corpus cases and both native self-rebuilds match the
 seed. A separate 100-expression call oracle exercises 286 named calls and verifies
 386 ordered output effects against BigInt modeling and upstream. The earlier pure
@@ -756,3 +756,28 @@ See [qualification](evidence/named-calls-qualification.json),
 [call/effect oracle](evidence/named-calls-seeded-effects.json),
 [static comparison](evidence/named-calls-comparison.json) and
 [design](REGISTER_SPILL_SPEC.md).
+
+## Scalar control-flow joins and measured performance — 2026-11-08
+
+The typed plan now includes real labels, conditional/unconditional jumps, scalar
+comparisons, short-circuit Boolean expressions and supported two-arm scalar cases.
+Successor-aware liveness preserves definitions needed by either branch and reaches
+a fixed point on backedges. Each selected path returns RAX; joins copy that result
+before restoring outer operands. Guarded/data-binding/general matches retain
+legacy lowering. This is not whole-function allocation for every construct.
+
+Qualification: **729 tests, 371 fresh upstream comparisons**, all 371 cases through
+the rebuilt compiler and two byte-identical native self-rebuilds. Three separate
+100-expression oracles cover pure arithmetic, calls/effects and nested branches.
+An initial verification timeout is preserved; straight-line regions now use the
+previous linear scan, and the aggregate multi-stage proof has an appropriate
+180-second allowance while individual native limits remain unchanged.
+
+The new compiler is 637,999 bytes, without external runtime dependencies.
+Its current-source self-build measured **8.75 s median wall / 7.42 s CPU** and
+**390.8 MiB maximum RSS** on this shared pinned-core host. No broad speedup is
+established: branch code is 45 bytes smaller with about 2% less CPU time here,
+while short-circuit code uses about 3% more CPU. Identical-code controls show noisy
+wall-time differences. See [full method/results](BENCHMARKS.md),
+[qualification](evidence/control-flow-qualification.json) and
+[actual self-build samples](evidence/control-flow-self-build-benchmarks.json).

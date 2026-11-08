@@ -593,3 +593,29 @@ not infer a speedup from the new capability. Current compiler image:
 617,676 bytes, SHA256 38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e. No runtime dependency
 or installed Crew/compiler executable was added or replaced. All prior receipts
 remain preserved under their original milestone names.
+
+## Scalar CFG joins, qualification and honest benchmarks — 2026-11-08
+
+We added real machine labels/jumps, signed scalar comparisons, short-circuit
+expressions and supported scalar cases. Successor-aware liveness unions both
+branches and converges on backedges. The join returns RAX before restoring pending
+outer operands; unsupported patterns still use the existing correct lowering.
+729 tests, 371 upstream/corpus comparisons and two exact native rebuilds pass.
+Pure, call/effect and branch stress programs each contain 100 generated expressions.
+
+Two aggregate verifier timeouts are retained. The first exposed applying graph
+analysis to straight-line plans; their qualified linear pass was restored. The
+multi-stage self-host proof also needed an aggregate allowance of 180 rather than
+60 seconds; individual process limits were not loosened. These are preserved
+findings, not a fabricated successful original run.
+
+Repeated pinned-child benchmarks compare previous/native current versions on
+identical frozen source and checked runtime inputs. Short-run wall times differed
+even for byte-identical controls, so tenfold longer workloads were measured too.
+The final current-source self-build median is 8.75 s elapsed / 7.42 s CPU and
+390.8 MiB peak RSS. Generated branch code is smaller and about 2% lower CPU here;
+short-circuit code is smaller but about 3% higher CPU. No broad speedup follows.
+The detailed raw distributions, source/image/harness hashes and limits are retained
+in BENCHMARKS.md and control-flow benchmark receipts. Current image: 637,999 bytes,
+SHA256 3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65. General whole-function and upstream-language
+work remains separate; no installed Crew/compiler process was replaced.

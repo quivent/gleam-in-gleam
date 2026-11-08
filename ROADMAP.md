@@ -24,13 +24,13 @@ compatibility score. The extension workstreams below remain incomplete.
 ## Verified starting point
 
 All 27 compiler modules rebuild through the native effect-runner entry. Stages
-1, 2 and 3 are byte-identical: 617,676 bytes, SHA256
-`38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e`.
-The stage-3 compiler passes 361 corpus cases; every accepted output matches the
-bootstrap bytes and executes correctly. Full qualification includes 715 tests,
-361 independent upstream comparisons, 16 examples and 59 native IO checks.
+1, 2 and 3 are byte-identical: 637,999 bytes, SHA256
+`3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65`.
+The stage-3 compiler passes 371 corpus cases; every accepted output matches the
+bootstrap bytes and executes correctly. Full qualification includes 729 tests,
+371 independent upstream comparisons, 16 examples and 59 native IO checks.
 See [the proof](SELF_HOSTING.md) and
-[qualification receipt](evidence/named-calls-qualification.json).
+[qualification receipt](evidence/control-flow-qualification.json).
 
 The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
 Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
@@ -51,7 +51,7 @@ receipts remain preserved under their original names.
    Deep non-tail recursion and arena exhaustion remain explicit limits.
 
 3. **Broader native-compiler testing — current corpus verified.**
-   All 361 positive/negative fixtures go through stage 3, with exact accepted
+   All 371 positive/negative fixtures go through stage 3, with exact accepted
    image/output comparisons. The separate upstream comparisons are independent.
    Expand this corpus alongside every new language/runtime feature.
 
@@ -59,7 +59,7 @@ receipts remain preserved under their original names.
    Two native self-rebuilds from the exact frozen source match the seed. A separate
    changed-source control produces the correctly changed compiler. Source hashes,
    stage images, native corpus and ELF observations are retained in
-   [the rebuild receipt](evidence/named-calls-native-rebuilds.json).
+   [the rebuild receipt](evidence/control-flow-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -82,7 +82,9 @@ receipts remain preserved under their original names.
    fall about 29%. The recorded 64 KiB non-tail workload now succeeds.
    Typed integer regions allocate three registers, spill on pressure and use
    explicit register/flags liveness. Named integer calls now preserve live operands
-   with caller saves; indirect/non-integer calls and control-flow joins remain boundaries.
+   with caller saves. Scalar joins now have successor-aware liveness; general
+   pattern/data/control-flow boundaries remain. Actual benchmarks are recorded in
+   [BENCHMARKS.md](BENCHMARKS.md), with no conclusive broad speedup.
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
    retaining correctness checks. Jay specifically requested look-ahead to avoid

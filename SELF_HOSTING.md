@@ -10,9 +10,9 @@ still incomplete.
 2. Stage 1 reads a frozen copy of all 27 actual compiler modules through the owned
    file runner and `--build-compiler`, producing stage 2.
 3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
-4. All three are 617,676 bytes with SHA256
-   `38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e`.
-5. Stage 3 compiles 361 corpus cases: 241 accepted, 120 rejected. Every accepted
+4. All three are 637,999 bytes with SHA256
+   `3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65`.
+5. Stage 3 compiles 371 corpus cases: 251 accepted, 120 rejected. Every accepted
    output is byte-identical to bootstrap output and executes correctly. Rejections
    have controlled compiler exits and publish no output.
 6. A changed version literal in a separate source copy produces a different native
@@ -50,11 +50,11 @@ value equality, measured optimization/register allocation and targets remain ope
 
 ## Evidence
 
-* [Complete qualification](evidence/named-calls-qualification.json): 715 checks,
-  361 fresh independent upstream comparisons and all 16 native example runs.
-* [Native rebuilds and corpus](evidence/named-calls-native-rebuilds.json): exact
+* [Complete qualification](evidence/control-flow-qualification.json): 729 checks,
+  371 fresh independent upstream comparisons and all 16 native example runs.
+* [Native rebuilds and corpus](evidence/control-flow-native-rebuilds.json): exact
   sources, image hashes, source-sensitivity control and individual native cases.
-* [Native IO qualification](evidence/named-calls-io-verification.json): 59 targeted
+* [Native IO qualification](evidence/control-flow-io-verification.json): 59 targeted
   checks, actual short IO, errors, preservation and ELF headers.
 * [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
   initial stack/heap failures and measured fixes; snapshots are not peak stack.
@@ -83,3 +83,8 @@ Named Int calls with supported integer arguments now participate in typed
 allocation with caller saves and an explicit volatile-register mask. Whole-function
 control-flow allocation and indirect/non-integer call regions remain open. The
 named-calls-* receipts preserve this current qualification and both stress modes.
+
+Scalar branches/short-circuit expressions now use explicit CFG edges and join
+liveness. General data/guarded patterns remain legacy boundaries. Current proof
+is under control-flow-*; [BENCHMARKS.md](BENCHMARKS.md) reports actual repeated
+measurements without claiming whole-function allocation or a broad speedup.

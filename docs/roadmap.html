@@ -21,12 +21,12 @@
 <section class="hero" aria-labelledby="title"><div><div class="eyebrow">A compiler, built in its own language</div><h1 id="title">The route to<br><em>self-hosting.</em></h1><p class="intro">Eight workstreams. Explicit specs. Real evidence.<br>A working map of what’s delivered and what comes next.</p></div><div class="progress-panel"><div class="progress-top"><div class="progress-number"><b id="percent">100</b><span>%</span></div><div class="progress-description">First supported-subset self-hosting milestone: defined acceptance met.</div></div><progress id="progress" value="100" max="100" aria-label="First native self-hosting milestone">100%</progress><p class="progress-caption"><strong>Native rebuilds verified.</strong> Full Gleam compatibility, optimization and other targets remain separate work. Review marks never change this status.</p></div></section>
 <section class="metrics" aria-label="Last qualified compiler evidence"><div class="metric"><div class="metric-value" id="tests">—</div><div class="metric-label">passing regression checks</div></div><div class="metric"><div class="metric-value" id="upstream">—</div><div class="metric-label">fresh upstream comparisons</div></div><div class="metric"><div class="metric-value" id="examples">—</div><div class="metric-label">native examples, exact bytes</div></div><div class="metric"><div class="metric-value" id="cli-bytes">—</div><div class="metric-label">standalone CLI · bytes</div></div></section>
 <div class="content-grid"><main class="roadmap-main"><div class="roadmap-top"><h2>The eight workstreams</h2><span class="count" id="count" role="status" aria-live="polite">8 workstreams</span></div><div class="tools"><div class="filters" role="group" aria-label="Filter workstreams"><button type="button" data-filter="all" aria-pressed="true">All eight</button><button type="button" data-filter="core" aria-pressed="false">Core milestone</button><button type="button" data-filter="extension" aria-pressed="false">Beyond self-hosting</button></div><div class="search"><label for="search" class="visually-hidden">Search specs and workstreams</label><input id="search" type="search" placeholder="Search specs, evidence, next actions…" autocomplete="off"></div></div><noscript><div class="fallback">This interactive view needs JavaScript. The complete <a href="../ROADMAP.md">text roadmap</a> and <a href="../FULL_SIZE_RELIABILITY_SPEC.md">scale implementation record</a> remain available.</div></noscript><div id="steps"></div><div id="empty" class="empty" hidden>No matching workstreams. Try a different search or filter.</div></main>
-<aside class="aside" aria-label="Current checkpoint"><section class="aside-card"><div class="eyebrow">Next implementation</div><h2>Join the<br>control-flow blocks.</h2><p>Named calls now preserve live operands. Next, model branches and block joins before extending allocation across control flow.</p><button type="button" class="primary" id="focus-next">Open the optimization plan →</button></section><section class="limits"><div class="small-label">The qualified boundary</div><dl><div><dt>Target</dt><dd>Linux x86-64</dd></div><div><dt>Source / file</dt><dd id="source-limit">128 KiB</dd></div><div><dt>Arena</dt><dd>512 MiB compiler · no GC</dd></div><div><dt>External runtime</dt><dd>None</dd></div><div><dt>Self-rebuild</dt><dd>Two identical native rebuilds</dd></div></dl></section><div class="aside-foot"><strong>Review it your way.</strong><p>Acceptance checkmarks and notes stay in this browser. They are your review, not new compiler verification or shared task status.</p><div id="storage-warning" role="alert" hidden></div><button type="button" id="export">Export my review ↓</button><div id="export-status" role="status" aria-live="polite"></div><div class="snapshot" id="snapshot"></div></div></aside></div>
+<aside class="aside" aria-label="Current checkpoint"><section class="aside-card"><div class="eyebrow">Next implementation</div><h2>Measure, then<br>choose the next change.</h2><p>Scalar calls and joins are qualified. Repeated benchmarks are recorded; profile actual costs before extending general allocation.</p><button type="button" class="primary" id="focus-next">Open the optimization plan →</button></section><section class="limits"><div class="small-label">The qualified boundary</div><dl><div><dt>Target</dt><dd>Linux x86-64</dd></div><div><dt>Source / file</dt><dd id="source-limit">128 KiB</dd></div><div><dt>Arena</dt><dd>512 MiB compiler · no GC</dd></div><div><dt>External runtime</dt><dd>None</dd></div><div><dt>Self-rebuild</dt><dd>Two identical native rebuilds</dd></div></dl></section><div class="aside-foot"><strong>Review it your way.</strong><p>Acceptance checkmarks and notes stay in this browser. They are your review, not new compiler verification or shared task status.</p><div id="storage-warning" role="alert" hidden></div><button type="button" id="export">Export my review ↓</button><div id="export-status" role="status" aria-live="polite"></div><div class="snapshot" id="snapshot"></div></div></aside></div>
 </div><footer><span>Correctness first. Inspect the ASM. Zero third-party compiler dependencies.</span><a href="../SELF_HOSTING.md">What counts as self-hosting? ↗</a></footer>
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "40e68afde3a4194ead1a8a069e2dcc64c0f7fc67",
+  "sourceRevision": "507a3866eee9fc151dce297e9e463ad5c103dd59",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -35,8 +35,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/named-calls-qualification.json",
-  "ioVerification": "evidence/named-calls-io-verification.json",
+  "verification": "evidence/control-flow-qualification.json",
+  "ioVerification": "evidence/control-flow-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -74,15 +74,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/named-calls-io-verification.json"
+          "path": "evidence/control-flow-io-verification.json"
         },
         {
-          "label": "715 checks and 361 upstream comparisons",
-          "path": "evidence/named-calls-qualification.json"
+          "label": "729 checks and 371 upstream comparisons",
+          "path": "evidence/control-flow-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/named-calls-disassembly.txt"
+          "path": "evidence/control-flow-disassembly.txt"
         }
       ],
       "related": [],
@@ -128,7 +128,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/named-calls-native-rebuilds.json"
+          "path": "evidence/control-flow-native-rebuilds.json"
         }
       ],
       "related": [
@@ -142,12 +142,12 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "All 361 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
+      "summary": "All 371 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "715 regression checks and 361 fresh upstream comparisons are separately recorded.",
-        "Stage 3 compiles 241 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
+        "729 regression checks and 371 fresh upstream comparisons are separately recorded.",
+        "Stage 3 compiles 251 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
       ],
@@ -171,16 +171,16 @@
       ],
       "evidence": [
         {
-          "label": "361 native cases, individual outcomes",
-          "path": "evidence/named-calls-native-rebuilds.json"
+          "label": "371 native cases, individual outcomes",
+          "path": "evidence/control-flow-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/named-calls-project-upstream-checks.json"
+          "path": "evidence/control-flow-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/named-calls-upstream-checks.json"
+          "path": "evidence/control-flow-upstream-checks.json"
         }
       ],
       "related": [
@@ -194,13 +194,13 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 617,676-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 637,999-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
         "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 27 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e.",
-        "The rebuilt image runs --version and qualifies the entire 361-case corpus with empty PATH.",
+        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65.",
+        "The rebuilt image runs --version and qualifies the entire 371-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
       "acceptance": [
@@ -224,7 +224,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/named-calls-native-rebuilds.json"
+          "path": "evidence/control-flow-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/named-calls-project-upstream-checks.json"
+          "path": "evidence/control-flow-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -338,10 +338,10 @@
       "title": "Measured optimization",
       "scope": "extension",
       "status": "partial",
-      "statusLabel": "Partial · caller-save allocation",
+      "statusLabel": "Partial · scalar joins benchmarked",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Add explicit branch/block effects and join liveness; retain indirect/non-integer calls as barriers until their ABI is modeled.",
-      "specMaturity": "Integer regions, named caller saves and sibling slots qualified; CFG remains",
+      "nextAction": "Profile measured costs before more optimization; extend general pattern/data/indirect boundaries without weakening behavior.",
+      "specMaturity": "Scalar CFG/calls qualified and benchmarked; general whole-function scope remains",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
         "Separate cold/warm compilation, runtime execution, allocation/peak memory and artifact-size measurements.",
@@ -351,10 +351,12 @@
         "R14/R15 remain reserved arena registers. Internal calls use the owned stack ABI, not an assumed SysV convention. Static instruction counts are not dynamic performance evidence.",
         "The earlier leaf RHS increment eliminated 260 static push/pop pairs and 451 instructions on fixed source; frame traffic remains unchanged. This is not a full allocator or runtime speed claim.",
         "Sibling-arm slots reserve the maximum branch footprint: fixed-source named frame totals fall 36,800 to 26,112 bytes; no peak-stack or speed claim.",
-        "Typed integer regions now use explicit register/flags liveness, three-register allocation and nested spills; indirect/non-integer calls and control flow remain boundaries.",
+        "Typed integer regions now use explicit register/flags liveness, three-register allocation and nested spills; unmodeled indirect/data boundaries remain.",
         "A seeded 100-expression program agrees with BigInt and upstream; 68 regions spill, maximum operand pressure seven.",
         "Named integer calls now save live pool values before arguments and copy return values before restoration. Calls kill the entire value pool, recovery scratch and Flags.",
-        "A separate seeded call program verifies 286 calls and 386 ordered effects. The fixed compiler-source image is unchanged; no speedup is claimed."
+        "A separate seeded call program verifies 286 calls and 386 ordered effects. The fixed compiler-source image is unchanged; no broad speedup is claimed.",
+        "Scalar comparisons, short-circuit expressions and supported two-arm cases now use successor-aware CFG liveness and real joins.",
+        "Repeated benchmarks show no conclusive broad speedup; identical-code controls expose shared-host wall noise. Actual current-source self-build: 8.75 s median wall, 7.42 s CPU, 390.8 MiB peak RSS."
       ],
       "acceptance": [
         {
@@ -376,20 +378,20 @@
       ],
       "evidence": [
         {
-          "label": "715 tests and exact native rebuilds",
-          "path": "evidence/named-calls-qualification.json"
+          "label": "729 tests and exact native rebuilds",
+          "path": "evidence/control-flow-qualification.json"
         },
         {
-          "label": "Seeded calls and ordered effects",
-          "path": "evidence/named-calls-seeded-effects.json"
+          "label": "Benchmark methods and honest results",
+          "path": "BENCHMARKS.md"
         },
         {
-          "label": "Pure stress regression",
-          "path": "evidence/named-calls-seeded-pure.json"
+          "label": "Actual current-source build measurements",
+          "path": "evidence/control-flow-self-build-benchmarks.json"
         },
         {
-          "label": "Honest fixed-source comparison",
-          "path": "evidence/named-calls-comparison.json"
+          "label": "Seeded nested branches and effects",
+          "path": "evidence/control-flow-seeded-branches.json"
         }
       ],
       "related": [
@@ -445,16 +447,16 @@
     }
   ],
   "metrics": {
-    "tests": 715,
-    "upstream": 361,
+    "tests": 729,
+    "upstream": 371,
     "examples": 16,
-    "cliBytes": 617676,
+    "cliBytes": 637999,
     "sourceLimitBytes": 131072,
-    "observedAt": "2026-11-08T03:36:50.053319+00:00"
+    "observedAt": "2026-11-08T12:34:36.505025+00:00"
   },
   "evidenceSHA256": {
-    "evidence/named-calls-qualification.json": "a2f8d2cb5979a7fb7a4bafa8dcfde0dee7ef4087e7641c641c93ac2ee647b5d3",
-    "evidence/named-calls-io-verification.json": "6e9232bbf2c63551ded6af5ca9955f0bde24f5c21d34e7484e595383cec94f90"
+    "evidence/control-flow-qualification.json": "1e02f9c4cfe344f9f02aaf26dd7b2883e094a10c8ef2fd59107a8a7024692738",
+    "evidence/control-flow-io-verification.json": "caccb324467e5208668dfaf8b9403fab25b21e7ec3d872daa0f7d9a4d8d1b814"
   }
 }</script>
 <script>

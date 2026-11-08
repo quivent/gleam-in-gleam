@@ -1,0 +1,876 @@
+{
+  "schema": "gleam-in-gleam.native-benchmark/1",
+  "observedAt": "2026-11-08T12:35:52.020830+00:00",
+  "environment": {
+    "kernel": "6.8.0-147-generic",
+    "machine": "x86_64",
+    "cpuModel": "Intel Xeon Processor (Icelake)",
+    "pinnedChildCPU": 3,
+    "affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "loadBefore": [
+      6.646484375,
+      8.87548828125,
+      9.59765625
+    ],
+    "loadAfter": [
+      8.88916015625,
+      8.923828125,
+      9.53564453125
+    ]
+  },
+  "binaries": {
+    "baseline": {
+      "bytes": 617676,
+      "sha256": "38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e"
+    },
+    "candidate": {
+      "bytes": 637999,
+      "sha256": "3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65"
+    }
+  },
+  "methodology": {
+    "repetitions": 5,
+    "warmupsPerVariant": 1,
+    "order": "alternating baseline/candidate; reverse on odd repetitions",
+    "cache": "OS cache uncontrolled; source frozen once; no cold-cache claim",
+    "wall": "perf_counter around fork/exec/wait4, includes process launch",
+    "cpu": "wait4 user and system CPU for exact owned child",
+    "peakRSS": "Linux wait4 ru_maxrss in KiB",
+    "rssCaveat": "Includes owned fork/pre-exec setup; small-program RSS is an upper bound, compiler RSS dominates setup",
+    "scope": "shared host, one pinned child CPU; no global settings or unrelated processes changed"
+  },
+  "complete": true,
+  "samples": [
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "baseline",
+      "repetition": 0,
+      "wallSeconds": 8.044128577923402,
+      "userSeconds": 6.546335,
+      "systemSeconds": 0.373938,
+      "peakRSSKiB": 381440,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "candidate",
+      "repetition": 0,
+      "wallSeconds": 8.25320835702587,
+      "userSeconds": 6.45899,
+      "systemSeconds": 0.40015,
+      "peakRSSKiB": 385408,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "candidate",
+      "repetition": 1,
+      "wallSeconds": 8.391115995007567,
+      "userSeconds": 6.398816,
+      "systemSeconds": 0.345252,
+      "peakRSSKiB": 385408,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "baseline",
+      "repetition": 1,
+      "wallSeconds": 7.6517558709019795,
+      "userSeconds": 6.165857,
+      "systemSeconds": 0.369561,
+      "peakRSSKiB": 381440,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "baseline",
+      "repetition": 2,
+      "wallSeconds": 7.631761297001503,
+      "userSeconds": 6.4383479999999995,
+      "systemSeconds": 0.36505099999999996,
+      "peakRSSKiB": 381440,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "candidate",
+      "repetition": 2,
+      "wallSeconds": 7.4944572179811075,
+      "userSeconds": 6.237632,
+      "systemSeconds": 0.346864,
+      "peakRSSKiB": 385408,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "candidate",
+      "repetition": 3,
+      "wallSeconds": 7.0600173100829124,
+      "userSeconds": 6.191035,
+      "systemSeconds": 0.329451,
+      "peakRSSKiB": 385408,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "baseline",
+      "repetition": 3,
+      "wallSeconds": 8.700872509041801,
+      "userSeconds": 6.605471,
+      "systemSeconds": 0.343093,
+      "peakRSSKiB": 381440,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "baseline",
+      "repetition": 4,
+      "wallSeconds": 8.146114859031513,
+      "userSeconds": 6.431035,
+      "systemSeconds": 0.38275,
+      "peakRSSKiB": 381440,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "compile-frozen-compiler",
+      "variant": "candidate",
+      "repetition": 4,
+      "wallSeconds": 9.038548214011826,
+      "userSeconds": 6.49307,
+      "systemSeconds": 0.40398799999999996,
+      "peakRSSKiB": 385408,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "baseline",
+      "repetition": 0,
+      "wallSeconds": 0.03471479599829763,
+      "userSeconds": 0.029802,
+      "systemSeconds": 0.002884,
+      "peakRSSKiB": 12900,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "candidate",
+      "repetition": 0,
+      "wallSeconds": 0.04092240601312369,
+      "userSeconds": 0.029200999999999998,
+      "systemSeconds": 0.002013,
+      "peakRSSKiB": 12900,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "candidate",
+      "repetition": 1,
+      "wallSeconds": 0.037933639949187636,
+      "userSeconds": 0.029303,
+      "systemSeconds": 0.002835,
+      "peakRSSKiB": 12776,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "baseline",
+      "repetition": 1,
+      "wallSeconds": 0.0352451850194484,
+      "userSeconds": 0.029064,
+      "systemSeconds": 0.0029059999999999997,
+      "peakRSSKiB": 12776,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "baseline",
+      "repetition": 2,
+      "wallSeconds": 0.036575075006112456,
+      "userSeconds": 0.029002999999999998,
+      "systemSeconds": 0.003222,
+      "peakRSSKiB": 12776,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "candidate",
+      "repetition": 2,
+      "wallSeconds": 0.03856367792468518,
+      "userSeconds": 0.030843,
+      "systemSeconds": 0.002056,
+      "peakRSSKiB": 12776,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "candidate",
+      "repetition": 3,
+      "wallSeconds": 0.04268786497414112,
+      "userSeconds": 0.030737999999999998,
+      "systemSeconds": 0.001921,
+      "peakRSSKiB": 12776,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "baseline",
+      "repetition": 3,
+      "wallSeconds": 0.033713280921801925,
+      "userSeconds": 0.029238999999999998,
+      "systemSeconds": 0.0030239999999999998,
+      "peakRSSKiB": 12904,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "baseline",
+      "repetition": 4,
+      "wallSeconds": 0.033477081917226315,
+      "userSeconds": 0.02916,
+      "systemSeconds": 0.0029159999999999998,
+      "peakRSSKiB": 12904,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "arithmetic",
+      "variant": "candidate",
+      "repetition": 4,
+      "wallSeconds": 0.03758116706740111,
+      "userSeconds": 0.029588,
+      "systemSeconds": 0.0029579999999999997,
+      "peakRSSKiB": 12904,
+      "exitCode": 0,
+      "stdout": "8000002000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "baseline",
+      "repetition": 0,
+      "wallSeconds": 0.04403857106808573,
+      "userSeconds": 0.039367,
+      "systemSeconds": 0.0019679999999999997,
+      "peakRSSKiB": 12908,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "candidate",
+      "repetition": 0,
+      "wallSeconds": 0.048277758061885834,
+      "userSeconds": 0.03784,
+      "systemSeconds": 0.003153,
+      "peakRSSKiB": 12908,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "candidate",
+      "repetition": 1,
+      "wallSeconds": 0.05056810600217432,
+      "userSeconds": 0.039425999999999996,
+      "systemSeconds": 0.003942,
+      "peakRSSKiB": 12908,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "baseline",
+      "repetition": 1,
+      "wallSeconds": 0.053404543083161116,
+      "userSeconds": 0.040284,
+      "systemSeconds": 0.000959,
+      "peakRSSKiB": 12912,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "baseline",
+      "repetition": 2,
+      "wallSeconds": 0.045357036986388266,
+      "userSeconds": 0.039251,
+      "systemSeconds": 0.002872,
+      "peakRSSKiB": 12912,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "candidate",
+      "repetition": 2,
+      "wallSeconds": 0.04269226989708841,
+      "userSeconds": 0.038822999999999996,
+      "systemSeconds": 0.00199,
+      "peakRSSKiB": 12912,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "candidate",
+      "repetition": 3,
+      "wallSeconds": 0.05360517592635006,
+      "userSeconds": 0.037708,
+      "systemSeconds": 0.003057,
+      "peakRSSKiB": 12920,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "baseline",
+      "repetition": 3,
+      "wallSeconds": 0.06931173906195909,
+      "userSeconds": 0.039279,
+      "systemSeconds": 0.0020139999999999997,
+      "peakRSSKiB": 12792,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "baseline",
+      "repetition": 4,
+      "wallSeconds": 0.04355971293989569,
+      "userSeconds": 0.039337,
+      "systemSeconds": 0.001966,
+      "peakRSSKiB": 12920,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "branch-join",
+      "variant": "candidate",
+      "repetition": 4,
+      "wallSeconds": 0.042780313990078866,
+      "userSeconds": 0.038870999999999996,
+      "systemSeconds": 0.001993,
+      "peakRSSKiB": 12924,
+      "exitCode": 0,
+      "stdout": "-4000004000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "baseline",
+      "repetition": 0,
+      "wallSeconds": 0.05333827901631594,
+      "userSeconds": 0.048642,
+      "systemSeconds": 0.002026,
+      "peakRSSKiB": 12924,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "candidate",
+      "repetition": 0,
+      "wallSeconds": 0.05181258905213326,
+      "userSeconds": 0.048125,
+      "systemSeconds": 0.001964,
+      "peakRSSKiB": 12924,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "candidate",
+      "repetition": 1,
+      "wallSeconds": 0.06287193496245891,
+      "userSeconds": 0.048649,
+      "systemSeconds": 0.001945,
+      "peakRSSKiB": 12924,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "baseline",
+      "repetition": 1,
+      "wallSeconds": 0.0667966790497303,
+      "userSeconds": 0.047355999999999995,
+      "systemSeconds": 0.002842,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "baseline",
+      "repetition": 2,
+      "wallSeconds": 0.08407408301718533,
+      "userSeconds": 0.049676,
+      "systemSeconds": 0.000993,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "candidate",
+      "repetition": 2,
+      "wallSeconds": 0.07439005398191512,
+      "userSeconds": 0.049323,
+      "systemSeconds": 0.001934,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "candidate",
+      "repetition": 3,
+      "wallSeconds": 0.0708066769875586,
+      "userSeconds": 0.048351,
+      "systemSeconds": 0.002902,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "baseline",
+      "repetition": 3,
+      "wallSeconds": 0.05769701302051544,
+      "userSeconds": 0.050180999999999996,
+      "systemSeconds": 0.0029519999999999998,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "baseline",
+      "repetition": 4,
+      "wallSeconds": 0.06158614798914641,
+      "userSeconds": 0.052454999999999995,
+      "systemSeconds": 0.000971,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "short-circuit-call",
+      "variant": "candidate",
+      "repetition": 4,
+      "wallSeconds": 0.0553496100474149,
+      "userSeconds": 0.048879,
+      "systemSeconds": 0.001995,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "-4000004000002\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "baseline",
+      "repetition": 0,
+      "wallSeconds": 0.0650358940474689,
+      "userSeconds": 0.046501999999999995,
+      "systemSeconds": 0.000949,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "candidate",
+      "repetition": 0,
+      "wallSeconds": 0.07267091900575906,
+      "userSeconds": 0.043373999999999996,
+      "systemSeconds": 0.000985,
+      "peakRSSKiB": 12928,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "candidate",
+      "repetition": 1,
+      "wallSeconds": 0.07076750893611461,
+      "userSeconds": 0.04557,
+      "systemSeconds": 0.001981,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "baseline",
+      "repetition": 1,
+      "wallSeconds": 0.0632013069698587,
+      "userSeconds": 0.044957,
+      "systemSeconds": 0.0019979999999999998,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "baseline",
+      "repetition": 2,
+      "wallSeconds": 0.0512742210412398,
+      "userSeconds": 0.044034,
+      "systemSeconds": 0.0029319999999999997,
+      "peakRSSKiB": 12800,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "candidate",
+      "repetition": 2,
+      "wallSeconds": 0.05667147203348577,
+      "userSeconds": 0.044858999999999996,
+      "systemSeconds": 0.001908,
+      "peakRSSKiB": 12932,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "candidate",
+      "repetition": 3,
+      "wallSeconds": 0.056530565954744816,
+      "userSeconds": 0.046088,
+      "systemSeconds": 0.00098,
+      "peakRSSKiB": 12932,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "baseline",
+      "repetition": 3,
+      "wallSeconds": 0.05485726008191705,
+      "userSeconds": 0.042724,
+      "systemSeconds": 0.0039759999999999995,
+      "peakRSSKiB": 12936,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "baseline",
+      "repetition": 4,
+      "wallSeconds": 0.05293827306013554,
+      "userSeconds": 0.044926,
+      "systemSeconds": 0.001997,
+      "peakRSSKiB": 12940,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    },
+    {
+      "workload": "live-across-call",
+      "variant": "candidate",
+      "repetition": 4,
+      "wallSeconds": 0.055701658013276756,
+      "userSeconds": 0.043904,
+      "systemSeconds": 0.0029259999999999998,
+      "peakRSSKiB": 12940,
+      "exitCode": 0,
+      "stdout": "23999998000000\n",
+      "stderr": ""
+    }
+  ],
+  "summaries": [
+    {
+      "workload": "compile-frozen-compiler",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 8.044128577923402,
+          "minWallSeconds": 7.631761297001503,
+          "maxWallSeconds": 8.700872509041801,
+          "medianCPUSeconds": 6.813784999999999,
+          "maxPeakRSSKiB": 381440
+        },
+        "candidate": {
+          "medianWallSeconds": 8.25320835702587,
+          "minWallSeconds": 7.0600173100829124,
+          "maxWallSeconds": 9.038548214011826,
+          "medianCPUSeconds": 6.744068,
+          "maxPeakRSSKiB": 385408
+        }
+      },
+      "candidateOverBaselineMedian": 1.025991600839931
+    },
+    {
+      "workload": "arithmetic",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 0.03471479599829763,
+          "minWallSeconds": 0.033477081917226315,
+          "maxWallSeconds": 0.036575075006112456,
+          "medianCPUSeconds": 0.032225,
+          "maxPeakRSSKiB": 12904
+        },
+        "candidate": {
+          "medianWallSeconds": 0.03856367792468518,
+          "minWallSeconds": 0.03758116706740111,
+          "maxWallSeconds": 0.04268786497414112,
+          "medianCPUSeconds": 0.032546,
+          "maxPeakRSSKiB": 12904
+        }
+      },
+      "candidateOverBaselineMedian": 1.110871512152233
+    },
+    {
+      "workload": "branch-join",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 0.045357036986388266,
+          "minWallSeconds": 0.04355971293989569,
+          "maxWallSeconds": 0.06931173906195909,
+          "medianCPUSeconds": 0.041303,
+          "maxPeakRSSKiB": 12920
+        },
+        "candidate": {
+          "medianWallSeconds": 0.048277758061885834,
+          "minWallSeconds": 0.04269226989708841,
+          "maxWallSeconds": 0.05360517592635006,
+          "medianCPUSeconds": 0.040864,
+          "maxPeakRSSKiB": 12924
+        }
+      },
+      "candidateOverBaselineMedian": 1.0643940007892068
+    },
+    {
+      "workload": "short-circuit-call",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 0.06158614798914641,
+          "minWallSeconds": 0.05333827901631594,
+          "maxWallSeconds": 0.08407408301718533,
+          "medianCPUSeconds": 0.050669,
+          "maxPeakRSSKiB": 12928
+        },
+        "candidate": {
+          "medianWallSeconds": 0.06287193496245891,
+          "minWallSeconds": 0.05181258905213326,
+          "maxWallSeconds": 0.07439005398191512,
+          "medianCPUSeconds": 0.050873999999999996,
+          "maxPeakRSSKiB": 12928
+        }
+      },
+      "candidateOverBaselineMedian": 1.0208778599619366
+    },
+    {
+      "workload": "live-across-call",
+      "variants": {
+        "baseline": {
+          "medianWallSeconds": 0.05485726008191705,
+          "minWallSeconds": 0.0512742210412398,
+          "maxWallSeconds": 0.0650358940474689,
+          "medianCPUSeconds": 0.046955,
+          "maxPeakRSSKiB": 12940
+        },
+        "candidate": {
+          "medianWallSeconds": 0.05667147203348577,
+          "minWallSeconds": 0.055701658013276756,
+          "maxWallSeconds": 0.07267091900575906,
+          "medianCPUSeconds": 0.04683,
+          "maxPeakRSSKiB": 12940
+        }
+      },
+      "candidateOverBaselineMedian": 1.0330715013629845
+    }
+  ],
+  "qualifications": [
+    {
+      "variant": "baseline",
+      "producedCompilerSHA256": "38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e",
+      "deterministic": true,
+      "versionStdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n",
+      "probeStdout": "45\n",
+      "probeSHA256": "0e3c0823ab6d1504f012c2ccd8a7dc4993307f868e4cff1d7410ef37bf07ed2c"
+    },
+    {
+      "variant": "candidate",
+      "producedCompilerSHA256": "64c0c60deae901eb65a94fb154729b82db52fa9eacbafbf71d3b13ce22319ad7",
+      "deterministic": true,
+      "versionStdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n",
+      "probeStdout": "45\n",
+      "probeSHA256": "0e3c0823ab6d1504f012c2ccd8a7dc4993307f868e4cff1d7410ef37bf07ed2c"
+    }
+  ],
+  "limitations": [
+    "Single host and workload set, not a language-wide speed ranking",
+    "Timing and RSS are distinct from binary size",
+    "Compiler target inputs are identical; different backends may emit different images",
+    "Five repeats expose variability but cannot eliminate shared-host interference"
+  ],
+  "compilationInput": {
+    "sourceRevision": "40e68afde3a4194ead1a8a069e2dcc64c0f7fc67",
+    "sourceSHA256": {
+      "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+      "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+      "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+      "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+      "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+      "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+      "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+      "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+      "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+      "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+      "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+      "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+      "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+      "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+      "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+      "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+      "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+      "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+      "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+      "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+      "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+      "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+      "src/native/registers.gleam": "2b8c205b6b2c36184198fea52d0b3d74ffcd0c4b31fda0a365634ec26c81695a",
+      "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+      "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+      "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+      "src/native/x64.gleam": "ed44ba0ce853727e74a7fcef5d03a24eb698a332c817fe259bc7d66515ee9fa8"
+    }
+  },
+  "runtimeInputs": {
+    "arithmetic": {
+      "source": "fn go(n:Int,a:Int)->Int {case n {0->a _->go(n-1,a+n)}} pub fn main()->Nil {echo go(4000000,0) Nil}",
+      "sourceSHA256": "c745d3a544f006dee52bee58dc4c18ce65384e512d85decf730201151e393d7c",
+      "iterations": 4000000,
+      "expectedStdout": "8000002000000\n",
+      "images": {
+        "baseline": {
+          "bytes": 544,
+          "sha256": "d85ca37a3a4f5e72398af628e3667c4d41044ae0afb46c6b89aec276b9ee5910"
+        },
+        "candidate": {
+          "bytes": 544,
+          "sha256": "d85ca37a3a4f5e72398af628e3667c4d41044ae0afb46c6b89aec276b9ee5910"
+        }
+      }
+    },
+    "branch-join": {
+      "source": "fn go(n:Int,a:Int)->Int {case n {0->a _->{let next=case n<2000000 {True->a+n False->a-n} go(n-1,next)}}} pub fn main()->Nil {echo go(4000000,0) Nil}",
+      "sourceSHA256": "a189c31a6f893d17a6e0ab6d69a3c5dd525c20cdd919c8e93e398889d3f30d6a",
+      "iterations": 4000000,
+      "expectedStdout": "-4000004000000\n",
+      "images": {
+        "baseline": {
+          "bytes": 668,
+          "sha256": "1322430bfbd772d49fe6de1983e5f917a8f4901c000a09d32d340c805190f20b"
+        },
+        "candidate": {
+          "bytes": 623,
+          "sha256": "5db42ebef52474e2247a99d0fa1074b67e68247938d42a7c98c204ccc64c1b7d"
+        }
+      }
+    },
+    "short-circuit-call": {
+      "source": "fn positive(n:Int)->Bool {n>0} fn go(n:Int,a:Int)->Int {case n {0->a _->{let next=case n<2000000 && positive(n-1) {True->a+n False->a-n} go(n-1,next)}}} pub fn main()->Nil {echo go(4000000,0) Nil}",
+      "sourceSHA256": "514f9a9da54c69b29019da1571211ed037d022146e71c3bcf2209d19808f9cb4",
+      "iterations": 4000000,
+      "expectedStdout": "-4000004000002\n",
+      "images": {
+        "baseline": {
+          "bytes": 756,
+          "sha256": "b9f31077517f5c37b94be3fbb217ac40cecef42d9187e6770dea7448b4a17e70"
+        },
+        "candidate": {
+          "bytes": 727,
+          "sha256": "bf0cf48efc053e4e36fd7662cc27451266c0f20c3444c6bedd8f91530b3851a0"
+        }
+      }
+    },
+    "live-across-call": {
+      "source": "fn mix(n:Int)->Int {n*3+1} fn go(n:Int,a:Int)->Int {case n {0->a _->go(n-1,a+mix(n-1))}} pub fn main()->Nil {echo go(4000000,0) Nil}",
+      "sourceSHA256": "56d9b6f1722d64233e83ce7017c24232ee804f001b4b4bb9a17fad0925eca7bd",
+      "iterations": 4000000,
+      "expectedStdout": "23999998000000\n",
+      "images": {
+        "baseline": {
+          "bytes": 640,
+          "sha256": "7512880d3940816a6525a7e3ef08a6ecb17b012dd3c8bea321e07204c242fac5"
+        },
+        "candidate": {
+          "bytes": 640,
+          "sha256": "7512880d3940816a6525a7e3ef08a6ecb17b012dd3c8bea321e07204c242fac5"
+        }
+      }
+    }
+  },
+  "harnessSourceRevision": "7fc27b6f09ab2271f88edb20439ad1fa6f70143b",
+  "harnessSHA256": "d5573f251047168f2fc3f2545ad972794f1ab7b63a1e20c3f36eae9f0aeb816e"
+}

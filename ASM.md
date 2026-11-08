@@ -584,3 +584,19 @@ The named-calls-* evidence includes actual save/copy/restore instruction checks,
 heap-clobbering callees, nested argument effects, earlier-argument overflow, two
 native rebuilds and the seeded effect oracle. The fixed compiler-source image is
 unchanged, so no image-size or timing improvement is claimed for this increment.
+
+## Successor-aware scalar joins
+
+Typed Mark/Jump/JumpZero instructions lower to unique region-prefixed assembly
+labels, JMP and TEST+JE. Comparisons use signed 64-bit CMP, an explicit low-byte
+REX SETcc, and MOVZX into the destination, including RDI spill recovery. Short-
+circuit and supported two-arm scalar cases evaluate their subject once and execute
+only the selected arm. Both edges define RAX before joining, then copy/restore
+pending ancestor registers. General bindings/guards/data patterns remain legacy.
+
+Liveness unions successor live-ins; backward fixed points include backedges.
+Missing/duplicate labels fail analysis. Dead moves use actual live-out sets;
+traps, calls, labels/jumps and stack effects remain. Straight-line plans keep their
+previous backwards scan, avoiding unnecessary CFG work. Scalar join/runtime code
+sizes and CPU/wall distributions are in BENCHMARKS.md and control-flow-* evidence.
+The benchmark does not prove a general speedup or whole-function allocation.

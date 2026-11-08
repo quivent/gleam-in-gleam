@@ -216,3 +216,40 @@ node tools/verify_register_regions.mjs out/gleam-native out/call-region-oracle.j
 Current receipts: evidence/named-calls-qualification.json,
 evidence/named-calls-seeded-effects.json, evidence/named-calls-seeded-pure.json,
 evidence/named-calls-comparison.json.
+
+## Scalar branches and control-flow joins
+
+The typed plan now includes comparisons, Mark, Jump and JumpZero. It admits scalar
+Boolean expressions, short-circuit AND/OR/NOT, and supported two-arm Boolean or
+Int-literal/default cases without bindings/guards. Conditional subjects evaluate
+once; only the selected arm executes. Both paths produce RAX, then the join copies
+that result to its assigned register before restoring pending outer operands.
+Each region has its own assembly-label namespace. RDI spill recovery supports
+low-byte SETcc with an explicit REX prefix and zero extension.
+
+Liveness uses the union of successor live-ins, not textual fallthrough across
+branches. A backwards fixed point supports backedges; duplicate/missing labels
+are errors. Labels, jumps, calls, arithmetic traps and stack effects are retained.
+Dead moves are removed only against the actual live-out set, repeating if needed
+for transitive dead copies. Straight-line regions retain the earlier qualified
+linear pass instead of paying for graph rows and a fixed point.
+
+General pattern bindings, guards, multi-subject/data-valued matches and unmodeled
+call arguments remain legacy barriers. This is not full whole-function allocation
+for all language constructs. The benchmark report states that scope explicitly.
+Two initial aggregate verifier timeouts are retained: the first exposed unnecessary
+CFG work on straight-line regions; the second showed the multi-stage job required
+an aggregate allowance above 60 seconds. Only the aggregate limit is now 180;
+the individual native process limits remain unchanged.
+
+The branch oracle generates 100 expressions and compares selected-path effects
+and values to upstream and an independent model. Its 271 observed effects exclude
+untaken branches; static call counts span both paths. Pure/call stress inputs are
+also rerun. Generated test programs, corpus cases and benchmark workloads are
+reported as separate evidence categories, not inflated into one compilation count.
+
+Final qualification for this pass: 729 tests, 371 independent upstream/corpus
+cases, two native self-rebuilds, and all three seeded oracles. The benchmark report
+contains two source-input cohorts and shorter/longer runtime trials. Scope remains
+explicit: supported scalar joins are implemented; general whole-function and
+pattern/data lowering remain future work. No broad speedup is claimed.
