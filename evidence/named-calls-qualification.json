@@ -1,0 +1,461 @@
+{
+  "schema": "gleam-in-gleam.self-hosting-qualification/1",
+  "observedAt": "2026-11-08T03:36:50.053319+00:00",
+  "bootstrapCompiler": "gleam 1.19.2",
+  "bootstrapNode": "v22.23.3",
+  "bootstrapBridgeSHA256": "2b256317511589241a8414ad3fb04010c4d3bbbd5831d080d91900fa94b31934",
+  "compilerSourceLanguage": "Gleam",
+  "compilerModules": 27,
+  "compilerSourceLines": 9233,
+  "declaredPackageDependencies": [],
+  "tests": {
+    "total": 715,
+    "passed": 715,
+    "failed": 0
+  },
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+    "src/native/registers.gleam": "2b8c205b6b2c36184198fea52d0b3d74ffcd0c4b31fda0a365634ec26c81695a",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "ed44ba0ce853727e74a7fcef5d03a24eb698a332c817fe259bc7d66515ee9fa8"
+  },
+  "examples": [
+    {
+      "name": "fibonacci",
+      "bytes": 592,
+      "sha256": "7363a1ccefcebcc43b9641003a6a148cb3b9abd1bd4291ff89fe60eb45e3c18f",
+      "exitCode": 0,
+      "stdout": "55\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "control",
+      "bytes": 1052,
+      "sha256": "ffe8502b08a7f7313ce903b4f732d11a18f8e2f5bec339a89cdaac7d279403b6",
+      "exitCode": 0,
+      "stdout": "14\nfourteen\nFalse\nTrue\n-12345\n0\n-2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "collections",
+      "bytes": 1289,
+      "sha256": "93dc00292d05f673cbca67f548dcbc02342ed2a7c720cd1dc22c25d624008236",
+      "exitCode": 0,
+      "stdout": "6\n3\n6\n6\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "custom_types",
+      "bytes": 1273,
+      "sha256": "18057047cd62f38dccf0efb62534146087096a1c3485a6860ae4f488373d7a53",
+      "exitCode": 0,
+      "stdout": "5\n23\n0\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "generics_records",
+      "bytes": 874,
+      "sha256": "dc7d2a6c6d337956c7eb57afe4b035a7692be212cf4e6aa91ffc0f9e44c2f1e4",
+      "exitCode": 0,
+      "stdout": "21\n2\n21\n2\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "functions",
+      "bytes": 1048,
+      "sha256": "a3634cc46d3d7d6437a782fdc452a0a26ffe805b4bb38c09dbe574b87429cf22",
+      "exitCode": 0,
+      "stdout": "22\n3\n4\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "closures",
+      "bytes": 1017,
+      "sha256": "a3e5a5d4d0c5edb407057e439d2e29d56990c03c26e4dc24cd86269c937b9e02",
+      "exitCode": 0,
+      "stdout": "12\n22\n6\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "record_updates",
+      "bytes": 930,
+      "sha256": "e9f4236e62b01c9351f170ee36fbdc3005f2bb40aab7986f2c23bd5e8913042a",
+      "exitCode": 0,
+      "stdout": "3\n7\nTrue\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "bit_arrays",
+      "bytes": 1816,
+      "sha256": "84485a3928b516df416c57b1eee4e866c7f86a76ead0cd757721dfc4e2da5d99",
+      "exitCode": 0,
+      "stdout": "5\n9\n-2\n4660\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "modules",
+      "bytes": 1056,
+      "sha256": "7e09bfdf5f093892796c1cd9ae5dc4e6b0cda4cbfb9ed43d5044debd784a42cc",
+      "exitCode": 0,
+      "stdout": "14\n8\n3\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "aliases_guards",
+      "bytes": 1265,
+      "sha256": "a87ad1ac6b621f895739eab7e959b3c76b88a7c9151e462d61da5afa1e8fcfa6",
+      "exitCode": 0,
+      "stdout": "7\n5\nTrue\nFalse\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "strings_prelude",
+      "bytes": 1851,
+      "sha256": "98ce9992d72a614ab13add4cc0ac7ae6bec4634737a53bc91f7043201be5fbb5",
+      "exitCode": 0,
+      "stdout": "True\nTrue\n\u03bb\ud83d\ude00\n206\n187\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "multi_patterns",
+      "bytes": 1142,
+      "sha256": "358980a91290453b29c9afd3ce86914c11bccb8814b93090033e93db3c1b6773",
+      "exitCode": 0,
+      "stdout": "7\n9\n3\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "structural_equality",
+      "bytes": 2602,
+      "sha256": "172f4ae1c8f01fb1682aedf961eee286c0b84fec91a199bdfe89262b9d242a38",
+      "exitCode": 0,
+      "stdout": "True\nFalse\nTrue\nTrue\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "pattern_aliases",
+      "bytes": 882,
+      "sha256": "6564575cff334ea2f19ce057164e314e3847dbde9a1e35b953eaadce6f0a4810",
+      "exitCode": 0,
+      "stdout": "14\n10\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    },
+    {
+      "name": "wide_patterns",
+      "bytes": 653,
+      "sha256": "83f65ff5a21c296282a2b786eb11556536a6b2393c445b19f43ba310b30e7184",
+      "exitCode": 0,
+      "stdout": "True\nFalse\n9007199254740991\n-2147483648\n",
+      "dynamicLoader": false,
+      "dynamicLibraries": [],
+      "nonExecutableStack": true
+    }
+  ],
+  "disassemblies": [
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "9cba372774c2759bc8c001b609c82586927a42a6416cdd446c7867f78ae45373",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-collections-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "180354c780c291e99e76894e4deea605c39d263c31da77d1107822cd7b6fd641",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-custom_types-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "2ee530bc54b035198b51a45eb857d27e79b464d91933bb5958f467c41b7eddcc",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-generics_records-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "f5c3712efa3d71cd4b6736f6a138c2e604ca7b889e16f81c381a8dd2c3af6a4f",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-functions-descriptor-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "73e59f85f9048bdbcda752169899ac1d7887a309f90cc2e0e4993d88fa577ef1",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-closures-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "bb3494cad4f2557a17245bca969531c6b9f06007905ddc59a6f0db3065f476cf",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-record_updates-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "d493406c8d98ce16196a8c15e3a5fcde59144211058e26a9cdd74122f8493ae2",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-bit_arrays-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "80f0cb2df8ec98cb9212bea9855ccca712110afb1e2f9139416faafd64f12254",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-modules-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "472539ff18c75929a7f02f1bab57789039509c26c8fdc86e87031d89ea400dca",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-aliases_guards-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "5f5ac1a797ce09efac0cc11b1596432b90bdfa26db2d5becba680929bd35dcd5",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-strings_prelude-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "fda7b67ecb100b3913d82177946d1470f89c1fec4d2c8106288a8b16486d090a",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-multi_patterns-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "c38ae17dc374cb64ae386d81d659d13cbf97bc8494c4746adc66e19fb818c79b",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-structural_equality-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "941dfcaf90949d69b1500ec64a5b4f0ce7937bead88df19fc55b30205f55e889",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-pattern_aliases-disassembly.txt"
+    },
+    {
+      "tool": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+      "entryAddress": "0x4000b0",
+      "rawCodeSHA256": "96b8563504ba741043b1ce82dddc487a8f9b57d070a351c2529f172c8f288d50",
+      "includesTrailingStaticData": true,
+      "path": "evidence/named-calls-wide_patterns-disassembly.txt"
+    }
+  ],
+  "upstreamAcceptanceChecks": {
+    "total": 64,
+    "agreed": 64,
+    "path": "evidence/named-calls-upstream-checks.json"
+  },
+  "bitArrayRepresentation": "arena descriptor: aligned size, tag -1, byte length, data pointer, root owner; owned payload or shared slice",
+  "bitArraySubset": "byte-aligned construction/concat, fixed integer widths 0..64 construction and 8..64 matching; signed/unsigned matching, endian options, final unsized bits/bytes tails",
+  "projectCompilation": {
+    "sourceLanguage": "Gleam",
+    "imports": "local module aliases and qualified values/types/constructors",
+    "namespace": "unlexable module-qualified internal names",
+    "dependencyOrder": "deterministic DFS postorder, cycles rejected, shared modules linked once",
+    "nativeLinker": "owned Gleam relocation emitter, no external linker",
+    "selectiveImports": false
+  },
+  "projectUpstreamChecks": {
+    "total": 297,
+    "agreed": 297,
+    "path": "evidence/named-calls-project-upstream-checks.json"
+  },
+  "totalFreshUpstreamComparisons": 361,
+  "linkedExampleSymbols": {
+    "functions": [
+      "add@module_demo/numbers",
+      "twice@module_demo/numbers",
+      "increment@module_demo/numbers",
+      "main"
+    ],
+    "types": [
+      "Box@module_demo/box"
+    ],
+    "remainingImports": 0,
+    "remainingAliases": 0
+  },
+  "exactSingleModuleEquivalenceFixture": "nested-path-default-alias (native test)",
+  "moduleFixturesSHA256": "2b3a2826c8710e7bb0926c082e4afc684e7fb574a17432c9957c0706e3bbae17",
+  "aliasesGuardsFixturesSHA256": "f015e42b509d172589f9e9d81511581cf091a7722a1725f358b0a48f9a71a6d4",
+  "stringsPreludeFixturesSHA256": "945b8d9362d8b73cb140ffd43c4c2d327ca90ac6749198198b9143b6b119c035",
+  "stringRepresentation": "static length/UTF8/newline; owned arena buffers have size/tag -2 preceding value pointer; prefix tails copy payload",
+  "implicitPrelude": "reserved Result(a,e)/Ok/Error, shared across modules; local declarations shadow each name; not re-exported",
+  "nativeOwnedComponentTest": "src/native/utf8.gleam compiled by this compiler and executed on valid/invalid byte sequences",
+  "multiPatternsFixturesSHA256": "89995f3f9c5060926cbc96f762adca35f4db6028aa7a5153f3b34a58c484e195",
+  "multiPatterns": "subjects evaluated once left-to-right into stack slots; alternatives share bindings/body; failed guard retries next alternative; finite constructor-product coverage",
+  "ownedCore": {
+    "source": "src/native/core.gleam",
+    "sourceSHA256": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+    "driver": "test/owned-core-driver.source",
+    "driverSHA256": "2c451661c941f16b12929bacc3843df291909a57d4c41569b2e9a277c0003197",
+    "executableSHA256": "cac0a90a2cf9053455b272676fd0fda96a97c26b107bc35c0a081072432868ec",
+    "bytes": 12322,
+    "exitCode": 0,
+    "stdout": "3\n1234\nTrue\nTrue\n7\n3\n4\n9\nTrue\nTrue\n",
+    "oracle": "native test compares current upstream-compiled core function results",
+    "allSourceFunctionsCompiled": true,
+    "fullCompilerSelfHosting": false
+  },
+  "integerCoverageFixturesSHA256": "98c902efc4646232fef08fcc5ef70e73f3358a3d5ec1d0cb506e8f7158407829",
+  "integerLiteralRange": "decimal magnitudes 0..9007199254740991; pre-accumulation bound and exact digit grouping preserve bootstrap precision",
+  "integerPatternLowering": "signed imm32 compare where exact; otherwise movabs rdx, imm64 then cmp rax, rdx",
+  "singleCaseCoverage": "legacy fast path/diagnostics, existing constructor-product matrix fallback with one subject column; guarded arms excluded",
+  "patternAliasFixturesSHA256": "f7c33c123d823d88a619e2c520ee4235098e33412eac8b4c2769f4cf3bce2311",
+  "patternAliases": "whole-value aliases reuse matched stack slots; aliases preserve underlying coverage and typed bindings; nested aliases, guards, alternatives and captures",
+  "equalityFixturesSHA256": "f58f9ceb5619441b631df866cb1d6ce2b0c2d56eb722089ace4703b96d0c0d37",
+  "structuralEquality": "type-directed static helper graph; lists loop over tails; nominal tags checked before variant fields; strings/bits compare bytes; no heap allocation during comparison",
+  "equalityLimits": "128 shape nodes per root; erased stored fields and function values explicitly unsupported; unresolved inference-only fields trap if visited",
+  "ownedTypeSystem": {
+    "entry": "native/type_system",
+    "sourceSHA256": {
+      "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+      "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+      "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1"
+    },
+    "driver": "test/owned-type-system-driver.source",
+    "driverSHA256": "5b6429b722e7341ab8fba47f705879c20c896f00cc1cf840cc190c9a1f390030",
+    "executableSHA256": "5c1500980eb544b13dafaf31f4c2c39c7ebf27c7168a57d637fbf25fdd054546",
+    "bytes": 25343,
+    "exitCode": 0,
+    "stdout": "Box(Int)\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n",
+    "allSourceFunctionsCompiled": true,
+    "fullCompilerSelfHosting": false,
+    "oracle": "native test compares current upstream-compiled owned module function results"
+  },
+  "ownedEqualityPlanner": {
+    "entry": "native/equality",
+    "sourceSHA256": {
+      "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+      "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+      "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+      "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+      "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+      "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f"
+    },
+    "driver": "test/owned-equality-driver.source",
+    "driverSHA256": "218c2ca8a95af3a9329d0caa64f305e0b8b015df8db20b4a37d8bdca144b6cfb",
+    "executableSHA256": "d0007c44df092025e41074292b75b55de9fc643d3f69e70110a00fa47b49bffd",
+    "bytes": 48666,
+    "exitCode": 0,
+    "stdout": "3\n0\n",
+    "allSourceFunctionsCompiled": true,
+    "fullCompilerSelfHosting": false,
+    "oracle": "native test compares current upstream-compiled owned module function results"
+  },
+  "aliases": "transparent, scoped expansion; cycle/arity/parameter/visibility checks; no target wrappers",
+  "guards": "restricted pure expressions, typed Bool; failed alternative guard retries alternatives then later arms; guarded arms do not prove exhaustiveness",
+  "functionValueRepresentation": "arena descriptor: size, tag0, code pointer, copied captures",
+  "compilerRunsNatively": true,
+  "nativeCompilerAPI": {
+    "path": "evidence/complete-api-named-calls-probe.json",
+    "bytes": 607253,
+    "emittedPrograms": 2,
+    "byteIdenticalToBootstrap": true,
+    "nativeCLI": false
+  },
+  "nativeCLI": {
+    "path": "evidence/named-calls-io-verification.json",
+    "artifact": {
+      "bytes": 617676,
+      "sha256": "38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e",
+      "dynamicLoader": false,
+      "dynamicSegment": false,
+      "nonExecutableStack": true
+    },
+    "sourceLimitBytes": 131072,
+    "compilerArenaBytes": 536870912,
+    "sourceConvention": "module path relative to explicit root or cwd",
+    "syscallBoundary": "typed pure Gleam request state machine + owned Linux effect runner",
+    "disassembly": {
+      "path": "evidence/named-calls-disassembly.txt",
+      "sha256": "f7897560c2f163faeca1d1613c8b6e69b243c759ef3ff3b503ce37c3cde1a3ea",
+      "kind": "selected actual instruction windows"
+    }
+  },
+  "selfHosting": true,
+  "selfHostingProof": "evidence/named-calls-native-rebuilds.json",
+  "nativeCorpus": {
+    "total": 361,
+    "accepted": 241,
+    "rejected": 120,
+    "allAcceptedOutputsByteIdentical": true,
+    "compilerStage": 3
+  },
+  "tailCalls": "direct returned self calls in blocks and cases; arguments evaluated before parameter replacement",
+  "fullGleamCompatibility": false,
+  "nativeTarget": "linux-x86_64",
+  "externalCodegenTools": [],
+  "limitations": [
+    "Self-hosted subset compiler; initial bootstrap uses upstream Gleam and Node",
+    "No polymorphic named function values/labelled function calls/selective imports or package resolution yet; guard construction remains unsupported",
+    "Anonymous parameters require annotations or a sufficiently resolved expected function type",
+    "Bounded native CLI: 128 KiB per source, 512 MiB compiler arena; ordinary emitted programs retain 64 MiB; no GC or mutual/indirect TCO",
+    "Erased stored-field/function equality, compound printing and full coverage are not implemented; equality graphs are bounded to 128 shape nodes",
+    "Unaligned/dynamic-size/float and UTF8 codepoint pattern segments are not implemented; unsigned 64-bit extraction above native signed Int range exits 70",
+    "Fixed-width integer and diagnostic formatting limitations documented in README"
+  ]
+}

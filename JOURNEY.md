@@ -571,3 +571,25 @@ naturally adds source/code beyond that fixed-target saving. An old hardcoded
 disassembly receipt path was corrected; 59 IO tests were rerun with unchanged
 compiler source/image and the initial receipt preserved. Earlier milestone
 receipts remain intact under their original names.
+
+## Caller saves across named integer calls — 2026-11-08
+
+The typed plan now models named calls and their full allocatable-register/flags
+kill mask. It saves pending ancestor operands before evaluating arguments with a
+fresh pool, stages arguments in source order, copies the return value before
+restoring saved operands and keeps effectful calls even when results are dead.
+This preserves the existing owned stack ABI and direct self-tail reentry path.
+Indirect/non-integer calls and general control-flow allocation remain unfinished.
+
+715 tests and 361 fresh upstream comparisons pass; all 361 cases also pass through
+the rebuilt native compiler. Two native self-rebuilds match the seed. The separate
+call stress program contains 100 expressions, 286 named calls and 386 modeled
+ordered effects; native/upstream/model results and native/bootstrap bytes agree.
+The previous pure stress program's source and output image are unchanged.
+
+No fixed compiler-source image or instruction-count improvement is observed for
+this foundation. Result placement/coalescing still deserves measurement; we do
+not infer a speedup from the new capability. Current compiler image:
+617,676 bytes, SHA256 38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e. No runtime dependency
+or installed Crew/compiler executable was added or replaced. All prior receipts
+remain preserved under their original milestone names.

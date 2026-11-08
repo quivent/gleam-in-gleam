@@ -178,3 +178,41 @@ a native compiler (development tools only):
 ```sh
 node tools/verify_register_regions.mjs out/gleam-native out/register-region-oracle.json
 ```
+
+## Named calls and caller-save allocation
+
+Named Int-returning calls whose arguments are supported integer trees now enter
+regions. Their stack ABI is unchanged: evaluate arguments in source order and
+push each result; call fn:NAME; remove exactly argument_count words. Dynamic
+function descriptors and non-integer arguments are outside this increment.
+
+Every allocatable register RAX/RCX/RDX, reserved recovery RDI and Flags is killed
+by a named callee. The definitions/kill set is consumed by backward liveness;
+only RAX contains a valid return value. Other killed values must not be used until
+restored. R14/R15 are reserved allocator state, not caller values to roll back.
+
+The occupied prefix of the register pool contains pending ancestor operands.
+Push it BEFORE argument evaluation, then evaluate each argument using a fresh
+pool, since previous arguments are already on the stack. Nested calls cannot
+silently overwrite an outer live value. After the call, copy its RAX return into
+the available target register before popping saved registers in reverse order.
+The target is not among the saved prefix. RDI cannot hold a persistent live value
+across a call. Arithmetic guards remain immediate; call/stack effects are never
+removed by dead-move elimination. Argument words are consumed by call cleanup,
+while caller saves and pressure spills have explicit matching pops.
+
+Qualification: 715 tests, 361 independent upstream corpus comparisons and native
+cases, and two exact native self-rebuilds. A separate seeded 100-expression call
+program checks 286 calls and 386 effect observations against upstream and an
+independent BigInt/effect model. The original pure stress program still has its
+previous source/image hashes. The compiler-source fixed image/instruction counts
+are unchanged; this does not claim faster execution. Caller result coalescing,
+indirect calls, non-integer arguments and general control-flow joins remain open.
+
+```sh
+node tools/verify_register_regions.mjs out/gleam-native out/call-region-oracle.json --calls
+```
+
+Current receipts: evidence/named-calls-qualification.json,
+evidence/named-calls-seeded-effects.json, evidence/named-calls-seeded-pure.json,
+evidence/named-calls-comparison.json.

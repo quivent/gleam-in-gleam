@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 351 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 361 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **613,842 bytes**, SHA256
-`df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b`.
+The native image is **617,676 bytes**, SHA256
+`38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/integer-regions-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/named-calls-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -711,10 +711,10 @@ Explicit uses/definitions include condition flags; backward liveness removes dea
 moves while retaining arithmetic traps. The allocator uses RAX/RCX/RDX and spills
 to the machine stack when the region exceeds that pool, with RDI reserved for
 recovery. Left-to-right evaluation and immediate overflow checks remain intact.
-Calls, effects and control flow retain their old lowering. This is expression-
+That first increment retained legacy calls/effects/control flow. It established expression-
 region allocation, not whole-function control-flow liveness.
 
-Current qualification: **702 tests and 351 fresh upstream comparisons**. The rebuilt
+The first typed-region qualification passed **702 tests and 351 fresh upstream comparisons**. The rebuilt
 native compiler qualifies all 351 corpus cases, and both native self-rebuilds are
 byte-identical. A separate seeded 100-expression program agrees with independent
 BigInt results and upstream: 68 regions spill, maximum operand pressure seven,
@@ -728,4 +728,31 @@ No runtime speed or whole-function allocation claim follows from these results.
 See [qualification](evidence/integer-regions-qualification.json),
 [seeded oracle](evidence/integer-regions-seeded-oracle.json),
 [static comparison](evidence/integer-regions-comparison.json) and
+[design](REGISTER_SPILL_SPEC.md).
+
+## Caller-save allocation for named integer calls — 2026-11-08
+
+Typed regions now admit named functions returning Int with supported integer
+arguments. The call mask kills every allocatable register, recovery scratch and
+flags. Live ancestor operands are pushed before evaluating arguments, which run
+left-to-right with a fresh register pool. Each argument is staged on the existing
+stack ABI. After the call and argument cleanup, copy the RAX result to its assigned
+register before restoring saved operands in reverse order. Calls remain effectful
+and cannot be deleted when their result is dead.
+
+Current qualification: **715 tests and 361 fresh upstream comparisons**. The rebuilt
+compiler qualifies all 361 corpus cases and both native self-rebuilds match the
+seed. A separate 100-expression call oracle exercises 286 named calls and verifies
+386 ordered output effects against BigInt modeling and upstream. The earlier pure
+100-expression program still produces exactly its previous image. These are two
+stress programs, not 200 additional independent compilation cases in the corpus.
+
+The frozen compiler-source image and static instruction counts are unchanged.
+This is a tested allocation foundation across calls, not a speedup claim; result
+placement/coalescing may need further work. The current compiler includes the new
+implementation and is 617,676 bytes. Indirect calls, non-integer arguments,
+effects outside callees and general control-flow joins retain legacy lowering.
+See [qualification](evidence/named-calls-qualification.json),
+[call/effect oracle](evidence/named-calls-seeded-effects.json),
+[static comparison](evidence/named-calls-comparison.json) and
 [design](REGISTER_SPILL_SPEC.md).

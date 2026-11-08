@@ -1,0 +1,1288 @@
+{
+  "schema": "gleam-in-gleam.seeded-register-regions/1",
+  "observedAt": "2026-11-08T03:35:01.636Z",
+  "seed": 1779033703,
+  "count": 100,
+  "callsMode": true,
+  "effectObservations": 386,
+  "source": "fn touch(n:Int)->Int {echo n n+1} fn mix(a:Int,b:Int)->Int {echo a echo b a-b}\nfn f_0(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{b + {touch(d) - {e - e}}}}\nfn f_1(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_2(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(d)}\nfn f_3(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch(touch(b)) + b}}\nfn f_4(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({mix(b,d) - d})}\nfn f_5(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{c * d} + {b + a}} * touch({c + b})} + c}}\nfn f_6(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch(mix({a - b},c)) + b} + touch({{a - {e - e}} - touch(a)})}}\nfn f_7(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch(touch({{{b - e} + touch(e)} * mix(mix(a,b),{b + d})})) + touch({a - d})}}\nfn f_8(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(d)}\nfn f_9(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_10(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{a - c} * {{touch({b * a}) + a} - {{touch(c) - mix(d,b)} + {mix(b,e) * e}}}}}\nfn f_11(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{b + touch(touch(touch(touch(e))))} * touch(e)}}\nfn f_12(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{e * {{c * d} + {c + e}}}}\nfn f_13(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{a + {{c - d} + mix(e,b)}} * {{{e * c} + {d + c}} - e}}}\nfn f_14(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{b - {d + {e + d}}} - {touch(d) * {{d * b} - a}}} - e}}\nfn f_15(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({{touch(touch(b)) * touch(d)} - {{touch(a) - {b * e}} + d}}) - {touch(touch(mix({a - a},{c * b}))) * {{{d + {b * c}} + {mix(e,e) - mix(e,b)}} + {{{e * d} * {c * e}} - d}}}}}\nfn f_16(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({{c - e} * {b + b}})}\nfn f_17(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix({touch(touch(e)) - touch({a - c})},touch(b))}\nfn f_18(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c * mix({{touch(c) * {d * d}} * mix({a + c},touch(b))},{{{b - c} - {a * b}} * a})}}\nfn f_19(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{a - {{{{{c + c} * touch(d)} * c} + {c * touch({e - e})}} * {e - e}}}}\nfn f_20(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_21(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_22(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{touch(d) * {e - b}} + touch(mix(d,e))} + {{touch(c) - {b + b}} - e}} * {touch({{d * d} + {b * e}}) * e}}}\nfn f_23(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch(touch(mix({b - b},{d - d}))) + {mix({{b * e} + {d + a}},{c - mix(c,a)}) + {mix({c * d},{b * c}) + c}}} * b}}\nfn f_24(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{e - touch(e)}}\nfn f_25(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_26(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{mix({{{c * d} + b} + {touch(c) + {e * e}}},touch({touch(c) - mix(a,d)})) - {{mix(touch(d),mix(a,d)) * {{c * d} * {b * e}}} - {touch({d * b}) + d}}}}\nfn f_27(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(mix({touch({e - e}) - {{mix(d,e) - b} * c}},{{{mix(e,e) - c} - {{d + a} - e}} - a}),touch(touch(d)))}\nfn f_28(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({mix(d,e) + {c + e}})}\nfn f_29(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{b * touch({{b - b} + {d * d}})}}\nfn f_30(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(b,d)}\nfn f_31(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_32(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{a - e} - touch(b)} - {{c * d} + touch(d)}}}\nfn f_33(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch(mix(a,c)) - touch({a - d})} + d}}\nfn f_34(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({mix(mix({d * a},{e * d}),{{a - d} + mix(b,b)}) + {d * {{e + d} + mix(b,b)}}})}\nfn f_35(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{mix({touch(touch(touch(b))) - touch({mix(e,b) * touch(c)})},touch(touch({touch(e) * touch(c)}))) - {touch({{{c + e} - {a * a}} + {{d - b} * e}}) * {touch(d) - {{b + {a - b}} + {{e * a} + touch(c)}}}}}}\nfn f_36(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(c)}\nfn f_37(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch(b) + {touch({a * c}) * {{c + b} + {c * b}}}}}\nfn f_38(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix({d - {touch({d * d}) - {{a * a} - mix(b,c)}}},{{{{a * b} - touch(e)} - {c - d}} + {touch(c) + mix({c * d},d)}})}\nfn f_39(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_40(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(touch(touch(a)))}\nfn f_41(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(c)}\nfn f_42(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch(mix({{b * b} * mix(b,c)},c)) * e}}\nfn f_43(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(mix(touch({e * touch({e - d})}),mix(b,mix({{b - b} - touch(b)},{{b * d} * {d * e}}))))}\nfn f_44(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{c + touch(d)} - mix(e,{e + b})}}\nfn f_45(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({{c * a} + a}) + c}}\nfn f_46(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_47(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_48(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{mix(a,d) - {b - e}} + a}}\nfn f_49(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(touch(e),touch(mix({a - c},d)))}\nfn f_50(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{mix(mix({{b - e} * mix(b,b)},touch(b)),mix({touch(a) + {a - b}},d)) + {{touch(mix(b,d)) - {mix(a,c) + {b - b}}} + {{touch(a) - {c + a}} - {touch(a) * touch(c)}}}}}\nfn f_51(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {a}\nfn f_52(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({touch(d) + touch(c)})}\nfn f_53(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({d + {{b - b} - touch(b)}})}\nfn f_54(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({mix({c + a},{a - e}) - e}) - {{{{d + b} - mix(b,b)} * e} * {mix(a,{d - a}) + {{c + e} + d}}}}}\nfn f_55(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(touch(b))}\nfn f_56(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{a * a} * {c + a}} - touch(e)}}\nfn f_57(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{b - {{e + b} + touch(b)}} - {{{b + e} - {e * d}} - {{c - a} * {a + a}}}}}\nfn f_58(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c + touch({{touch(b) * d} * touch({d + d})})}}\nfn f_59(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix({mix({{{d * d} + touch(a)} - {{a + d} + {a * b}}},{a - touch(b)}) * touch(touch({{e * a} - a}))},mix(mix(e,a),mix(touch(e),b)))}\nfn f_60(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(touch({d * e}))}\nfn f_61(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix({mix(b,{e * d}) + touch({d + e})},touch(a))}\nfn f_62(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_63(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({{{touch({d + b}) * touch({d + b})} * touch(b)} * {{touch(touch(b)) - {{c - a} + {b - d}}} - mix({e - mix(e,e)},{{e + d} * {a + d}})}})}\nfn f_64(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(d,e)}\nfn f_65(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{d + e} * {b - e}} * {mix(a,d) * c}} + {touch({b - d}) * mix({a * e},{d + c})}}}\nfn f_66(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(a)}\nfn f_67(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_68(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{e - mix(a,a)} + touch({a * c})}}\nfn f_69(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {b}\nfn f_70(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{c * mix(mix({{c + b} + {b * e}},{touch(b) * {a * c}}),d)}}\nfn f_71(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({mix({c + {e - d}},{{c + e} + touch(c)}) - e}) - b}}\nfn f_72(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({{e + a} - d})}\nfn f_73(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{d + {{d + b} - {a * b}}} + a}}\nfn f_74(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{b - {{{b * {b * b}} - {{a + c} * {a - a}}} + touch({mix(d,a) + mix(e,c)})}}}\nfn f_75(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{c + d} * touch({mix(touch({c * c}),touch({d - a})) - touch(mix({a + c},mix(a,d)))})}}\nfn f_76(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {d}\nfn f_77(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(touch(a),{touch(touch(b)) - {touch(a) + {b + d}}})}\nfn f_78(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch({{c + d} - {c + b}}) + {b * e}} * d}}\nfn f_79(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_80(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{b + {e + {b * c}}}}\nfn f_81(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({touch(e) - {d * {b * c}}})}\nfn f_82(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{{e * a} + {d - b}} - touch(touch(b))} * {c + mix(d,{c - e})}} - touch({c * touch(touch(b))})}}\nfn f_83(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {e}\nfn f_84(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch(a) * c} - {touch(b) * e}}}\nfn f_85(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{d + c} * mix(a,d)} - d} * {mix({e - b},{e - d}) + touch(b)}}}\nfn f_86(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {c}\nfn f_87(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{{{touch({d - b}) + touch(mix(c,c))} - mix({{e * d} + mix(b,a)},touch(e))} + {{touch(touch(b)) * {touch(a) * e}} - b}} - c}}\nfn f_88(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({a * b}) * {b - touch(a)}}}\nfn f_89(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({a + touch(b)})}\nfn f_90(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{touch(mix(c,mix(d,a))) + d} + d}}\nfn f_91(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{d + mix(d,{c * e})} + {{d * a} - touch({{touch(a) * {c * b}} - {touch(b) * mix(d,e)}})}}}\nfn f_92(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(mix({a + a},{d - d}),mix(touch(e),{b - b}))}\nfn f_93(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{touch({{e * b} + {a * b}}) * mix(a,{{a - a} - mix(b,c)})}}\nfn f_94(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(mix(mix({{d * c} * mix(a,e)},{{e + e} + touch(a)}),{{touch(b) * touch(c)} * {{a * d} - {b + a}}}))}\nfn f_95(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {{{b * {{touch(e) * touch(touch(d))} * touch({b - {e + c}})}} + touch({{mix(touch(d),a) + c} - touch({mix(a,a) * {c * c}})})}}\nfn f_96(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(mix(c,b))}\nfn f_97(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch({touch(touch(b)) + {{d * c} + {c + a}}})}\nfn f_98(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {touch(e)}\nfn f_99(a:Int,b:Int,c:Int,d:Int,e:Int)->Int {mix(touch(touch(e)),c)}\npub fn main()->Nil {echo f_0(2,-3,4,-2,1)\necho f_1(2,-3,4,-2,1)\necho f_2(2,-3,4,-2,1)\necho f_3(2,-3,4,-2,1)\necho f_4(2,-3,4,-2,1)\necho f_5(2,-3,4,-2,1)\necho f_6(2,-3,4,-2,1)\necho f_7(2,-3,4,-2,1)\necho f_8(2,-3,4,-2,1)\necho f_9(2,-3,4,-2,1)\necho f_10(2,-3,4,-2,1)\necho f_11(2,-3,4,-2,1)\necho f_12(2,-3,4,-2,1)\necho f_13(2,-3,4,-2,1)\necho f_14(2,-3,4,-2,1)\necho f_15(2,-3,4,-2,1)\necho f_16(2,-3,4,-2,1)\necho f_17(2,-3,4,-2,1)\necho f_18(2,-3,4,-2,1)\necho f_19(2,-3,4,-2,1)\necho f_20(2,-3,4,-2,1)\necho f_21(2,-3,4,-2,1)\necho f_22(2,-3,4,-2,1)\necho f_23(2,-3,4,-2,1)\necho f_24(2,-3,4,-2,1)\necho f_25(2,-3,4,-2,1)\necho f_26(2,-3,4,-2,1)\necho f_27(2,-3,4,-2,1)\necho f_28(2,-3,4,-2,1)\necho f_29(2,-3,4,-2,1)\necho f_30(2,-3,4,-2,1)\necho f_31(2,-3,4,-2,1)\necho f_32(2,-3,4,-2,1)\necho f_33(2,-3,4,-2,1)\necho f_34(2,-3,4,-2,1)\necho f_35(2,-3,4,-2,1)\necho f_36(2,-3,4,-2,1)\necho f_37(2,-3,4,-2,1)\necho f_38(2,-3,4,-2,1)\necho f_39(2,-3,4,-2,1)\necho f_40(2,-3,4,-2,1)\necho f_41(2,-3,4,-2,1)\necho f_42(2,-3,4,-2,1)\necho f_43(2,-3,4,-2,1)\necho f_44(2,-3,4,-2,1)\necho f_45(2,-3,4,-2,1)\necho f_46(2,-3,4,-2,1)\necho f_47(2,-3,4,-2,1)\necho f_48(2,-3,4,-2,1)\necho f_49(2,-3,4,-2,1)\necho f_50(2,-3,4,-2,1)\necho f_51(2,-3,4,-2,1)\necho f_52(2,-3,4,-2,1)\necho f_53(2,-3,4,-2,1)\necho f_54(2,-3,4,-2,1)\necho f_55(2,-3,4,-2,1)\necho f_56(2,-3,4,-2,1)\necho f_57(2,-3,4,-2,1)\necho f_58(2,-3,4,-2,1)\necho f_59(2,-3,4,-2,1)\necho f_60(2,-3,4,-2,1)\necho f_61(2,-3,4,-2,1)\necho f_62(2,-3,4,-2,1)\necho f_63(2,-3,4,-2,1)\necho f_64(2,-3,4,-2,1)\necho f_65(2,-3,4,-2,1)\necho f_66(2,-3,4,-2,1)\necho f_67(2,-3,4,-2,1)\necho f_68(2,-3,4,-2,1)\necho f_69(2,-3,4,-2,1)\necho f_70(2,-3,4,-2,1)\necho f_71(2,-3,4,-2,1)\necho f_72(2,-3,4,-2,1)\necho f_73(2,-3,4,-2,1)\necho f_74(2,-3,4,-2,1)\necho f_75(2,-3,4,-2,1)\necho f_76(2,-3,4,-2,1)\necho f_77(2,-3,4,-2,1)\necho f_78(2,-3,4,-2,1)\necho f_79(2,-3,4,-2,1)\necho f_80(2,-3,4,-2,1)\necho f_81(2,-3,4,-2,1)\necho f_82(2,-3,4,-2,1)\necho f_83(2,-3,4,-2,1)\necho f_84(2,-3,4,-2,1)\necho f_85(2,-3,4,-2,1)\necho f_86(2,-3,4,-2,1)\necho f_87(2,-3,4,-2,1)\necho f_88(2,-3,4,-2,1)\necho f_89(2,-3,4,-2,1)\necho f_90(2,-3,4,-2,1)\necho f_91(2,-3,4,-2,1)\necho f_92(2,-3,4,-2,1)\necho f_93(2,-3,4,-2,1)\necho f_94(2,-3,4,-2,1)\necho f_95(2,-3,4,-2,1)\necho f_96(2,-3,4,-2,1)\necho f_97(2,-3,4,-2,1)\necho f_98(2,-3,4,-2,1)\necho f_99(2,-3,4,-2,1)\nNil}",
+  "sourceSHA256": "6846c2f0af265e108795343f5eecd0e8847f19e8625dca9fba5a659141ad4a98",
+  "compilerSHA256": "38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e",
+  "programSHA256": "d285e58d6e8e7086b347962b29752416cf947aae2c0a6bf446af4b51877fe80d",
+  "bytes": 22305,
+  "upstreamCompiler": "gleam 1.19.2",
+  "independentBigIntExpected": true,
+  "upstreamStdoutMatches": true,
+  "nativeStdoutMatches": true,
+  "byteIdenticalToBootstrap": true,
+  "spillingRegions": 59,
+  "coverage": [
+    {
+      "name": "f_0",
+      "expected": "-4",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_1",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_2",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_3",
+      "expected": "-4",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_4",
+      "expected": "2",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_5",
+      "expected": "-14",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_6",
+      "expected": "-1",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "5",
+        "4",
+        "1",
+        "2",
+        "-1"
+      ]
+    },
+    {
+      "name": "f_7",
+      "expected": "-13",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "1",
+        "2",
+        "-3",
+        "5",
+        "-5",
+        "-20",
+        "-19",
+        "4"
+      ]
+    },
+    {
+      "name": "f_8",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_9",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_10",
+      "expected": "6",
+      "operandPressure": 5,
+      "staticSpills": 10,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "-6",
+        "4",
+        "-2",
+        "-3",
+        "-3",
+        "1"
+      ]
+    },
+    {
+      "name": "f_11",
+      "expected": "4",
+      "operandPressure": 2,
+      "staticSpills": 2,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "1"
+      ]
+    },
+    {
+      "name": "f_12",
+      "expected": "-3",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_13",
+      "expected": "60",
+      "operandPressure": 4,
+      "staticSpills": 3,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_14",
+      "expected": "3",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-2"
+      ]
+    },
+    {
+      "name": "f_15",
+      "expected": "334",
+      "operandPressure": 6,
+      "staticSpills": 17,
+      "namedCalls": 10,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-2",
+        "2",
+        "-3",
+        "0",
+        "-12",
+        "12",
+        "13",
+        "1",
+        "1",
+        "1",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_16",
+      "expected": "-17",
+      "operandPressure": 3,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-18"
+      ]
+    },
+    {
+      "name": "f_17",
+      "expected": "6",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "1",
+        "2",
+        "-2",
+        "-3",
+        "4",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_18",
+      "expected": "648",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "4",
+        "-3",
+        "6",
+        "-2",
+        "160",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_19",
+      "expected": "2",
+      "operandPressure": 5,
+      "staticSpills": 6,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "0"
+      ]
+    },
+    {
+      "name": "f_20",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_21",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_22",
+      "expected": "8",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "-2",
+        "-2",
+        "1",
+        "-3",
+        "4",
+        "1"
+      ]
+    },
+    {
+      "name": "f_23",
+      "expected": "-15",
+      "operandPressure": 4,
+      "staticSpills": 5,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "4",
+        "2",
+        "-3",
+        "2",
+        "-8",
+        "-12"
+      ]
+    },
+    {
+      "name": "f_24",
+      "expected": "-1",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_25",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_26",
+      "expected": "118",
+      "operandPressure": 5,
+      "staticSpills": 10,
+      "namedCalls": 9,
+      "expectedEffects": [
+        "4",
+        "4",
+        "2",
+        "-2",
+        "1",
+        "-5",
+        "2",
+        "-2",
+        "2",
+        "-2",
+        "-1",
+        "4",
+        "6"
+      ]
+    },
+    {
+      "name": "f_27",
+      "expected": "6",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "0",
+        "-2",
+        "1",
+        "1",
+        "1",
+        "1",
+        "-5",
+        "-2",
+        "-1",
+        "6",
+        "0"
+      ]
+    },
+    {
+      "name": "f_28",
+      "expected": "3",
+      "operandPressure": 3,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "f_29",
+      "expected": "-15",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "4"
+      ]
+    },
+    {
+      "name": "f_30",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_31",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_32",
+      "expected": "12",
+      "operandPressure": 3,
+      "staticSpills": 3,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_33",
+      "expected": "-8",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "2",
+        "4",
+        "-2",
+        "4"
+      ]
+    },
+    {
+      "name": "f_34",
+      "expected": "-3",
+      "operandPressure": 4,
+      "staticSpills": 5,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "-4",
+        "-2",
+        "-3",
+        "-3",
+        "-2",
+        "4",
+        "-3",
+        "-3",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_35",
+      "expected": "-3",
+      "operandPressure": 6,
+      "staticSpills": 14,
+      "namedCalls": 14,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-1",
+        "1",
+        "-3",
+        "4",
+        "20",
+        "1",
+        "4",
+        "10",
+        "11",
+        "-21",
+        "12",
+        "2",
+        "-2",
+        "4"
+      ]
+    },
+    {
+      "name": "f_36",
+      "expected": "5",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "4"
+      ]
+    },
+    {
+      "name": "f_37",
+      "expected": "-101",
+      "operandPressure": 5,
+      "staticSpills": 4,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "8"
+      ]
+    },
+    {
+      "name": "f_38",
+      "expected": "19",
+      "operandPressure": 4,
+      "staticSpills": 9,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "4",
+        "-3",
+        "4",
+        "1",
+        "4",
+        "-8",
+        "-2",
+        "4",
+        "-15"
+      ]
+    },
+    {
+      "name": "f_39",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_40",
+      "expected": "5",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "2",
+        "3",
+        "4"
+      ]
+    },
+    {
+      "name": "f_41",
+      "expected": "5",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "4"
+      ]
+    },
+    {
+      "name": "f_42",
+      "expected": "-66",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "4",
+        "-63",
+        "4",
+        "-67"
+      ]
+    },
+    {
+      "name": "f_43",
+      "expected": "23",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "3",
+        "4",
+        "-3",
+        "2",
+        "-12",
+        "-3",
+        "14",
+        "5",
+        "-17",
+        "22"
+      ]
+    },
+    {
+      "name": "f_44",
+      "expected": "0",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "1",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_45",
+      "expected": "15",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "10"
+      ]
+    },
+    {
+      "name": "f_46",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_47",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_48",
+      "expected": "10",
+      "operandPressure": 3,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "2",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_49",
+      "expected": "1",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "1",
+        "-2",
+        "-2",
+        "0",
+        "2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_50",
+      "expected": "-24",
+      "operandPressure": 5,
+      "staticSpills": 16,
+      "namedCalls": 12,
+      "expectedEffects": [
+        "-3",
+        "-3",
+        "-3",
+        "0",
+        "-2",
+        "2",
+        "8",
+        "-2",
+        "2",
+        "10",
+        "-3",
+        "-2",
+        "-1",
+        "2",
+        "4",
+        "2",
+        "2",
+        "4"
+      ]
+    },
+    {
+      "name": "f_51",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_52",
+      "expected": "5",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-2",
+        "4",
+        "4"
+      ]
+    },
+    {
+      "name": "f_53",
+      "expected": "1",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "0"
+      ]
+    },
+    {
+      "name": "f_54",
+      "expected": "50",
+      "operandPressure": 5,
+      "staticSpills": 7,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "6",
+        "1",
+        "4",
+        "-3",
+        "-3",
+        "2",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_55",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_56",
+      "expected": "22",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_57",
+      "expected": "9",
+      "operandPressure": 5,
+      "staticSpills": 6,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-3"
+      ]
+    },
+    {
+      "name": "f_58",
+      "expected": "-7",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "-4",
+        "-12"
+      ]
+    },
+    {
+      "name": "f_59",
+      "expected": "24",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 10,
+      "expectedEffects": [
+        "2",
+        "-3",
+        "13",
+        "4",
+        "0",
+        "1",
+        "1",
+        "2",
+        "1",
+        "2",
+        "-3",
+        "-1",
+        "5",
+        "18",
+        "-6"
+      ]
+    },
+    {
+      "name": "f_60",
+      "expected": "0",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-2",
+        "-1"
+      ]
+    },
+    {
+      "name": "f_61",
+      "expected": "-4",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-1",
+        "2",
+        "-1",
+        "3"
+      ]
+    },
+    {
+      "name": "f_62",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_63",
+      "expected": "97",
+      "operandPressure": 5,
+      "staticSpills": 9,
+      "namedCalls": 8,
+      "expectedEffects": [
+        "-5",
+        "-5",
+        "-3",
+        "-3",
+        "-2",
+        "1",
+        "1",
+        "1",
+        "0",
+        "96"
+      ]
+    },
+    {
+      "name": "f_64",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "-2",
+        "1"
+      ]
+    },
+    {
+      "name": "f_65",
+      "expected": "64",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "2",
+        "-2",
+        "-1",
+        "2",
+        "2"
+      ]
+    },
+    {
+      "name": "f_66",
+      "expected": "3",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "2"
+      ]
+    },
+    {
+      "name": "f_67",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_68",
+      "expected": "10",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2",
+        "2",
+        "8"
+      ]
+    },
+    {
+      "name": "f_69",
+      "expected": "-3",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_70",
+      "expected": "64",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-16",
+        "14",
+        "-2"
+      ]
+    },
+    {
+      "name": "f_71",
+      "expected": "0",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "4",
+        "7",
+        "10",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_72",
+      "expected": "6",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "5"
+      ]
+    },
+    {
+      "name": "f_73",
+      "expected": "1",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_74",
+      "expected": "30",
+      "operandPressure": 5,
+      "staticSpills": 7,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-2",
+        "2",
+        "1",
+        "4",
+        "-7"
+      ]
+    },
+    {
+      "name": "f_75",
+      "expected": "36",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "16",
+        "-4",
+        "17",
+        "-3",
+        "2",
+        "-2",
+        "6",
+        "4",
+        "2",
+        "17"
+      ]
+    },
+    {
+      "name": "f_76",
+      "expected": "-2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_77",
+      "expected": "2",
+      "operandPressure": 4,
+      "staticSpills": 2,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "2",
+        "-3",
+        "-2",
+        "2",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "name": "f_78",
+      "expected": "2",
+      "operandPressure": 3,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_79",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_80",
+      "expected": "-14",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_81",
+      "expected": "-21",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "1",
+        "-22"
+      ]
+    },
+    {
+      "name": "f_82",
+      "expected": "-1",
+      "operandPressure": 4,
+      "staticSpills": 5,
+      "namedCalls": 6,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-2",
+        "3",
+        "-3",
+        "-2",
+        "-4"
+      ]
+    },
+    {
+      "name": "f_83",
+      "expected": "1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_84",
+      "expected": "14",
+      "operandPressure": 3,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "2",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_85",
+      "expected": "-10",
+      "operandPressure": 3,
+      "staticSpills": 4,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "2",
+        "-2",
+        "4",
+        "3",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_86",
+      "expected": "4",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 0,
+      "expectedEffects": []
+    },
+    {
+      "name": "f_87",
+      "expected": "8",
+      "operandPressure": 4,
+      "staticSpills": 7,
+      "namedCalls": 9,
+      "expectedEffects": [
+        "1",
+        "4",
+        "4",
+        "0",
+        "-3",
+        "2",
+        "1",
+        "-7",
+        "2",
+        "-3",
+        "-2",
+        "2"
+      ]
+    },
+    {
+      "name": "f_88",
+      "expected": "30",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-6",
+        "2"
+      ]
+    },
+    {
+      "name": "f_89",
+      "expected": "1",
+      "operandPressure": 2,
+      "staticSpills": 1,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "-3",
+        "0"
+      ]
+    },
+    {
+      "name": "f_90",
+      "expected": "5",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-2",
+        "2",
+        "4",
+        "-4",
+        "8"
+      ]
+    },
+    {
+      "name": "f_91",
+      "expected": "29",
+      "operandPressure": 5,
+      "staticSpills": 6,
+      "namedCalls": 5,
+      "expectedEffects": [
+        "-2",
+        "4",
+        "2",
+        "-3",
+        "-2",
+        "1",
+        "-42"
+      ]
+    },
+    {
+      "name": "f_92",
+      "expected": "2",
+      "operandPressure": 2,
+      "staticSpills": 0,
+      "namedCalls": 4,
+      "expectedEffects": [
+        "4",
+        "0",
+        "1",
+        "2",
+        "0",
+        "4",
+        "2"
+      ]
+    },
+    {
+      "name": "f_93",
+      "expected": "40",
+      "operandPressure": 3,
+      "staticSpills": 2,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-9",
+        "-3",
+        "4",
+        "2",
+        "7"
+      ]
+    },
+    {
+      "name": "f_94",
+      "expected": "-42",
+      "operandPressure": 4,
+      "staticSpills": 4,
+      "namedCalls": 7,
+      "expectedEffects": [
+        "2",
+        "1",
+        "2",
+        "-8",
+        "5",
+        "-3",
+        "4",
+        "-13",
+        "30",
+        "-43"
+      ]
+    },
+    {
+      "name": "f_95",
+      "expected": "1",
+      "operandPressure": 5,
+      "staticSpills": 7,
+      "namedCalls": 9,
+      "expectedEffects": [
+        "1",
+        "-2",
+        "-1",
+        "-8",
+        "-2",
+        "-1",
+        "2",
+        "2",
+        "2",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "name": "f_96",
+      "expected": "8",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 2,
+      "expectedEffects": [
+        "4",
+        "-3",
+        "7"
+      ]
+    },
+    {
+      "name": "f_97",
+      "expected": "-2",
+      "operandPressure": 4,
+      "staticSpills": 1,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "-3",
+        "-2",
+        "-3"
+      ]
+    },
+    {
+      "name": "f_98",
+      "expected": "2",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 1,
+      "expectedEffects": [
+        "1"
+      ]
+    },
+    {
+      "name": "f_99",
+      "expected": "-1",
+      "operandPressure": 1,
+      "staticSpills": 0,
+      "namedCalls": 3,
+      "expectedEffects": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
+    }
+  ],
+  "limits": "Every intermediate value is within exact +/- (2^53-1); overflow tested separately, no speed claim"
+}

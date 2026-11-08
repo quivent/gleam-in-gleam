@@ -1,7 +1,7 @@
 # Native CLI milestone
 
 Status: bounded implementation qualified in 59 targeted tests; full regression
-receipt in evidence/integer-regions-qualification.json. Target: standalone Linux x86-64, no Node,
+receipt in evidence/named-calls-qualification.json. Target: standalone Linux x86-64, no Node,
 libc, external compiler, assembler, linker or VM at runtime.
 
 ## Command
@@ -72,14 +72,14 @@ headers. These are design references, not delivered dependencies.
 
 ## Qualified result
 
-The standalone image is 613,842 bytes, SHA256
-`df8df2222b511f403f7488472dada651a0a8a5c8010a199fe88046e8e039bb7b`.
-59 CLI-specific checks and the full 702-test/351-upstream-comparison run pass.
+The standalone image is 617,676 bytes, SHA256
+`38eaaeb14bd30e616378134367ed0fe4fdebc6c19868c4cd30de18fd69b4258e`.
+59 CLI-specific checks and the full 715-test/361-upstream-comparison run pass.
 All sixteen examples match bootstrap bytes and execute correctly. Actual short IO,
 interruptions, errors, existing-path preservation and ELF headers are retained in
-[evidence/integer-regions-io-verification.json](evidence/integer-regions-io-verification.json).
+[evidence/named-calls-io-verification.json](evidence/named-calls-io-verification.json).
 The native self-build runs twice and produces identical images; stage 3 qualifies
-all 351 corpus cases. See [SELF_HOSTING.md](SELF_HOSTING.md).
+all 361 corpus cases. See [SELF_HOSTING.md](SELF_HOSTING.md).
 
 The earlier 582,442-byte, 16 KiB CLI and initial failures remain under their original
 native-cli-* receipt names. New scale measurements are retained separately in

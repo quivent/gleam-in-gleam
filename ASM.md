@@ -562,3 +562,25 @@ On the identical db47d61 source, this increment removes 15 static push/pop pairs
 unchanged. The added planner source is separate from this fixed-input comparison.
 Evidence: integer-regions-comparison.json and integer-regions-seeded-oracle.json
 under evidence/. This is not a runtime benchmark or whole-function allocator.
+
+## Named calls in typed regions
+
+NamedCall(name, argument_count) lowers to CALL fn:NAME followed by ADD RSP,
+argument_count*8. Its register kill mask covers the complete RAX/RCX/RDX pool,
+reserved recovery RDI and Flags; RAX alone is the returned value. Pending operands
+are pushed before evaluating arguments, whose values are then pushed in source
+order using a fresh pool. After return, move RAX into its assigned available
+register BEFORE restoring the occupied prefix in reverse order. The result cannot
+be overwritten by restoring a saved RAX. Saved words sit outside callee parameter
+slots and are not removed by argument cleanup.
+
+Calls, argument pushes and caller/pressure spills remain effectful during liveness
+cleanup. Flags cannot survive a call; all arithmetic traps are checked before the
+next argument or call is evaluated. Existing direct self-tail calls still use their
+separate frame-reentry path. Indirect descriptors/non-integer argument trees and
+general CFG joins remain outside typed-call allocation.
+
+The named-calls-* evidence includes actual save/copy/restore instruction checks,
+heap-clobbering callees, nested argument effects, earlier-argument overflow, two
+native rebuilds and the seeded effect oracle. The fixed compiler-source image is
+unchanged, so no image-size or timing improvement is claimed for this increment.
