@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 371 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 383 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **637,999 bytes**, SHA256
-`3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65`.
+The native image is **644,591 bytes**, SHA256
+`47999bf4831281341ad5e2d8ca15e49663d67fe5304a302ca6c44f6685995c7f`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/control-flow-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/byte-count-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -781,3 +781,14 @@ while short-circuit code uses about 3% more CPU. Identical-code controls show no
 wall-time differences. See [full method/results](BENCHMARKS.md),
 [qualification](evidence/control-flow-qualification.json) and
 [actual self-build samples](evidence/control-flow-self-build-benchmarks.json).
+
+
+## Allocation reduction — 2026-11-08
+
+A phase trace found millions of temporary byte-tail descriptors in pure counting
+loops. Structural recognition now replaces exactly that effect-free loop with a
+length load and checked addition; it never chooses an optimization by function name.
+On identical frozen compiler input, allocated volume falls **17.2%** and peak RSS
+falls **390.8 → 323.6 MiB**, without GC. The current compiler is 644,591 bytes;
+744 tests, 383 upstream comparisons and two byte-identical native rebuilds pass.
+See [MEMORY.md](MEMORY.md) for measurements, emitted instructions and remaining work.

@@ -122,3 +122,19 @@ space until process exit. Allocation volume must be profiled before attributing
 most of that memory to a particular phase. Reduce unnecessary temporary lists,
 copies and buffers before choosing whether collection is warranted. Large memory
 use alone does not establish slow execution; the timing results are separate.
+
+
+## Byte-count allocation rewrite — 2026-11-08
+
+The later structural byte-count rewrite has a separate controlled experiment:
+both versions compile the same 27-module source at `7fc27b6`, one warm-up and five
+alternating repeats, CPU-pinned. Median CPU falls **7.522 → 5.015 s (33.3%)**;
+median wall falls **8.586 → 5.883 s (31.5%)**, with ranges 8.393–8.916 and
+5.123–6.913 s respectively. Peak RSS falls **390.8 → 323.6 MiB**. The shared-host
+wall variation remains visible; no general language ranking follows.
+
+The candidate is 644,591 bytes, including its recognizer. On fixed input its
+output is 637,775 bytes vs 637,999 before. Current 28-module self-rebuilds remain
+byte-identical to the candidate. See [all samples](evidence/byte-count-benchmark.json)
+and [phase allocation analysis](MEMORY.md). Earlier measurements above are retained
+as historical results, not overwritten with this later improvement.

@@ -7,12 +7,12 @@ still incomplete.
 ## Exact observed chain
 
 1. The upstream Gleam/JavaScript bootstrap emits stage 1, our native compiler.
-2. Stage 1 reads a frozen copy of all 27 actual compiler modules through the owned
+2. Stage 1 reads a frozen copy of all 28 actual compiler modules through the owned
    file runner and `--build-compiler`, producing stage 2.
 3. Stage 2 repeats the rebuild from those same bytes, producing stage 3.
-4. All three are 637,999 bytes with SHA256
-   `3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65`.
-5. Stage 3 compiles 371 corpus cases: 251 accepted, 120 rejected. Every accepted
+4. All three are 644,591 bytes with SHA256
+   `47999bf4831281341ad5e2d8ca15e49663d67fe5304a302ca6c44f6685995c7f`.
+5. Stage 3 compiles 383 corpus cases: 263 accepted, 120 rejected. Every accepted
    output is byte-identical to bootstrap output and executes correctly. Rejections
    have controlled compiler exits and publish no output.
 6. A changed version literal in a separate source copy produces a different native
@@ -50,11 +50,11 @@ value equality, measured optimization/register allocation and targets remain ope
 
 ## Evidence
 
-* [Complete qualification](evidence/control-flow-qualification.json): 729 checks,
-  371 fresh independent upstream comparisons and all 16 native example runs.
-* [Native rebuilds and corpus](evidence/control-flow-native-rebuilds.json): exact
+* [Complete qualification](evidence/byte-count-qualification.json): 744 checks,
+  383 fresh independent upstream comparisons and all 16 native example runs.
+* [Native rebuilds and corpus](evidence/byte-count-native-rebuilds.json): exact
   sources, image hashes, source-sensitivity control and individual native cases.
-* [Native IO qualification](evidence/control-flow-io-verification.json): 59 targeted
+* [Native IO qualification](evidence/byte-count-io-verification.json): 59 targeted
   checks, actual short IO, errors, preservation and ELF headers.
 * [Measured scale frontier](evidence/self-hosting-scale-frontier.json): retained
   initial stack/heap failures and measured fixes; snapshots are not peak stack.
@@ -85,6 +85,10 @@ control-flow allocation and indirect/non-integer call regions remain open. The
 named-calls-* receipts preserve this current qualification and both stress modes.
 
 Scalar branches/short-circuit expressions now use explicit CFG edges and join
-liveness. General data/guarded patterns remain legacy boundaries. Current proof
+liveness. General data/guarded patterns remain legacy boundaries. That milestone
 is under control-flow-*; [BENCHMARKS.md](BENCHMARKS.md) reports actual repeated
 measurements without claiming whole-function allocation or a broad speedup.
+
+Pure byte-count loops now use the descriptor length and a checked addition,
+avoiding suffix allocation. The same frozen input rebuild uses 323.6 MiB peak RSS
+instead of 390.8 MiB. See [MEMORY.md](MEMORY.md) for exact phases and limits.

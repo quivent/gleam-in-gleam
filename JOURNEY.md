@@ -619,3 +619,27 @@ The detailed raw distributions, source/image/harness hashes and limits are retai
 in BENCHMARKS.md and control-flow benchmark receipts. Current image: 637,999 bytes,
 SHA256 3a8063b7582cb04e53c7443110403dc80f7c757fab0a893add0089a367ca8b65. General whole-function and upstream-language
 work remains separate; no installed Crew/compiler process was replaced.
+
+
+## Remove allocation before adding GC — 2026-11-08
+
+Rather than infer garbage from the 391 MiB rebuild peak, we traced the arena
+cursor at compiler phase boundaries in a new owned child. ELF packaging allocated
+26 MB for about 638 KB of code: the byte-count helper constructed a 40-byte suffix
+descriptor at each step. Assembly repeatedly paid the same cost.
+
+A typed structural recognizer now identifies only the exact effect-free unit-step
+byte-count recursion, regardless of function name, and emits a descriptor-length
+load plus checked addition. Guards, effects, changed increments/bases and different
+callees retain ordinary lowering. Actual ASM checks verify the 40-byte function
+contains no loop/allocation call; aliases, borrowed tails and overflow are tested.
+
+Same-input allocation falls 409,183,952 → 338,729,536 bytes (17.2%); peak RSS falls
+390.8 → 323.6 MiB. Five untraced repeated runs show median CPU 7.522 → 5.015 s,
+with wall variation retained. No collector or third-party dependency was added.
+Correctness: 744 tests, 383 upstream comparisons and byte-identical native rebuilds.
+The compiler grows to 644,591 bytes because it includes its own recognizer.
+
+This is measured waste removal, not full heap liveness or complete Gleam support.
+Project linking is now the largest selected phase and is the next profiling target.
+Crew CLI updates remain with their separate owner. [Method and evidence](MEMORY.md).
