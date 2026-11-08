@@ -72,6 +72,15 @@ fn slot(state: State) -> #(Int, State) {
   #(0 - count * 8, State(..state, slots: count))
 }
 
+// Sibling arms cannot execute together. Their local slots may overlap, but
+// the function must reserve the largest branch footprint at the join.
+fn reserve_slots(count: Int, state: State) -> State {
+  case count > state.slots {
+    True -> State(..state, slots: count)
+    False -> state
+  }
+}
+
 fn add_string(bytes: BitArray, state: State) -> #(String, State) {
   let #(name, state) = label(state)
   let size = c.byte_length(bytes)
@@ -733,6 +742,7 @@ fn case_arms(
     [] -> Ok(#([jump("rt:match")], state))
     [arm, ..rest] -> {
       let env = state.env
+      let base_slots = state.slots
       let #(next, state) = label(state)
       use #(condition_code, state) <- c.then(pattern_code(
         arm.pattern,
@@ -751,14 +761,15 @@ fn case_arms(
         }
       })
       use #(body, state) <- c.then(tail_expression(arm.body, mode, state))
-      let state = State(..state, env: env)
+      let arm_slots = state.slots
+      let state = State(..state, env: env, slots: base_slots)
       use #(tail, state) <- c.then(case_arms(rest, subject, finish, mode, state))
       Ok(#(
         c.append(
           c.append(condition_code, guard),
           c.append(body, [jump(finish), asm.Label(next), ..tail]),
         ),
-        state,
+        reserve_slots(arm_slots, state),
       ))
     }
   }
@@ -1618,6 +1629,7 @@ fn multi_arms(
     [] -> Ok(#([jump("rt:match")], state))
     [arm, ..rest] -> {
       let outer = state.env
+      let base_slots = state.slots
       let #(canonical, state) = binding_slots(arm.bindings, state)
       let #(body_label, state) = label(state)
       let #(next_arm, state) = label(state)
@@ -1636,19 +1648,20 @@ fn multi_arms(
         mode,
         State(..state, env: c.append(canonical, outer)),
       ))
+      let arm_slots = state.slots
       use #(tail, state) <- c.then(multi_arms(
         rest,
         subjects,
         finish,
         mode,
-        State(..state, env: outer),
+        State(..state, env: outer, slots: base_slots),
       ))
       Ok(#(
         c.append(matching, [
           asm.Label(body_label),
           ..c.append(body, [jump(finish), asm.Label(next_arm), ..tail])
         ]),
-        state,
+        reserve_slots(arm_slots, state),
       ))
     }
   }

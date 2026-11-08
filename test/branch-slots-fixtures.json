@@ -1,0 +1,74 @@
+[
+  {
+    "name": "slots-single-arm-locals",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->{let a=n+1 let b=a+2 b} 1->{let a=n+2 let b=a+3 b} _->{let a=n+4 let b=a+5 b}}} pub fn main()->Nil {echo f(0) echo f(1) echo f(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "3\n6\n13\n"
+  },
+  {
+    "name": "slots-live-outer-after-join",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {let keep=100 let got=case n {0->{let x=7 x*2} _->{let x=3 let y=x+n y}} keep+got} pub fn main()->Nil {echo f(0) echo f(5) Nil}"
+    },
+    "accepted": true,
+    "stdout": "114\n108\n"
+  },
+  {
+    "name": "slots-escaping-copied-captures",
+    "entry": "main",
+    "files": {
+      "main": "fn maker(n:Int)->fn()->Int {case n {0->{let x=12 fn(){x}} _->{let x=n+20 let y=x*2 fn(){x+y}}}} pub fn main()->Nil {let a=maker(0) let b=maker(2) echo a() echo b() Nil}"
+    },
+    "accepted": true,
+    "stdout": "12\n66\n"
+  },
+  {
+    "name": "slots-pattern-guard-fallback",
+    "entry": "main",
+    "files": {
+      "main": "fn f(xs:List(Int))->Int {case xs {[a,b] if a>b->{let tmp=a-b tmp} [a,b]->{let tmp=a+b tmp*2} _->9}} pub fn main()->Nil {echo f([1,4]) echo f([9,3]) echo f([]) Nil}"
+    },
+    "accepted": true,
+    "stdout": "10\n6\n9\n"
+  },
+  {
+    "name": "slots-multi-canonical-bindings",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int)->Int {case a,b {0,y->{let x=y+1 x} x,0->{let y=x+2 y} x,y->{let z=x*y z+3}}} pub fn main()->Nil {echo f(0,4) echo f(4,0) echo f(2,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "5\n6\n9\n"
+  },
+  {
+    "name": "slots-nested-case",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->Int {case n {0->{let x=40 case n+1 {1->{let y=x+2 y} _->x}} _->{let x=9 case n {2->{let y=x+n y} _->x}}}} pub fn main()->Nil {echo f(0) echo f(2) Nil}"
+    },
+    "accepted": true,
+    "stdout": "42\n11\n"
+  },
+  {
+    "name": "slots-return-heap-value",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int)->List(Int) {case n {0->{let x=5 [x,x+1]} _->{let x=n+8 [x]}}} pub fn main()->Nil {echo f(0)==[5,6] echo f(2)==[10] Nil}"
+    },
+    "accepted": true,
+    "stdout": "True\nTrue\n"
+  },
+  {
+    "name": "slots-tail-loop-parameters",
+    "entry": "main",
+    "files": {
+      "main": "fn f(n:Int,a:Int)->Int {case n {0->a x if x%2==0->{let b=a+2 f(x-1,b)} _->{let b=a+1 f(n-1,b)}}} pub fn main()->Nil {echo f(100,0) echo f(101,0) Nil}"
+    },
+    "accepted": true,
+    "stdout": "150\n151\n"
+  }
+]

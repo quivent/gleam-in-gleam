@@ -37,3 +37,12 @@ test('register retention preserves checked overflow before any echo',()=>{
  try{const path=join(dir,'app');writeFileSync(path,unwrap(compile(new BitArray(Buffer.from(source)))).rawBuffer,{mode:0o755});const r=spawnSync(path,[],{encoding:'utf8'});assert.equal(r.status,70);assert.equal(r.signal,null);assert.equal(r.stdout,'');}
  finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+test('single-case siblings reserve their maximum local frame, not their sum',()=>{
+ const asm=body('fn f(n:Int)->Int {case n {0->{let a=n+1 let b=a+2 b} 1->{let a=n+2 let b=a+3 b} _->{let a=n+4 let b=a+5 b}}} pub fn main()->Nil {echo f(0) Nil}','f');
+ assert.match(asm,/sub\s+\$0x20,%rsp/);
+});
+test('multi-case siblings share local space without overwriting saved subjects',()=>{
+ const asm=body('fn f(a:Int,b:Int)->Int {case a,b {0,y->{let x=y+1 let z=x+2 z} x,0->{let y=x+2 let z=y+3 z} x,y->{let z=x*y let v=z+3 v}}} pub fn main()->Nil {echo f(0,4) Nil}','f');
+ assert.match(asm,/sub\s+\$0x30,%rsp/);
+});
