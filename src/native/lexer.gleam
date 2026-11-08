@@ -31,8 +31,11 @@ fn scan(
 ) -> Result(List(Token), String) {
   case source {
     <<>> -> Ok(core.reverse([Token(End, offset), ..acc]))
-    <<c, rest:bits>> if c == 32 || c == 9 || c == 10 || c == 13 ->
-      scan(rest, offset + 1, acc)
+    <<c, rest:bits>> if c == 32 || c == 9 || c == 10 || c == 13 -> {
+      // Keep long whitespace runs out of scan's much larger native frame.
+      let #(remaining, at) = whitespace(rest, offset + 1)
+      scan(remaining, at, acc)
+    }
     <<47, 47, rest:bits>> -> {
       let #(remaining, at) = comment(rest, offset + 2)
       scan(remaining, at, acc)
@@ -86,6 +89,14 @@ fn scan(
           scan(rest, offset + 1, [Token(Symbol(symbol), offset), ..acc])
       }
     _ -> fail(offset, "Source is not byte aligned")
+  }
+}
+
+fn whitespace(source: BitArray, offset: Int) -> #(BitArray, Int) {
+  case source {
+    <<c, rest:bits>> if c == 32 || c == 9 || c == 10 || c == 13 ->
+      whitespace(rest, offset + 1)
+    _ -> #(source, offset)
   }
 }
 

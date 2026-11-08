@@ -438,3 +438,36 @@ The current native compiler API-plus-driver is 498,418 bytes, SHA256
 Its generated 380- and 745-byte children execute and match bootstrap bytes exactly;
 all fifteen previous examples remain byte-identical. Those measurements establish
 specific artifacts and execution, not a final compiler size or performance result.
+
+## Owned native CLI effect runner
+
+The CLI build selects an explicit entry/runner; ordinary generated programs keep
+their previous entry ABI and hashes. The CLI preserves the initial kernel stack
+through its own RBP frame, initializes the arena, calls Gleam main and dispatches
+Request constructor tags. Native IO returns ordinary typed Result values to Gleam
+callbacks. Constructor owner/type/label order and callback signatures are validated
+against the resolved context before code generation.
+
+The runner's temporary C strings use owned tag -3 buffers; normal Strings retain
+tag -2/value-pointer layout. Argument validation uses a temporary stack BitArray
+descriptor while kernel argv remains live, then copies a validated String. Source
+buffers use normal tag -1 descriptors with owned payloads. No GC is implied by
+these headers. Internal helpers save live values in frames across syscalls and
+Gleam calls, preserve R14/R15 semantics and treat RCX/R11 as clobbered.
+
+For image SHA256
+`d3428f3554f4fbce00f18e8a0fcb52cceeccd332b4e47b15e41b9580648fc39e`,
+`evidence/native-cli-disassembly.txt` contains selected real instruction windows.
+Entry establishes RBP at 0x4000b1 and loads request tags at 0x4000cc. Read builds
+an initialized 24-byte open_how and issues syscall 437 at 0x488bd0; the -EINTR
+comparison branches back at 0x488bd9. Write calls its complete-write helper at
+0x48902c, fchmod at 0x489054, fsync at 0x48907c, and close at 0x4890b5. That close
+has no retry branch. R8D=1 at 0x4890e9 supplies RENAME_NOREPLACE before syscall
+316 at 0x4890f4. These are instruction windows, with trailing instructions, not a
+symbolized disassembly of every function.
+
+The trace harness actually reduces read/write RDX requests before the kernel runs;
+recorded positive short IO still yields byte-identical output. Separate injected
+errors test retry/cleanup branches. Full-size stack handling, native tail-call
+elimination and memory collection remain future work; the first native CLI uses
+an explicit 16 KiB source-file bound.

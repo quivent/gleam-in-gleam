@@ -1,6 +1,7 @@
 import native/assembler as asm
 import native/ast as a
 import native/check as t
+import native/cli_runtime
 import native/core as c
 import native/definitions as d
 import native/equality as eq
@@ -83,9 +84,28 @@ pub fn generate_with(
   functions: List(t.Function),
   globals: d.Context,
 ) -> Result(BitArray, String) {
+  generate_program(functions, globals, False, [], [])
+}
+
+// Explicit effect-runner entrypoint; ordinary language programs keep their ABI.
+pub fn generate_cli(
+  functions: List(t.Function),
+  globals: d.Context,
+) -> Result(BitArray, String) {
+  use #(entry, runtime) <- c.then(cli_runtime.generate(globals))
+  generate_program(functions, globals, True, entry, runtime)
+}
+
+fn generate_program(
+  functions: List(t.Function),
+  globals: d.Context,
+  cli: Bool,
+  cli_entry: List(asm.Part),
+  cli_code: List(asm.Part),
+) -> Result(BitArray, String) {
   use #(bodies, state) <- c.then(function_list(
     functions,
-    State(0, 0, [], [], False, [], [], globals, []),
+    State(0, 0, [], [], cli, [], [], globals, []),
   ))
   use equality_code <- c.then(equality_helpers(state.equalities, 0))
   let init = case state.needs_heap {
@@ -96,15 +116,21 @@ pub fn generate_with(
     True -> heap.runtime()
     False -> []
   }
-  let entry =
-    c.append(init, [call("fn:main"), raw(<<49, 255, 184, 60, 0, 0, 0, 15, 5>>)])
+  let entry = case cli {
+    True -> cli_entry
+    False ->
+      c.append(init, [
+        call("fn:main"),
+        raw(<<49, 255, 184, 60, 0, 0, 0, 15, 5>>),
+      ])
+  }
   let parts =
     c.append(
       entry,
       c.append(
         c.append(c.append(bodies, state.closures), equality_code),
         c.append(
-          runtime(),
+          c.append(cli_code, runtime()),
           c.append(
             heap_runtime,
             c.append(

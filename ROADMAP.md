@@ -5,47 +5,49 @@ Compiler logic stays in Gleam, with zero third-party compiler/runtime dependenci
 
 ## Subjective progress
 
-**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 65%**
+**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 70%**
 
 ```text
-[█████████████░░░░░░░] 65%
+[██████████████░░░░░░] 70%
 ```
 
-Estimate as of 2026-11-08. The frontend, backend and complete native compiler API
-are working, which puts us roughly two-thirds of the way toward this milestone.
-The remaining work includes substantial uncertainty: native CLI/IO, full-size
-memory/stack reliability, broader native-path testing and a real self-rebuild.
+Estimate as of 2026-11-08. The frontend, backend, native API and bounded native
+file-based CLI work. That raises my subjective estimate from 65% to 70%.
+Substantial uncertainty remains in full-size stack/memory reliability, broader
+native-path testing and an actual self-rebuild; this is not a forecast.
 
 For this bar, **100% means** a usable native Linux x86-64 CLI that compiles the
 complete compiler source, produces a byte-identical successive rebuild, and
 passes the native-path qualification checks with zero third-party runtime
 requirements. Full upstream Gleam compatibility, other targets and subsequent
 optimization remain separate roadmap work; this bar does not claim those are
-65% complete. It is not calculated from test counts or a delivery-date forecast.
+70% complete. It is not calculated from test counts or a delivery-date forecast.
 Update it when new evidence changes the assessment.
 
 ## Verified starting point
 
-The complete compiler API runs as a 498,418-byte standalone Linux x86-64 ELF,
-including its bounded test driver. It compiled two programs whose bytes exactly
-match bootstrap output, and both programs execute correctly. Qualification is
-572 passing tests and 297 fresh upstream comparisons. The two native compiler
-output/execute checks are separate from those test counts.
+The native CLI reads files/imports, compiles all sixteen tracked examples to
+bootstrap-identical executables, and executes the outputs. Its input bound is
+16 KiB per source; it does not yet compile the complete compiler source tree.
+Current qualification is **631 passing tests and 297 fresh upstream comparisons**.
+The 59 targeted CLI checks cover real short IO, EINTR, publication/error cleanup,
+Unicode paths, preservation and ABI validation. See the
+[CLI spec](NATIVE_CLI_SPEC.md), [IO evidence](evidence/native-cli-io-verification.json)
+and [current verification](evidence/native-cli-verification.json).
 
-The ordinary file-based CLI still uses the Node bootstrap. A native CLI, complete
-Gleam compatibility and a compiler rebuilding itself remain unfinished. See
-[the native API proof](evidence/complete-api-wide-integers-probe.json),
-[verification](evidence/integers-coverage-verification.json) and
-[self-hosting status](SELF_HOSTING.md).
+The earlier 498,418-byte native API-plus-driver result and 572-test baseline remain
+historical in [their receipt](evidence/integers-coverage-verification.json).
+A complete compiler rebuild and full upstream Gleam compatibility are unfinished.
 
 ## Priorities and completion evidence
 
-1. **Usable native compiler CLI — next deliverable.**
+1. **Usable native compiler CLI — delivered for bounded inputs.**
    Read arguments and source files, resolve local modules, write executables and
    report errors through owned native IO. Handle partial reads/writes, interrupted
    syscalls and failures correctly. Complete when a standalone executable compiles
    a supported source tree from the terminal without Node or upstream tooling at
-   runtime, and its emitted programs execute correctly.
+   runtime, and its emitted programs execute correctly. This bounded milestone
+   now passes; lifting its 16 KiB source bound belongs to priority 2.
 
 2. **Full-size compilation reliability.**
    Exercise large inputs and complete compiler inputs. Address measured stack and
@@ -68,7 +70,8 @@ Gleam compatibility and a compiler rebuilding itself remain unfinished. See
    compiler, and compare successive identical-input builds byte-for-byte. Retain
    exact input hashes, commands, compiler/output hashes and test results. Only an
    actual rebuild establishes this milestone; compiling embedded sample programs
-   does not.
+   does not. Use the dedicated `cli_builder.build` path for the compiler's own
+   effect-runner entry; a native self-build command still needs to be connected.
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package

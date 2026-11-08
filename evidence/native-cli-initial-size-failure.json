@@ -1,0 +1,66 @@
+{
+  "schema": "gleam-in-gleam.native-cli-size-failure/1",
+  "observedDate": "2026-11-08",
+  "compilerArtifact": {
+    "bytes": 581136,
+    "sha256": "7a8611ae3b0516a39e52dd496d1a9cfbac171e6451fb4bad172f190e2ae88a6f"
+  },
+  "originalSourceLimitBytes": 1048576,
+  "observedCases": [
+    {
+      "commentBytes": 4096,
+      "sourceBytes": 4132,
+      "sourceSHA256": "0dfdb230cd386f9efe5bbbcb57d7ff74fc0318763e9e0de0cec9e200dd296118",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "commentBytes": 8192,
+      "sourceBytes": 8228,
+      "sourceSHA256": "65a311fdb6e6d803d0bd8941725ecc4c859b670b6132d71209308bca2b50099e",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "commentBytes": 12000,
+      "sourceBytes": 12036,
+      "sourceSHA256": "16b5ad5f9a70d039b4b45ef2172aa2c995139254d2fe3c422c51b3f8decf03cf",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "commentBytes": 16000,
+      "sourceBytes": 16036,
+      "sourceSHA256": "85bc602e005b1d8d679d8a160beeccb860a7a192bee692fd766d819d4faa69ed",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "commentBytes": 24000,
+      "sourceBytes": 24036,
+      "sourceSHA256": "f2a2bf380bba49e646464d8b5725ba72ab6cfce27f5d22adfae744a18804fac7",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "commentBytes": 33000,
+      "sourceBytes": 33036,
+      "sourceSHA256": "bd39db5236e7b3aae60dd636b8a6426720468f0e3f3b827a2c511934b72990f2",
+      "exitCode": null,
+      "signal": "SIGSEGV"
+    },
+    {
+      "commentBytes": 70000,
+      "sourceBytes": 70036,
+      "sourceSHA256": "e91774f92af906412e33a9707aa1df8d2eee829de9e0e693175f30fe6cebe1de",
+      "exitCode": null,
+      "signal": "SIGSEGV"
+    }
+  ],
+  "currentMitigation": {
+    "perFileLimitBytes": 16384,
+    "whitespaceRuns": "separate small lexer frame",
+    "qualifiedBoundaryEvidence": "evidence/native-cli-io-verification.json"
+  },
+  "fullSizeReliability": false
+}

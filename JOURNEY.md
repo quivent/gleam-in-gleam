@@ -369,3 +369,64 @@ complete compiler input natively at scale and a real identical-source rebuild.
 Arena growth/collection and native TCO remain measured-scale concerns, especially
 the two-pass append and existing byte concatenation; they are not silently solved
 by successful bounded native compilation.
+
+## Bounded native CLI and real syscall qualification — 2026-11-08
+
+We specified a concrete command before implementation: source module path relative
+to an explicit source root (default cwd), a new output, help/version and explicit
+error codes. This differs intentionally from the bootstrap's implicit dirname
+root. We kept compiler policy in a pure Gleam request state machine: Arguments,
+ReadSource, WriteExecutable and Finish. A small owned emitted effect runner reads
+kernel argv and calls typed policy callbacks. No placeholder function replacement,
+foreign compilation strings, upstream subprocess or VM is involved.
+
+The build entry validates constructor owner, field types AND label order, plus
+callback signatures before emitting the runner. Two String fields can swap places
+without a type error; the label-order check specifically prevents that ABI bug.
+Kernel argument bytes are UTF-8-validated before forming owned Strings. Reads use
+root descriptors/openat2 restrictions, regular-file checks and complete-read loops.
+Writes use an exclusive sibling, complete writes, chmod/fsync/checked close and
+renameat2 NOREPLACE publication. Existing files/directories/symlinks are preserved;
+normal failures clean owned temporary files. Crash/directory durability and
+termination cleanup are deliberately not promised. Linux close errors are not
+retried. The syscall ABI references are linked in NATIVE_CLI_SPEC.md.
+
+First-build failures were ordinary compiler-subset/assembly diagnostics: the
+entry suffix bit-array pattern needed explicit byte literals, and entry dispatch
+labels needed their own namespace to avoid colliding with IO helpers. These were
+corrected before execution qualification. A proposed 1 MiB input cap was then
+shown unsafe: a 33 KiB comment-heavy source crashed the native frontend stack,
+while 24 KiB passed. The exact old artifact and input hashes/results are retained
+in native-cli-initial-size-failure.json. We reduced the qualified cap to 16 KiB;
+a boundary test verifies 16,384 bytes compile and 16,385 fail before parsing.
+Whitespace runs now use a separate small lexer frame instead of recurring through
+scan's much larger frame. This is a bounded resource fix, not general native TCO
+or full-size reliability. A test caught that my initial constant edit had changed
+the diagnostic but missed the formatter's underscored numeric literal; the actual
+limit/chunk constants were corrected and boundary-qualified before completion.
+
+All sixteen example programs now compile through the native file-based executable,
+with empty PATH, exact bootstrap byte comparisons and successful child execution.
+The 59 CLI-specific tests also cover Unicode paths, a multi-chunk file, invalid
+UTF-8/arguments/sources/imports, cycles, symlinks/directories/FIFOs, oversized files,
+existing-output preservation, concurrent publishers and preexisting temporary files.
+Strace injects EINTR at eight syscall sites and explicit IO/publication/close errors.
+A separate Python/ctypes ptrace DEVELOPMENT harness shortens actual kernel request
+sizes: 4 real positive short reads and 54 real positive short writes still produce
+the expected ELF. Only the initial execve is observed; the native process does not
+launch another program. The target contains no ctypes, libc, strace or Python.
+
+The native CLI is 582,442 bytes; the current embedded API-plus-driver is 573,503
+bytes. These are different entrypoint artifacts. Both ELF headers show no dynamic
+loader/segment and an RW, non-executable stack. Selected actual entry/read/write
+instruction windows are retained. Final qualification passes 631 tests and 297
+fresh upstream comparisons; all sixteen older example hashes remain unchanged.
+The earlier API receipts are preserved rather than rewritten with new source.
+A runnable, ignored local artifact is out/gleam-native. No installed Crew/compiler
+or unrelated session was changed; generated images stay out of Git.
+
+The next measured work is full-size stack/allocation reliability and lifting the
+source cap. A native self-build route must invoke cli_builder.build to retain the
+compiler effect runner; the ordinary program compile path does not supply that
+entry. Stage-2 rebuilding remains unproved. Subjective milestone progress moves
+from 65% to 70% for delivered bounded CLI/IO, not full-language compatibility.

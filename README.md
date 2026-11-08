@@ -5,26 +5,25 @@ third-party dependencies** as a hard design constraint. No LLVM, Cranelift,
 Glance, standard-library package, external assembler, external linker, libc,
 or bundled VM is used by the native seed.
 
-**Status: the complete compiler API now compiles and runs as a standalone native
-ELF, but the native CLI and self-rebuilding compiler are not finished.** A bounded
-driver exercises the actual compiler source on two embedded programs, checks its
-emitted ELF bytes against the bootstrap implementation, and executes both outputs.
-The ordinary file-based CLI still uses the separated JavaScript bootstrap.
+**Status: a bounded standalone native compiler CLI now reads source files and
+imports, emits executables and runs without Node or a third-party runtime.**
+It supports Linux x86-64 and a 16 KiB per-source limit. Larger-input reliability
+and a compiler rebuilding itself remain unfinished.
 
-**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 65%**
+**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 70%**
 
 ```text
-[█████████████░░░░░░░] 65%
+[██████████████░░░░░░] 70%
 ```
 
-This is a judgment call, not a measured completion percentage or full-Gleam
-compatibility score. The native core works; native file/argument IO, full-size
+This is a judgment call, not measured completion or a full-Gleam compatibility
+score. Native CLI/IO now works for bounded inputs; full-size stack/memory
 reliability and the actual self-rebuild remain. See [ROADMAP.md](ROADMAP.md) for
-the estimate's scope, remaining work and completion evidence.
+scope, remaining work and completion evidence.
 
 ## What actually runs
 
-Current bootstrap:
+The bootstrap remains available for development:
 
 ```text
 Gleam compiler source (this repository)
@@ -36,8 +35,8 @@ Gleam compiler source (this repository)
 ```
 
 The final two steps do not use Node, Rust, Gleam tooling, libraries, a dynamic
-loader, an assembler or a linker. The default CLI still uses the bootstrap; the
-native API proof executes without it after the initial image is generated.
+loader, an assembler or a linker. The standalone native CLI also executes without
+the bootstrap after its initial native image is generated.
 A 601-byte Fibonacci executable is **a generated example program**,
 not the size of a completed compiler.
 
@@ -49,12 +48,44 @@ Stage 1: that compiler emits a native compiler from the same source
 Stage 2: the native compiler recompiles itself with identical output
 ```
 
-The stage-1 compiler core now executes natively under a bounded driver. A usable
-native compiler CLI and the stage-2 self-rebuild/byte comparison remain unproved.
+The stage-1 compiler core and bounded file-based CLI now execute natively.
+Full-size input reliability and the stage-2 self-rebuild/byte comparison remain unproved.
 Self-hosting requires that actual rebuild; neither accepting compiler text nor
 wrapping JavaScript in a native executable establishes it.
 
 ## Run the current implementation
+
+Build the native CLI once, then compile files directly:
+
+```sh
+gleam build --warnings-as-errors
+mkdir -p out
+node build-native.mjs out/gleam-native
+./out/gleam-native fibonacci.gleam out/fibonacci-native --source-root examples
+./out/fibonacci-native
+./out/gleam-native modules.gleam out/modules-native --source-root examples
+./out/modules-native
+```
+
+The outputs print `55` and `14,8,3` respectively. SOURCE is relative to the chosen
+source root (default current directory), rather than the bootstrap's implicit
+source dirname. Output must be new: completed files are published without replacing
+an existing file, directory or symlink. The runtime uses direct Linux syscalls,
+including openat2 and renameat2; unsupported operations fail explicitly.
+
+This first CLI bounds each source file to **16 KiB** and a graph to 256 files,
+refuses source symlinks and nonregular files, and validates UTF-8 arguments.
+The arena is still 64 MiB without GC and native tail calls are not eliminated.
+These limits do not establish full-size reliability. A 33 KiB comment-heavy input
+exposed stack exhaustion during development; the explicit input cap and a small
+whitespace scanner avoid the observed cases within the qualified boundary. See
+[NATIVE_CLI_SPEC.md](NATIVE_CLI_SPEC.md) for the protocol and acceptance evidence.
+
+The native tests require strace, objdump, Python and ptrace permission as
+**development-only fault-injection/inspection tools**. The native compiler itself
+does not load those tools or call another process.
+
+The original bootstrap entrypoint is also available:
 
 Prerequisites **for development/bootstrap only**: upstream Gleam 1.19.2, Node
 22+, and Linux x86-64 to execute native outputs. No package download is required:
@@ -101,17 +132,18 @@ The bridge loads only requested local `.gleam` modules and refuses symlinks that
 escape that root. It still refuses to overwrite an existing executable. There is
 no package download or external object-file linker in this implementation.
 
-To repeat the native compiler API proof after building the bootstrap:
+To repeat the separate embedded-input native compiler API proof:
 
 ```sh
 node test/probe-compiler-api.mjs
 ```
 
-This compiles all 22 actual compiler modules with a tracked test driver, executes
-the native image, extracts two generated ELF files, compares them byte-for-byte
+This compiles the reachable compiler API modules with a tracked test driver,
+executes the native image, extracts two generated ELF files, compares them byte-for-byte
 with bootstrap output, and runs both. It does not invoke upstream compilation
 inside the native compiler, replace an installed compiler, or prove a self-rebuild.
-See `evidence/complete-api-wide-integers-probe.json` for source/driver/artifact hashes.
+See `evidence/complete-api-native-cli-probe.json` for current source/driver/artifact
+hashes; the earlier wide-integer receipt remains historical.
 
 ## Current implementation
 
@@ -145,6 +177,9 @@ code generation remain in Gleam; the bridge performs no language compilation.
 | `native/elf` | ELF64 image and program headers, non-executable stack |
 | `native/project` | Import graph, local module names, visibility and lexical resolution |
 | `native/compiler` | Single-file/project compile pipeline |
+| `native/cli` | Pure arguments, source graph and output request policy |
+| `native/cli_runtime` | Owned Linux effect runner, validated request ABI, syscall loops |
+| `native/cli_builder` | Explicit stage-0 build entry for the native compiler CLI |
 
 The internal assembler is written in Gleam and emits bytes. It is not an
 external assembler dependency. The small generated integer/string print
@@ -380,8 +415,9 @@ local-field semantics.
   diagnostics. That is a seed diagnostic convention, not completed `echo`
   compatibility. Oracle tests compare returned pure values and render them
   separately; they do not assert identical upstream debug formatting.
-* The generated print helpers currently issue a single write syscall. General
-  partial-write/EINTR handling and file IO belong to the upcoming native runtime.
+* Ordinary language `echo` helpers still issue a single write syscall. The native
+  CLI's file and diagnostic IO has separate complete-write/EINTR loops; that does
+  not silently change ordinary program echo behavior.
 * There is no optimizer, garbage collector, package manager, formatter or language
   server in this rewrite. The upstream compiler remains untouched.
 
@@ -558,11 +594,24 @@ programs, both exactly identical to bootstrap output; both execute correctly.
 ELF headers and child execution. This measures a native compiler core plus driver,
 not a finished file-based CLI, full Gleam compatibility or a self-rebuild.
 
+The native CLI milestone passes **631/631** tests and **297/297** fresh upstream
+comparisons. Its **59** CLI-specific tests compile/execute all sixteen examples
+with an empty PATH, preserve existing outputs, test input bounds and exercise IO
+failure paths. All sixteen earlier example hashes remain unchanged. The standalone
+CLI is **582,442 bytes**, with no dynamic loader/segment and an RW non-executable
+stack. Source/test/bridge hashes and real observations are linked from
+`evidence/native-cli-verification.json`.
+
+The ptrace harness shortened real kernel requests to seven bytes: the observed
+run had **4 positive short reads and 54 positive short writes**, emitted the exact
+expected executable, and spawned no further program. Separate strace injections
+verify EINTR retries, close-error handling and temporary cleanup. These are
+explicit development-only tests, not libraries or wrappers inside the native CLI.
+
 Next actions, in dependency order:
 
-1. Add an owned native compiler entrypoint for argument/source-file IO, with
-   correct partial read/write and error handling; replace the Node bridge in the
-   usable native CLI path.
+1. Extend the bounded native CLI to real compiler-source scale, starting with
+   measured stack behavior and the explicit 16 KiB source bound.
 2. Exercise native compilation of the compiler's full source at real scale.
    Address measured tail-call, arena/allocation and collection limits without
    changing language semantics or introducing external dependencies.

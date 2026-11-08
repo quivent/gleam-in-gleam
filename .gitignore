@@ -9,6 +9,7 @@
 __pycache__/
 *.py[cod]
 *.log
+*.gleam-tmp-*
 .DS_Store
 
 # Local configuration and credentials

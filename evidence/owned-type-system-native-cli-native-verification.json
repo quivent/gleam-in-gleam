@@ -1,0 +1,17 @@
+{
+  "entry": "native/type_system",
+  "sourceSHA256": {
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/core.gleam": "5a6a26a431ade3b6222b1a4ffe67a93720a5ba37588d7a123009eb8067f4d8a0",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1"
+  },
+  "driver": "test/owned-type-system-driver.source",
+  "driverSHA256": "5b6429b722e7341ab8fba47f705879c20c896f00cc1cf840cc190c9a1f390030",
+  "executableSHA256": "ea3353ff1b4bc4ee7720d971110e871e869e6c18955e7ce12aa498e6895e579e",
+  "bytes": 24933,
+  "exitCode": 0,
+  "stdout": "Box(Int)\nTrue\nTrue\nTrue\nTrue\nTrue\nTrue\n",
+  "allSourceFunctionsCompiled": true,
+  "fullCompilerSelfHosting": false,
+  "oracle": "native test compares current upstream-compiled owned module function results"
+}
