@@ -474,7 +474,7 @@ an explicit 16 KiB source-file bound.
 
 ## Direct self-tail lowering and scale-qualified image
 
-The current image is 592,047 bytes, SHA256
+The first self-hosting image was 592,047 bytes, SHA256
 `752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
 The previous instruction addresses above describe the older named image.
 Current CLI instruction windows are in evidence/self-hosting-disassembly.txt.
@@ -506,3 +506,19 @@ reorder effects or move a trap. RAX/RCX/RDX and other scratch registers are clob
 by internal helpers as documented by their actual instructions. Linux syscall
 clobbers RCX/R11. Any values live across these boundaries need explicit spills or
 a preserved-register convention; do not infer that the internal stack ABI is SysV.
+
+## Bounded leaf register retention
+
+The operator ABI stays RCX=left, RAX=right. A typed Integer/Bool/Nil/local RHS
+cannot call or clobber RCX. Leaf left operands materialize directly in RCX;
+compound left results move from RAX to RCX only after their evaluation completes.
+A non-leaf RHS keeps push RAX, ordinary RHS evaluation, pop RCX. No retained
+register value crosses an unknown helper/call/syscall boundary. Short-circuit
+branches and checked arithmetic remain unchanged.
+
+On the exact e099363 target source, the new emitter removes 260 push/pop pairs
+and 451 static named-function instructions. The image is 334 bytes smaller;
+frame-memory counts are unchanged. Actual ASM and identities are in
+[evidence/leaf-register-comparison.json](evidence/leaf-register-comparison.json).
+The newer compiler's own added implementation changes its size separately.
+General allocation, live intervals and spill-slot reuse are not implemented.

@@ -7,7 +7,7 @@ or bundled VM is used by the native seed.
 
 **Status: the standalone Linux x86-64 compiler now rebuilds itself.** Two native
 rebuilds of the exact frozen compiler source are byte-identical to the initial
-native seed. The rebuilt compiler passes all 317 positive/negative corpus cases;
+native seed. The rebuilt compiler passes all 333 positive/negative corpus cases;
 accepted programs match bootstrap executable bytes and run correctly.
 
 **First self-hosting milestone: 100% of its defined acceptance scope.**
@@ -54,12 +54,12 @@ Stage 2: stage 1 recompiles the exact frozen compiler source
 Stage 3: stage 2 repeats that rebuild; all three native images are identical
 ```
 
-The native image is **592,047 bytes**, SHA256
-`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
+The native image is **596,782 bytes**, SHA256
+`8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18`.
 The qualification also changes a version literal in an isolated source copy:
 the native compiler emits the correctly changed image, matching the bootstrap.
 This checks that the rebuild consumes source rather than copying its own image.
-See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/self-hosting-native-rebuilds.json).
+See [SELF_HOSTING.md](SELF_HOSTING.md) and the [rebuild receipt](evidence/leaf-register-native-rebuilds.json).
 
 ## Run the current implementation
 
@@ -86,7 +86,7 @@ refuses source symlinks and nonregular files, and validates UTF-8 arguments.
 Direct returned self-calls loop after the prologue; mutual/indirect calls and
 continuation callbacks retain ordinary calls. Balanced byte concatenation and
 reverse closure accumulation avoid two measured quadratic copying paths.
-The compiler arena is 512 MiB without GC or growth. One native self-rebuild used
+The compiler arena is 512 MiB without GC or growth. The first milestone native self-rebuild used
 368,525,376 arena bytes and peaked at 360,320 KiB RSS; this is a resource observation,
 not a speed benchmark. Ordinary emitted programs still use a 64 MiB arena.
 
@@ -644,9 +644,9 @@ No time, final compiler size, compile-speed or language-wide runtime-performance
 claim is established by the native seed. The finished compiler's external
 dependency budget remains zero.
 
-## Self-hosting qualification — 2026-11-08
+## First self-hosting qualification — 2026-11-08
 
-The current result is recorded separately in
+The first milestone result is preserved separately in
 [evidence/self-hosting-qualification.json](evidence/self-hosting-qualification.json):
 657 regression checks, 317 fresh upstream comparisons, 59 targeted native CLI
 checks, and the entire 317-case corpus compiled by the rebuilt stage-3 compiler.
@@ -660,3 +660,25 @@ iterations also finish under a 64 KiB stack. Heap failures before the copying fi
 and successful full compiler rebuild consumption are preserved in
 [evidence/self-hosting-scale-frontier.json](evidence/self-hosting-scale-frontier.json).
 No installed Crew/compiler executable or active session was replaced.
+
+## Look-ahead and conservative register retention — 2026-11-08
+
+The current qualification passes **677 tests and 333 fresh upstream comparisons**.
+The rebuilt stage-3 compiler qualifies all 333 cases (213 accepted, 120 rejected).
+Both native self-rebuilds remain byte-identical to their seed; the current image
+is 596,782 bytes. See [qualification](evidence/leaf-register-qualification.json)
+and [rebuilds](evidence/leaf-register-native-rebuilds.json).
+
+A leaf right operand lets the emitter retain left in RCX instead of spilling it.
+Right operands with calls or other clobbers retain their existing push/pop path.
+The fixed-source comparison removes 260 static push/pop pairs and 451 instructions;
+frame-slot traffic is unchanged. The same target source image shrinks 334 bytes.
+This is not a whole-function register allocator or a measured runtime speedup.
+The new compiler itself includes the optimization and lexical correction, so its
+source/image growth is distinct from that fixed-source saving.
+
+An independent comparison caught an older signed-number parsing mismatch after
+calls and whitespace. That input and failure are retained; token-end tracking now
+matches the new upstream cases. See [design and limits](REGISTER_SPILL_SPEC.md).
+The verifier defaults to current-* development receipts; GIG_VERIFY_PREFIX selects
+a separate milestone prefix so earlier evidence remains intact.

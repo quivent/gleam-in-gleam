@@ -1,7 +1,7 @@
 {
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "e09936384d62a65142cf079047c6d0ca160044d4",
+  "sourceRevision": "db47d6142b85e6e02812a5bdff82225c26581101",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -10,8 +10,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/self-hosting-qualification.json",
-  "ioVerification": "evidence/self-hosting-io-verification.json",
+  "verification": "evidence/leaf-register-qualification.json",
+  "ioVerification": "evidence/leaf-register-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -49,15 +49,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/self-hosting-io-verification.json"
+          "path": "evidence/leaf-register-io-verification.json"
         },
         {
-          "label": "657 checks and 317 upstream comparisons",
-          "path": "evidence/self-hosting-qualification.json"
+          "label": "677 checks and 333 upstream comparisons",
+          "path": "evidence/leaf-register-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/self-hosting-disassembly.txt"
+          "path": "evidence/leaf-register-disassembly.txt"
         }
       ],
       "related": [],
@@ -103,7 +103,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/self-hosting-native-rebuilds.json"
+          "path": "evidence/leaf-register-native-rebuilds.json"
         }
       ],
       "related": [
@@ -117,12 +117,12 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified \u00b7 bounded scope",
-      "summary": "All 317 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
+      "summary": "All 333 current positive/negative cases pass through the rebuilt stage-3 native compiler.",
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "657 regression checks and 317 fresh upstream comparisons are separately recorded.",
-        "Stage 3 compiles 198 accepted and 119 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
+        "677 regression checks and 333 fresh upstream comparisons are separately recorded.",
+        "Stage 3 compiles 213 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
       ],
@@ -146,16 +146,16 @@
       ],
       "evidence": [
         {
-          "label": "317 native cases, individual outcomes",
-          "path": "evidence/self-hosting-native-rebuilds.json"
+          "label": "333 native cases, individual outcomes",
+          "path": "evidence/leaf-register-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/self-hosting-project-upstream-checks.json"
+          "path": "evidence/leaf-register-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/self-hosting-upstream-checks.json"
+          "path": "evidence/leaf-register-upstream-checks.json"
         }
       ],
       "related": [
@@ -169,13 +169,13 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified \u00b7 bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 592,047-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 596,782-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
         "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 26 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb.",
-        "The rebuilt image runs --version and qualifies the entire 317-case corpus with empty PATH.",
+        "Stages 1, 2 and 3 have the same SHA256: 8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18.",
+        "The rebuilt image runs --version and qualifies the entire 333-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
       "acceptance": [
@@ -199,7 +199,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/self-hosting-native-rebuilds.json"
+          "path": "evidence/leaf-register-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -252,7 +252,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/self-hosting-project-upstream-checks.json"
+          "path": "evidence/leaf-register-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -312,18 +312,19 @@
       "id": "optimization",
       "title": "Measured optimization",
       "scope": "extension",
-      "status": "next",
-      "statusLabel": "Next \u00b7 frame traffic",
+      "status": "partial",
+      "statusLabel": "Partial \u00b7 leaf spills removed",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Measure actual frame loads/stores and temporary push/pop traffic; use bounded look-ahead and explicit register/clobber rules to remove redundant spills.",
-      "specMaturity": "Outline; refine before implementation",
+      "nextAction": "Define owned instruction use/def/clobber metadata and liveness before extending register lifetimes or reusing spill slots.",
+      "specMaturity": "Leaf retention qualified; general allocator still outlined",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
         "Separate cold/warm compilation, runtime execution, allocation/peak memory and artifact-size measurements.",
         "Use multiple runs, retain environment/toolchain/input hashes and report variation.",
         "Select an observed bottleneck, inspect ASM and compare correctness before/after.",
         "Jay requested look-ahead and register spilling. Keep evaluation order and overflow traps; preserve live values across internal calls and Linux syscall RCX/R11 clobbers.",
-        "R14/R15 remain reserved arena registers. Internal calls use the owned stack ABI, not an assumed SysV convention. Static instruction counts are not dynamic performance evidence."
+        "R14/R15 remain reserved arena registers. Internal calls use the owned stack ABI, not an assumed SysV convention. Static instruction counts are not dynamic performance evidence.",
+        "Leaf RHS look-ahead eliminates 260 static push/pop pairs and 451 instructions on fixed source; frame traffic remains unchanged. This is not a full allocator or runtime speed claim."
       ],
       "acceptance": [
         {
@@ -345,18 +346,22 @@
       ],
       "evidence": [
         {
-          "label": "Current instruction contract",
-          "path": "ASM.md"
+          "label": "Fixed-source static comparison",
+          "path": "evidence/leaf-register-comparison.json"
         },
         {
-          "label": "Development history and limits",
-          "path": "JOURNEY.md"
+          "label": "677 checks, native corpus and rebuilds",
+          "path": "evidence/leaf-register-qualification.json"
+        },
+        {
+          "label": "Preserved upstream failure and correction",
+          "path": "evidence/leaf-register-initial-upstream-failure.json"
         }
       ],
       "related": [
         "native-testing"
       ],
-      "spec": null
+      "spec": "REGISTER_SPILL_SPEC.md"
     },
     {
       "id": "targets",

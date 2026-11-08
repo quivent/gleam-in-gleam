@@ -59,3 +59,7 @@ The browser check covers real filtering, keyboard/touch navigation, review
 persistence/export, inert note text, storage errors, no-JavaScript fallback,
 320/390/768px layouts and absence of external HTTP requests. Generated screenshots
 and example review exports stay under ignored out/roadmap-preview/.
+
+The current optimization increment and remaining allocator design are in
+[REGISTER_SPILL_SPEC.md](../REGISTER_SPILL_SPEC.md). Core self-hosting stays
+verified; the optimization workstream is partial.

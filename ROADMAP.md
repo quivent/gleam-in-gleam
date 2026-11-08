@@ -24,13 +24,13 @@ compatibility score. The extension workstreams below remain incomplete.
 ## Verified starting point
 
 All 26 compiler modules rebuild through the native effect-runner entry. Stages
-1, 2 and 3 are byte-identical: 592,047 bytes, SHA256
-`752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb`.
-The stage-3 compiler passes 317 corpus cases; every accepted output matches the
-bootstrap bytes and executes correctly. Full qualification includes 657 tests,
-317 independent upstream comparisons, 16 examples and 59 native IO checks.
+1, 2 and 3 are byte-identical: 596,782 bytes, SHA256
+`8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18`.
+The stage-3 compiler passes 333 corpus cases; every accepted output matches the
+bootstrap bytes and executes correctly. Full qualification includes 677 tests,
+333 independent upstream comparisons, 16 examples and 59 native IO checks.
 See [the proof](SELF_HOSTING.md) and
-[qualification receipt](evidence/self-hosting-qualification.json).
+[qualification receipt](evidence/leaf-register-qualification.json).
 
 The explicit limits are 128 KiB/source and 512 MiB compiler arena, without GC.
 Ordinary output programs keep their 64 MiB arena. Historical 16 KiB CLI and API
@@ -46,12 +46,12 @@ receipts remain preserved under their original names.
    Actual stack frames identified the UTF-8 recursion failure. Returned direct
    self-calls now loop after the prologue, including blocks and cases. Balanced
    byte concatenation and reverse closure accumulation remove measured copying
-   frontiers. Full rebuild allocation is 368,525,376 bytes; observed peak RSS is
+   frontiers. The first milestone rebuild allocated 368,525,376 bytes; its observed peak RSS was
    360,320 KiB. These bounded measurements do not prove arbitrary-input reliability.
    Deep non-tail recursion and arena exhaustion remain explicit limits.
 
 3. **Broader native-compiler testing — current corpus verified.**
-   All 317 positive/negative fixtures go through stage 3, with exact accepted
+   All 333 positive/negative fixtures go through stage 3, with exact accepted
    image/output comparisons. The separate upstream comparisons are independent.
    Expand this corpus alongside every new language/runtime feature.
 
@@ -59,7 +59,7 @@ receipts remain preserved under their original names.
    Two native self-rebuilds from the exact frozen source match the seed. A separate
    changed-source control produces the correctly changed compiler. Source hashes,
    stage images, native corpus and ELF observations are retained in
-   [the rebuild receipt](evidence/self-hosting-native-rebuilds.json).
+   [the rebuild receipt](evidence/leaf-register-native-rebuilds.json).
 
 5. **Remaining Gleam language compatibility.**
    Extend general inference, polymorphic function values, selective/package
@@ -74,7 +74,10 @@ receipts remain preserved under their original names.
    bit-array operations. Do not round unsupported literals or guess erased layouts.
    Retain precise native arithmetic limits and upstream semantic comparisons.
 
-7. **Measured optimization after correctness.**
+7. **Measured optimization after correctness — first bounded increment verified.**
+   Leaf operand look-ahead removes 260 static push/pop pairs and 451 instructions
+   on fixed source; calls retain their spills. General register allocation,
+   liveness and spill-slot reuse remain open in [the spec](REGISTER_SPILL_SPEC.md).
    Benchmark compilation speed, generated-code execution, allocation and binary
    size on reproducible workloads. Inspect ASM and optimize demonstrated costs,
    retaining correctness checks. Jay specifically requested look-ahead to avoid

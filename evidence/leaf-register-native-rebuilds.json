@@ -1,0 +1,3417 @@
+{
+  "schema": "gleam-in-gleam.self-hosting-verification/1",
+  "observedAt": "2026-11-08T02:46:39.401Z",
+  "sourceSHA256": {
+    "src/native/assembler.gleam": "93bca639d010f47f821d2148978ea29f9156e088cb65fd9ea3ac4be1701a8e71",
+    "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+    "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+    "src/native/check.gleam": "a46b3d634e50de8425f0322b2c1166c8194d86573c5babb47e302922ded21099",
+    "src/native/cli.gleam": "d2788c64a44bd67e9053c30d6cd097c9d4036310ff5287a390ff79306cab648f",
+    "src/native/cli_builder.gleam": "b7b2511dcfd85158291095b1399bac20f6b2dc9cee78ec591f34bf98ac009c8b",
+    "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+    "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+    "src/native/compiler.gleam": "b99f6a1e30e67c7c0fe327bc73b626adcc56bc8b48a5346ad0f662d8c8eff1a3",
+    "src/native/core.gleam": "548ea325a8683f566e0f7b397638483c4b009fa0833a076e00d75859f79a7f58",
+    "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+    "src/native/definitions.gleam": "511f3f1b40478d0a5d5171a7dd92045b4ec1a3911f4282d8b65219b84b97980b",
+    "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+    "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+    "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+    "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+    "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+    "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+    "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+    "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+    "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+    "src/native/project.gleam": "6c8b3406ea50c8466c4d248a11be08bf11cbe304bf9d25798fc5f8c9b7f52927",
+    "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+    "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+    "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+    "src/native/x64.gleam": "9ac6398edfa75092b6e7092093bc5feff4100d2a435601fa36ccc3a7a39d0fc0"
+  },
+  "sourceModules": 26,
+  "sourceBytes": 239552,
+  "frozenInputs": true,
+  "limits": {
+    "sourceBytes": 131072,
+    "compilerArenaBytes": 536870912,
+    "ordinaryProgramArenaBytes": 67108864
+  },
+  "bootstrap": {
+    "sourceLanguage": "Gleam",
+    "runtime": "upstream Gleam-generated JavaScript, used only to emit the first native seed"
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "producer": "bootstrap implementation emits native CLI",
+      "bytes": 596782,
+      "sha256": "8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18",
+      "dynamicLoader": false,
+      "dynamicSegment": false,
+      "nonExecutableStack": true
+    },
+    {
+      "stage": 2,
+      "producer": "native stage 1",
+      "operation": "--build-compiler NEW_OUTPUT --source-root FROZEN_SOURCE",
+      "exitCode": 0,
+      "bytes": 596782,
+      "sha256": "8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18",
+      "byteIdenticalToSeed": true,
+      "versionStdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n",
+      "dynamicLoader": false,
+      "dynamicSegment": false,
+      "nonExecutableStack": true
+    },
+    {
+      "stage": 3,
+      "producer": "native stage 2",
+      "operation": "--build-compiler NEW_OUTPUT --source-root FROZEN_SOURCE",
+      "exitCode": 0,
+      "bytes": 596782,
+      "sha256": "8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18",
+      "byteIdenticalToSeed": true,
+      "versionStdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n",
+      "dynamicLoader": false,
+      "dynamicSegment": false,
+      "nonExecutableStack": true
+    }
+  ],
+  "nativeCorpus": [
+    {
+      "name": "nested-path-default-alias",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 440,
+      "sha256": "3bb49417935d8d94c1eadf7edb08c052d88879514f9efba4ec1511eda0a8bfe6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "distinct-private-and-public-names",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 933,
+      "sha256": "9754b5adfb659102c2c673ae36bc6ee24fb1ec95fe76b8119036a593d055a2f8",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n2\n3\n7\n"
+    },
+    {
+      "name": "generic-imported-call",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 498,
+      "sha256": "cd59bfc04c0d6915251772c3592b40cf6061e0d1dab44262dc032194107587f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\nTrue\n"
+    },
+    {
+      "name": "private-helper-within-module",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 488,
+      "sha256": "fc2d09c6d529e69e4ec53ac3245b5e43c59a27832c682f2eff7d443910240892",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "diamond-dependency",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 545,
+      "sha256": "cd53d145bff802149401989afbed8a543cfa1f50751af06d76de9ac45fba26a3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "transitive-qualified-generic-type",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 633,
+      "sha256": "231b720d35a7656432cd2c8cebc37838e50879ba4b3dcacca49887a43c5feb94",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "qualified-record-type-change",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 882,
+      "sha256": "a94172ca9677edbb13e67b48c75668841b0b875ee9b46d1f72594feb5b64fc99",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n9\n1\n"
+    },
+    {
+      "name": "qualified-zero-constructor",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 549,
+      "sha256": "78e7624cad3bde7c6f1853255cb5f77bf6dbf0f038a786d65a65dcbae02e10dc",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "imported-closure-factory",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 702,
+      "sha256": "1d506cb3831be3ec74f1a714113ddb35e31a7f0c4ef17f3c09aa4945a8be889b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "qualified-function-value",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 618,
+      "sha256": "c1997bdded9a543a42c12105e1cb57b15f0c7da1e78492d748488574f93bc10c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "block-alias-shadowing",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 810,
+      "sha256": "0d1f0b571b5b898f32fb06d5c8c95a8fff3c9bae49a28dc154fd61667e68a826",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "101\n4\n102\n"
+    },
+    {
+      "name": "function-and-module-alias-coexist",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 500,
+      "sha256": "6e83e31ffae116321b7910f9a995a5d1769ad96183f1174c7b99b07a4fe48975",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "6\n103\n"
+    },
+    {
+      "name": "constructor-namespace-survives-value-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 854,
+      "sha256": "d111966c9fc3545bd3b5fd16f16a60a98d884ad56d88f8df596332ef091e3aec",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n5\n"
+    },
+    {
+      "name": "imported-main-is-not-entrypoint",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 432,
+      "sha256": "40cab065723fb6a87e3394a297b1dd149d1b53d7612d86f8698b866c3650634c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "same-module-two-aliases",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 466,
+      "sha256": "3bc6e991724fcb303b66d7ef0bbb0580dcc17a451b97441d888ae8fd5e2d1580",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "parameter-shadows-module-value",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 787,
+      "sha256": "e9f2d130d8e209005784927519260b88f35e6e3281eb5572a56ba4283b18da95",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "6\n101\n"
+    },
+    {
+      "name": "qualified-constructor-in-list-pattern",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 705,
+      "sha256": "9cac8047471ce4bef4cbaa3d1023c283b715d4460e30a01340bab4298689611e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "imported-recursion",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 524,
+      "sha256": "bc832747c39ba31fd0e41222607d848546d8f285b03dab2be1155b4edf507743",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "21\n"
+    },
+    {
+      "name": "imported-callback-record",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 766,
+      "sha256": "24176c4dc09f8916937dc0030b8864de418705e3105e46f73aa574c1a059a5be",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "bit-arrays-across-module",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1106,
+      "sha256": "232fb7883d823c8aa050702cf8f8207aedfe607c60206a309c80071b86273f2f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n7\n8\n"
+    },
+    {
+      "name": "private-function-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private module member: library.hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "private-type-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private module type: library.Hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "private-constructor-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private module member: library.Hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "unknown-member-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown name: library.missing\n",
+      "noOutput": true
+    },
+    {
+      "name": "unqualified-module-member-is-not-global",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown name: main.f\n",
+      "noOutput": true
+    },
+    {
+      "name": "cross-module-nominal-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Box@right, found Box@left\n",
+      "noOutput": true
+    },
+    {
+      "name": "import-cycle",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Import cycle at module: main\n",
+      "noOutput": true
+    },
+    {
+      "name": "missing-import",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Cannot read missing.gleam: Cannot open source beneath root (symlinks are refused)\n",
+      "noOutput": true
+    },
+    {
+      "name": "duplicate-alias",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: Duplicate module alias: m\n",
+      "noOutput": true
+    },
+    {
+      "name": "unknown-type-alias",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown module alias: missing\n",
+      "noOutput": true
+    },
+    {
+      "name": "duplicate-function-in-dependency",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Duplicate function: f@bad\n",
+      "noOutput": true
+    },
+    {
+      "name": "qualified-type-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type argument count mismatch: Box@model\n",
+      "noOutput": true
+    },
+    {
+      "name": "private-constructor-pattern-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private module member: library.Hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-primitive-transparent",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 432,
+      "sha256": "163c29c0bcd72b5cfe1b5880c0e34d475ec212cd2dd87b9af01f255d2028a7be",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "alias-generic-tuple",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 635,
+      "sha256": "2d7ba4ca0afb3de115cc0bf9ba899a48138e778e41cd318a191f855d94cad694",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "alias-forward-chain",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 778,
+      "sha256": "bea08b1b508aabb5fa8347a30e0cbb164e6dea2a763cb268b199f341fb9a8fc6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "6\n"
+    },
+    {
+      "name": "alias-function-type",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 659,
+      "sha256": "7ccd98379def858d079b92a68a5dbb62c6a8cbee1bffd74438efa5da823baf68",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "alias-recursive-nominal",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 820,
+      "sha256": "b5706a245e02f81d05044f1a9a626bc64c4145583783cfeb3c16fc821585fd19",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2\n"
+    },
+    {
+      "name": "alias-defining-module-scope",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 579,
+      "sha256": "dfedf410eb9f538be66dbf925f1b3db0b4a9e102cbecabe028c96214495bff53",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "alias-public-primitive-export",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 432,
+      "sha256": "7b5b83f33498a305b9479a6013d93699dd88e3bfd662415bcc62801d5cc822e2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "alias-private-transparent-in-public-api",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 405,
+      "sha256": "41a1817c1661210ac2e8b60aef52996140940c2e0e67a1ba643d7de454e329de",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "alias-public-private-unused-is-valid",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "alias-bit-array",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 885,
+      "sha256": "5c0c01c73cb7d82f4146f394dcc7a528cc6b24026a89a3e14f4df60f683e50f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "alias-duplicate",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Duplicate type: A\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-nominal-name-conflict",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Duplicate type: A\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-cycle-direct",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type alias cycle: main.A\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-cycle-mutual",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type alias cycle: main.A\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-unused-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unused type alias parameter: a\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-unbound-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unbound type parameter: b\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-duplicate-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Duplicate type parameter: a\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-discard-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type parameters must be named lowercase variables\n",
+      "noOutput": true
+    },
+    {
+      "name": "nominal-discard-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type parameters must be named lowercase variables\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-wrong-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type argument count mismatch\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-unused-invalid-body",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type argument count mismatch: Box\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-is-not-a-constructor",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown name: main.Count\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-private-import-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private module type: library.Hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-cannot-leak-private-nominal",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private type used in public interface: Hidden\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-integer-fallthrough",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 598,
+      "sha256": "9fc661b593d313caf359ccc9e19375cfcd57f1c1b0e765915c2a75b0b8865d75",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n3\n"
+    },
+    {
+      "name": "guard-pattern-before-condition",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 792,
+      "sha256": "06ad663e33d51097c78e1742a206372afae37b10a3ca96c7a8d35c3ccc69ec54",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n0\n4\n"
+    },
+    {
+      "name": "guard-field-and-tuple",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 885,
+      "sha256": "05752e7edd863187fd8a836ead5d8ddfb106358eb3b98f56350ae9b8cadb43a3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n0\n"
+    },
+    {
+      "name": "guard-grouping-and-arithmetic",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 868,
+      "sha256": "5519939fe54f61a75ccf2b54e3bfdc32f4adac9288f6f23716ca717dae4d3c8a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "guard-scalar-short-circuit",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 655,
+      "sha256": "5169d2663655103441820f719c182379ecea89048baa0fd4e479afaac7f6de7a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "guard-only-capture",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 835,
+      "sha256": "1b4d01e5cd0d513775a01871ca163ba6a3f34e666c8f7f32f5d87d0dd3381abd",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n0\n"
+    },
+    {
+      "name": "guard-shadowed-name-recovery",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 498,
+      "sha256": "bc3ec6ab9d83a73f69996ac1d8581d2c0a0bfd541712d0bbe6c5a9d8ed2f3eaf",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n9\n"
+    },
+    {
+      "name": "guard-known-variant",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 871,
+      "sha256": "599af5374d670f75173f5f6876cee8c28c0547f54535d83ac24320038834af91",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n1\n0\n"
+    },
+    {
+      "name": "guard-bit-pattern",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1135,
+      "sha256": "cb559bdf7903e488bb07a1033d1b97cf62bdb7d2b5526787d44e4764820e4ae6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n0\n5\n"
+    },
+    {
+      "name": "guard-alias-module-interaction",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 562,
+      "sha256": "8b6a7b80f25924cb4106be9862411e4bdddc8cb178075d2e9fee862ef4c29f8c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n1\n"
+    },
+    {
+      "name": "guard-true-does-not-prove-coverage",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-variant-does-not-prove-coverage",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function pick: Non-exhaustive custom-type case: add missing variants or a catch-all\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-must-be-bool",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-function-calls",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-callback-calls",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-effects",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-let",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-case",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-no-refinement-after-failure",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown name: main.n\n",
+      "noOutput": true
+    },
+    {
+      "name": "guard-checks-dead-body",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-literal-equality",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 833,
+      "sha256": "510a03b2ed406fa9552726476c8215dde9868acefabc409aca5d074facd00d55",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nTrue\nFalse\n"
+    },
+    {
+      "name": "strings-dynamic-equality",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 995,
+      "sha256": "2e4e79aa93eb5657b73f62ea57135b9ccf880f12fbfcf9856fc75079575e8492",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nFalse\n"
+    },
+    {
+      "name": "strings-prefix-guard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1176,
+      "sha256": "7ebfff63954f22458236329c738c87b66600b1902ac1a702f032b6e8df45b40c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n3\n"
+    },
+    {
+      "name": "strings-prefix-as",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 954,
+      "sha256": "8c9aaf431235aa31d4c2a7d1bfc01682e2c97387cca6bcfab079e728210b7522",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "strings-guard-concat",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 829,
+      "sha256": "366378032156e9e50dd7ecc8fbdecfc46dcf4641e1c19888dff10d4f15769601",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "strings-UTF8-dynamic",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1043,
+      "sha256": "28f0374e27be2f3b8fd2ebbfa30af684956512bb572442083d7507177d2c8a41",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "206\n187\n206\n178\n"
+    },
+    {
+      "name": "strings-UTF8-literal-default",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 882,
+      "sha256": "969dd15df53efdeeddd77dd653ea5aa67cb265152d548c1a060e5b4e9affdfe1",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "104\n105\n33\n"
+    },
+    {
+      "name": "strings-length-guards",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 790,
+      "sha256": "b074dbf3aa38cfef24ff9b187309bb6b4477c447e40cae0d0c7fde11e447b43a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n"
+    },
+    {
+      "name": "strings-empty-prefix",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 891,
+      "sha256": "506b060f9dc5bececc667b4061b6fa3c8948245bcca1cacf0c9c3b710bfbc71d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "strings-operand-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 813,
+      "sha256": "df1fb95bc42b45aa45b8d1d4f4b1dd9fb3bb18a0327ac1b89bffee85c3aa678b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\nTrue\n"
+    },
+    {
+      "name": "strings-imported-return",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 810,
+      "sha256": "5e02d335573d957595f460038fe30ee60928c85095aaa48787d169ecf3fe887c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "strings-concat-wrong-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected String, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-equality-wrong-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found String\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-prefix-literal-tail",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 45: Expected identifier\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-empty-prefix-refutable-let",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-prefix-coverage-conservative",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-prefix-duplicate-binding",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: x\n",
+      "noOutput": true
+    },
+    {
+      "name": "strings-variable-needs-UTF8-option",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found String\n",
+      "noOutput": true
+    },
+    {
+      "name": "prelude-default-result",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1112,
+      "sha256": "90a3f87e555cf7a6bae97acde9640e26938e2734d079f4c34ddd288d8cfb4bfc",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\nTrue\n"
+    },
+    {
+      "name": "prelude-generic-result",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1054,
+      "sha256": "25042ed8b5ea847e78fc84119c13a2d0a3413586468c4137f4e1abffb97148e0",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "prelude-result-alias",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 677,
+      "sha256": "5fa011e51347592f7889545c472bb79d244fa341c651cfe546e1cb6f22ab5196",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "prelude-cross-module-result",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 710,
+      "sha256": "cd85614816de577ee6f36d2aa0b2a4df3460ad0ef39272deb81fc5e37547233d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "prelude-local-result-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 576,
+      "sha256": "3c18648d26d0180533b377c07a883b430475e232ec43588d6f4f78d530e7a569",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "prelude-independent-local-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 914,
+      "sha256": "b04866eccc4c44fe651e54645e482ae37e7058525ac17f9d97b11972e5c5a628",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n8\n"
+    },
+    {
+      "name": "prelude-unused-result-alias",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 380,
+      "sha256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "prelude-local-Ok-shadows-only-value",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Result@$prelude(Int, String), found Other\n",
+      "noOutput": true
+    },
+    {
+      "name": "prelude-local-Result-alias-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 394,
+      "sha256": "1837538d048aa74eea68a0215c6f6a67a45aede05b9ee10669f300865bf849f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "prelude-not-reexported",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Unknown name: library.Ok\n",
+      "noOutput": true
+    },
+    {
+      "name": "prelude-result-wrong-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Type argument count mismatch: Result@$prelude\n",
+      "noOutput": true
+    },
+    {
+      "name": "prelude-Ok-unlabelled",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unknown constructor label: value\n",
+      "noOutput": true
+    },
+    {
+      "name": "prelude-use-continuation",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1054,
+      "sha256": "ec0b78e967b56c089361432c0651ef056cac105963a08f6780ca3fdb887f8aea",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "prelude-error-skips-continuation",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1230,
+      "sha256": "6aa74e615c0b641b0a90241cc33e1e14658ff7493c56cc5347cdef239d7060b0",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "multi-subject-evaluation-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 598,
+      "sha256": "b19ef2a6ccbbb6cc77a8d8d697d0634b8dd313daddc1458e1c356b2196e3420f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n7\n"
+    },
+    {
+      "name": "multi-four-bool-combinations",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 819,
+      "sha256": "ac3ecf7c643985653642c194a76ae95b556534652a06178433ecfb6437c2366b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n3\n4\n"
+    },
+    {
+      "name": "multi-three-bool-columns",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 796,
+      "sha256": "e0eceef24af95c92a8df8dec53e600809f45398e51d092bd7dec7e1d227b2d73",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n4\n"
+    },
+    {
+      "name": "multi-guard-retries-alternatives",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 680,
+      "sha256": "f8abf3e7d97599ac93318754ff2f66321d261ce72776f453c22cb2f079f6b456",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n7\n0\n"
+    },
+    {
+      "name": "or-tuple-binding-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 748,
+      "sha256": "694d44363c9adfa73297b97aa809a72d17af7d3cef76f1dabf13fc1feed3ddc1",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "12\n"
+    },
+    {
+      "name": "or-guard-retries-tuple",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 778,
+      "sha256": "97154221275f459599fa0147d44551a86df0c76b3f1ccda47eaed6087bb50e8d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "or-guard-both-fail",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 778,
+      "sha256": "b067f1c78eb650b17c344db3d4c8381be36f446a1bca2929611fdd5b05884b1c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "or-string-prefix-classifier",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 912,
+      "sha256": "e92fd43643cb14415ed09ebe994c54afd0c4fc05c8b2e657a1d8a896da4748ae",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nFalse\n"
+    },
+    {
+      "name": "or-prefix-binding-values",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1236,
+      "sha256": "c5481962debe6845fa6b51711a222e88a577077e43dac2f3987eff3a21e8f95a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nFalse\n"
+    },
+    {
+      "name": "or-prefix-overlap-guard-retry",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1068,
+      "sha256": "fa407e10b22e03388453bbaab726533d85f24bb15df10c12cd45ec774e2c2cf2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "or-constructor-alternatives",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 775,
+      "sha256": "0d28b747a90232dad25c76fd9232a2b35fde1128b4211f333135989029bb0965",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n4\n"
+    },
+    {
+      "name": "multi-correlated-constructors",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 964,
+      "sha256": "74618288f700806a2c74ccb7d6e066d9ce668ab80fb0b87bc534132db6ff6331",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n1\n0\n"
+    },
+    {
+      "name": "multi-list-and-bool",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 941,
+      "sha256": "ae0ef36d9f2f12b06b4691431597276643983784aa9a937eec1a7bc8e77d556b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n7\n1\n"
+    },
+    {
+      "name": "multi-two-lists",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1226,
+      "sha256": "76a98c43552533e525cefda35be9cdf49ee6facf25a6db35a50c1984a190f33d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n3\n4\n7\n"
+    },
+    {
+      "name": "multi-generic-result-product",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1011,
+      "sha256": "e90bcf9b173ad2e28025b74ffdeab886882c4d0b01b04694f2d99d7bd5077972",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n1\n0\n"
+    },
+    {
+      "name": "multi-nested-tuple-bool",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1020,
+      "sha256": "7c8a8107ab22d40b72bee2e484bd845f42f3296b28d190ed3c0d745cd92ba11a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "multi-known-constructor-per-subject",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 672,
+      "sha256": "ab3cadb998958c54df095d6facce68dd7354f2aa37d0cf75f72af9c9134927d2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "multi-zero-tuple-column",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 704,
+      "sha256": "2fa514b39e10239f85920a1cbc8bdffc37c76a1c1dacba37280cfbfbeb00ccd1",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n"
+    },
+    {
+      "name": "multi-outer-shadow-restored",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 590,
+      "sha256": "e9743a15fba6e752a29eb081257964c30fd67a8189308acab1d6b8e6d3afc0e8",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n9\n"
+    },
+    {
+      "name": "multi-captures-and-returned-callback",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 968,
+      "sha256": "9fb080f1c1fe7e9e2271523a54a81f2e6f57d6db59331eb0655cdb7814128aa2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n0\n"
+    },
+    {
+      "name": "multi-context-returned-lambda",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 912,
+      "sha256": "08a69d4753c835f67aab2ab54d5727294f05ea9a5dbdd5459c8b27002a8b1046",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "multi-qualified-constructors",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 831,
+      "sha256": "fc2ceef645c1491239031b88c26019344d5ba4eb50259cc6e6cb4fcd6662c9cc",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "multi-alias-types",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1039,
+      "sha256": "c976b1428d3467827942fcf72d114513c199531372f62bd933b752ccaf9cf0c0",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n"
+    },
+    {
+      "name": "multi-bit-pattern-and-alias",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1229,
+      "sha256": "bd84d07b4a9a667231d7a43672bae46d0ae0c3b4da74c9c4112ad28dcc1ba3c4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n0\n"
+    },
+    {
+      "name": "multi-marginals-not-exhaustive",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-list-hole",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-guard-does-not-cover",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-catchall-row-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-extra-row-pattern",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-alternative-row-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n",
+      "noOutput": true
+    },
+    {
+      "name": "or-missing-variable",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables\n",
+      "noOutput": true
+    },
+    {
+      "name": "or-extra-variable",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables\n",
+      "noOutput": true
+    },
+    {
+      "name": "or-different-variable-names",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables: a\n",
+      "noOutput": true
+    },
+    {
+      "name": "or-inconsistent-binding-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-duplicate-binding-across-subjects",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: n\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-unsafe-known-variant-merge",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unknown constructor label: a\n",
+      "noOutput": true
+    },
+    {
+      "name": "or-nested-pattern-syntax",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 40: Expected ',' or ']' in list pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-branch-result-types",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-pattern-subject-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "multi-returned-closure-captures-selected-binding",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1003,
+      "sha256": "b1aae8a7fd76dca9ebeff13a05e7eebe74daec2fe4730f867fe73d38fd8dc5ca",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n7\n"
+    },
+    {
+      "name": "eq-list-values",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1709,
+      "sha256": "1a32a4156e9b78b5cc5bdbdbe6a420e2f5f80097245fce7588ae58d8aef3ecba",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nFalse\nTrue\n"
+    },
+    {
+      "name": "eq-tuple-nested",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 2076,
+      "sha256": "d031baf8c3cd2d2fd9e2e8c2a90d244a51d68925cf39b6d943a0e1b71572e86e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\nTrue\n"
+    },
+    {
+      "name": "eq-recursive-tree",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1588,
+      "sha256": "f70df6a29ce1ba560a16f0a6bcf181d4eda3895ba6d920add2ce3f23fde67f2d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\n"
+    },
+    {
+      "name": "eq-constructor-tag-before-fields",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1459,
+      "sha256": "af969347ad054fab460e277f1bdb13d0b3297994a10f75cc87f52f855bcb87f2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "False\nFalse\nTrue\n"
+    },
+    {
+      "name": "eq-mutually-recursive-types",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1228,
+      "sha256": "9437e609fcfcd5c30aa61d7f94bae3705eb230485ad33c44b38d23c61c80fa0b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "eq-generic-record",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 2118,
+      "sha256": "afbd06ba0c131b5f48a8ccdb7a7c18fa97cbe4160013ea0b0a331a0b14b9c463",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nTrue\n"
+    },
+    {
+      "name": "eq-nested-generic-same-owner",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1181,
+      "sha256": "b77ffe3f1a613d95a0d942d8e08e5edf3d7ca66023ed18b7d3b06a2165d9ff89",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\n"
+    },
+    {
+      "name": "eq-generic-recursive-tree",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1809,
+      "sha256": "56907da106b3304d9dcd8674a41063eee1dc4a224c8fd9cff6fef16ef1117c31",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "eq-parameter-swap-recursion",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1525,
+      "sha256": "5058162e0ad0028c6e21f8b20c3e55dd28be65ea99155ce41a88543bba52d59a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\n"
+    },
+    {
+      "name": "eq-phantom-rigid-parameter",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 798,
+      "sha256": "888b4b324bc0016ead34dd61cbee463db1664a1c5503770e9bbda3e2bcb54259",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "eq-result-holes",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1862,
+      "sha256": "1dabdc07861c68f7e68090b2577ec63379eb7dda6f46651cc8e204cce23fbb0f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nFalse\n"
+    },
+    {
+      "name": "eq-empty-inference-unification",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1759,
+      "sha256": "1e8a3338be99c3354abb7b0c8345dfc5ba27ce38097cef00965e443620602ed3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "False\nTrue\nTrue\n"
+    },
+    {
+      "name": "eq-bit-arrays",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1607,
+      "sha256": "348118fe23d800cb42d91cdb9ad2167e034e135747055ebc6f924e8e1239dbc7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nTrue\n"
+    },
+    {
+      "name": "eq-bit-array-view",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1219,
+      "sha256": "210b2795435675c605f2a75a900afa5dd04b3b7a7aac0227c8af7a62503f7dad",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "eq-byte-payload-inside-record",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1414,
+      "sha256": "9738a5c2818f5b9c84303d2e50dd3279ef6eacdfdb36d7a5ed45757d96ffba75",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "eq-alias",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1144,
+      "sha256": "09e61539f8001bde8ad7b3ea42e16307ae3a0cb454b47870b2648d5dacf2ffe9",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "eq-guard-local-values",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1078,
+      "sha256": "558c1f52a0fcc360d4658b8f24346e6325245600d7cbd63054a5ba56431c8fa5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "eq-operand-evaluation-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 772,
+      "sha256": "a86b2ff4b2b80da6a8e50cedcbae4de53b96e39aae8f539c2126dc09b830e55a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\nTrue\n"
+    },
+    {
+      "name": "eq-shared-tail",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1166,
+      "sha256": "c637f93b16097afe19d75fff55a15d822d0948354dbdb6a81dcd94c2499d34aa",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\n"
+    },
+    {
+      "name": "eq-empty-constructor-generic",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1466,
+      "sha256": "0b54b81dc46ea06e4e5e856dc83b9a9bc0d771a59dca3fc4c434763768ccda65",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nTrue\nTrue\n"
+    },
+    {
+      "name": "eq-cross-module-nominal",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 884,
+      "sha256": "4d0922614b6b3812c66385e233b7190ce98cdd65986dd98e95f7e6c08eebf246",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "eq-wrong-nominal-types",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected B, found A\n",
+      "noOutput": true
+    },
+    {
+      "name": "eq-wrong-list-elements",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "eq-wrong-tuple-arity",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Tuple/type argument arity mismatch\n",
+      "noOutput": true
+    },
+    {
+      "name": "eq-wrong-generic-instantiation",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-fallback-nonrecord",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 640,
+      "sha256": "ab9dd6f70b78e74130061bab66cde6b640d39ec5956046ba65986f5501b23af8",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "alias-fallback-missing-record-field",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 580,
+      "sha256": "f8eab0b2317f970d3d2dc469fbdb5c4ac9405adc83262cd6dfb14e17995d1d94",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "alias-present-field-wins",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 599,
+      "sha256": "1675444ee20f8c04bda30097298a52cae1391bb90b7f879db8c23da007907e01",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "alias-present-noncallable-does-not-fallback",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Value is not a function\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-private-fallback-denied",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Private module member: library.f\n",
+      "noOutput": true
+    },
+    {
+      "name": "alias-local-field-can-shadow-private",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 599,
+      "sha256": "1675444ee20f8c04bda30097298a52cae1391bb90b7f879db8c23da007907e01",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "alias-closure-captures-present-field",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 769,
+      "sha256": "723183a33bb7711bf82e7daead61608c91f09e9de6e8a8e94ceca211f3afffdf",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "alias-field-in-guard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 740,
+      "sha256": "7f3115fc57c76f7921a83c5b43d55d298b15e62ad3400891666b05bd5a267868",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "pattern-alias-nested-constructor",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1372,
+      "sha256": "2be8705bff15a9a78e8fc28f456712375eb0a094fe5cc86a5de472bfedc3f143",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\nTrue\nTrue\n"
+    },
+    {
+      "name": "pattern-alias-tuple-list-let",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1343,
+      "sha256": "7974600bd7233ecd88cd1121ccff6fb86c979b76d1175bd2eeae7d25e506da27",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\nTrue\nTrue\n"
+    },
+    {
+      "name": "pattern-alias-bool-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 659,
+      "sha256": "e25e6dec99f0f969f9934aca2522f85daa8d7d7d53324d4b36be76e0655479c4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n1\nFalse\n2\n"
+    },
+    {
+      "name": "pattern-alias-list-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1082,
+      "sha256": "30e97b54ca86547d7438a4c1e13faafe3233c99fcd500a9c344853dda8b0ba1e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n0\nTrue\n9\n"
+    },
+    {
+      "name": "pattern-alias-tag-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1081,
+      "sha256": "ebc7fccc347bf1ee08c6a97e289b4bdba2c9613ec3bc95513a9e966bae784c9a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n4\nTrue\n0\n"
+    },
+    {
+      "name": "pattern-alias-guard-retry",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1104,
+      "sha256": "e00a6922c969e6089ac623450bffec122270bf39113255eca6538e9d02c8c026",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n9\n"
+    },
+    {
+      "name": "pattern-alias-multi-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1118,
+      "sha256": "3d24aa54f45cdbb4d52601234cf67930c250d10297dc18710fdb8045988c112b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "False\nFalse\n3\n"
+    },
+    {
+      "name": "pattern-alias-returned-capture",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1281,
+      "sha256": "aa0f0eaf3b6dc4953820034fd2b42b762450d30d4009cdd69872756f4a7c8ec4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "pattern-alias-lexical-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1011,
+      "sha256": "08341a59e38ff519af689f3b90ecc20f6ec36f7364ae0377fdc1c3225090b635",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n99\n"
+    },
+    {
+      "name": "pattern-alias-known-variant",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 671,
+      "sha256": "b8932e5ac1f4086add3ca253023d9ad07bdfb53a29e4552210adb521da4405b4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "pattern-alias-nested-known-variant",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 736,
+      "sha256": "c438835d76af0e1b0dab46310667b6f11ddb7a3d51d77d5a7475f11e21ce448a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "pattern-alias-string-literal",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 603,
+      "sha256": "8c53b282f45aef6311d42ddef995b8471455faeda79412ce3a2d38160e09de78",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "pattern-alias-string-prefix",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1034,
+      "sha256": "a6614234424b5762910119c28031f6c6075e948a83f86cdcfc2e5825a3295d27",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "pattern-alias-whole-bit-array",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1157,
+      "sha256": "68372d2e9fce512becc9aab8d540e6fb592ba2fe3f3bdb84b68a285b064daa09",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "pattern-alias-module-constructor",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 851,
+      "sha256": "772f786bf3e58038e3619caafc8cbbf28a83bd2fa502954f66b9af189252b060",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\nTrue\n"
+    },
+    {
+      "name": "pattern-alias-evaluated-once",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 940,
+      "sha256": "59c69a086b6b8117eab6308c3610211c0e9c933af4f41a503e6dce9d17683d13",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n5\nTrue\n"
+    },
+    {
+      "name": "pattern-alias-duplicate-inner",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: x\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-duplicate-across-columns",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: same\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-alternative-name-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables: a\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-alternative-type-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-refutable-let",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-guard-not-coverage",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-alias-does-not-widen",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-incompatible-use",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found #(Int, Int)\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-discard",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 36: Pattern alias requires a named variable\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-underscore",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 36: Pattern alias requires a named variable\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-chain",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 38: Expected '='\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-string-discard",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 39: Pattern alias requires a named variable\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-string-chain",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 41: Expected '->'\n",
+      "noOutput": true
+    },
+    {
+      "name": "pattern-alias-variable",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 410,
+      "sha256": "e11fa6b1e7312d62d26373752a0de9028b35889d4e0913208f3957b62c7d17f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "wide-int-positive-boundaries",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 425,
+      "sha256": "ecd24cf42424cb450da2f279fafabaab5f37b8f9fc98e10ceaf0f5292fab622d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2147483648\n4294967295\n4294967296\n9007199254740991\n"
+    },
+    {
+      "name": "wide-int-negative-boundaries",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 425,
+      "sha256": "d63f1f7039ce6a293ba35a52d69273ff70faaf30cea9ea76b540831c7bbf2c12",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-2147483648\n-2147483649\n-4294967296\n-9007199254740991\n"
+    },
+    {
+      "name": "wide-pattern-sign",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 623,
+      "sha256": "d20c8e75ee44082cea5bff952361db13d248e94102ba4f04535d733ec9943312",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "wide-pattern-word",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 623,
+      "sha256": "71fb2be3a69716a7da879a06933ffc9d4d72a34df2141c9a8c79939583fb1ace",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "wide-pattern-high",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 623,
+      "sha256": "c9300329b448fcf1ee68a6aee2b8433968c872646d1771a09f900faf1878050f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "wide-pattern-negative",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 623,
+      "sha256": "2f72e1bce5498295042223e341b67be4587c416768e327d6112ea8b3f857fd9c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "wide-pattern-nested",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 827,
+      "sha256": "b6e4492c48b386224e7efa3a6350d632005ef2bb350e2cfd357386ba1b9c0480",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "wide-pattern-bit-array",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1546,
+      "sha256": "59d073359109523cd867fd633186f1683df1fb91ad9e58b04949b898ec7eabba",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\nFalse\n"
+    },
+    {
+      "name": "wide-pattern-signed-array",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 995,
+      "sha256": "b8a48b69cba26fef1227c8b54ba4cbb4922fc03291ac88194b261fa883a28318",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "wide-pattern-guard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 545,
+      "sha256": "169914fe01fbdf9118415b06d6179bd5ab1b6e63e9fc6203fe6bef7a661175d4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n0\n"
+    },
+    {
+      "name": "single-list-sum-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 985,
+      "sha256": "190c4a9bf73a63e0a48febaff02d9dc9c83ad11fd8b3e46288d6f1ce3dedb781",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "single-list-sum-missing",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "single-tuple-bool-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 841,
+      "sha256": "29193c1015a4898f8d6ce3243e975f75b367ff78e47426e776fd515ab236c092",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "single-tuple-bool-hole",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "single-nested-adt-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 814,
+      "sha256": "64baa790e49f6c502d2f243c354c26f1a76c57229dce1fe030d242119bb5efb2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2\n3\n"
+    },
+    {
+      "name": "single-nested-adt-hole",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive custom-type case: add missing variants or a catch-all\n",
+      "noOutput": true
+    },
+    {
+      "name": "single-recursive-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 928,
+      "sha256": "4f3c9eca845988bab1d5688ff6fcc00d5f42e5b6a4e1897c4b501b9fe76ccae1",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "single-list-bool-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 797,
+      "sha256": "2438d426c043a9ca0145e99c398ccb98aff7624dfb3d6fb89db9584fa0cd3ebb",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2\n"
+    },
+    {
+      "name": "single-list-tail-hole",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "single-guarded-leaf-not-coverage",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive custom-type case: add missing variants or a catch-all\n",
+      "noOutput": true
+    },
+    {
+      "name": "single-aliased-nested-coverage",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1167,
+      "sha256": "bf5ad526efcf0fe83b8c0dc5f2f5e1efa105d55a023cd900d9472a881670ec67",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n2\n"
+    },
+    {
+      "name": "tail-accumulator",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 547,
+      "sha256": "cfdab37fffebcaec67489c29060b7e71858a02ebbee7f8538e04e086648dc12b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "50005000\n"
+    },
+    {
+      "name": "tail-simultaneous-swap",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 597,
+      "sha256": "dd0f2ac8194dbcbe8f9184cb0cdbce7f90248164f859e414715b96ef554101c7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "73\n"
+    },
+    {
+      "name": "tail-dependent-arguments",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 574,
+      "sha256": "3cf98f2028d53a294d13e8e7c2da4140aeed99b4d93cee6a3b9774cae1cd97e7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "6765\n"
+    },
+    {
+      "name": "tail-argument-effects",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 651,
+      "sha256": "00246870f4e66e760ca3fb6a520c7e21de1b3502146ca3d957d2413b8eaba692",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n20\n10\n0\n10\n20\n10\n20\n"
+    },
+    {
+      "name": "tail-block-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 598,
+      "sha256": "ce12a72684fc0522db8cb808fe45fd04e1d3f0beb159c786f81eded91d66d0ce",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "94\n"
+    },
+    {
+      "name": "tail-guarded-loop",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 564,
+      "sha256": "edb3e12344df8147a69c5d150ab0934ff8f2231be12bde859f560609daac0f11",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5050\n"
+    },
+    {
+      "name": "tail-multi-alternative-guard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 815,
+      "sha256": "abc4b595124fc5319cf969f46d4c6ba8370391501588ade25d8878679915cc6a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "91\n"
+    },
+    {
+      "name": "tail-saved-capture-values",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1137,
+      "sha256": "92d10ac6d2656ad1dd88badd1b8d08654413e8f0cd742ca3f33035eb36c47a6c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n3\n"
+    },
+    {
+      "name": "tail-closure-boundary",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 754,
+      "sha256": "b992d971426bc09be95aff923c30792e9cf9d55774555542ca26369cc398bb7a",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "tail-echo-not-tail",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 511,
+      "sha256": "21554fc87c77a179ec36163ce5fa5c8275d53547663977f25d8dc91b8a7a22f5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n9\n9\n9\n"
+    },
+    {
+      "name": "tail-non-tail-fibonacci",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 593,
+      "sha256": "481e4d637571575050a9521a6f831cf42115245df6adb16adddab40716dde7a1",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "144\n"
+    },
+    {
+      "name": "tail-named-descriptor",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 736,
+      "sha256": "6ee837d8a159dd7ab7bba362b99e210ae8cf7b2130ae4f4d15fa702bd6cddf8e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "10000\n"
+    },
+    {
+      "name": "tail-mutual-not-self",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 676,
+      "sha256": "58cdd60db163f52c17a80e86f91878b0d751a0b20f73f3c1df936f053a7d0ce6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "False\n"
+    },
+    {
+      "name": "tail-non-tail-argument",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 541,
+      "sha256": "3db50659086022056756d8d7f94646b7aead902a8ba7d86b2948f445c6df1fe9",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n"
+    },
+    {
+      "name": "tail-bind-not-tail",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 574,
+      "sha256": "66dd0f1e492a5fe53f28cd58db7e2a35327afba4c99eeb48b56d066b28de4875",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "200\n"
+    },
+    {
+      "name": "tail-generic-pointer",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1031,
+      "sha256": "c9e62687f9cb9d4cd2f9ab6fd5986dc640806ed6d8755008547b4144e135d185",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "tail-local-call-shadow",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 645,
+      "sha256": "e0fc223fac5a419368505482db493067f758e389af8d6a86f11e8aaaff907af2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "13\n"
+    },
+    {
+      "name": "tail-short-circuit-preserved",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 582,
+      "sha256": "40cc087b10de442225530c40cd05e1fb3ff5acdbc7b9ba2028052815b0786c22",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "tail-zero-arity",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 440,
+      "sha256": "08a48575eb9881440cacb280b6aa6137ae1ebd2d59834ba66775568d49f53dc7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": ""
+    },
+    {
+      "name": "tail-qualified-import",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 550,
+      "sha256": "6ad0ed386604e1a86624ac06476b6401e9e36d6291c8f26f753466c890ce1368",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "10000\n"
+    },
+    {
+      "name": "register-leaf-operands",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 825,
+      "sha256": "f3df0685dca643c354ddd5ffd4b7ddf081d602eeeb3b8746d23d1c09600f3033",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "22\n12\n85\n3\n2\nFalse\nTrue\n"
+    },
+    {
+      "name": "register-wide-immediates",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 436,
+      "sha256": "9b508d4ba948a590443248d139ac6d48067936fb6a0ecc274ae2768ef275843e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9007197107257343\n2147483651\n"
+    },
+    {
+      "name": "register-left-effect-right-local",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 480,
+      "sha256": "1be6b2ce9b97a474d45f868c52dab5c92a893485af44534f0bf628f8b389bdd5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n13\n"
+    },
+    {
+      "name": "register-spill-right-call",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 462,
+      "sha256": "e21edf3cb5acf371952d19b158f396d984fd1bfa0ef504fcfeefe174d6314d55",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "11\n3\n8\n"
+    },
+    {
+      "name": "register-nested-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 507,
+      "sha256": "98775b1890993e44d7632736e1ab53051a25108f6828251613735f2158fc45f4",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n3\n6\n"
+    },
+    {
+      "name": "register-string-local-helper",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 816,
+      "sha256": "62ff0a0a07e106501c63a9d3f6ff6d3f08a4161b4870f8f9ee1584af5213aa6c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "register-short-circuit-effects",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 589,
+      "sha256": "93505b7c394fe46abde1cd3d3179ad8213b3365adf9fba5662174343ba9c23c2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "False\nTrue\n"
+    },
+    {
+      "name": "register-division-zero-leaf",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 565,
+      "sha256": "1ba60c275340539f7dccb659e648991229c6b4643968a3243c9afefecd8f5322",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n0\n"
+    },
+    {
+      "name": "signed-nested-call-adjacency",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 492,
+      "sha256": "7c59cab5bc35a6bcb553d8586d0d7ed1d570ee7696f4f7f1f04b206081d923e2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n3\n-3\n"
+    },
+    {
+      "name": "signed-space-after-variable",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 404,
+      "sha256": "3a41fe5ae22c7c7d2b7323242c3ffcdc355154346c846405a8d8bb76b3ad928b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-1\n"
+    },
+    {
+      "name": "signed-adjacent-variable-subtract",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 416,
+      "sha256": "636c2e505e34f2dc65769353f3ec5bdae96a12ba22bb7d581bc3618fb68eaff3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2\n"
+    },
+    {
+      "name": "signed-newline-expression",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 390,
+      "sha256": "2abcd637e2ad2ed34ed4ffc496f23783be903c2e39e6cb2c2effc9d913d2b07e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-1\n"
+    },
+    {
+      "name": "signed-underscored-subtract",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 402,
+      "sha256": "7bd1ec2159c5c748a8ec01d1395952cdda42ecc37c57e9baf9c4c0ce184d2916",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "999\n"
+    },
+    {
+      "name": "signed-comment-expression",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 404,
+      "sha256": "3a41fe5ae22c7c7d2b7323242c3ffcdc355154346c846405a8d8bb76b3ad928b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-1\n"
+    },
+    {
+      "name": "signed-minus-negative",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 402,
+      "sha256": "153785e7b7f2f7ae7be9227282db475fd4cdfa6a3085b16d32d42214a4433962",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4\n"
+    },
+    {
+      "name": "signed-missing-argument-comma",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 50: Expected ',' or ')' in call\n",
+      "noOutput": true
+    },
+    {
+      "name": "known-local-variant",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 590,
+      "sha256": "4cf4b84ca2c319d16977e6c9752e1ec8a5a7709deae953e24b2efbb670d08e29",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "zero-field-is-not-callable",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Zero-field constructor is a value, not a function: Zero\n",
+      "noOutput": true
+    },
+    {
+      "name": "private-type-in-public-api",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private type used in public interface: A\n",
+      "noOutput": true
+    },
+    {
+      "name": "unknown-variant-let",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "custom-result-names",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 576,
+      "sha256": "3c18648d26d0180533b377c07a883b430475e232ec43588d6f4f78d530e7a569",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "missing-variant",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Non-exhaustive custom-type case: add missing variants or a catch-all\n",
+      "noOutput": true
+    },
+    {
+      "name": "wrong-field-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "nested-constructor-not-refined",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "generic-repeated-parameter",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "generic-argument-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n",
+      "noOutput": true
+    },
+    {
+      "name": "label-declaration-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 636,
+      "sha256": "d1ac17bc8cd68772aa288f722349c6630d4b64dfc3ad32449db9e969d05d2161",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n1\n2\n"
+    },
+    {
+      "name": "generic-record",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 677,
+      "sha256": "31235c14cd659adb258e372d595be0c47815f33c1a32dbc1f5e4c5014e440817",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n2\n"
+    },
+    {
+      "name": "record-offset-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Record field must have the same position and declared type across variants\n",
+      "noOutput": true
+    },
+    {
+      "name": "record-template-mismatch",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function read: Record field must have the same position and declared type across variants\n",
+      "noOutput": true
+    },
+    {
+      "name": "label-positional-order",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Positional argument after labelled argument\n",
+      "noOutput": true
+    },
+    {
+      "name": "generic-function-instantiation",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 498,
+      "sha256": "cd59bfc04c0d6915251772c3592b40cf6061e0d1dab44262dc032194107587f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\nTrue\n"
+    },
+    {
+      "name": "higher-order-function",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 645,
+      "sha256": "f08e552f9d54fd4b36b8746cb344a3abab3f89fbcdbbc23563ae0dd7447a9ef7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "8\n"
+    },
+    {
+      "name": "indirect-evaluation-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 662,
+      "sha256": "8e3dcbba8c03ccda8f14fd5f78489884e24afa4f272acbe67b72ae674b89eb65",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n3\n5\n"
+    },
+    {
+      "name": "generic-rigid-body",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Type mismatch: expected a, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "generic-self-recursion",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Type mismatch: expected List(a), found a\n",
+      "noOutput": true
+    },
+    {
+      "name": "generic-mutual-recursion",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 575,
+      "sha256": "ca4e764c95ca54079d7dd0c17df4fa8297740fd74570f1ed784ba8907c933139",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": ""
+    },
+    {
+      "name": "private-function-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "Private type used in public interface: Private\n",
+      "noOutput": true
+    },
+    {
+      "name": "returned-closure-capture",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 702,
+      "sha256": "d0de76da92f0009831340b7b3919d8d061bad0eadc8df66e185dfbf2744da4a6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "10\n"
+    },
+    {
+      "name": "nested-closure-capture",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 934,
+      "sha256": "d7b510708f92bc637abdc3ba26b8b3ed294dee1d9b4068689f0cc269ce62f256",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "12\n"
+    },
+    {
+      "name": "use-callback-scope",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 724,
+      "sha256": "ddd784887200ffd2b63db3a203d3c24f41ac8397df3cd9a5ebf5f137c018f887",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n"
+    },
+    {
+      "name": "use-tuple-pattern",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 765,
+      "sha256": "ac57d95a241194c621795872af37afe92fdd94869935ca1858938f94b725ef0e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "use-lazy-continuation",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 591,
+      "sha256": "0132d6b69aa57ea3779a2ca2800f34da37859b02b967375f9bab824afec0ab06",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "7\n"
+    },
+    {
+      "name": "closure-wrong-return",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "use-refutable-pattern",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "discarded-callable",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Discarded variable cannot be read\n",
+      "noOutput": true
+    },
+    {
+      "name": "closure-case-context",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 906,
+      "sha256": "beccebe5d3a0f583199e02173b74b5208ff56233f932ff95ec523bad30a48265",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "10\n"
+    },
+    {
+      "name": "update-evaluation-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 766,
+      "sha256": "dd9d2e56b873d78b326b6317d87657021af61bee333a3fa215e6a64275daf270",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n6\n4\n7\n5\n"
+    },
+    {
+      "name": "update-type-change",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 682,
+      "sha256": "33e846972f54ed4d054468a202b1d4a1717e9789ae8db6c7d1bc57183f2d36f3",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "True\n"
+    },
+    {
+      "name": "update-unsafe-variant",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function update: Unsafe record update: target constructor is not known\n",
+      "noOutput": true
+    },
+    {
+      "name": "update-known-variant",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 625,
+      "sha256": "2868da252d2d8899da716e0af19287f3d6b4ef81c5d1a0a57870dfefba4e04c5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "2\n"
+    },
+    {
+      "name": "update-empty",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 657,
+      "sha256": "7d911ec937bc89b7099cc083a931d6c83b060537f851512c8de0c658b6fc931d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n"
+    },
+    {
+      "name": "update-partial-type-change-rejected",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n",
+      "noOutput": true
+    },
+    {
+      "name": "update-unknown-label",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Unknown constructor label: y\n",
+      "noOutput": true
+    },
+    {
+      "name": "update-original-effects",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 687,
+      "sha256": "da6e44240f29fcc5b822747bb573aed2fabb6800aeac155283d0054aae328ac6",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "9\n2\n3\n"
+    },
+    {
+      "name": "update-zero-field-invalid",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Invalid record update constructor: no fields\n",
+      "noOutput": true
+    },
+    {
+      "name": "update-phantom-type-change",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 658,
+      "sha256": "5bb8514f9433c931aeb6dde383fc9fb5f64bde12f98c5fbb20bfac9a7139968e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "3\n"
+    },
+    {
+      "name": "update-lambda-retained-context",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 961,
+      "sha256": "37b9bc665b5e54ddc7e83db04b6c5cf7c75caa8c565bc8154f351dc45c3a276d",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "5\n"
+    },
+    {
+      "name": "bits-signed-and-truncation",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 939,
+      "sha256": "a2ce83c41f3a89e704cb9609d7b66cc4cf76ffe72ac00f619096b3d7cdb8e88b",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n255\n1\n"
+    },
+    {
+      "name": "bits-signed-pattern",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 728,
+      "sha256": "a8ed492357982a11ddec0e60bcc5010df65248bb2ea37b132e6efd90c0ac86ad",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-1\n"
+    },
+    {
+      "name": "bits-concat-order",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1087,
+      "sha256": "8facdac5093bd6719abf51b4553d1935d5637ba3e61ee078891ac017ba629e6e",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n7\n8\n9\n"
+    },
+    {
+      "name": "bits-full-tail",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 954,
+      "sha256": "935bb0ea62439f27194748c480226787b6753711b495ae2ec01508966a103f4f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n2\n"
+    },
+    {
+      "name": "bits-exact-length-guard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1661,
+      "sha256": "564cde6d96c2bca77c73cc9575891d4c6fc54560fbb515f790d1b45fc0f9ae6c",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "0\n9\n2\n9\n"
+    },
+    {
+      "name": "bits-64-safe-range",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1203,
+      "sha256": "e12697052de1bf3ded4989e3008dd463a3cf95d822ecab4760af3f665cea94b5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "-2\n1000000\n"
+    },
+    {
+      "name": "bits-64-literal-discard",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1150,
+      "sha256": "305b3947e59824ed2ff0346e6fb73661ff3591dfb87edc07edb7079fbce459b2",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n"
+    },
+    {
+      "name": "bits-mismatching-literals",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 1088,
+      "sha256": "a56a4fc61dbbbd592960f99f06cca9ee57aeed8e616dbae0688843cbebf086d5",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n"
+    },
+    {
+      "name": "bits-unsigned-pattern",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 720,
+      "sha256": "0f94c4df0de7b53aac91b2bfb0a87e0314bc01721edf04b9f22a3234bc2c806f",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "255\n"
+    },
+    {
+      "name": "bits-options-size",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 747,
+      "sha256": "b2df5d2b255e458761a4e50246b2ce8d1e889a22690b7d34547d37af0386d7f0",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "4660\n"
+    },
+    {
+      "name": "bits-empty",
+      "accepted": true,
+      "compilerStage": 3,
+      "compileExit": 0,
+      "bytes": 639,
+      "sha256": "689cec0a56692a8ca84506ece1c7515e0a26a0ef6e2500951eaf3e801b7d37b7",
+      "byteIdenticalToBootstrap": true,
+      "runExit": 0,
+      "stdout": "1\n"
+    },
+    {
+      "name": "bits-wrong-segment-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-wrong-concat-type",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Type mismatch: expected BitArray, found Int\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-pattern-only-sign",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Bit-array option is only valid in patterns: signed\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-pattern-only-bytes",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Bit-array option is only valid in patterns: bytes\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-duplicate-size",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate/conflicting bit-array option\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-duplicate-endian",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function main: Duplicate/conflicting bit-array option\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-zero-pattern-size",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Native seed supports only byte-aligned integer segments of 0..64 bits\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-unsized-tail-last",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Unsized bit-array pattern tail must be last and bind a variable or discard\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-nonexhaustive",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-refutable-bytes-tail",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In function f: Refutable let pattern: use case (let assert is not implemented)\n",
+      "noOutput": true
+    },
+    {
+      "name": "bits-unbraced-expression",
+      "accepted": false,
+      "compilerStage": 3,
+      "compileExit": 1,
+      "diagnostic": "In main: byte 33: Expected ',' or '>>' in bit array\n",
+      "noOutput": true
+    }
+  ],
+  "selfHosting": true,
+  "fullGleamCompatibility": false,
+  "sourceSensitivity": {
+    "isolatedChange": "native/cli version literal 0.1.0 -> 0.1.1",
+    "compilerStage": 3,
+    "compileExit": 0,
+    "bytes": 596782,
+    "sha256": "bec806ae64aa76191af65f0886254329906894ed03e7bf879eddf78646eb2cbb",
+    "differsFromSeed": true,
+    "byteIdenticalToBootstrap": true,
+    "versionStdout": "gleam-native 0.1.1 (Linux x86-64; experimental)\n"
+  },
+  "fixtureSHA256": {
+    "test/modules-fixtures.json": "2b3a2826c8710e7bb0926c082e4afc684e7fb574a17432c9957c0706e3bbae17",
+    "test/aliases-guards-fixtures.json": "f015e42b509d172589f9e9d81511581cf091a7722a1725f358b0a48f9a71a6d4",
+    "test/strings-prelude-fixtures.json": "945b8d9362d8b73cb140ffd43c4c2d327ca90ac6749198198b9143b6b119c035",
+    "test/multi-pattern-fixtures.json": "89995f3f9c5060926cbc96f762adca35f4db6028aa7a5153f3b34a58c484e195",
+    "test/equality-fixtures.json": "f58f9ceb5619441b631df866cb1d6ce2b0c2d56eb722089ace4703b96d0c0d37",
+    "test/pattern-alias-fixtures.json": "f7c33c123d823d88a619e2c520ee4235098e33412eac8b4c2769f4cf3bce2311",
+    "test/integer-coverage-fixtures.json": "98c902efc4646232fef08fcc5ef70e73f3358a3d5ec1d0cb506e8f7158407829",
+    "test/tail-calls-fixtures.json": "e29adcc093021cade1f3b3945184682c0dcf2e59e0607dc52a18390c38440082",
+    "test/register-fixtures.json": "37fdfd20f99140f931f37e4dbb5e0890ee46b8a28eff020557ebec9e4c64e8db",
+    "test/grammar-fixtures.json": "042aedc013dde73c12f31b7a2138e0fe96e32d3683de4101c214e82b0f94f553"
+  },
+  "nativeCorpusSummary": {
+    "total": 333,
+    "accepted": 213,
+    "rejected": 120,
+    "allAcceptedOutputsByteIdentical": true,
+    "compilerStage": 3
+  }
+}

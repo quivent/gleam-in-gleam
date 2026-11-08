@@ -503,3 +503,26 @@ Jay next suggested GCC-style look-ahead and register spilling. We will measure
 frame traffic first, then retain values in registers where the actual clobber and
 evaluation-order contracts allow it. No borrowed optimizer, external backend or
 runtime dependency is introduced. Correctness and actual ASM stay the criteria.
+
+## Look-ahead, spills and a caught grammar mismatch — 2026-11-08
+
+Jay suggested look-ahead and register spilling. We first recorded actual frame
+traffic, then limited the optimization to proven leaf right operands. RCX retains
+the left word only when the right cannot clobber it; calls keep their spills.
+An identical-target comparison removes 260 push/pop pairs and 451 static named-
+function instructions, saving 334 bytes. Frame-slot traffic is unchanged; these
+counts are not a runtime benchmark or a whole-function allocator.
+
+The fresh upstream comparison rejected our expected result for a new nested-effect
+case: mark(3)-1 begins a signed-literal expression after the call. The prior native
+compiler had the same mismatch. We retained that failure, added token-end tracking
+and separate adjacency/spacing/newline/comment/underscore regressions. Correct
+subtraction is tested with its explicit spacing. We did not hide the failing input
+by only rewriting it into a passing fixture.
+
+Final qualification passes 677 tests and 333 independent upstream comparisons.
+Stage 3 natively compiles all 333 corpus cases, and two native self-rebuilds are
+again byte-identical. Current native image: 596,782 bytes,
+SHA256 8d9ff75ac0eabe36662e6c7bd3bf8291af145ee054db7d706ee178d09678db18. The original first self-hosting receipts
+remain intact; leaf-register-* records this new increment. No runtime dependency,
+installed Crew executable or unrelated process was added or replaced.

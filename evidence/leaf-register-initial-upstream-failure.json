@@ -1,0 +1,17 @@
+{
+  "schema": "gleam-in-gleam.preserved-semantic-failure/1",
+  "observedAt": "2026-11-08T02:42:22.816452+00:00",
+  "fixture": "register-nested-order",
+  "source": "fn mark(n:Int)->Int {echo n n} pub fn main()->Nil {echo {mark(1)+2}*{mark(3)-1} Nil}",
+  "initialNativeStdout": "1\n3\n6\n",
+  "upstreamStdout": "1\n3\n-3\n",
+  "upstreamFormattedRHS": "{ mark(3) ; -1 } (two expressions, notation explanatory)",
+  "cause": "Signed numeric literal tokenization after closing delimiter; not caused by register staging",
+  "resolution": "Track prior token end and kind; retain adjacent word/number subtraction, preserve signed-number expression boundary",
+  "regressions": "test/register-fixtures.json signed-* entries",
+  "baselineBeforeRegisterChange": {
+    "compilerSHA256": "752240b4e5ab9bb926e171614468790d4a21f168ef3a70d04e9c6d0897e98fbb",
+    "exit": 0,
+    "stdout": "1\n3\n6\n"
+  }
+}
