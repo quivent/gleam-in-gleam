@@ -19,7 +19,7 @@ type State {
     env: List(#(String, Int)),
     data: List(asm.Part),
     needs_heap: Bool,
-    // Reverse instruction stream: append only the newly emitted helper.
+    // Reverse helper order; each immutable body is retained once as a span.
     closures: List(asm.Part),
     strings: List(String),
     globals: d.Context,
@@ -177,21 +177,21 @@ fn plan_program(
   let entry = case cli {
     True -> cli_entry
     False ->
-      c.append(init, [
+      asm.join(init, [
         call("fn:main"),
         raw(<<49, 255, 184, 60, 0, 0, 0, 15, 5>>),
       ])
   }
   let parts =
-    c.append(
+    asm.join(
       entry,
-      c.append(
-        c.append(c.append(bodies, c.reverse(state.closures)), equality_code),
-        c.append(
-          c.append(cli_code, runtime()),
-          c.append(
+      asm.join(
+        asm.join(asm.join(bodies, c.reverse(state.closures)), equality_code),
+        asm.join(
+          asm.join(cli_code, runtime()),
+          asm.join(
             heap_runtime,
-            c.append(
+            asm.join(
               string_runtime.generate(state.strings),
               c.reverse(state.data),
             ),
@@ -220,7 +220,7 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
           asm.Label("fn:" <> f.name),
           prologue,
           asm.Label("fn:loop:" <> f.name),
-          ..c.append(body, [
+          ..asm.join(body, [
             raw(<<201, 195>>),
             asm.Label("fn:end:" <> f.name),
             ..tail
@@ -288,7 +288,7 @@ fn statement_mode(
     [t.Evaluate(e), ..rest] -> {
       use #(code, state) <- c.then(expression(e, state))
       use #(tail, state) <- c.then(statement_mode(rest, mode, state))
-      Ok(#(c.append(code, tail), state))
+      Ok(#(asm.join(code, tail), state))
     }
     [t.Bind(pat, e), ..rest] -> {
       use #(code, state) <- c.then(expression(e, state))
@@ -300,7 +300,7 @@ fn statement_mode(
         state,
       ))
       use #(tail, state) <- c.then(statement_mode(rest, mode, state))
-      Ok(#(c.append(code, [store(offset), ..c.append(bindings, tail)]), state))
+      Ok(#(asm.join(code, [store(offset), ..asm.join(bindings, tail)]), state))
     }
   }
 }
@@ -347,7 +347,7 @@ fn register_code(
     [instruction, ..rest] -> {
       use head <- c.then(register_instruction(instruction, env, prefix))
       use tail <- c.then(register_code(rest, env, prefix))
-      Ok(c.append(head, tail))
+      Ok(asm.join(head, tail))
     }
   }
 }
@@ -461,17 +461,17 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
       let inspect = [
         raw(<<72, 133, 192>>),
         branch(132, "rt:match"),
-        ..c.append(field_tags(tags, found), [
+        ..asm.join(field_tags(tags, found), [
           asm.Label(found),
           raw(<<72, 139, 128, offset:32-little>>),
         ])
       ]
-      Ok(#(c.append(code, inspect), state))
+      Ok(#(asm.join(code, inspect), state))
     }
     t.TupleIndexNode(tuple, index) -> {
       use #(code, state) <- c.then(expression(tuple, state))
       let offset = 16 + index * 8
-      Ok(#(c.append(code, [raw(<<72, 139, 128, offset:32-little>>)]), state))
+      Ok(#(asm.join(code, [raw(<<72, 139, 128, offset:32-little>>)]), state))
     }
     t.ListNode(elements, tail) -> {
       use #(code, state) <- c.then(arguments(elements, state))
@@ -481,7 +481,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
       })
       let n = c.length(elements)
       Ok(#(
-        c.append(code, c.append(tail_code, cons_cells(n))),
+        asm.join(code, asm.join(tail_code, cons_cells(n))),
         State(..state, needs_heap: state.needs_heap || n > 0),
       ))
     }
@@ -495,7 +495,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
         "-" -> [raw(<<72, 247, 216>>), branch(128, "rt:overflow")]
         _ -> [raw(<<72, 131, 240, 1>>)]
       }
-      Ok(#(c.append(code, instructions), state))
+      Ok(#(asm.join(code, instructions), state))
     }
     t.BinaryNode(op, left, right) -> binary(op, left, right, state)
     t.EqualityNode(left, right, type_, invert) -> {
@@ -507,9 +507,9 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
         False -> []
       }
       Ok(#(
-        c.append(code, [
+        asm.join(code, [
           raw(<<80>>),
-          ..c.append(rhs, [raw(<<89>>), call(target), ..invert])
+          ..asm.join(rhs, [raw(<<89>>), call(target), ..invert])
         ]),
         state,
       ))
@@ -518,7 +518,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
       use #(code, state) <- c.then(arguments(args, state))
       let cleanup = c.length(args) * 8
       Ok(#(
-        c.append(code, [
+        asm.join(code, [
           call("fn:" <> name),
           raw(<<72, 129, 196, cleanup:32-little>>),
         ]),
@@ -543,7 +543,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
         raw(<<255, 208, 72, 129, 196, cleanup:32-little>>),
       ]
       Ok(#(
-        c.append(target_code, [raw(<<80>>), ..c.append(argument_code, invoke)]),
+        asm.join(target_code, [raw(<<80>>), ..asm.join(argument_code, invoke)]),
         state,
       ))
     }
@@ -557,7 +557,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
     t.EchoNode(inner) -> {
       use #(code, state) <- c.then(expression(inner, state))
       let #(print, state) = render_echo(inner.type_, state)
-      Ok(#(c.append(code, print), state))
+      Ok(#(asm.join(code, print), state))
     }
   }
 }
@@ -576,9 +576,9 @@ fn tail_expression(e: t.Typed, mode: TailMode, state: State) -> Generated {
           // Popping in reverse order matches the existing stack argument ABI.
           use #(code, state) <- c.then(arguments(args, state))
           Ok(#(
-            c.append(
+            asm.join(
               code,
-              c.append(tail_parameters(arity, 0), [jump("fn:loop:" <> self)]),
+              asm.join(tail_parameters(arity, 0), [jump("fn:loop:" <> self)]),
             ),
             state,
           ))
@@ -618,7 +618,7 @@ fn case_code(
   let #(finish, state) = label(state)
   use #(matches, state) <- c.then(case_arms(arms, offset, finish, mode, state))
   Ok(#(
-    c.append(code, [store(offset), ..c.append(matches, [asm.Label(finish)])]),
+    asm.join(code, [store(offset), ..asm.join(matches, [asm.Label(finish)])]),
     state,
   ))
 }
@@ -639,7 +639,7 @@ fn descriptor(
     raw(<<72, 137, 72, 16>>),
   ]
   Ok(#(
-    c.append(values, c.append(create, capture_stores(n - 1))),
+    asm.join(values, asm.join(create, capture_stores(n - 1))),
     State(..state, needs_heap: True),
   ))
 }
@@ -688,15 +688,13 @@ fn closure(
   let helper = [
     asm.Label(entry),
     prologue,
-    ..c.append(initialise, c.append(code, [raw(<<201, 195>>)]))
+    ..asm.join(initialise, asm.join(code, [raw(<<201, 195>>)]))
   ]
   let state =
-    State(
-      ..helper_state,
-      env: outer_env,
-      slots: outer_slots,
-      closures: c.append(c.reverse(helper), helper_state.closures),
-    )
+    State(..helper_state, env: outer_env, slots: outer_slots, closures: [
+      asm.Span(helper),
+      ..helper_state.closures
+    ])
   descriptor(entry, captures, state)
 }
 
@@ -718,7 +716,7 @@ fn capture_locals(
         store(offset),
       ]
       let #(tail, state) = capture_locals(rest, hidden, index + 1, state)
-      #(c.append(instructions, tail), state)
+      #(asm.join(instructions, tail), state)
     }
   }
 }
@@ -729,7 +727,7 @@ fn arguments(args: List(t.Typed), state: State) -> Generated {
     [arg, ..rest] -> {
       use #(code, state) <- c.then(expression(arg, state))
       use #(tail, state) <- c.then(arguments(rest, state))
-      Ok(#(c.append(code, [raw(<<80>>), ..tail]), state))
+      Ok(#(asm.join(code, [raw(<<80>>), ..tail]), state))
     }
   }
 }
@@ -750,10 +748,10 @@ fn binary(
         _ -> 133
       }
       Ok(#(
-        c.append(left_code, [
+        asm.join(left_code, [
           raw(<<72, 133, 192>>),
           branch(condition, finish),
-          ..c.append(right_code, [asm.Label(finish)])
+          ..asm.join(right_code, [asm.Label(finish)])
         ]),
         state,
       ))
@@ -780,7 +778,7 @@ fn binary(
         }
         _ -> operation(op, state)
       }
-      Ok(#(c.append(values, operation), state))
+      Ok(#(asm.join(values, operation), state))
     }
   }
 }
@@ -824,15 +822,15 @@ fn binary_values(
     True -> {
       use saved <- c.then(case register_leaf(left) {
         True -> leaf_in_rcx(left, state)
-        False -> Ok(c.append(left_code, [raw(<<72, 137, 193>>)]))
+        False -> Ok(asm.join(left_code, [raw(<<72, 137, 193>>)]))
       })
       use #(rhs, state) <- c.then(expression(right, state))
-      Ok(#(c.append(saved, rhs), state))
+      Ok(#(asm.join(saved, rhs), state))
     }
     False -> {
       use #(rhs, state) <- c.then(expression(right, state))
       Ok(#(
-        c.append(left_code, [raw(<<80>>), ..c.append(rhs, [raw(<<89>>)])]),
+        asm.join(left_code, [raw(<<80>>), ..asm.join(rhs, [raw(<<89>>)])]),
         state,
       ))
     }
@@ -862,7 +860,7 @@ fn operation(op: String, state: State) -> #(List(asm.Part), State) {
           branch(132, "rt:overflow"),
           asm.Label(normal),
           raw(<<72, 153, 72, 247, 255>>),
-          ..c.append(
+          ..asm.join(
             case op {
               "%" -> [raw(<<72, 137, 208>>)]
               _ -> []
@@ -911,7 +909,7 @@ fn case_arms(
         a.Guard(value) -> {
           use #(code, state) <- c.then(expression(value, state))
           Ok(#(
-            c.append(code, [raw(<<72, 133, 192>>), branch(132, next)]),
+            asm.join(code, [raw(<<72, 133, 192>>), branch(132, next)]),
             state,
           ))
         }
@@ -921,9 +919,9 @@ fn case_arms(
       let state = State(..state, env: env, slots: base_slots)
       use #(tail, state) <- c.then(case_arms(rest, subject, finish, mode, state))
       Ok(#(
-        c.append(
-          c.append(condition_code, guard),
-          c.append(body, [jump(finish), asm.Label(next), ..tail]),
+        asm.join(
+          asm.join(condition_code, guard),
+          asm.join(body, [jump(finish), asm.Label(next), ..tail]),
         ),
         reserve_slots(arm_slots, state),
       ))
@@ -1000,7 +998,7 @@ fn object(elements: List(t.Typed), tag: Int, state: State) -> Generated {
     raw(<<72, 199, 0, size:32-little, 72, 199, 64, 8, tag:32-little>>),
   ]
   Ok(#(
-    c.append(code, c.append(allocation, tuple_fields(n - 1))),
+    asm.join(code, asm.join(allocation, tuple_fields(n - 1))),
     State(..state, needs_heap: True),
   ))
 }
@@ -1098,7 +1096,7 @@ fn pattern_code(
         failure,
         state,
       ))
-      Ok(#(c.append(inspect, body), state))
+      Ok(#(asm.join(inspect, body), state))
     }
     a.DiscardPattern -> Ok(#([], state))
     a.VariablePattern(name) ->
@@ -1165,7 +1163,7 @@ fn tuple_pattern(
           load(subject),
           raw(<<72, 139, 128, displacement:32-little>>),
           store(field),
-          ..c.append(inner, tail)
+          ..asm.join(inner, tail)
         ],
         state,
       ))
@@ -1215,7 +1213,7 @@ fn list_pattern(
         failure,
         state,
       ))
-      Ok(#(c.append(extract, c.append(head_code, tail_code)), state))
+      Ok(#(asm.join(extract, asm.join(head_code, tail_code)), state))
     }
   }
 }
@@ -1352,7 +1350,7 @@ fn bit_array(segments: List(#(t.Typed, a.BitMode)), state: State) -> Generated {
   let #(result, state) = slot(state)
   let allocation = [
     raw(<<49, 192>>),
-    ..c.append(bit_lengths(saved), [
+    ..asm.join(bit_lengths(saved), [
       store(length),
       // Add descriptor + alignment before calling the checked arena allocator.
       raw(<<72, 131, 192, 47>>),
@@ -1385,9 +1383,9 @@ fn bit_array(segments: List(#(t.Typed, a.BitMode)), state: State) -> Generated {
     ])
   ]
   Ok(#(
-    c.append(
+    asm.join(
       evaluated,
-      c.append(allocation, c.append(write_bit_values(saved), [load(result)])),
+      asm.join(allocation, asm.join(write_bit_values(saved), [load(result)])),
     ),
     State(..state, needs_heap: True),
   ))
@@ -1408,7 +1406,7 @@ fn save_bit_values(
       let #(saved, state) = slot(state)
       use #(tail, values, state) <- c.then(save_bit_values(rest, state))
       Ok(#(
-        c.append(code, [store(saved), ..tail]),
+        asm.join(code, [store(saved), ..tail]),
         [#(saved, mode), ..values],
         state,
       ))
@@ -1427,7 +1425,7 @@ fn bit_lengths(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
         ]
         a.Utf8Segment -> [raw(<<72, 139, 141, saved:32-little, 72, 3, 1>>)]
       }
-      c.append(add, [branch(130, "rt:oom"), ..bit_lengths(rest)])
+      asm.join(add, [branch(130, "rt:oom"), ..bit_lengths(rest)])
     }
   }
 }
@@ -1446,7 +1444,7 @@ fn write_bit_values(values: List(#(Int, a.BitMode))) -> List(asm.Part) {
         ]
         a.Utf8Segment -> [raw(<<72, 139, 8, 72, 141, 112, 8, 252, 243, 164>>)]
       }
-      [load(saved), ..c.append(write, write_bit_values(rest))]
+      [load(saved), ..asm.join(write, write_bit_values(rest))]
     }
   }
 }
@@ -1503,7 +1501,7 @@ fn bit_pattern(
     failure,
     state,
   ))
-  Ok(#(c.append(inspect, body), state))
+  Ok(#(asm.join(inspect, body), state))
 }
 
 fn bit_pattern_size(segments: List(#(a.Pattern, a.BitMode))) -> #(Int, Bool) {
@@ -1551,7 +1549,7 @@ fn bit_pattern_fields(
             [
               load(subject),
               raw(<<72, 139, 80, 24, 49, 192>>),
-              ..c.append(read_integer_bytes(n, little, index, 0), sign)
+              ..asm.join(read_integer_bytes(n, little, index, 0), sign)
             ],
             state,
           )
@@ -1639,7 +1637,7 @@ fn bit_pattern_fields(
         failure,
         state,
       ))
-      Ok(#(c.append(decode, [store(value), ..c.append(match, tail)]), state))
+      Ok(#(asm.join(decode, [store(value), ..asm.join(match, tail)]), state))
     }
   }
 }
@@ -1730,7 +1728,7 @@ fn string_prefix(
       ))
     }
   })
-  Ok(#(c.append(inspect, c.append(head, rest)), state))
+  Ok(#(asm.join(inspect, asm.join(head, rest)), state))
 }
 
 fn multi_case(
@@ -1742,7 +1740,7 @@ fn multi_case(
   use #(evaluate, saved, state) <- c.then(save_subjects(subjects, state))
   let #(finish, state) = label(state)
   use #(body, state) <- c.then(multi_arms(arms, saved, finish, mode, state))
-  Ok(#(c.append(evaluate, c.append(body, [asm.Label(finish)])), state))
+  Ok(#(asm.join(evaluate, asm.join(body, [asm.Label(finish)])), state))
 }
 
 fn save_subjects(
@@ -1755,7 +1753,7 @@ fn save_subjects(
       use #(code, state) <- c.then(expression(value, state))
       let #(saved, state) = slot(state)
       use #(tail, slots, state) <- c.then(save_subjects(rest, state))
-      Ok(#(c.append(code, [store(saved), ..tail]), [saved, ..slots], state))
+      Ok(#(asm.join(code, [store(saved), ..tail]), [saved, ..slots], state))
     }
   }
 }
@@ -1813,9 +1811,9 @@ fn multi_arms(
         State(..state, env: outer, slots: base_slots),
       ))
       Ok(#(
-        c.append(matching, [
+        asm.join(matching, [
           asm.Label(body_label),
-          ..c.append(body, [jump(finish), asm.Label(next_arm), ..tail])
+          ..asm.join(body, [jump(finish), asm.Label(next_arm), ..tail])
         ]),
         reserve_slots(arm_slots, state),
       ))
@@ -1852,7 +1850,7 @@ fn alternative_code(
             State(..state, env: c.append(canonical, outer)),
           ))
           Ok(#(
-            c.append(code, [raw(<<72, 133, 192>>), branch(132, next)]),
+            asm.join(code, [raw(<<72, 133, 192>>), branch(132, next)]),
             state,
           ))
         }
@@ -1868,11 +1866,11 @@ fn alternative_code(
         State(..state, env: outer),
       ))
       Ok(#(
-        c.append(
+        asm.join(
           matching,
-          c.append(
+          asm.join(
             copies,
-            c.append(condition, [jump(success), asm.Label(next), ..tail]),
+            asm.join(condition, [jump(success), asm.Label(next), ..tail]),
           ),
         ),
         state,
@@ -1892,7 +1890,7 @@ fn row_code(
     [p, ..patterns], [saved, ..subjects] -> {
       use #(code, state) <- c.then(pattern_code(p, saved, failure, state))
       use #(tail, state) <- c.then(row_code(patterns, subjects, failure, state))
-      Ok(#(c.append(code, tail), state))
+      Ok(#(asm.join(code, tail), state))
     }
     _, _ -> Error("Case pattern count does not match subject count")
   }
@@ -1956,7 +1954,7 @@ fn equality_helpers(
     [#(_, plan), ..rest] -> {
       use code <- c.then(eq_runtime.generate(plan, index))
       use tail <- c.then(equality_helpers(rest, index + 1))
-      Ok(c.append(code, tail))
+      Ok(asm.join(code, tail))
     }
   }
 }

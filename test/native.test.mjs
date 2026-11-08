@@ -1,5 +1,5 @@
 import {test} from 'node:test';
-import {assemble, Bytes, Label, Relative} from '../build/dev/javascript/gleam_native/native/assembler.mjs';
+import {assemble, Bytes, Label, Relative, Span, join as joinParts, symbols as assemblySymbols} from '../build/dev/javascript/gleam_native/native/assembler.mjs';
 import {toList} from '../build/dev/javascript/gleam_native/gleam.mjs';
 import assert from 'node:assert/strict';
 import {mkdtempSync, readFileSync, writeFileSync, rmSync} from 'node:fs';
@@ -526,4 +526,22 @@ test('out-of-range magnitudes are rejected before bootstrap rounding, including 
    const result=compileResult(source);assert.equal(result.isOk(),false);assert.match(result[0],/exact 53-bit literal range/);
   }
  }
+});
+
+
+test('immutable instruction spans preserve flat bytes and cross-span label offsets',()=>{
+ const b=xs=>new Bytes(new BitArray(Uint8Array.from(xs))),jump=name=>new Relative(new BitArray(Uint8Array.of(0xe9)),name);
+ const flat=toList([new Label('start'),b([0x90]),jump('end'),b([0x91]),jump('start'),new Label('end'),b([0xc3])]);
+ const left=toList([new Label('start'),b([0x90]),jump('end')]),right=toList([new Span(toList([])),b([0x91]),new Span(toList([jump('start'),new Label('end')])),b([0xc3])]);
+ const nested=joinParts(left,right);const a=assemble(flat),z=assemble(nested);assert.equal(a.isOk(),true,a[0]);assert.equal(z.isOk(),true,z[0]);assert.deepEqual(z[0].rawBuffer,a[0].rawBuffer);assert.deepEqual(assemblySymbols(nested),assemblySymbols(flat));
+ assert.equal(joinParts(left,toList([])),left);assert.equal(joinParts(toList([]),right),right);
+});
+test('span traversal rejects duplicate and unresolved labels across composition boundaries',()=>{
+ const duplicate=assemble(toList([new Span(toList([new Label('same')])),new Span(toList([new Label('same')]))]));assert.equal(duplicate.isOk(),false);assert.match(duplicate[0],/Duplicate assembly label/);
+ const absent=assemble(toList([new Span(toList([new Relative(new BitArray(Uint8Array.of(0xe9)),'missing')]))]));assert.equal(absent.isOk(),false);assert.match(absent[0],/Unknown name/);
+});
+test('deep instruction-span nesting is walked with an explicit pending stack',()=>{
+ let parts=toList([new Bytes(new BitArray(Uint8Array.of(0xc3)))]);
+ for(let i=0;i<20000;i++)parts=toList([new Span(parts)]);
+ const result=assemble(parts);assert.equal(result.isOk(),true,result[0]);assert.deepEqual([...result[0].rawBuffer],[0xc3]);
 });
