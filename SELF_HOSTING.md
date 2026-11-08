@@ -2,7 +2,9 @@
 
 **The complete compiler API now compiles and runs natively. The native CLI and
 stage-2 self-rebuild are not yet proved.** This remains a tested Gleam subset,
-not a replacement for upstream or a defensible completion percentage.
+not a replacement for upstream. The 65% progress bar in [ROADMAP.md](ROADMAP.md)
+is explicitly a subjective estimate toward a usable self-hosting Linux compiler,
+not a measured completion percentage or full-language compatibility score.
 
 The repeatable `node test/probe-compiler-api.mjs` builds all 22 actual compiler
 modules plus `test/owned-compiler-api-driver.source` into a standalone Linux

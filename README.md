@@ -11,7 +11,16 @@ driver exercises the actual compiler source on two embedded programs, checks its
 emitted ELF bytes against the bootstrap implementation, and executes both outputs.
 The ordinary file-based CLI still uses the separated JavaScript bootstrap.
 
-The prioritized remaining work and completion criteria are in [ROADMAP.md](ROADMAP.md).
+**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 65%**
+
+```text
+[█████████████░░░░░░░] 65%
+```
+
+This is a judgment call, not a measured completion percentage or full-Gleam
+compatibility score. The native core works; native file/argument IO, full-size
+reliability and the actual self-rebuild remain. See [ROADMAP.md](ROADMAP.md) for
+the estimate's scope, remaining work and completion evidence.
 
 ## What actually runs
 

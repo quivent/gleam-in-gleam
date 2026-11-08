@@ -3,6 +3,27 @@
 Updated 2026-11-08. Correctness comes first; inspect generated ASM throughout.
 Compiler logic stays in Gleam, with zero third-party compiler/runtime dependencies.
 
+## Subjective progress
+
+**Subjective progress toward a usable, self-hosting Linux x86-64 compiler: 65%**
+
+```text
+[█████████████░░░░░░░] 65%
+```
+
+Estimate as of 2026-11-08. The frontend, backend and complete native compiler API
+are working, which puts us roughly two-thirds of the way toward this milestone.
+The remaining work includes substantial uncertainty: native CLI/IO, full-size
+memory/stack reliability, broader native-path testing and a real self-rebuild.
+
+For this bar, **100% means** a usable native Linux x86-64 CLI that compiles the
+complete compiler source, produces a byte-identical successive rebuild, and
+passes the native-path qualification checks with zero third-party runtime
+requirements. Full upstream Gleam compatibility, other targets and subsequent
+optimization remain separate roadmap work; this bar does not claim those are
+65% complete. It is not calculated from test counts or a delivery-date forecast.
+Update it when new evidence changes the assessment.
+
 ## Verified starting point
 
 The complete compiler API runs as a 498,418-byte standalone Linux x86-64 ELF,
