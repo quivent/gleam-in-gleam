@@ -32,7 +32,7 @@ def sha(data):
 
 run([gleam, 'format', '--check', 'src', 'test', 'examples'])
 run([gleam, 'build', '--warnings-as-errors'])
-suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs', 'test/registers.test.mjs', 'test/loop-idioms.test.mjs'],
+suite = run(['node', '--test', 'test/native.test.mjs', 'test/modules.test.mjs', 'test/strings.test.mjs', 'test/native-cli.test.mjs', 'test/tail-calls.test.mjs', 'test/registers.test.mjs', 'test/loop-idioms.test.mjs', 'test/static-parameters.test.mjs'],
             env={**os.environ, 'NATIVE_CLI_RECEIPT': str(ROOT / f'evidence/{PREFIX}-io-verification.json'),
                  'NATIVE_CLI_ASM': str(ROOT / f'evidence/{PREFIX}-disassembly.txt')})
 tests = int(re.search(r'^# tests (\d+)$', suite.stdout, re.M)[1])
@@ -143,7 +143,8 @@ with tempfile.TemporaryDirectory(prefix='gleam-native-upstream-acceptance-') as 
                                    upstreamExit=reference.returncode, nativeExit=native.returncode,
                                    upstreamDiagnostic=reference.stderr.replace(str(project), '<oracle>'),
                                    nativeDiagnostic=native.stderr))
-module_fixtures = (json.loads((ROOT / 'test/comparison-case-fixtures.json').read_text())
+module_fixtures = (json.loads((ROOT / 'test/static-parameter-fixtures.json').read_text())
+                   + json.loads((ROOT / 'test/comparison-case-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/modules-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/aliases-guards-fixtures.json').read_text())
                    + json.loads((ROOT / 'test/strings-prelude-fixtures.json').read_text())

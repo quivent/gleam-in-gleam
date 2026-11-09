@@ -3,17 +3,15 @@ import native/ast as a
 import native/check as t
 
 pub type Plan {
-  ByteCount(source: String, accumulator: String)
+  ByteCount(source: Int, accumulator: Int)
 }
 
 pub fn recognize(function: t.Function) -> Result(Plan, String) {
   case function.result {
     a.Integer ->
       case function.parameters {
-        [#(source, a.BitArrayType), #(counter, a.Integer)] ->
-          body(function, source, counter, False)
-        [#(counter, a.Integer), #(source, a.BitArrayType)] ->
-          body(function, source, counter, True)
+        [#(_, a.BitArrayType), #(_, a.Integer)] -> body(function, 24, 16, False)
+        [#(_, a.Integer), #(_, a.BitArrayType)] -> body(function, 16, 24, True)
         _ -> Error("Not a byte-count loop signature")
       }
     _ -> Error("Not an integer result")
@@ -22,8 +20,8 @@ pub fn recognize(function: t.Function) -> Result(Plan, String) {
 
 fn body(
   function: t.Function,
-  source: String,
-  counter: String,
+  source: Int,
+  counter: Int,
   reversed: Bool,
 ) -> Result(Plan, String) {
   case function.body {
@@ -31,7 +29,7 @@ fn body(
       case value.node {
         t.CaseNode(subject, [first, last]) ->
           case subject.node {
-            t.VariableNode(name) if name == source ->
+            t.ParameterNode(offset) if offset == source ->
               arms(function.name, first, last, source, counter, reversed)
             _ -> Error("Not a case on the source parameter")
           }
@@ -45,14 +43,14 @@ fn arms(
   self: String,
   first: t.Arm,
   last: t.Arm,
-  source: String,
-  counter: String,
+  source: Int,
+  counter: Int,
   reversed: Bool,
 ) -> Result(Plan, String) {
   case last {
     t.Arm(a.DiscardPattern, a.NoGuard, base) ->
       case base.node {
-        t.VariableNode(name) if name == counter ->
+        t.ParameterNode(offset) if offset == counter ->
           case first {
             t.Arm(a.CheckedBitArrayPattern(segments), a.NoGuard, recursive) ->
               case segments {
@@ -62,11 +60,7 @@ fn arms(
                 ] ->
                   case mode {
                     a.BitsSegment | a.BytesSegment ->
-                      case tail == counter {
-                        True -> Error("Tail shadows the counter")
-                        False ->
-                          step(self, recursive, source, counter, tail, reversed)
-                      }
+                      step(self, recursive, source, counter, tail, reversed)
                     _ -> Error("Not a complete byte tail")
                   }
                 _ -> Error("Not a discarded single byte and tail")
@@ -82,8 +76,8 @@ fn arms(
 fn step(
   self: String,
   recursive: t.Typed,
-  source: String,
-  counter: String,
+  source: Int,
+  counter: Int,
   tail: String,
   reversed: Bool,
 ) -> Result(Plan, String) {
@@ -102,7 +96,7 @@ fn step(
           case counter_argument.node {
             t.BinaryNode("+", left, right) ->
               case left.node {
-                t.VariableNode(name) if name == counter ->
+                t.ParameterNode(offset) if offset == counter ->
                   case right.node {
                     t.IntegerNode(1) -> Ok(ByteCount(source, counter))
                     _ -> Error("Counter step is not exactly one")

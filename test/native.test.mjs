@@ -205,7 +205,7 @@ test('typed closure records only actual lexical free variables', () => {
   assert.equal(typed.isOk(), true, typed[0]);
   const statements = typed[0].toArray()[0].body.toArray();
   const closure = statements[2][1].node;
-  assert.deepEqual(closure[2].toArray(), ['used']);
+  assert.deepEqual(closure[2].toArray(), [['used', 0]]);
 });
 test('use continuation body is not executed when the callee skips it', () => {
   const source = `fn skip(_next: fn() -> Int) -> Int { 7 }

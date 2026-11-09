@@ -1,0 +1,92 @@
+[
+  {
+    "name": "static-parameters-four-positions",
+    "entry": "main",
+    "files": {
+      "main": "fn f(a:Int,b:Int,c:Int,d:Int)->Int {a+10*b+100*c+1000*d} pub fn main()->Nil {echo f(1,2,3,4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4321\n"
+  },
+  {
+    "name": "static-parameters-block-shadow",
+    "entry": "main",
+    "files": {
+      "main": "fn f(x:Int)->Int {let before=x let y={let x=x+1 x} before*100+y*10+x} pub fn main()->Nil {echo f(2) Nil}"
+    },
+    "accepted": true,
+    "stdout": "232\n"
+  },
+  {
+    "name": "static-parameters-nested-captures",
+    "entry": "main",
+    "files": {
+      "main": "fn outer(a:Int,b:Int)->fn(Int)->fn(Int)->Int {fn(c:Int){fn(d:Int){a+10*b+100*c+1000*d}}} pub fn main()->Nil {echo outer(1,2)(3)(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "4321\n"
+  },
+  {
+    "name": "static-parameters-captured-function",
+    "entry": "main",
+    "files": {
+      "main": "fn apply(f:fn(Int)->Int,x:Int)->Int {f(x)} fn make(a:Int)->fn(Int)->Int {fn(b:Int){apply(fn(c:Int){a+b+c},3)}} pub fn main()->Nil {echo make(10)(20) Nil}"
+    },
+    "accepted": true,
+    "stdout": "33\n"
+  },
+  {
+    "name": "static-parameters-destructured-lambda",
+    "entry": "main",
+    "files": {
+      "main": "fn make(seed:Int)->fn(#(Int,Int))->Int {fn(pair: #(Int,Int)){let #(x,y)=pair seed+x*10+y}} pub fn main()->Nil {echo make(100)(#(2,3)) Nil}"
+    },
+    "accepted": true,
+    "stdout": "123\n"
+  },
+  {
+    "name": "static-parameters-tail-reentry-swap",
+    "entry": "main",
+    "files": {
+      "main": "fn loop(a:Int,b:Int,n:Int)->Int {case n {0->a*10+b _->loop(b,a,n-1)}} pub fn main()->Nil {echo loop(1,2,3) Nil}"
+    },
+    "accepted": true,
+    "stdout": "21\n"
+  },
+  {
+    "name": "static-parameters-pattern-alternatives",
+    "entry": "main",
+    "files": {
+      "main": "fn f(x:Int,y:Int)->Int {let z=case x,y {1,a|a,1 if a>0 -> a*10+x _ , _ -> y} z+x} pub fn main()->Nil {echo f(1,7) echo f(5,1) Nil}"
+    },
+    "accepted": true,
+    "stdout": "72\n60\n"
+  },
+  {
+    "name": "static-parameters-shadowed-capture",
+    "entry": "main",
+    "files": {
+      "main": "fn f(x:Int)->Int {let old=fn(){x} let x=x+1 let newer=fn(){x} old()*10+newer()} pub fn main()->Nil {echo f(4) Nil}"
+    },
+    "accepted": true,
+    "stdout": "45\n"
+  },
+  {
+    "name": "static-parameters-capture-known-constructor",
+    "entry": "main",
+    "files": {
+      "main": "type Box {Box(Int)} fn make(value:Box)->fn(Int)->Int {fn(n:Int){let Box(x)=value x+n}} pub fn main()->Nil {echo make(Box(7))(5) Nil}"
+    },
+    "accepted": true,
+    "stdout": "12\n"
+  },
+  {
+    "name": "static-parameters-zero-arity-captures",
+    "entry": "main",
+    "files": {
+      "main": "fn f(x:Int,y:Int)->fn()->Int {fn(){x-y}} pub fn main()->Nil {echo f(20,3)() Nil}"
+    },
+    "accepted": true,
+    "stdout": "17\n"
+  }
+]

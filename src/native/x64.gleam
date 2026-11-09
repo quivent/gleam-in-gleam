@@ -206,10 +206,9 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
   case functions {
     [] -> Ok(#([], state))
     [f, ..rest] -> {
-      let env = parameter_offsets(f.parameters, c.length(f.parameters), 0)
       use #(body, state) <- c.then(function_body(
         f,
-        State(..state, slots: 0, env: env),
+        State(..state, slots: 0, env: []),
       ))
       // The stack frame is known after allocating all locals, including branches.
       let frame = { { state.slots * 8 + 15 } / 16 } * 16
@@ -235,8 +234,6 @@ fn function_list(functions: List(t.Function), state: State) -> Generated {
 fn function_body(function: t.Function, state: State) -> Generated {
   case loop_idioms.recognize(function) {
     Ok(loop_idioms.ByteCount(source, counter)) -> {
-      use source <- c.then(c.lookup(state.env, source))
-      use counter <- c.then(c.lookup(state.env, counter))
       // All owned byte-array descriptors contain their byte length at +16.
       // A pure +1-per-byte loop is length + initial counter, with identical
       // signed-overflow behavior and no temporary suffix descriptors.
@@ -256,20 +253,6 @@ fn function_body(function: t.Function, state: State) -> Generated {
         SelfTail(function.name, c.length(function.parameters)),
         state,
       )
-  }
-}
-
-fn parameter_offsets(
-  params: List(#(String, a.Type)),
-  size: Int,
-  index: Int,
-) -> List(#(String, Int)) {
-  case params {
-    [] -> []
-    [#(name, _), ..rest] -> [
-      #(name, 16 + { size - index - 1 } * 8),
-      ..parameter_offsets(rest, size, index + 1)
-    ]
   }
 }
 
@@ -361,6 +344,10 @@ fn register_instruction(
     r.Constant(target, n) -> {
       use target <- c.then(register_number(target))
       Ok([raw(<<72, { 184 + target }, n:64-little>>)])
+    }
+    r.ReadParameter(target, offset) -> {
+      use target <- c.then(register_number(target))
+      Ok([raw(<<72, 139, { 133 + target * 8 }, offset:32-little>>)])
     }
     r.ReadLocal(target, name) -> {
       use target <- c.then(register_number(target))
@@ -485,6 +472,7 @@ fn ordinary_expression(e: t.Typed, state: State) -> Generated {
         State(..state, needs_heap: state.needs_heap || n > 0),
       ))
     }
+    t.ParameterNode(offset) -> Ok(#([load(offset)], state))
     t.VariableNode(name) -> {
       use offset <- c.then(c.lookup(state.env, name))
       Ok(#([load(offset)], state))
@@ -729,7 +717,7 @@ fn ordinary_case(
 
 fn descriptor(
   entry: String,
-  captures: List(String),
+  captures: List(#(String, Int)),
   state: State,
 ) -> Generated {
   use values <- c.then(capture_values(captures, state.env))
@@ -749,13 +737,16 @@ fn descriptor(
 }
 
 fn capture_values(
-  captures: List(String),
+  captures: List(#(String, Int)),
   env: List(#(String, Int)),
 ) -> Result(List(asm.Part), String) {
   case captures {
     [] -> Ok([])
-    [name, ..rest] -> {
-      use offset <- c.then(c.lookup(env, name))
+    [#(name, parameter_offset), ..rest] -> {
+      use offset <- c.then(case parameter_offset > 0 {
+        True -> Ok(parameter_offset)
+        False -> c.lookup(env, name)
+      })
       use tail <- c.then(capture_values(rest, env))
       Ok([load(offset), raw(<<80>>), ..tail])
     }
@@ -775,14 +766,13 @@ fn capture_stores(index: Int) -> List(asm.Part) {
 fn closure(
   params: List(#(String, a.Type)),
   body: List(t.Statement),
-  captures: List(String),
+  captures: List(#(String, Int)),
   state: State,
 ) -> Generated {
   let outer_env = state.env
   let outer_slots = state.slots
   let #(entry, state) = label(state)
-  let parameter_env = parameter_offsets(params, c.length(params), 0)
-  let helper_state = State(..state, env: parameter_env, slots: 0)
+  let helper_state = State(..state, env: [], slots: 0)
   let hidden = 16 + c.length(params) * 8
   let #(initialise, helper_state) =
     capture_locals(captures, hidden, 0, helper_state)
@@ -803,14 +793,14 @@ fn closure(
 }
 
 fn capture_locals(
-  captures: List(String),
+  captures: List(#(String, Int)),
   hidden: Int,
   index: Int,
   state: State,
 ) -> #(List(asm.Part), State) {
   case captures {
     [] -> #([], state)
-    [name, ..rest] -> {
+    [#(name, _), ..rest] -> {
       let #(offset, state) = slot(state)
       let state = State(..state, env: [#(name, offset), ..state.env])
       let field = 24 + index * 8
@@ -892,7 +882,11 @@ fn binary(
 // Anything else still spills the left word before evaluating the right operand.
 fn register_leaf(e: t.Typed) -> Bool {
   case e.node {
-    t.IntegerNode(_) | t.BooleanNode(_) | t.UnitNode | t.VariableNode(_) -> True
+    t.IntegerNode(_)
+    | t.BooleanNode(_)
+    | t.UnitNode
+    | t.VariableNode(_)
+    | t.ParameterNode(_) -> True
     _ -> False
   }
 }
@@ -908,6 +902,7 @@ fn leaf_in_rcx(e: t.Typed, state: State) -> Result(List(asm.Part), String) {
       Ok([raw(<<72, 185, n:64-little>>)])
     }
     t.UnitNode -> Ok([raw(<<72, 185, 0:64-little>>)])
+    t.ParameterNode(offset) -> Ok([raw(<<72, 139, 141, offset:32-little>>)])
     t.VariableNode(name) -> {
       use offset <- c.then(c.lookup(state.env, name))
       Ok([raw(<<72, 139, 141, offset:32-little>>)])

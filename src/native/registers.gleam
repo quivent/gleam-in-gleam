@@ -28,6 +28,7 @@ pub type Operator {
 pub type Instruction {
   Constant(target: Register, value: Int)
   ReadLocal(target: Register, name: String)
+  ReadParameter(target: Register, offset: Int)
   Copy(source: Register, target: Register)
   Push(Register)
   Pop(Register)
@@ -43,6 +44,7 @@ pub type Instruction {
 type Tree {
   Literal(Int)
   Local(String)
+  Parameter(Int)
   Unary(Tree)
   Binary(Operator, Tree, Tree)
   DirectCall(String, List(Tree))
@@ -88,6 +90,7 @@ fn recognize(value: t.Typed) -> Result(Tree, String) {
           Ok(Choose(left, Literal(1), right))
         }
         t.VariableNode(name) -> Ok(Local(name))
+        t.ParameterNode(offset) -> Ok(Parameter(offset))
         t.CallNode(name, arguments) -> {
           use arguments <- c.then(recognize_arguments(arguments))
           Ok(DirectCall(name, arguments))
@@ -177,6 +180,7 @@ fn allocate(
       case tree {
         Literal(n) -> Ok([Constant(target, n)])
         Local(name) -> Ok([ReadLocal(target, name)])
+        Parameter(offset) -> Ok([ReadParameter(target, offset)])
         DirectCall(name, arguments) -> {
           // The occupied prefix contains ancestor values still needed after the
           // call. Save it BEFORE evaluating arguments, which may themselves call.
@@ -298,6 +302,7 @@ pub fn uses(instruction: Instruction) -> List(Register) {
   case instruction {
     Constant(_, _)
     | ReadLocal(_, _)
+    | ReadParameter(_, _)
     | Pop(_)
     | NamedCall(_, _)
     | Mark(_)
@@ -313,6 +318,7 @@ pub fn definitions(instruction: Instruction) -> List(Register) {
   case instruction {
     Constant(target, _)
     | ReadLocal(target, _)
+    | ReadParameter(target, _)
     | Copy(_, target)
     | Pop(target) -> [target]
     Negate(target) | Calculate(_, _, target) -> [target, Flags]
@@ -523,7 +529,8 @@ pub fn analyze(code: List(Instruction)) -> Result(List(LiveRow), String) {
 
 fn removable(instruction: Instruction, live: List(Register)) -> Bool {
   case instruction {
-    Constant(target, _) | ReadLocal(target, _) -> !member(target, live)
+    Constant(target, _) | ReadLocal(target, _) | ReadParameter(target, _) ->
+      !member(target, live)
     Copy(source, target) -> source == target || !member(target, live)
     _ -> False
   }

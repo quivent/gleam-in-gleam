@@ -24,13 +24,15 @@ pub type Node {
   ConstructorNode(Int, List(Typed))
   FieldNode(Typed, Int, List(Int))
   VariableNode(String)
+  // Bound once while checking; source names stay in the lexical environment.
+  ParameterNode(offset: Int)
   UnaryNode(String, Typed)
   BinaryNode(String, Typed, Typed)
   EqualityNode(Typed, Typed, a.Type, Bool)
   CallNode(String, List(Typed))
   FunctionNode(String)
   IndirectCallNode(Typed, List(Typed))
-  ClosureNode(List(#(String, a.Type)), List(Statement), List(String))
+  ClosureNode(List(#(String, a.Type)), List(Statement), List(#(String, Int)))
   BlockNode(List(Statement))
   CaseNode(Typed, List(Arm))
   MultiCaseNode(List(Typed), List(MultiArm))
@@ -73,7 +75,7 @@ type Environment =
   List(#(String, Local))
 
 type Local {
-  Local(type_: a.Type, known_variant: Int)
+  Local(type_: a.Type, known_variant: Int, read: Node)
 }
 
 fn plain(node: Node, type_: a.Type) -> Typed {
@@ -174,6 +176,22 @@ fn unique_parameters(
   }
 }
 
+// The current native calling convention binds incoming values at +16 onward,
+// in reverse push order. This fuses location binding into the required lexical
+// environment construction; codegen no longer builds a second parameter map.
+fn parameter_environment(
+  parameters: List(#(String, a.Type)),
+  offset: Int,
+) -> Environment {
+  case parameters {
+    [] -> []
+    [#(name, type_), ..rest] -> [
+      #(name, Local(type_, 0, ParameterNode(offset))),
+      ..parameter_environment(rest, offset - 8)
+    ]
+  }
+}
+
 fn function(f: a.Function, globals: Globals) -> Result(Function, String) {
   let variables =
     types.variables(c.append(c.map(f.parameters, fn(p) { p.1 }), [f.result]))
@@ -185,7 +203,7 @@ fn function(f: a.Function, globals: Globals) -> Result(Function, String) {
     )
   use #(body, result_type) <- c.then(statements(
     f.body,
-    c.map(f.parameters, fn(p) { #(p.0, Local(p.1, 0)) }),
+    parameter_environment(f.parameters, 16 + { c.length(f.parameters) - 1 } * 8),
     globals,
     f.result,
   ))
@@ -335,8 +353,7 @@ fn expression(
         True -> constructor(name, [], env, globals, False, a.Unresolved)
         False -> {
           case c.lookup(env, name) {
-            Ok(local) ->
-              Ok(Typed(VariableNode(name), local.type_, local.known_variant))
+            Ok(local) -> Ok(Typed(local.read, local.type_, local.known_variant))
             Error(_) -> {
               use f <- c.then(c.lookup(globals.functions, name))
               let signature =
@@ -626,16 +643,25 @@ fn lambda(
     a.Inferred -> Ok(Nil)
     a.Annotated(t) -> d.validate_type(t, globals)
   })
-  let parameter_env = c.map(parameters, fn(p) { #(p.0, Local(p.1, 0)) })
+  let parameter_env =
+    parameter_environment(parameters, 16 + { c.length(parameters) - 1 } * 8)
+  let captures = actual_captures(free_names.names(body, names), env)
+  // Captures belong to the new frame. Their incoming parent offsets are used
+  // only when constructing the descriptor, never from inside the closure.
+  use captured_env <- c.then(
+    c.try_map(captures, fn(entry) {
+      use local <- c.then(c.lookup(env, entry.0))
+      Ok(#(entry.0, Local(..local, read: VariableNode(entry.0))))
+    }),
+  )
   use #(typed_body, result) <- c.then(statements(
     c.append(bindings, body),
-    c.append(parameter_env, env),
+    c.append(parameter_env, captured_env),
     globals,
     result_context,
   ))
   use result <- c.then(types.merge(result, result_context))
   use _ <- c.then(equal(result, expected_result))
-  let captures = actual_captures(free_names.names(body, names), env)
   Ok(plain(
     ClosureNode(parameters, typed_body, captures),
     a.FunctionType(parameter_types, result),
@@ -729,12 +755,21 @@ fn lower_parameters(
   }
 }
 
-fn actual_captures(names: List(String), env: Environment) -> List(String) {
+fn actual_captures(
+  names: List(String),
+  env: Environment,
+) -> List(#(String, Int)) {
   case names {
     [] -> []
     [name, ..rest] ->
       case c.lookup(env, name) {
-        Ok(_) -> [name, ..actual_captures(rest, env)]
+        Ok(local) -> {
+          let offset = case local.read {
+            ParameterNode(offset) -> offset
+            _ -> 0
+          }
+          [#(name, offset), ..actual_captures(rest, env)]
+        }
         Error(_) -> actual_captures(rest, env)
       }
   }
@@ -794,7 +829,7 @@ fn named_call(
             True -> Error("Discarded variable cannot be read")
             False ->
               indirect_source_call(
-                Typed(VariableNode(name), local.type_, local.known_variant),
+                Typed(local.read, local.type_, local.known_variant),
                 source_args,
                 env,
                 globals,
@@ -865,12 +900,13 @@ fn known_bindings(
   bindings: Environment,
 ) -> Environment {
   case p {
-    a.VariablePattern(name) -> c.put(bindings, name, Local(t, known))
+    a.VariablePattern(name) ->
+      c.put(bindings, name, Local(t, known, VariableNode(name)))
     a.AliasPattern(inner, name) ->
       c.put(
         known_bindings(inner, t, known, bindings),
         name,
-        Local(t, pattern_variant(inner, known)),
+        Local(t, pattern_variant(inner, known), VariableNode(name)),
       )
     _ -> bindings
   }
@@ -1111,7 +1147,11 @@ fn pattern_bindings(
         t,
         bindings,
       ))
-      Ok(c.put(bindings, name, Local(t, pattern_variant(inner, 0))))
+      Ok(c.put(
+        bindings,
+        name,
+        Local(t, pattern_variant(inner, 0), VariableNode(name)),
+      ))
     }
     a.StringPattern(_) -> {
       use _ <- c.then(equal(t, a.StringType))
@@ -1137,7 +1177,7 @@ fn pattern_bindings(
     a.VariablePattern(name) ->
       case c.lookup(bindings, name) {
         Ok(_) -> Error("Duplicate variable in pattern: " <> name)
-        Error(_) -> Ok([#(name, Local(t, 0)), ..bindings])
+        Error(_) -> Ok([#(name, Local(t, 0, VariableNode(name))), ..bindings])
       }
     a.IntegerPattern(_) -> {
       use _ <- c.then(equal(t, a.Integer))
@@ -1777,7 +1817,7 @@ fn merge_environments(
             True -> entry.1.known_variant
             False -> 0
           }
-          Ok(#(entry.0, Local(t, known)))
+          Ok(#(entry.0, Local(t, known, entry.1.read)))
         }),
       )
       merge_environments(rest, merged)
