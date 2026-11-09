@@ -26,7 +26,7 @@
 <script id="roadmap-data" type="application/json">{
   "schema": "gleam-in-gleam.interactive-roadmap/1",
   "project": "Gleam in Gleam",
-  "sourceRevision": "fa468e68e45a3d0e33cd188c67323490ec02bd77",
+  "sourceRevision": "9472a756403988b5d243bb3453727c0450f6ab40",
   "focus": "optimization",
   "estimate": {
     "percent": 100,
@@ -35,8 +35,8 @@
     "completeWhen": "The native CLI compiles its complete compiler input, produces byte-identical successive rebuilds and passes native-path qualification.",
     "excludes": "Full upstream compatibility, additional targets and later optimization are separate work."
   },
-  "verification": "evidence/comparison-flags-qualification.json",
-  "ioVerification": "evidence/comparison-flags-io-verification.json",
+  "verification": "evidence/fusion-qualification.json",
+  "ioVerification": "evidence/fusion-io-verification.json",
   "steps": [
     {
       "id": "native-cli",
@@ -74,15 +74,15 @@
       "evidence": [
         {
           "label": "59 IO checks and actual headers",
-          "path": "evidence/comparison-flags-io-verification.json"
+          "path": "evidence/fusion-io-verification.json"
         },
         {
-          "label": "763 checks and 394 upstream comparisons",
-          "path": "evidence/comparison-flags-qualification.json"
+          "label": "766 checks and 394 upstream comparisons",
+          "path": "evidence/fusion-qualification.json"
         },
         {
           "label": "Actual native instruction windows",
-          "path": "evidence/comparison-flags-disassembly.txt"
+          "path": "evidence/fusion-disassembly.txt"
         }
       ],
       "related": [],
@@ -128,7 +128,7 @@
         },
         {
           "label": "Actual complete native rebuilds",
-          "path": "evidence/comparison-flags-native-rebuilds.json"
+          "path": "evidence/fusion-native-rebuilds.json"
         }
       ],
       "related": [
@@ -146,7 +146,7 @@
       "nextAction": "Expand native and independent upstream comparisons with every language/runtime addition.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
-        "763 regression checks and 394 fresh upstream comparisons are separately recorded.",
+        "766 regression checks and 394 fresh upstream comparisons are separately recorded.",
         "Stage 3 compiles 251 accepted and 120 rejected corpus cases; accepted images match bootstrap bytes and execute correctly.",
         "Rejections must return controlled compiler exits with no output, not signals or runtime failure exits.",
         "Coverage includes modules, generics/recursive data, closures, effects, patterns, Unicode, bytes and direct self-tail calls."
@@ -172,15 +172,15 @@
       "evidence": [
         {
           "label": "394 native cases, individual outcomes",
-          "path": "evidence/comparison-flags-native-rebuilds.json"
+          "path": "evidence/fusion-native-rebuilds.json"
         },
         {
           "label": "Independent project comparisons",
-          "path": "evidence/comparison-flags-project-upstream-checks.json"
+          "path": "evidence/fusion-project-upstream-checks.json"
         },
         {
           "label": "Independent grammar comparisons",
-          "path": "evidence/comparison-flags-upstream-checks.json"
+          "path": "evidence/fusion-upstream-checks.json"
         }
       ],
       "related": [
@@ -194,12 +194,12 @@
       "scope": "core",
       "status": "verified",
       "statusLabel": "Verified · bounded scope",
-      "summary": "Two actual native self-rebuilds produce the exact same 653,202-byte compiler image.",
+      "summary": "Two actual native self-rebuilds produce the exact same 660,173-byte compiler image.",
       "nextAction": "Keep frozen-input, exact-byte and changed-source controls on future compiler changes.",
       "specMaturity": "Qualified implementation; limits retained",
       "design": [
         "--build-compiler NEW_OUTPUT --source-root ROOT retains the effect runner. All 28 actual compiler modules are read through the native IO path.",
-        "Stages 1, 2 and 3 have the same SHA256: 3a8063b7582cb04e53c7633110403dc80f7c757fab0a893add0089a367ca8b65.",
+        "Stages 1, 2 and 3 have the same SHA256: 55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4.",
         "The rebuilt image runs --version and qualifies the entire 394-case corpus with empty PATH.",
         "An isolated version-literal change produces a different correct image matching bootstrap. Full upstream compatibility remains false."
       ],
@@ -224,7 +224,7 @@
       "evidence": [
         {
           "label": "Rebuild and source-sensitivity proof",
-          "path": "evidence/comparison-flags-native-rebuilds.json"
+          "path": "evidence/fusion-native-rebuilds.json"
         },
         {
           "label": "Status, commands and limits",
@@ -277,7 +277,7 @@
         },
         {
           "label": "Fresh upstream comparisons",
-          "path": "evidence/comparison-flags-project-upstream-checks.json"
+          "path": "evidence/fusion-project-upstream-checks.json"
         }
       ],
       "related": [],
@@ -340,7 +340,7 @@
       "status": "partial",
       "statusLabel": "Partial · direct comparison flags benchmarked",
       "summary": "Measure and improve compilation, generated code, allocations and size after correctness.",
-      "nextAction": "Use paired external runtime measurements to prioritize constant arithmetic, call/value placement and further deferred materialization.",
+      "nextAction": "Reduce label-index/hash traversal allocation and test scaling on larger varied inputs; preserve the exact-output and three-way comparison contract.",
       "specMaturity": "Scalar CFG/calls qualified and benchmarked; general whole-function scope remains",
       "design": [
         "Existing instruction inspection and resource fixes are not language-wide performance benchmarks.",
@@ -449,6 +449,18 @@
         {
           "label": "Paired native-before/native-after/Node/GCC measurements",
           "path": "evidence/comparison-flags-surface-baselines.json"
+        },
+        {
+          "label": "Fused layout, original Gleam and previous GTA on identical full source",
+          "path": "evidence/fusion-full-compilation.json"
+        },
+        {
+          "label": "766 regression checks and native fixed point",
+          "path": "evidence/fusion-qualification.json"
+        },
+        {
+          "label": "Native collision/relocation/validation execution oracle",
+          "path": "evidence/fusion-execution.json"
         }
       ],
       "related": [
@@ -504,16 +516,16 @@
     }
   ],
   "metrics": {
-    "tests": 763,
+    "tests": 766,
     "upstream": 394,
     "examples": 16,
-    "cliBytes": 653202,
+    "cliBytes": 660173,
     "sourceLimitBytes": 131072,
-    "observedAt": "2026-11-08T19:08:45.127780+00:00"
+    "observedAt": "2026-11-08T23:59:09.239596+00:00"
   },
   "evidenceSHA256": {
-    "evidence/comparison-flags-qualification.json": "fd815064e8001f637a67e875916732e22f7533711f3593dfb8bd984a426642e9",
-    "evidence/comparison-flags-io-verification.json": "4036306529059a2040f1a2df0983e9dd1c23c0e9c2ef2cf31ffe87af3bbf88a3"
+    "evidence/fusion-qualification.json": "22914cbe626acbcbe46383582a896758e1d36bab65a4375f7d4cfe487b20d1ca",
+    "evidence/fusion-io-verification.json": "b73e24069b777fed87a803546327b1c93603c5d828bd840da406f0c7f7bdecc0"
   }
 }</script>
 <script>

@@ -378,7 +378,10 @@ a per-compilation value, not a persistent cache. Existing callers may still pass
 raw `Source` values; only reachable raw sources are parsed. Mixed inputs preserve
 cycle, visibility, duplicate-source and deterministic-order checks.
 
-`native/definitions` builds nominal definitions and constructor context.
+`native/definitions` builds nominal definitions and constructor context. The normal
+link/check/emit path retains this validated context instead of rebuilding it
+three times. Validation-only callbacks use `core.try_each` to consume successes
+directly and stop at the first failure without materializing a discarded list.
 `native/check` produces typed expressions and validates scope, functions, patterns,
 constructor arguments and coverage. `native/type_system`, `native/coverage`,
 `native/labels`, `native/free_names` and `native/bit_options` provide explicit owned
@@ -416,7 +419,12 @@ not copy their instruction lists. Closure helpers retain their bodies once; the
 assembler walks nested spans with an explicit pending stack, preserving global
 label offsets and instruction order without first flattening the whole plan.
 
-`native/assembler` resolves owned labels and relative displacements into bytes.
+`native/assembler` fuses offset layout, label indexing and relocation capture.
+Its immutable AVL index is ordered by a bounded hash; full names disambiguate
+collisions. A reversed chunk walk resolves forward/backward references while
+building final output order, retaining source-order diagnostics. Duplicate labels,
+missing targets and signed-32-bit displacement bounds remain checked. The faster
+lookup path currently costs more arena allocation; see [the measured tradeoff](PERFORMANCE.md).
 `native/elf` emits ELF headers and executable payload directly. There is no external
 object-file linker or assembler invocation. Actual objdump output is inspection
 evidence, not the mechanism that generates executable code. See [ASM.md](ASM.md)

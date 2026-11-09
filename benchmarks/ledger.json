@@ -34,6 +34,10 @@
     {
       "label": "Instruction spans",
       "receipt": "evidence/instruction-spans-benchmark.json"
+    },
+    {
+      "label": "Fused layout + shared context",
+      "receipt": "evidence/fusion-full-compilation.json"
     }
   ],
   "rules": [
@@ -45,5 +49,6 @@
     "Append qualified cohorts and retain raw samples; no hand-edited benchmark figures in README"
   ],
   "primaryComparison": "Original upstream Gleam CLI compilation: JavaScript output versus GTA native ELF",
-  "originalFullCompilation": "evidence/original-gleam-full-compilation.json"
+  "originalFullCompilation": "evidence/fusion-full-compilation.json",
+  "compilationSourceRevision": "9472a756403988b5d243bb3453727c0450f6ab40"
 }

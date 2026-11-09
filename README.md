@@ -17,7 +17,7 @@
   <img src="docs/assets/target.svg" alt="Native target: Linux x86-64">
   <img src="docs/assets/dependencies.svg" alt="Third-party compiler/runtime dependencies: zero">
   <br>
-  <img src="docs/assets/checks.svg" alt="Qualified regression checks: 763 of 763">
+  <img src="docs/assets/checks.svg" alt="Qualified regression checks: 766 of 766">
   <img src="docs/assets/rebuilds.svg" alt="Two native rebuilds are byte-identical to the seed">
 </p>
 
@@ -44,12 +44,12 @@ native rebuilds are byte-identical to the seed.
 
 | Verified snapshot · 2026-11-08 | Result |
 |:---|---:|
-| Standalone compiler image | **653,202 bytes** |
-| Regression tests | **763 / 763 passed** |
+| Standalone compiler image | **660,173 bytes** |
+| Regression tests | **766 / 766 passed** |
 | Independent upstream comparisons | **394 cases** |
 | Native self-rebuilds | **2, both byte-identical to the seed** |
 | Third-party compiler/runtime dependencies | **0** |
-| Same-input peak RSS, instruction-span milestone | **168.5 MiB** |
+| Full-source benchmark peak RSS | **200.25 MiB** |
 
 > [!IMPORTANT]
 > **Self-hosting is verified within the supported subset.** Full upstream Gleam
@@ -248,7 +248,7 @@ cmp out/stage2 out/stage3
 <details>
 <summary><strong>Exact qualified native image</strong></summary>
 
-**653,202 bytes**, with no dynamic loader or dynamic libraries and a non-executable
+**660,173 bytes**, with no dynamic loader or dynamic libraries and a non-executable
 stack. The seed and both native rebuilds have SHA256:
 
 ```text
@@ -259,7 +259,7 @@ The stage-3 compiler also passes all **394 positive/negative corpus cases**.
 Accepted output matches bootstrap executable bytes and runs correctly; rejected
 input fails without publishing an executable.
 
-[Native rebuild receipt →](evidence/comparison-flags-native-rebuilds.json)
+[Native rebuild receipt →](evidence/fusion-native-rebuilds.json)
 
 </details>
 
@@ -301,7 +301,10 @@ input fails without publishing an executable.
 
 The loader keeps original source bytes and their parsed module in one immutable
 snapshot. Dependency discovery and linking reuse that AST. Existing raw-source
-API callers still work; unreachable supplied raw source remains unparsed.
+API callers still work; unreachable supplied raw source remains unparsed. Linking
+retains its validated definition context for checking and code generation. The
+assembler fuses layout and relocation capture around an immutable balanced label
+index; see the measured throughput and memory tradeoff below.
 
 [Detailed architecture, lifetimes and APIs →](GUIDE.md#3-architecture-source-to-executable)
 
@@ -344,26 +347,34 @@ remain reserved arena registers. There is **no GC or arena growth yet**.
 <!-- GTA_BENCHMARK_LEDGER_START -->
 ### GTA via Gleam — living benchmark ledger
 
-**Self-hosted native compiler · 763 regression checks passed.**
+**Self-hosted native compiler · 766 regression checks passed.**
 
-**Primary comparison: original upstream Gleam compilation.** The original Gleam CLI is `gleam 1.19.2`. It emits JavaScript; GTA emits native ELF. The source is identical within each paired experiment, but target/backend work differs. This is the original compiler, not our Node-hosted bootstrap.
+**Primary comparison: original upstream Gleam compilation.** The original Gleam CLI is `gleam 1.19.2`. It emits JavaScript; GTA emits native ELF. All three versions compile the same frozen **28 modules / 275,945 source bytes**, with fresh build directories. Target/backend work differs. This is the original compiler, not our Node-hosted bootstrap.
 
-**Full-source headline:** original Gleam **0.587 s CPU**, GTA **5.538 s CPU** — GTA uses **9.43×** the CPU on this build. Measured 2026-11-08.
+**Fusion result:** previous GTA **5.783 s CPU** → fused GTA **0.484 s** (**11.95×**, **91.63% less CPU**). Original Gleam uses **0.600 s**; GTA uses **19.42% less CPU** on this input. Measured 2026-11-08.
 
-| Source/workload | Original Gleam CPU | GTA CPU | CPU reduction | Original wall → GTA wall | Wall reduction |
+| Full compiler compilation | Original Gleam → JS | Previous GTA → ELF | Fused GTA → ELF |
+|:---|---:|---:|---:|
+| Median CPU | 0.600 s | 5.783 s | **0.484 s** |
+| Median elapsed | 0.713 s | 6.869 s | **0.577 s** |
+| Elapsed min–max | 0.633–0.919 s | 6.702–7.252 s | 0.546–1.068 s |
+| Maximum RSS | 44.4 MiB | 175.9 MiB | 200.2 MiB |
+
+**Memory cost:** the immutable label index raises peak RSS by 24.4 MiB relative to previous GTA. Both native versions emit the exact same compiler bytes from these inputs. The improvement is compilation throughput, not faster generated-program execution. Shared-host timing ranges overlap between original Gleam and fused GTA; this is not a language-wide ranking.
+
+[Three-way raw samples](evidence/fusion-full-compilation.json) · [Qualified source](evidence/fusion-qualification.json) · [Pre-fusion original-Gleam comparison](evidence/original-gleam-full-compilation.json)
+
+**Earlier small-source compilation cohort — pre-fusion GTA.** These retained measurements use the earlier compiler, not the fused candidate. They show startup behavior and do not predict larger-project speed. Positive reductions favor GTA.
+
+| Source/workload | Original Gleam CPU | Pre-fusion GTA CPU | CPU reduction | Original wall → GTA wall | Wall reduction |
 |:---|---:|---:|---:|---:|---:|
 | Startup control | 10.456 ms | 0.968 ms | ↑ +90.74% | 36.669 → 4.251 ms | ↑ +88.41% |
 | Integer recurrence · 20M | 11.510 ms | 1.178 ms | ↑ +89.77% | 38.370 → 5.392 ms | ↑ +85.95% |
 | Branch + call · 20M | 11.319 ms | 1.380 ms | ↑ +87.81% | 33.211 → 7.369 ms | ↑ +77.81% |
 | Fibonacci · n=35 | 11.007 ms | 1.164 ms | ↑ +89.42% | 32.839 → 5.799 ms | ↑ +82.34% |
 | List build/map/sum · 500K | 12.295 ms | 1.570 ms | ↑ +87.23% | 37.636 → 6.003 ms | ↑ +84.05% |
-| **Full compiler · 28 modules** | **0.587 s** | **5.538 s** | **↓ -843.41%** | **0.773 → 6.323 s** | **↓ -717.67%** |
 
-Full-source maximum RSS: original Gleam **44.2 MiB**, GTA **173.2 MiB**. The full-source row has its own paired cohort; do not combine its timings with the tiny-program cohort. Positive reduction favors GTA; a negative percentage exposes a regression. Read the larger-source result alongside the tiny-input startup advantage.
-
-[Full-source raw samples](evidence/original-gleam-full-compilation.json) · [Small-source raw samples](evidence/comparison-flags-surface-baselines.json)
-
-**Secondary comparison: generated-program runtime against our previous native version.** Frozen native baseline: `9f5bb10` (647,417 B). Current measured code: `fa468e6` (653,202 B). This tracks optimization of our own generated code; it is separate from original-Gleam compilation speed.
+**Secondary comparison: earlier generated-program runtime cohort.** Frozen native baseline: `9f5bb10` (647,417 B). Measured code: `fa468e6` (653,202 B). This tracks optimization of our own generated code; it is separate from original-Gleam compilation speed.
 
 Median CPU milliseconds; positive percentages reduce cost. `≈` marks changes under 1%, not a statistical confidence claim.
 
@@ -397,6 +408,7 @@ Tiny-input hosting gains are dominated by launch/module initialization. They do 
 | Direct lookup | 5.016 → 4.867 s | ↑ +2.96% | ↑ +8.24% | ↑ +14.72% |
 | Lookup + retained AST | 4.833 → 4.730 s | ↑ +2.13% | ≈ -0.94% | ↑ +32.37% |
 | Instruction spans | 4.816 → 5.213 s | ↓ -8.24% | ↓ -8.10% | ↑ +22.96% |
+| Fused layout + shared context | 5.783 → 0.484 s | ↑ +91.63% | ↑ +91.60% | ↓ -13.86% |
 
 **External references — same runtime cohort.** CPU ratios below 1× favor GTA; above 1× favor the reference. These compare supported workloads, not complete language implementations.
 
@@ -460,7 +472,7 @@ allocations do not automatically make generated programs execute faster.
 > These rebuild measurements describe compiling a fixed input. They do not rank
 > Gleam against other languages or establish a universal runtime speedup.
 
-The current native compiler is **653,202 bytes**. Working RAM, reserved arena size,
+The current native compiler is **660,173 bytes**. Working RAM, reserved arena size,
 and executable size are separate quantities.
 
 [Allocation investigation →](MEMORY.md) · [All timing samples and methodology →](BENCHMARKS.md) · [External native/Node/GCC baselines →](PERFORMANCE.md)
@@ -472,7 +484,7 @@ and executable size are separate quantities.
 ## 08 · Verification
 
 ```text
-   763 / 763    regression tests passed
+   766 / 766    regression tests passed
    394          independent upstream comparisons
    394          cases through the rebuilt native compiler
     16          native example programs
@@ -492,12 +504,12 @@ and changed-source/native self-hosting controls.
 
 | Evidence | Record |
 |:---|:---|
-| Full qualification | [Source hashes, tests and outcomes](evidence/comparison-flags-qualification.json) |
-| Native self-hosting | [Stages, image hashes and corpus](evidence/comparison-flags-native-rebuilds.json) |
-| Native CLI | [IO, fault injection and ELF checks](evidence/comparison-flags-io-verification.json) |
+| Full qualification | [Source hashes, tests and outcomes](evidence/fusion-qualification.json) |
+| Native self-hosting | [Stages, image hashes and corpus](evidence/fusion-native-rebuilds.json) |
+| Native CLI | [IO, fault injection and ELF checks](evidence/fusion-io-verification.json) |
 | Memory | [Same-input allocation comparison](evidence/parsed-snapshot-allocation-reduction.json) |
 | Timing | [Repeated CPU, wall and RSS measurements](evidence/parsed-snapshot-benchmark.json) |
-| Language guide | [Nine actual native executions](evidence/comparison-flags-guide-execution.json) |
+| Language guide | [Nine actual native executions](evidence/fusion-guide-execution.json) |
 
 Upstream Gleam is an independent development oracle. The native compiler does not
 invoke it during compilation. Initial failures and earlier milestones remain in

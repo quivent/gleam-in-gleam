@@ -189,3 +189,15 @@ execution, startup, list memory, artifact sizes, source hashes and actual ASM.
 The raw receipt preserves all 200 measured samples and the earlier failed harness
 attempts remain separate. This is a surface microbenchmark set, not a broad
 language ranking or GCC parity claim.
+
+## Fused assembler full-source cohort — 2026-11-09
+
+The latest complete compilation measurement is a three-way original Gleam / prior
+GTA / fused GTA cohort on the same frozen 28 modules. The small C measurement
+parent avoids pre-exec Python RSS inflation. Five repeats per tool follow one
+warm-up, rotating/reversed ordering, fresh build directories and pinned CPU.
+Both native tools emit the same qualified compiler bytes. Full values, supported
+target differences, overlapping wall ranges and the extra 24.38 MiB RSS are
+recorded in [PERFORMANCE.md](PERFORMANCE.md) and
+[the complete receipt](evidence/fusion-full-compilation.json). The README is
+generated from those raw samples, not hand-updated summary numbers.

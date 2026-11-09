@@ -4,7 +4,80 @@ Measured on 2026-11-08. These are small, reproducible comparisons on one shared
 Linux/Icelake host, with all results checked. They establish a baseline for this
 compiler, not a language-wide ranking or a claim of GCC performance parity.
 
-## Primary comparison: original upstream Gleam compilation
+## Current full-source result: fused layout and shared context
+
+The qualified source is `9472a75`: 28 modules, 275,945 source bytes,
+766 tests, 394 independent upstream comparisons and two byte-identical native
+self-rebuilds. Five measured repeats follow a warm-up for **each of three tools**.
+All compile the same frozen input in fresh directories on one pinned CPU; order
+rotates and reverses. The original Gleam 1.19.2 emits JavaScript; both GTA versions
+emit standalone ELF. Targets and supported language scope differ.
+
+| Same full input | Original Gleam → JS | Previous GTA → ELF | Fused GTA → ELF |
+|---|---:|---:|---:|
+| Median CPU | 0.600387 s | 5.783283 s | **0.483816 s** |
+| Median elapsed | 0.713376 s | 6.869283 s | **0.576871 s** |
+| Elapsed min–max | 0.633–0.919 s | 6.702–7.252 s | 0.546–1.068 s |
+| Maximum RSS | 44.45 MiB | 175.88 MiB | 200.25 MiB |
+
+The combined pass uses **91.63% less CPU** than previous GTA
+(**11.95×** throughput on this input), and **19.42% less CPU** than
+original Gleam in this cohort. Original/fused elapsed ranges overlap on the shared
+host; these medians do not establish a universal compiler ranking. Earlier small
+program timings remain historical and are not substituted for this full build.
+
+### What changed
+
+The phase trace put about 97% of the initial full build in assembly. The old
+assembler scanned a flat label list for duplicate detection and each relocation.
+With L labels and R references this admitted quadratic work. The new layout walk
+captures offsets, an immutable AVL label index, and reversed output chunks together.
+A chunk-only walk resolves relocations and constructs final order; it does not
+revisit instruction spans or remeasure their lengths. Keys use a bounded hash and
+full-name collision buckets: hash equality never replaces string equality.
+Tree paths are logarithmic in distinct hashes; adversarial collision buckets can
+still require linear searches. Balanced concatenation remains a separate operation.
+
+Linking now retains its validated definition context for checking and codegen:
+three context collections become one. Validation-only traversals consume success
+results directly instead of allocating lists that are thrown away. The measured
+improvement belongs to the **combined pass**; these subchanges were not individually
+isolated in the final timing cohort.
+
+### Preserved behavior and cost
+
+Both native tools emit **the same 660,173-byte compiler**, SHA256
+`55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4`,
+from the frozen input. All repeats are deterministic. This is a compilation win,
+not an improvement to generated-program runtime. Tests cover full-name hash
+collisions, duplicate labels, missing references in source order, UTF-8 labels,
+large mixed forward/backward relocations and deep spans. Native and original-Gleam
+execution agree on the dedicated assembler/validation probe.
+
+The faster immutable index costs memory: **24.38 MiB more peak RSS**.
+Same-input allocation traces rise from 183,603,232 to 209,172,536 bytes; these are
+allocation volumes, not reachable-object measurements. No GC, runtime dependency,
+LLVM, assembler or linker was added to the delivered compiler. Compact index/hash
+traversal storage and larger varied-source scaling are the next measurements.
+
+[All 15 samples and exact input/output hashes](evidence/fusion-full-compilation.json),
+[qualification](evidence/fusion-qualification.json),
+[native rebuilds](evidence/fusion-native-rebuilds.json),
+[execution oracle](evidence/fusion-execution.json),
+[before allocation trace](evidence/fusion-same-input-before-phases.json),
+[after allocation trace](evidence/fusion-same-input-after-phases.json).
+
+```sh
+python3 tools/benchmark_upstream_compile.py out/fusion-final/compiler out/fusion-repeat.json \
+  --qualification evidence/fusion-qualification.json \
+  --native-baseline out/allocation-profile/flags-v1/compiler
+```
+
+The previous native image is retained locally with its original hash; fresh
+checkouts must reproduce or provide it before using that comparison option.
+The older comparison below stays intact as the record that exposed the gap.
+
+## Historical first comparison: original upstream Gleam compilation
 
 This comparison uses the original **Gleam 1.19.2 compiler**, not our previous
 native version and not our own compiler running under Node.

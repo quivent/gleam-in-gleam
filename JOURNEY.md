@@ -739,3 +739,30 @@ and the README exposes both the negative full-source percentage and small-file
 results. The native self-build is exact; original-Gleam output is deterministic
 and its generated compiler passes a separately executed native-program probe.
 This is measurement of an actual gap, not a replacement for correctness evidence.
+
+## Fuse the consumer before adding more passes — 2026-11-09
+
+The original-compiler comparison exposed a whole-build problem that tiny programs
+hid. An owned phase trace put about 97% of the build in assembly: a flat label
+list was rescanned for duplicates and relocations. Layout now fuses offset
+measurement, relocation capture and immutable AVL indexing. A chunk-only pass
+resolves references while constructing output order. Full names handle hash
+collisions, and reverse traversal retains the first source-order error.
+
+The front end also carries its validated definition context from linking into
+checking and emission instead of collecting it three times. Validation traversals
+consume successful results without constructing discarded lists. An initial debug
+symbol traversal overflowed the Node stack because a Result continuation hid its
+tail call; explicit tail-recursive cases repaired it. That attempt remains recorded.
+
+766 regression tests, 394 upstream comparisons, all rebuilt-native cases, two
+exact self-rebuilds, nine guide examples and the dedicated native/upstream
+collision/validation oracle pass. The compiler is 660,173 bytes, with no new
+runtime/compiler dependency or codegen backend change.
+
+The final five-repeat three-way run compiles identical 28-module input. Previous
+GTA uses 5.783 s CPU, fused GTA 0.484 s, original Gleam 0.600 s: 91.63% less CPU
+than previous GTA (11.95x) and 19.42% less than upstream on this input. Targets
+remain native ELF versus JavaScript, and elapsed ranges overlap on the shared
+host. The immutable index costs 24.38 MiB extra peak RSS; memory is the next
+tradeoff to work on. Full data and repeat commands are in PERFORMANCE.md.

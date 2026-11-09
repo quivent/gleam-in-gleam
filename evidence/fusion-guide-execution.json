@@ -1,0 +1,73 @@
+{
+  "schema": "gleam-in-gleam.guide-execution/1",
+  "observedAt": "2026-11-09T00:22:49.481873+00:00",
+  "guideSHA256": "1c151fb39196b4658c00f1960a497ae42a8316351baed71a450b68cb13e395c2",
+  "compilerSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+  "scope": "Native compile/run of complete guide examples; not a new upstream conformance claim",
+  "complete": true,
+  "examples": [
+    {
+      "example": 1,
+      "sourceSHA256": "9383ef4d24073ba91b8967a2280fd7662cc9ee13d8ae7e8c18f3e7bc8e33b6c5",
+      "artifactSHA256": "ffb2d27fb12c50b90a668eca87ccc2340e1090e56ba8613f72df691d61df4ce8",
+      "exitCode": 0,
+      "stdout": "42\n"
+    },
+    {
+      "example": 2,
+      "sourceSHA256": "7ea94522d7af6e7d8313da0d07ab17ad7e81cd7b96cab49450a8dbe13055f8a2",
+      "artifactSHA256": "66d364a0c163e7c590f33e7fa5b5d1ca85f65a54a01b2b85607890723a295e14",
+      "exitCode": 0,
+      "stdout": "56\n"
+    },
+    {
+      "example": 3,
+      "sourceSHA256": "d2a95d748c60d67994c1c76dd0fd839813428b1e87df4618c06fd98dd925b7fc",
+      "artifactSHA256": "9ce44d552930630c24929771adbcb24bc035457b16e85503eea4e9f18eedda84",
+      "exitCode": 0,
+      "stdout": "7\nseven\n"
+    },
+    {
+      "example": 4,
+      "sourceSHA256": "7f571bc967d2c513004ee0134d56c8e72caf56ec25ee6bf2b2300e14a0507326",
+      "artifactSHA256": "af20b76b286099117a35e07bdd90849db0628b3ba8398fa71784463669f84efb",
+      "exitCode": 0,
+      "stdout": "7\n"
+    },
+    {
+      "example": 5,
+      "sourceSHA256": "46135f6ce680187d2c003aa9a9b39d21a964003ac3e5b0593a784f87a83f3b8e",
+      "artifactSHA256": "8381fafdb7e5de6a4ca943732d6e5042c756abcae08d44ec984bee82e22be480",
+      "exitCode": 0,
+      "stdout": "14\n8\n"
+    },
+    {
+      "example": 6,
+      "sourceSHA256": "b670d7a6ccc9962c68b47621e605097350c342c685ab04d0151f9c916ae1064e",
+      "artifactSHA256": "f9d10b5e2da21c74ba7a468d9d05ed6615f3b66ca00f3cbb1c765f8228eedffc",
+      "exitCode": 0,
+      "stdout": "15\n"
+    },
+    {
+      "example": 7,
+      "sourceSHA256": "955b2246a3fab42cc8823504cede1e7fa6307c49ac73eaccd8fe32e753f90a64",
+      "artifactSHA256": "a4cef1d7e0471ff473533cdbe3906672b906b47e2acb7d5befc6da55b54d2960",
+      "exitCode": 0,
+      "stdout": "6\n"
+    },
+    {
+      "example": 8,
+      "sourceSHA256": "af15eaf7c8519187400c591c73c07c5100d2d75ec49c39e73a0414c75bcf28a7",
+      "artifactSHA256": "7a1983382f98e54ce92c0518df63a3ad2349a0c218cc5d927860faf25db43fff",
+      "exitCode": 0,
+      "stdout": "prefix:\u03bb\ud83d\ude00\n"
+    },
+    {
+      "example": 9,
+      "sourceSHA256": "1f0465c660f0a0df6b4f2655066323427462ba76189f9b7582d66a670466dad2",
+      "artifactSHA256": "929446a0e05f063e7a6a3bb2f1e81e08cff24b7d47a523c35179465c560e6388",
+      "exitCode": 0,
+      "stdout": "1\nTrue\n"
+    }
+  ]
+}

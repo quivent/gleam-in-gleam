@@ -331,3 +331,20 @@ This is a representation/memory result. It does not by itself establish a runtim
 speedup or make arbitrary effectful branches safe to evaluate eagerly. Gleam's
 existing evaluation order, short-circuiting and overflow behavior remain required.
 [Actual allocation trace](evidence/instruction-spans-allocation-phases.json).
+
+## Throughput/index tradeoff — 2026-11-09
+
+The fused assembler replaces quadratic label scans with an immutable balanced
+index. On the identical current 28-module input, total arena allocation changes
+183,603,232 → 209,172,536 bytes. Repeated untraced maximum RSS changes
+175.88 → 200.25 MiB. This is an intentional speed/storage tradeoff, not another
+allocation reduction: the combined pass uses 91.63% less compile CPU, while its
+index retains/copies more nodes. Context reuse removes two redundant collections,
+but does not offset the index cost. No collector was added.
+
+See [the controlled three-way timings](evidence/fusion-full-compilation.json),
+[before cursor trace](evidence/fusion-same-input-before-phases.json) and
+[after cursor trace](evidence/fusion-same-input-after-phases.json). Earlier frozen
+27-module allocation results above remain their own experiments; do not splice
+them into a current-source memory score. Next: compact index/hash traversal
+storage while preserving collision correctness and exact-output qualification.
