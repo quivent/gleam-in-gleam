@@ -1,0 +1,15 @@
+{
+  "schema": "gta.compiler-experiment-attempt/1",
+  "scope": "dedicated typed binding assertion",
+  "tests": {
+    "passed": 2,
+    "failed": 1
+  },
+  "runtimeFixtures": {
+    "passed": 10,
+    "failed": 0
+  },
+  "cause": "Test expected a named lambda parameter to remain a direct incoming slot; existing lambda lowering creates a synthetic parameter and a pattern-local binding, so captured y correctly uses the local-frame route.",
+  "correction": "Retain the existing lambda lowering and emitted-code contract; assert the synthetic parameter is bound and captured locals are rebound to their own frame.",
+  "compilerChangeNeeded": false
+}

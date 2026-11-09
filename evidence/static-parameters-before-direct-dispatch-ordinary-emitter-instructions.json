@@ -1,0 +1,33 @@
+{
+  "harnessSHA256": "4350cf4516146f7006d76028b871668a2054f2464f5202d79c2b29b8f5afe024",
+  "probesSHA256": "ee25aa874ef8f66c6d776f0a663594439c3a0adabe3579f7a7609a4f6c5d1e09",
+  "schema": "gta.native-function-instructions/1",
+  "observedAt": "2026-11-09T01:28:00.106978+00:00",
+  "countScope": "actual x86-64 single-step entries through return, inclusive of any nested runtime calls; caller/request/printing excluded",
+  "timingIsBenchmark": false,
+  "cases": [
+    {
+      "name": "before",
+      "function": "ordinary_expression",
+      "instructions": [
+        414
+      ],
+      "sourceModuleSHA256": "7736070c44b670cdba440b248232c19d59972ef82ef82fe63040c2dbb27e0453",
+      "binarySHA256": "84b36fb81cccd51b39e95f9f3ac9dfd7854d525c5db2ef895ee2dab91e4d10d7",
+      "targetAddress": 4423282,
+      "stdout": "True\n"
+    },
+    {
+      "name": "after",
+      "function": "ordinary_expression",
+      "instructions": [
+        225
+      ],
+      "sourceModuleSHA256": "a77782bd525034c3c19e5cf259a2ea56697502fe31ceb319d53161ad16773bc2",
+      "binarySHA256": "6698a70560b1eccaff844516c760dca1017dd81dbbb9fefaadad35a3b110152b",
+      "targetAddress": 4425186,
+      "stdout": "True\n"
+    }
+  ],
+  "complete": true
+}

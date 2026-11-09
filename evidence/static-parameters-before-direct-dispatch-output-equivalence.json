@@ -1,0 +1,2862 @@
+{
+  "schema": "gta.parameter-output-equivalence/1",
+  "observedAt": "2026-11-09T01:28:16.417215+00:00",
+  "harnessSHA256": "84c832ecf98720222a1880832da2ae113b1859bbf7bd20bbbf9494d148a20df1",
+  "complete": true,
+  "binaries": {
+    "baseline": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+    "candidate": "3ce78f4b48cd38f2a631dad66d3f66f9b20197071447128c26e1c4e3f19c7084"
+  },
+  "fixtureSHA256": {
+    "test/static-parameter-fixtures.json": "d40337d5878683f031894da9f5d3f75ab256e21b3c943cd593b0450883af5c5a",
+    "test/comparison-case-fixtures.json": "ee8d6dad2d41b6670dd555a41a3384542d5111d6e055a33460278e7d716c6174",
+    "test/modules-fixtures.json": "2b3a2826c8710e7bb0926c082e4afc684e7fb574a17432c9957c0706e3bbae17",
+    "test/aliases-guards-fixtures.json": "f015e42b509d172589f9e9d81511581cf091a7722a1725f358b0a48f9a71a6d4",
+    "test/strings-prelude-fixtures.json": "945b8d9362d8b73cb140ffd43c4c2d327ca90ac6749198198b9143b6b119c035",
+    "test/multi-pattern-fixtures.json": "89995f3f9c5060926cbc96f762adca35f4db6028aa7a5153f3b34a58c484e195",
+    "test/equality-fixtures.json": "f58f9ceb5619441b631df866cb1d6ce2b0c2d56eb722089ace4703b96d0c0d37",
+    "test/pattern-alias-fixtures.json": "f7c33c123d823d88a619e2c520ee4235098e33412eac8b4c2769f4cf3bce2311",
+    "test/integer-coverage-fixtures.json": "98c902efc4646232fef08fcc5ef70e73f3358a3d5ec1d0cb506e8f7158407829",
+    "test/tail-calls-fixtures.json": "e29adcc093021cade1f3b3945184682c0dcf2e59e0607dc52a18390c38440082",
+    "test/register-fixtures.json": "37fdfd20f99140f931f37e4dbb5e0890ee46b8a28eff020557ebec9e4c64e8db",
+    "test/branch-slots-fixtures.json": "ab8ab9e9322a28c4a9b40cce4a71c4ae2f241be59d3f8c439ff260263e1fde3e",
+    "test/allocated-expression-fixtures.json": "56c0bb4985d43c34dcb5b3c062911fb5c7ec657920424febe19c9809be91638e",
+    "test/allocated-call-fixtures.json": "341d4d0515a94a11bbcd7c918b7ead5c51afabcf6614671fade88146a57babe8",
+    "test/control-flow-fixtures.json": "c2785c6d27c8ecf146ff978647ad0fe8991f6dc71355a52fbfe5e5e05f8a4592",
+    "test/length-idiom-fixtures.json": "65847ff77e48211b334451bd1b202d20707e71d4000316b7890f18f4e81f9669",
+    "test/grammar-fixtures.json": "042aedc013dde73c12f31b7a2138e0fe96e32d3683de4101c214e82b0f94f553"
+  },
+  "cases": [
+    {
+      "name": "static-parameters-four-positions",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bd8a391039e364692927ad0c102e15d52e8198cd8e4bf1a78e0218e7c4f65712",
+      "bytes": 554
+    },
+    {
+      "name": "static-parameters-block-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0c88ed314348830dc1e459a1d03d5a0ff48bc5d151736f472fadf08e9d88c623",
+      "bytes": 546
+    },
+    {
+      "name": "static-parameters-nested-captures",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "edcf0524854e0e4c88612543b19722f6cd917faa16017f2ee53f2b78dcccff7d",
+      "bytes": 1064
+    },
+    {
+      "name": "static-parameters-captured-function",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "55276f856ba40cd06553b84acd985e8528bdf490de2d17b802419eb7f3964be6",
+      "bytes": 944
+    },
+    {
+      "name": "static-parameters-destructured-lambda",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "448d9367bd5b3afb6907be0569b73c7f17f3ddd12a91cb1fed87918a4976fc46",
+      "bytes": 833
+    },
+    {
+      "name": "static-parameters-tail-reentry-swap",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6e53b9dc56043412f2e3da10250f42d802ccbf8986fa44c19bee8e37b9d680e0",
+      "bytes": 591
+    },
+    {
+      "name": "static-parameters-pattern-alternatives",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1b5dad6596cdab8c41494aadd4341613cd9ccacafd709f957a45cda72adda497",
+      "bytes": 744
+    },
+    {
+      "name": "static-parameters-shadowed-capture",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b36e719a0b8b04f3f4247bf5987c0011fdcee31dbae2dbc8678ce29d282d4642",
+      "bytes": 886
+    },
+    {
+      "name": "static-parameters-capture-known-constructor",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ac0afd6156c21fa64f56938bda258c5e755e2d9688bbdaaee28b4dc25877cebc",
+      "bytes": 787
+    },
+    {
+      "name": "static-parameters-zero-arity-captures",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b52bd853a35b68a9652c403c682575fcae38490c4d74e8641a578ef4ec268dae",
+      "bytes": 711
+    },
+    {
+      "name": "comparison-flags-equal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9e2bd0e94f5505a23e0449a07f87d5faa73ed0585ee2b507845f08af0b244fb0",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-unequal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5b8b2fc9767648c856e8fa8f742b8e0ad1c1850b513eafe7342e4a7560203f26",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-less",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "59337fa288e43ed1871375635053811ee412a8c4fdd16d9c80275d12b0118d43",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-less-equal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aec2fe0289d4c7c1f5970e9f3188e1a441d70495c8690f8f2e814c12e081daad",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-greater",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "34b344f7601325af3a5d53c4907061ca5d46511225c5e370f88f36d093a35f6a",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-greater-equal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5769c485920d2742e0cc852e288dbee1bc0da40af3a1d590de740722440e5704",
+      "bytes": 485
+    },
+    {
+      "name": "comparison-flags-false-first",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8f76c803ddf58ea7d38b846095ced8c7e98151e73c3ff652e3a19376647efd7b",
+      "bytes": 557
+    },
+    {
+      "name": "comparison-flags-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "956fbb4e2f11cb8db1b1ea61ab6f76902bdd4d5c8814b0051a47f606615c63fe",
+      "bytes": 511
+    },
+    {
+      "name": "comparison-flags-untaken-overflow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "07038ba9c0a9bb893eb2c45e2a1b287b87b0c1a35caba71fb7d46201b2a0e962",
+      "bytes": 529
+    },
+    {
+      "name": "comparison-flags-local-scope",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8fe46a48075df200cd60304c1db44166735ef5f753a7d17eb84047ad7a1a3210",
+      "bytes": 513
+    },
+    {
+      "name": "comparison-flags-tail-reentry",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "33f87be1ebc2daa3e47a9788d44bbb0ae5c48dcfde883236b46bc0dd32edada7",
+      "bytes": 527
+    },
+    {
+      "name": "nested-path-default-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "35bb9adecb135cc43d1c8e0f4ee70e9015c18d3ee3b3ab3565c63f899b671867",
+      "bytes": 440
+    },
+    {
+      "name": "distinct-private-and-public-names",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1eb1624bb4ca84124dad9d8e20906dcbe2007fe49a9b5f9a0916ffe4a9bb1e2a",
+      "bytes": 933
+    },
+    {
+      "name": "generic-imported-call",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "cd59bfc04c0d6915251772c3592b40cf6061e0d1dab44262dc032194107587f3",
+      "bytes": 498
+    },
+    {
+      "name": "private-helper-within-module",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "849b8fbb2197af39eff9f2420032af79e29fe032077d81993ba0cbf80c1f2858",
+      "bytes": 485
+    },
+    {
+      "name": "diamond-dependency",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ee99f0aceb51d8de8f48abf4a6b1e0bf514fd2aca572738086303e173413533f",
+      "bytes": 548
+    },
+    {
+      "name": "transitive-qualified-generic-type",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "231b720d35a7656432cd2c8cebc37838e50879ba4b3dcacca49887a43c5feb94",
+      "bytes": 633
+    },
+    {
+      "name": "qualified-record-type-change",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a94172ca9677edbb13e67b48c75668841b0b875ee9b46d1f72594feb5b64fc99",
+      "bytes": 882
+    },
+    {
+      "name": "qualified-zero-constructor",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "78e7624cad3bde7c6f1853255cb5f77bf6dbf0f038a786d65a65dcbae02e10dc",
+      "bytes": 549
+    },
+    {
+      "name": "imported-closure-factory",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "af648270d9ec6ed84b3d923e2453d78cc50348f8ddbee44ed31da89465925496",
+      "bytes": 702
+    },
+    {
+      "name": "qualified-function-value",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b546c1d043f5377dc2b514c813db9f23b6e6be11d7e837730314d79339b5fb50",
+      "bytes": 618
+    },
+    {
+      "name": "block-alias-shadowing",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5a9cd23ca37e1f8e2818aa229afc4061977b28cebb6808008274bbe91cf2236d",
+      "bytes": 810
+    },
+    {
+      "name": "function-and-module-alias-coexist",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fb999245db177f6e8327cdbc0f275efc7c575842e2cda4533fcd0eb54a4517bc",
+      "bytes": 500
+    },
+    {
+      "name": "constructor-namespace-survives-value-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d111966c9fc3545bd3b5fd16f16a60a98d884ad56d88f8df596332ef091e3aec",
+      "bytes": 854
+    },
+    {
+      "name": "imported-main-is-not-entrypoint",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "30b4f30610ba547dd72178711bf64d5c11db845118a07fa79d18a9905a013b90",
+      "bytes": 432
+    },
+    {
+      "name": "same-module-two-aliases",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "20a20742fc8dabd3b47f03cf1e3e1c26ac898fa73a684f921b32de8fcd5b08e9",
+      "bytes": 469
+    },
+    {
+      "name": "parameter-shadows-module-value",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2edb503e3c5d600b316dc83692f28ad57edb14ec2cf2c2fcbd64fa78320d6a39",
+      "bytes": 787
+    },
+    {
+      "name": "qualified-constructor-in-list-pattern",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9cac8047471ce4bef4cbaa3d1023c283b715d4460e30a01340bab4298689611e",
+      "bytes": 705
+    },
+    {
+      "name": "imported-recursion",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5cf2485854d7f8fc9fe2a241a3cb57a22cba1dc8cd5f11d5927f8927b89d5ce6",
+      "bytes": 524
+    },
+    {
+      "name": "imported-callback-record",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "38e14aa4910972c154a41c4dc14397fa70f8fdcdcc989790d194b78759e7e024",
+      "bytes": 766
+    },
+    {
+      "name": "bit-arrays-across-module",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0b3adf8b2e967d71446592b0857bca0bd3a3bfdf66b333b74fdea51ef30140cd",
+      "bytes": 1106
+    },
+    {
+      "name": "private-function-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private module member: library.hidden\n"
+    },
+    {
+      "name": "private-type-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private module type: library.Hidden\n"
+    },
+    {
+      "name": "private-constructor-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private module member: library.Hidden\n"
+    },
+    {
+      "name": "unknown-member-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown name: library.missing\n"
+    },
+    {
+      "name": "unqualified-module-member-is-not-global",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown name: main.f\n"
+    },
+    {
+      "name": "cross-module-nominal-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Box@right, found Box@left\n"
+    },
+    {
+      "name": "import-cycle",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Import cycle at module: main\n"
+    },
+    {
+      "name": "missing-import",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Cannot read missing.gleam: Cannot open source beneath root (symlinks are refused)\n"
+    },
+    {
+      "name": "duplicate-alias",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: Duplicate module alias: m\n"
+    },
+    {
+      "name": "unknown-type-alias",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown module alias: missing\n"
+    },
+    {
+      "name": "duplicate-function-in-dependency",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Duplicate function: f@bad\n"
+    },
+    {
+      "name": "qualified-type-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type argument count mismatch: Box@model\n"
+    },
+    {
+      "name": "private-constructor-pattern-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private module member: library.Hidden\n"
+    },
+    {
+      "name": "alias-primitive-transparent",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "428d07e4366fa0b8e21742198c502224df11164775306f8d96b8c7a1240b900c",
+      "bytes": 432
+    },
+    {
+      "name": "alias-generic-tuple",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b8d1a6d4f727b79b3077797c1836410da19887e44df401a2a989ea8c805f6802",
+      "bytes": 635
+    },
+    {
+      "name": "alias-forward-chain",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bea08b1b508aabb5fa8347a30e0cbb164e6dea2a763cb268b199f341fb9a8fc6",
+      "bytes": 778
+    },
+    {
+      "name": "alias-function-type",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7a7c21e487f54007b94b0d6dea81438277375d1b04d8f88443a8458cd744eb29",
+      "bytes": 659
+    },
+    {
+      "name": "alias-recursive-nominal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b5706a245e02f81d05044f1a9a626bc64c4145583783cfeb3c16fc821585fd19",
+      "bytes": 820
+    },
+    {
+      "name": "alias-defining-module-scope",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "dfedf410eb9f538be66dbf925f1b3db0b4a9e102cbecabe028c96214495bff53",
+      "bytes": 579
+    },
+    {
+      "name": "alias-public-primitive-export",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "251bc1855629b1f4fddf02e0037889c0408498a63766fc42503df23c19085be9",
+      "bytes": 432
+    },
+    {
+      "name": "alias-private-transparent-in-public-api",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "41a1817c1661210ac2e8b60aef52996140940c2e0e67a1ba643d7de454e329de",
+      "bytes": 405
+    },
+    {
+      "name": "alias-public-private-unused-is-valid",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "bytes": 380
+    },
+    {
+      "name": "alias-bit-array",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5c0c01c73cb7d82f4146f394dcc7a528cc6b24026a89a3e14f4df60f683e50f3",
+      "bytes": 885
+    },
+    {
+      "name": "alias-duplicate",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Duplicate type: A\n"
+    },
+    {
+      "name": "alias-nominal-name-conflict",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Duplicate type: A\n"
+    },
+    {
+      "name": "alias-cycle-direct",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type alias cycle: main.A\n"
+    },
+    {
+      "name": "alias-cycle-mutual",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type alias cycle: main.A\n"
+    },
+    {
+      "name": "alias-unused-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unused type alias parameter: a\n"
+    },
+    {
+      "name": "alias-unbound-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unbound type parameter: b\n"
+    },
+    {
+      "name": "alias-duplicate-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Duplicate type parameter: a\n"
+    },
+    {
+      "name": "alias-discard-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type parameters must be named lowercase variables\n"
+    },
+    {
+      "name": "nominal-discard-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type parameters must be named lowercase variables\n"
+    },
+    {
+      "name": "alias-wrong-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type argument count mismatch\n"
+    },
+    {
+      "name": "alias-unused-invalid-body",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type argument count mismatch: Box\n"
+    },
+    {
+      "name": "alias-is-not-a-constructor",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown name: main.Count\n"
+    },
+    {
+      "name": "alias-private-import-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private module type: library.Hidden\n"
+    },
+    {
+      "name": "alias-cannot-leak-private-nominal",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private type used in public interface: Hidden\n"
+    },
+    {
+      "name": "guard-integer-fallthrough",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bce0d59714045caa8f5289577ed4ee6c21be7efa3b2c47380727ad5d0863fa09",
+      "bytes": 600
+    },
+    {
+      "name": "guard-pattern-before-condition",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d00d9514b28361d38543350d82fb5782488976d7aa3e5919420046e66c536388",
+      "bytes": 793
+    },
+    {
+      "name": "guard-field-and-tuple",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "05752e7edd863187fd8a836ead5d8ddfb106358eb3b98f56350ae9b8cadb43a3",
+      "bytes": 885
+    },
+    {
+      "name": "guard-grouping-and-arithmetic",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f20bfcb0b1cb0310686c52a9bfea9141711bd2a21e330e7d338e39d6563ff3d7",
+      "bytes": 866
+    },
+    {
+      "name": "guard-scalar-short-circuit",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5169d2663655103441820f719c182379ecea89048baa0fd4e479afaac7f6de7a",
+      "bytes": 655
+    },
+    {
+      "name": "guard-only-capture",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2c2e61dadef84e45d534e09e0f18514340d8207cf8cef88f1c72d1bd67014598",
+      "bytes": 836
+    },
+    {
+      "name": "guard-shadowed-name-recovery",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a5c1414e99ea970e2db2bc79789abc921eb0e20d18df67daddb8ade0e671b1c8",
+      "bytes": 499
+    },
+    {
+      "name": "guard-known-variant",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6197cbbc269b66c3d810cd2c5ab4325ff2a44c4b5fe558c3374476b612390c0b",
+      "bytes": 872
+    },
+    {
+      "name": "guard-bit-pattern",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "caf50e2c7d570446719f1522ce485f063dcf7788a3d9c0e84e4654c8a4581f62",
+      "bytes": 1136
+    },
+    {
+      "name": "guard-alias-module-interaction",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fdbeb4f728beb8a5f740f483411db1bd763f51dabaa6ce616b51d1ced238934d",
+      "bytes": 563
+    },
+    {
+      "name": "guard-true-does-not-prove-coverage",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "guard-variant-does-not-prove-coverage",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function pick: Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+    },
+    {
+      "name": "guard-must-be-bool",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "guard-no-function-calls",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n"
+    },
+    {
+      "name": "guard-no-callback-calls",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n"
+    },
+    {
+      "name": "guard-no-effects",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n"
+    },
+    {
+      "name": "guard-no-let",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n"
+    },
+    {
+      "name": "guard-no-case",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unsupported guard expression: calls/bindings/effects forbidden; construction not implemented\n"
+    },
+    {
+      "name": "guard-no-refinement-after-failure",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown name: main.n\n"
+    },
+    {
+      "name": "guard-checks-dead-body",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "strings-literal-equality",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "510a03b2ed406fa9552726476c8215dde9868acefabc409aca5d074facd00d55",
+      "bytes": 833
+    },
+    {
+      "name": "strings-dynamic-equality",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2e4e79aa93eb5657b73f62ea57135b9ccf880f12fbfcf9856fc75079575e8492",
+      "bytes": 995
+    },
+    {
+      "name": "strings-prefix-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7ebfff63954f22458236329c738c87b66600b1902ac1a702f032b6e8df45b40c",
+      "bytes": 1176
+    },
+    {
+      "name": "strings-prefix-as",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8c9aaf431235aa31d4c2a7d1bfc01682e2c97387cca6bcfab079e728210b7522",
+      "bytes": 954
+    },
+    {
+      "name": "strings-guard-concat",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "366378032156e9e50dd7ecc8fbdecfc46dcf4641e1c19888dff10d4f15769601",
+      "bytes": 829
+    },
+    {
+      "name": "strings-UTF8-dynamic",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "28f0374e27be2f3b8fd2ebbfa30af684956512bb572442083d7507177d2c8a41",
+      "bytes": 1043
+    },
+    {
+      "name": "strings-UTF8-literal-default",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "969dd15df53efdeeddd77dd653ea5aa67cb265152d548c1a060e5b4e9affdfe1",
+      "bytes": 882
+    },
+    {
+      "name": "strings-length-guards",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b074dbf3aa38cfef24ff9b187309bb6b4477c447e40cae0d0c7fde11e447b43a",
+      "bytes": 790
+    },
+    {
+      "name": "strings-empty-prefix",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "506b060f9dc5bececc667b4061b6fa3c8948245bcca1cacf0c9c3b710bfbc71d",
+      "bytes": 891
+    },
+    {
+      "name": "strings-operand-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "df1fb95bc42b45aa45b8d1d4f4b1dd9fb3bb18a0327ac1b89bffee85c3aa678b",
+      "bytes": 813
+    },
+    {
+      "name": "strings-imported-return",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5e02d335573d957595f460038fe30ee60928c85095aaa48787d169ecf3fe887c",
+      "bytes": 810
+    },
+    {
+      "name": "strings-concat-wrong-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected String, found Int\n"
+    },
+    {
+      "name": "strings-equality-wrong-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found String\n"
+    },
+    {
+      "name": "strings-prefix-literal-tail",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 45: Expected identifier\n"
+    },
+    {
+      "name": "strings-empty-prefix-refutable-let",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "strings-prefix-coverage-conservative",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "strings-prefix-duplicate-binding",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: x\n"
+    },
+    {
+      "name": "strings-variable-needs-UTF8-option",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found String\n"
+    },
+    {
+      "name": "prelude-default-result",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "de62f71d5b23d6438b566d64d36750701c39e33438ed9d35a993e273b72bc701",
+      "bytes": 1112
+    },
+    {
+      "name": "prelude-generic-result",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "91a18ad75fc1ca78c1ca91c4471646cab8d1ea043b2d839c90ac4fb25d0e5ff4",
+      "bytes": 1054
+    },
+    {
+      "name": "prelude-result-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3eddba4b69ed63ac09e2cd1cccc5791bd4d6ecbed4dfef768c57a5f4e2812d99",
+      "bytes": 677
+    },
+    {
+      "name": "prelude-cross-module-result",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "eda10a3cc360b3667f603d5d1c5bde455b56ebe75c346e5bc5510ab6aedbeb52",
+      "bytes": 710
+    },
+    {
+      "name": "prelude-local-result-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3c18648d26d0180533b377c07a883b430475e232ec43588d6f4f78d530e7a569",
+      "bytes": 576
+    },
+    {
+      "name": "prelude-independent-local-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d73d4bf860bebe94fcda69b9f8679886a02d33a1538ec540a11c64adb30495b9",
+      "bytes": 914
+    },
+    {
+      "name": "prelude-unused-result-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d7a7902f98d4f7a33ddbda03b0bd321ab4b9cfe134b1fb45175789914e47fc50",
+      "bytes": 380
+    },
+    {
+      "name": "prelude-local-Ok-shadows-only-value",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Result@$prelude(Int, String), found Other\n"
+    },
+    {
+      "name": "prelude-local-Result-alias-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1837538d048aa74eea68a0215c6f6a67a45aede05b9ee10669f300865bf849f3",
+      "bytes": 394
+    },
+    {
+      "name": "prelude-not-reexported",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Unknown name: library.Ok\n"
+    },
+    {
+      "name": "prelude-result-wrong-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Type argument count mismatch: Result@$prelude\n"
+    },
+    {
+      "name": "prelude-Ok-unlabelled",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unknown constructor label: value\n"
+    },
+    {
+      "name": "prelude-use-continuation",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8f11b68fa5b3a7948db22dd800f91aa744e3638b3495c6da6ecc2883ad739f3a",
+      "bytes": 1054
+    },
+    {
+      "name": "prelude-error-skips-continuation",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fdce08f3b1ac7fbed050545e43a9a795232193d4a6ce678c87dd15660d87db2d",
+      "bytes": 1230
+    },
+    {
+      "name": "multi-subject-evaluation-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b19ef2a6ccbbb6cc77a8d8d697d0634b8dd313daddc1458e1c356b2196e3420f",
+      "bytes": 598
+    },
+    {
+      "name": "multi-four-bool-combinations",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ac3ecf7c643985653642c194a76ae95b556534652a06178433ecfb6437c2366b",
+      "bytes": 819
+    },
+    {
+      "name": "multi-three-bool-columns",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e0eceef24af95c92a8df8dec53e600809f45398e51d092bd7dec7e1d227b2d73",
+      "bytes": 796
+    },
+    {
+      "name": "multi-guard-retries-alternatives",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ea388cdaa269addf24b8717526a659cb7b817f1756159c486968b663e8c77127",
+      "bytes": 682
+    },
+    {
+      "name": "or-tuple-binding-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "be2cf827f195314c1b8d8424f6e8d13e77f0a26f5b154d3459c9e687a2032b9c",
+      "bytes": 745
+    },
+    {
+      "name": "or-guard-retries-tuple",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c54d2c31e513837354377949e7f55a8e4ed853795288a0edf1366c82f29db9cb",
+      "bytes": 780
+    },
+    {
+      "name": "or-guard-both-fail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "753e141031590e9c37a105bb6973400b4a277383a55b4f38167f27f1f6745a82",
+      "bytes": 780
+    },
+    {
+      "name": "or-string-prefix-classifier",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e92fd43643cb14415ed09ebe994c54afd0c4fc05c8b2e657a1d8a896da4748ae",
+      "bytes": 912
+    },
+    {
+      "name": "or-prefix-binding-values",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c5481962debe6845fa6b51711a222e88a577077e43dac2f3987eff3a21e8f95a",
+      "bytes": 1236
+    },
+    {
+      "name": "or-prefix-overlap-guard-retry",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fa407e10b22e03388453bbaab726533d85f24bb15df10c12cd45ec774e2c2cf2",
+      "bytes": 1068
+    },
+    {
+      "name": "or-constructor-alternatives",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0d28b747a90232dad25c76fd9232a2b35fde1128b4211f333135989029bb0965",
+      "bytes": 775
+    },
+    {
+      "name": "multi-correlated-constructors",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6be3e8371a3014afae3f73e6752dafbdd1ff2797a075e14ef7ae2f3289270476",
+      "bytes": 964
+    },
+    {
+      "name": "multi-list-and-bool",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bbb64bebf50424d042fbbe79dff3ed3082813bf6dc5c8bc03b3a4cb9c7c438c6",
+      "bytes": 941
+    },
+    {
+      "name": "multi-two-lists",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6f7184c99d63fdd3882321ca5cd51e6122f90d1f75efa5c249af487d1a31822c",
+      "bytes": 1226
+    },
+    {
+      "name": "multi-generic-result-product",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9910d7ccb4e4d9a6c23648b4bc253df3ef52dbb2ef80cba751daa725ef087d20",
+      "bytes": 1011
+    },
+    {
+      "name": "multi-nested-tuple-bool",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b27248534d03ba9cfc7ae8c53c371288dcd1a61e6309929204b2acf9c1365c62",
+      "bytes": 1020
+    },
+    {
+      "name": "multi-known-constructor-per-subject",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ab3cadb998958c54df095d6facce68dd7354f2aa37d0cf75f72af9c9134927d2",
+      "bytes": 672
+    },
+    {
+      "name": "multi-zero-tuple-column",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2fa514b39e10239f85920a1cbc8bdffc37c76a1c1dacba37280cfbfbeb00ccd1",
+      "bytes": 704
+    },
+    {
+      "name": "multi-outer-shadow-restored",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "de1e7628f18df3b90c45b8f78c408dd3b85db03f5ed4282bd12bf78a29cc5b6f",
+      "bytes": 592
+    },
+    {
+      "name": "multi-captures-and-returned-callback",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "de045f5a5627c4891b43a8d925cfdef5d23ec56b87e72d9fe068e289289c8bd2",
+      "bytes": 970
+    },
+    {
+      "name": "multi-context-returned-lambda",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "99e8329b1db4985111f6cb37924482797dfe93b6e2acda1f4f952a5ae640ada7",
+      "bytes": 912
+    },
+    {
+      "name": "multi-qualified-constructors",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fc2ceef645c1491239031b88c26019344d5ba4eb50259cc6e6cb4fcd6662c9cc",
+      "bytes": 831
+    },
+    {
+      "name": "multi-alias-types",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "27d5e9413d3b7a22a9058755b4a0d0c2dce002d983b7d97763e7605cbc1d249f",
+      "bytes": 1039
+    },
+    {
+      "name": "multi-bit-pattern-and-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bd84d07b4a9a667231d7a43672bae46d0ae0c3b4da74c9c4112ad28dcc1ba3c4",
+      "bytes": 1229
+    },
+    {
+      "name": "multi-marginals-not-exhaustive",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n"
+    },
+    {
+      "name": "multi-list-hole",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n"
+    },
+    {
+      "name": "multi-guard-does-not-cover",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Non-exhaustive multi-pattern case: add missing combinations or a catch-all row\n"
+    },
+    {
+      "name": "multi-catchall-row-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n"
+    },
+    {
+      "name": "multi-extra-row-pattern",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n"
+    },
+    {
+      "name": "multi-alternative-row-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Case pattern count does not match subject count\n"
+    },
+    {
+      "name": "or-missing-variable",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables\n"
+    },
+    {
+      "name": "or-extra-variable",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables\n"
+    },
+    {
+      "name": "or-different-variable-names",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables: a\n"
+    },
+    {
+      "name": "or-inconsistent-binding-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "multi-duplicate-binding-across-subjects",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: n\n"
+    },
+    {
+      "name": "multi-unsafe-known-variant-merge",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unknown constructor label: a\n"
+    },
+    {
+      "name": "or-nested-pattern-syntax",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 40: Expected ',' or ']' in list pattern\n"
+    },
+    {
+      "name": "multi-branch-result-types",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "multi-pattern-subject-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "multi-returned-closure-captures-selected-binding",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f82ad78a1f1bbbaf618ebb03390ffe4225ef29293d8b137137282366e11b08c1",
+      "bytes": 1005
+    },
+    {
+      "name": "eq-list-values",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1a32a4156e9b78b5cc5bdbdbe6a420e2f5f80097245fce7588ae58d8aef3ecba",
+      "bytes": 1709
+    },
+    {
+      "name": "eq-tuple-nested",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d031baf8c3cd2d2fd9e2e8c2a90d244a51d68925cf39b6d943a0e1b71572e86e",
+      "bytes": 2076
+    },
+    {
+      "name": "eq-recursive-tree",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f70df6a29ce1ba560a16f0a6bcf181d4eda3895ba6d920add2ce3f23fde67f2d",
+      "bytes": 1588
+    },
+    {
+      "name": "eq-constructor-tag-before-fields",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "af969347ad054fab460e277f1bdb13d0b3297994a10f75cc87f52f855bcb87f2",
+      "bytes": 1459
+    },
+    {
+      "name": "eq-mutually-recursive-types",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9437e609fcfcd5c30aa61d7f94bae3705eb230485ad33c44b38d23c61c80fa0b",
+      "bytes": 1228
+    },
+    {
+      "name": "eq-generic-record",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "afbd06ba0c131b5f48a8ccdb7a7c18fa97cbe4160013ea0b0a331a0b14b9c463",
+      "bytes": 2118
+    },
+    {
+      "name": "eq-nested-generic-same-owner",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b77ffe3f1a613d95a0d942d8e08e5edf3d7ca66023ed18b7d3b06a2165d9ff89",
+      "bytes": 1181
+    },
+    {
+      "name": "eq-generic-recursive-tree",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "56907da106b3304d9dcd8674a41063eee1dc4a224c8fd9cff6fef16ef1117c31",
+      "bytes": 1809
+    },
+    {
+      "name": "eq-parameter-swap-recursion",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5058162e0ad0028c6e21f8b20c3e55dd28be65ea99155ce41a88543bba52d59a",
+      "bytes": 1525
+    },
+    {
+      "name": "eq-phantom-rigid-parameter",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "888b4b324bc0016ead34dd61cbee463db1664a1c5503770e9bbda3e2bcb54259",
+      "bytes": 798
+    },
+    {
+      "name": "eq-result-holes",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1dabdc07861c68f7e68090b2577ec63379eb7dda6f46651cc8e204cce23fbb0f",
+      "bytes": 1862
+    },
+    {
+      "name": "eq-empty-inference-unification",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1e8a3338be99c3354abb7b0c8345dfc5ba27ce38097cef00965e443620602ed3",
+      "bytes": 1759
+    },
+    {
+      "name": "eq-bit-arrays",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "348118fe23d800cb42d91cdb9ad2167e034e135747055ebc6f924e8e1239dbc7",
+      "bytes": 1607
+    },
+    {
+      "name": "eq-bit-array-view",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "210b2795435675c605f2a75a900afa5dd04b3b7a7aac0227c8af7a62503f7dad",
+      "bytes": 1219
+    },
+    {
+      "name": "eq-byte-payload-inside-record",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9738a5c2818f5b9c84303d2e50dd3279ef6eacdfdb36d7a5ed45757d96ffba75",
+      "bytes": 1414
+    },
+    {
+      "name": "eq-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "09e61539f8001bde8ad7b3ea42e16307ae3a0cb454b47870b2648d5dacf2ffe9",
+      "bytes": 1144
+    },
+    {
+      "name": "eq-guard-local-values",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "558c1f52a0fcc360d4658b8f24346e6325245600d7cbd63054a5ba56431c8fa5",
+      "bytes": 1078
+    },
+    {
+      "name": "eq-operand-evaluation-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a86b2ff4b2b80da6a8e50cedcbae4de53b96e39aae8f539c2126dc09b830e55a",
+      "bytes": 772
+    },
+    {
+      "name": "eq-shared-tail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c637f93b16097afe19d75fff55a15d822d0948354dbdb6a81dcd94c2499d34aa",
+      "bytes": 1166
+    },
+    {
+      "name": "eq-empty-constructor-generic",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0b54b81dc46ea06e4e5e856dc83b9a9bc0d771a59dca3fc4c434763768ccda65",
+      "bytes": 1466
+    },
+    {
+      "name": "eq-cross-module-nominal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "4d0922614b6b3812c66385e233b7190ce98cdd65986dd98e95f7e6c08eebf246",
+      "bytes": 884
+    },
+    {
+      "name": "eq-wrong-nominal-types",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected B, found A\n"
+    },
+    {
+      "name": "eq-wrong-list-elements",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "eq-wrong-tuple-arity",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Tuple/type argument arity mismatch\n"
+    },
+    {
+      "name": "eq-wrong-generic-instantiation",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "alias-fallback-nonrecord",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0a75234549dddf00e363ada6acefb2669108da4db23e2b354a6717320fd92ca5",
+      "bytes": 640
+    },
+    {
+      "name": "alias-fallback-missing-record-field",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bf19e8eb28bbffa2329317b1bfda8fd141d0f68ce8f505a23572ed5544d1c0fe",
+      "bytes": 580
+    },
+    {
+      "name": "alias-present-field-wins",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ea6f25d5bfd910cefa85d6ba21ca428d681add327a03366b067b078101bbdc00",
+      "bytes": 599
+    },
+    {
+      "name": "alias-present-noncallable-does-not-fallback",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Value is not a function\n"
+    },
+    {
+      "name": "alias-private-fallback-denied",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Private module member: library.f\n"
+    },
+    {
+      "name": "alias-local-field-can-shadow-private",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ea6f25d5bfd910cefa85d6ba21ca428d681add327a03366b067b078101bbdc00",
+      "bytes": 599
+    },
+    {
+      "name": "alias-closure-captures-present-field",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "cdf985a137600adc0d54bb92757203a7c85425f991d61a798280c1c013a3a768",
+      "bytes": 769
+    },
+    {
+      "name": "alias-field-in-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "25e1860df4b47bb900bcc2203f1cf5461d326561b815c6543d74833eee5f3a20",
+      "bytes": 740
+    },
+    {
+      "name": "pattern-alias-nested-constructor",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2be8705bff15a9a78e8fc28f456712375eb0a094fe5cc86a5de472bfedc3f143",
+      "bytes": 1372
+    },
+    {
+      "name": "pattern-alias-tuple-list-let",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7974600bd7233ecd88cd1121ccff6fb86c979b76d1175bd2eeae7d25e506da27",
+      "bytes": 1343
+    },
+    {
+      "name": "pattern-alias-bool-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e25e6dec99f0f969f9934aca2522f85daa8d7d7d53324d4b36be76e0655479c4",
+      "bytes": 659
+    },
+    {
+      "name": "pattern-alias-list-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "30e97b54ca86547d7438a4c1e13faafe3233c99fcd500a9c344853dda8b0ba1e",
+      "bytes": 1082
+    },
+    {
+      "name": "pattern-alias-tag-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ebc7fccc347bf1ee08c6a97e289b4bdba2c9613ec3bc95513a9e966bae784c9a",
+      "bytes": 1081
+    },
+    {
+      "name": "pattern-alias-guard-retry",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "4e6fb7585ed76b373061a582b5ad8c2739afa5d18c725b601b0697924c9fc477",
+      "bytes": 1106
+    },
+    {
+      "name": "pattern-alias-multi-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f98baba51657fcb560e54882aaeb48823194ac3562233df5cdd6decd9d62e7b1",
+      "bytes": 1118
+    },
+    {
+      "name": "pattern-alias-returned-capture",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aa0f0eaf3b6dc4953820034fd2b42b762450d30d4009cdd69872756f4a7c8ec4",
+      "bytes": 1281
+    },
+    {
+      "name": "pattern-alias-lexical-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "08341a59e38ff519af689f3b90ecc20f6ec36f7364ae0377fdc1c3225090b635",
+      "bytes": 1011
+    },
+    {
+      "name": "pattern-alias-known-variant",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b8932e5ac1f4086add3ca253023d9ad07bdfb53a29e4552210adb521da4405b4",
+      "bytes": 671
+    },
+    {
+      "name": "pattern-alias-nested-known-variant",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c438835d76af0e1b0dab46310667b6f11ddb7a3d51d77d5a7475f11e21ce448a",
+      "bytes": 736
+    },
+    {
+      "name": "pattern-alias-string-literal",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8c53b282f45aef6311d42ddef995b8471455faeda79412ce3a2d38160e09de78",
+      "bytes": 603
+    },
+    {
+      "name": "pattern-alias-string-prefix",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a6614234424b5762910119c28031f6c6075e948a83f86cdcfc2e5825a3295d27",
+      "bytes": 1034
+    },
+    {
+      "name": "pattern-alias-whole-bit-array",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "68372d2e9fce512becc9aab8d540e6fb592ba2fe3f3bdb84b68a285b064daa09",
+      "bytes": 1157
+    },
+    {
+      "name": "pattern-alias-module-constructor",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "772f786bf3e58038e3619caafc8cbbf28a83bd2fa502954f66b9af189252b060",
+      "bytes": 851
+    },
+    {
+      "name": "pattern-alias-evaluated-once",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6c25060b9373e714ca7440b9bdb05547f66d5c191ec97c3f9080f4b77442197e",
+      "bytes": 940
+    },
+    {
+      "name": "pattern-alias-duplicate-inner",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: x\n"
+    },
+    {
+      "name": "pattern-alias-duplicate-across-columns",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate variable in pattern: same\n"
+    },
+    {
+      "name": "pattern-alias-alternative-name-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Alternative patterns must bind the same variables: a\n"
+    },
+    {
+      "name": "pattern-alias-alternative-type-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "pattern-alias-refutable-let",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "pattern-alias-guard-not-coverage",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "pattern-alias-alias-does-not-widen",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "pattern-alias-incompatible-use",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found #(Int, Int)\n"
+    },
+    {
+      "name": "pattern-alias-discard",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 36: Pattern alias requires a named variable\n"
+    },
+    {
+      "name": "pattern-alias-underscore",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 36: Pattern alias requires a named variable\n"
+    },
+    {
+      "name": "pattern-alias-chain",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 38: Expected '='\n"
+    },
+    {
+      "name": "pattern-alias-string-discard",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 39: Pattern alias requires a named variable\n"
+    },
+    {
+      "name": "pattern-alias-string-chain",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 41: Expected '->'\n"
+    },
+    {
+      "name": "pattern-alias-variable",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2b20973a3b8362f9e2f4419610590dab98117b9a5aa11528cbbf8b69ecc6c35b",
+      "bytes": 410
+    },
+    {
+      "name": "wide-int-positive-boundaries",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ecd24cf42424cb450da2f279fafabaab5f37b8f9fc98e10ceaf0f5292fab622d",
+      "bytes": 425
+    },
+    {
+      "name": "wide-int-negative-boundaries",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d63f1f7039ce6a293ba35a52d69273ff70faaf30cea9ea76b540831c7bbf2c12",
+      "bytes": 425
+    },
+    {
+      "name": "wide-pattern-sign",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d20c8e75ee44082cea5bff952361db13d248e94102ba4f04535d733ec9943312",
+      "bytes": 623
+    },
+    {
+      "name": "wide-pattern-word",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "71fb2be3a69716a7da879a06933ffc9d4d72a34df2141c9a8c79939583fb1ace",
+      "bytes": 623
+    },
+    {
+      "name": "wide-pattern-high",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c9300329b448fcf1ee68a6aee2b8433968c872646d1771a09f900faf1878050f",
+      "bytes": 623
+    },
+    {
+      "name": "wide-pattern-negative",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2f72e1bce5498295042223e341b67be4587c416768e327d6112ea8b3f857fd9c",
+      "bytes": 623
+    },
+    {
+      "name": "wide-pattern-nested",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b6e4492c48b386224e7efa3a6350d632005ef2bb350e2cfd357386ba1b9c0480",
+      "bytes": 827
+    },
+    {
+      "name": "wide-pattern-bit-array",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "59d073359109523cd867fd633186f1683df1fb91ad9e58b04949b898ec7eabba",
+      "bytes": 1546
+    },
+    {
+      "name": "wide-pattern-signed-array",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b8a48b69cba26fef1227c8b54ba4cbb4922fc03291ac88194b261fa883a28318",
+      "bytes": 995
+    },
+    {
+      "name": "wide-pattern-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "189a85153a407326858dacd2acdab8a360cfe0878007ad4bbe8b65d8216ec004",
+      "bytes": 546
+    },
+    {
+      "name": "single-list-sum-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "49dc71475e5f5e4e1564d92b545b3d3aab3c7d69d5ecb2633fa59b3c93635196",
+      "bytes": 985
+    },
+    {
+      "name": "single-list-sum-missing",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "single-tuple-bool-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f5bc0688c36d4a47c40e7ad50aacdb73b040efc9c229041608bf61d2eac02e75",
+      "bytes": 841
+    },
+    {
+      "name": "single-tuple-bool-hole",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "single-nested-adt-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ccf07bb6f97b84f49e782988346bdea97635ea59877ebcf61f55b39389b49838",
+      "bytes": 814
+    },
+    {
+      "name": "single-nested-adt-hole",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+    },
+    {
+      "name": "single-recursive-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9e686a133f3e29c8c5594fa0295d64c52c4083d10f3e4f776fec95b702de0104",
+      "bytes": 928
+    },
+    {
+      "name": "single-list-bool-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "05c830c168b91eb2f457f84be1a18f2ee5630c885ed2bfe9797495465d901ed6",
+      "bytes": 797
+    },
+    {
+      "name": "single-list-tail-hole",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "single-guarded-leaf-not-coverage",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+    },
+    {
+      "name": "single-aliased-nested-coverage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d80b2783f8c2100cfd33d4c2d5a4160907a26f042ec1fed88e48169d693bbf57",
+      "bytes": 1167
+    },
+    {
+      "name": "tail-accumulator",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7db4e79645eee3e6a49275b9b00a79bb4614b72287bae295fcc5bc37ac01699e",
+      "bytes": 544
+    },
+    {
+      "name": "tail-simultaneous-swap",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aeae08480018e0224f6a313226d1a87cf2f9c55aec514b05ca99f0ed557297dc",
+      "bytes": 591
+    },
+    {
+      "name": "tail-dependent-arguments",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a0c1c9795888e95559c8503a61344cf1ef79037f5a4646d987eb6467d5c750e8",
+      "bytes": 571
+    },
+    {
+      "name": "tail-argument-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "93b0314894979f0a1c5572c34931e507ce22d67d6863f3f857836219cf659d8a",
+      "bytes": 648
+    },
+    {
+      "name": "tail-block-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "be6da81ab16511eee11a5dc8c4810ee12904df4d15489a72d7d37c6509b1c805",
+      "bytes": 595
+    },
+    {
+      "name": "tail-guarded-loop",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ed88f3ee1c7db248d765d7d9f380eebdeb8c401a9ee8eab0eed2bee42b8a4a16",
+      "bytes": 562
+    },
+    {
+      "name": "tail-multi-alternative-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "34c6c0266cfabf029a9c44adc397f9fadbc488682442dbdb04f5da652c682a51",
+      "bytes": 814
+    },
+    {
+      "name": "tail-saved-capture-values",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7beac0f528bd10a5d629d7f5733a4d6663f3d2920ff66d1ce6a49ff60da99c0c",
+      "bytes": 1134
+    },
+    {
+      "name": "tail-closure-boundary",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "08c4bfcd0d91369943907ec5a9055d289269a2cb6ae6bf70cb1ec8d7f9a7ca5a",
+      "bytes": 751
+    },
+    {
+      "name": "tail-echo-not-tail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "44f01752d0db36b17c08712f645c253b30d4689d3a3f91dd0965ca2a28ba77d1",
+      "bytes": 508
+    },
+    {
+      "name": "tail-non-tail-fibonacci",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "4725c43800a8199642c8f8ffa93aa47755a10ba361f489bfb9419e2f4af56c19",
+      "bytes": 590
+    },
+    {
+      "name": "tail-named-descriptor",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "11a92399170624ba3461faac1eaefd71e478e1c50b492bf984068059ed55ac2d",
+      "bytes": 733
+    },
+    {
+      "name": "tail-mutual-not-self",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "483ea6121199d71bcf84255824f54e1fa8f3d78896aa45989244dee45441da18",
+      "bytes": 670
+    },
+    {
+      "name": "tail-non-tail-argument",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "21e193de16f4a538ebe708c2fb8bd59402499793766a541be20f4a828467f815",
+      "bytes": 535
+    },
+    {
+      "name": "tail-bind-not-tail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "08902e66c3f432c71220e3bc39f196b31984a2e541631b599e0c963c9021828f",
+      "bytes": 571
+    },
+    {
+      "name": "tail-generic-pointer",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "88b24e314be4e09665948ebd2390a1e5528a80df42ed9ad03ad5e208c958a587",
+      "bytes": 1028
+    },
+    {
+      "name": "tail-local-call-shadow",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a1c26fe4cb2c72c42df727c55559df86bbf9be5e0f4436fb11f84751a2ea86c9",
+      "bytes": 645
+    },
+    {
+      "name": "tail-short-circuit-preserved",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fc6b9e0f4bbcb515a09b7d5446327f176df343e1c3cc05ab39045fd1851454a8",
+      "bytes": 594
+    },
+    {
+      "name": "tail-zero-arity",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "08a48575eb9881440cacb280b6aa6137ae1ebd2d59834ba66775568d49f53dc7",
+      "bytes": 440
+    },
+    {
+      "name": "tail-qualified-import",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "93d3900cd6730fd6fa6fca30fbaacb9f5581af5cca05c52d97eeb9b64ef4ceb9",
+      "bytes": 547
+    },
+    {
+      "name": "register-leaf-operands",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ccf1695b0018596f5895849310f9aa5b4ea6f4a6547910c7e6d4c8642b5e081f",
+      "bytes": 824
+    },
+    {
+      "name": "register-wide-immediates",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "92756bbd8caf70068575d3e527679461c5b8bb50661eb7470612f94ffb5a47bf",
+      "bytes": 433
+    },
+    {
+      "name": "register-left-effect-right-local",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "68232f95e9ea114f8f9eb660e134e74ad956baa09cdfdff67edb32367439725c",
+      "bytes": 477
+    },
+    {
+      "name": "register-spill-right-call",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ea3fec4300e8e634c98622d2c4b67890acb052f3d788583ea4f963e64505680f",
+      "bytes": 462
+    },
+    {
+      "name": "register-nested-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ee70048ffeae1b1f85ae035239dc58f3038e87ba8600b65f4ceef14ca423263e",
+      "bytes": 501
+    },
+    {
+      "name": "register-string-local-helper",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "62ff0a0a07e106501c63a9d3f6ff6d3f08a4161b4870f8f9ee1584af5213aa6c",
+      "bytes": 816
+    },
+    {
+      "name": "register-short-circuit-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "757014fd63fdb459e00d5b1c991411aea9599d18e8260bbbed584fe0c5c2bdf7",
+      "bytes": 619
+    },
+    {
+      "name": "register-division-zero-leaf",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1ba60c275340539f7dccb659e648991229c6b4643968a3243c9afefecd8f5322",
+      "bytes": 565
+    },
+    {
+      "name": "signed-nested-call-adjacency",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aecfad7704547761d1b4cc7fa938b4c4633f45740c8fbf79002cee35027590e2",
+      "bytes": 489
+    },
+    {
+      "name": "signed-space-after-variable",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3a41fe5ae22c7c7d2b7323242c3ffcdc355154346c846405a8d8bb76b3ad928b",
+      "bytes": 404
+    },
+    {
+      "name": "signed-adjacent-variable-subtract",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "180518433aa71a0044f0ff651127e2d8157372fd2bb7940d25a712e1b69747b0",
+      "bytes": 413
+    },
+    {
+      "name": "signed-newline-expression",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2abcd637e2ad2ed34ed4ffc496f23783be903c2e39e6cb2c2effc9d913d2b07e",
+      "bytes": 390
+    },
+    {
+      "name": "signed-underscored-subtract",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8a55e3b1d1ab154bafc32f869a20feb1ff57c16b0758b783cc99a3b1b511e5ad",
+      "bytes": 399
+    },
+    {
+      "name": "signed-comment-expression",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3a41fe5ae22c7c7d2b7323242c3ffcdc355154346c846405a8d8bb76b3ad928b",
+      "bytes": 404
+    },
+    {
+      "name": "signed-minus-negative",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "66f73a4842db5946ee29d0f61072e5608504fcc139bc38730210f6876afed8b9",
+      "bytes": 399
+    },
+    {
+      "name": "signed-missing-argument-comma",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 50: Expected ',' or ')' in call\n"
+    },
+    {
+      "name": "slots-single-arm-locals",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d0e632302d6f14d828170a16040cc59840deb46fe108b558b93dd55c878e7669",
+      "bytes": 753
+    },
+    {
+      "name": "slots-live-outer-after-join",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bf46217d3463bf2089a75d27ea4eb3ce9c9e72b02dbb0cbcb9992278c848d651",
+      "bytes": 627
+    },
+    {
+      "name": "slots-escaping-copied-captures",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c8242d41e6287507a3c1708d3785d6bb8f39fbf5957e4af6a7b8ebff9726dfd4",
+      "bytes": 1032
+    },
+    {
+      "name": "slots-pattern-guard-fallback",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fbe602bc1c0e854dcd8ccc7558361773a204c7a191e60d384d9b39c6ecbbd599",
+      "bytes": 1115
+    },
+    {
+      "name": "slots-multi-canonical-bindings",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9311db227ecec4b3c28b55572e2387bfc24a4d8cc9ea30fd77152454e3da402d",
+      "bytes": 804
+    },
+    {
+      "name": "slots-nested-case",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6d452aca807fb25fa4b018596faa5da29a2dc073a2a024d4892c9fbf0de78b15",
+      "bytes": 722
+    },
+    {
+      "name": "slots-return-heap-value",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1bd4c9c70136f8b25c561d8ffde57f1433295296097b10d351e61ff6f41f8ad4",
+      "bytes": 1230
+    },
+    {
+      "name": "slots-tail-loop-parameters",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "faec3731dbebbac4774594395f3b1ddb0e9938d388208d15be7cfa35d9117583",
+      "bytes": 802
+    },
+    {
+      "name": "allocated-three-register-tree",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "951e31d6980bbcdc49aff12049d98e7eb26798d5f5ac6fa61291d2f8799d84ea",
+      "bytes": 468
+    },
+    {
+      "name": "allocated-mixed-subtraction",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9602905911c7837748ac99268777faef0d4a976f8dd4b8ead02ffbdab8b899ba",
+      "bytes": 495
+    },
+    {
+      "name": "allocated-unary-product",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "258c4f2f0ffe36850b0b56953d1e9467f34ae6c6b58b35dddfdb64241ce16372",
+      "bytes": 477
+    },
+    {
+      "name": "allocated-repeated-local",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1340d3fd3a8d0a31b58e1e11d403c3abd4df719b37245452a6d2f6db14f51fdd",
+      "bytes": 479
+    },
+    {
+      "name": "allocated-wide-immediate",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3bbe5baa83e428bea8a4a221eff3289a0d31670133e2d7c877cd766d1e2cc83c",
+      "bytes": 460
+    },
+    {
+      "name": "allocated-call-effect-border",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "1dd5a8dc1b7b0d6172d477cf251fa34ff9d5d741c55195cefb3dd4f1b946608a",
+      "bytes": 508
+    },
+    {
+      "name": "allocated-division-border",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9adba1fd1683d5402aaa3777aaa0641a3f5336c82936c0e26609f809c09b150c",
+      "bytes": 539
+    },
+    {
+      "name": "allocated-nested-case-border",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e414679fbfd872fab05a9e0c28f060694038add7e69ea496d369ff02379dd079",
+      "bytes": 592
+    },
+    {
+      "name": "allocated-nested-spill-recovery",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6a050297974154e6e598c17d1b4a18f6942cc01429cf585a74446f607f29bc0b",
+      "bytes": 532
+    },
+    {
+      "name": "allocated-spilled-subtract-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7530bdabfaa43df4186a2c2e5a6a8036cce877374ffadb4a2eb23ce6c9cdb5e4",
+      "bytes": 531
+    },
+    {
+      "name": "call-live-one",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "fcc4d907073a73d333b7812330a840a4e9316602a4383dc049028931a20c82b6",
+      "bytes": 506
+    },
+    {
+      "name": "call-live-two-heap-clobber",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b53f02132af81d8a6116b6e4fec77705f6595d1d9eb51381d964e08a35221bb2",
+      "bytes": 886
+    },
+    {
+      "name": "call-argument-evaluation-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b3977d9cab2ec7f3cc0575d1acf1fa4ff05b8777930ae7efc040f8ba57175bc7",
+      "bytes": 542
+    },
+    {
+      "name": "call-nested-arguments",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2f4fd47e9a505dfbea36fe41215199d59e99784d9d7a7637a912c96ee2cf24f5",
+      "bytes": 603
+    },
+    {
+      "name": "call-noncommutative-result",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d78dcbaffbda7b18def6a63532ce42a7c2063fb41b90f9690d590ac94958b9c8",
+      "bytes": 490
+    },
+    {
+      "name": "call-spill-around-nested-pressure",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f984f4fffbf2dac09ab1b2abe0474f3a55f936fbb7db6c4d0d9417351ab9cf1e",
+      "bytes": 595
+    },
+    {
+      "name": "call-module-int-target",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bb3fb97c5066ab580c903f411ad567c3ac2d3100b30369db46705d5b8cb3d606",
+      "bytes": 456
+    },
+    {
+      "name": "call-indirect-fallback",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5c03450157e682b67d5611f4309a4439ecaa47a6ce73ce2967f07c87e273f598",
+      "bytes": 678
+    },
+    {
+      "name": "call-noninteger-argument-fallback",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "6eaec203166580fc751bcda6564be282e44dc40e3d76ed30bcd6d214b82cb0f5",
+      "bytes": 580
+    },
+    {
+      "name": "call-lhs-effects-before-rhs",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d7fb9cc3e958ddfe68be27cd26885df3c44a2eaf206f91afe3b85a3031fb91ed",
+      "bytes": 502
+    },
+    {
+      "name": "cfg-live-outer-call",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "351dcbae01720c5e9df3709209cd3994085f687f3bd16c9874de4cf3db5c81c2",
+      "bytes": 661
+    },
+    {
+      "name": "cfg-boolean-reverse",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "29af1775ad6b2ebe302d34e32413cf4ff315a1abf372cc88d0375ee9bb4fcf25",
+      "bytes": 542
+    },
+    {
+      "name": "cfg-two-joins",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5790564bc3aff504ad1cc56e406f486a50f83daa48bc212d247db9b97571220b",
+      "bytes": 623
+    },
+    {
+      "name": "cfg-short-circuit-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e32c0f6721955a5e968abdabdb53e4b1f4957de562f794d68c4c2f71890520cd",
+      "bytes": 894
+    },
+    {
+      "name": "cfg-int-literal-default",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "432cde6f2e80c2fc035565f5e4987d5154e726add74e93a7a1eaf933fc012459",
+      "bytes": 611
+    },
+    {
+      "name": "cfg-nested-conditionals",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bbd2c0aca4a5a8b34b22c4ab2720f08a9f2e14d26f4c33b918d4764dba67079c",
+      "bytes": 777
+    },
+    {
+      "name": "cfg-boolean-spill-byte-register",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "abf54fa3c03cf689f85f3b9c2586f88129fe00bfc80d7b16b72fb8c107162558",
+      "bytes": 596
+    },
+    {
+      "name": "cfg-wide-signed-comparison",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "cb257887c53997cca14f0f8adf9d14fe9a855792b16c562dd4f7bc89fff8339a",
+      "bytes": 923
+    },
+    {
+      "name": "cfg-case-argument-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d8ba1a35d76784295086ccedd3a06639a4710762de47f5afff037ea13cc77393",
+      "bytes": 680
+    },
+    {
+      "name": "cfg-unmodeled-pattern-fallback",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "63ebb98a6b1034514fb2a8517512bddec4c29a3c915a68fc9253c3ade29d461a",
+      "bytes": 598
+    },
+    {
+      "name": "length-generic-renamed",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "c4d203668ee72d8e3b873ca1bdd9653f119da5762e126b540c6fd6902dd3cd94",
+      "bytes": 885
+    },
+    {
+      "name": "length-reversed-parameters",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3750ef4020efed16714732235273434a5a91d20b0d13dc14d3fb5e42e081acef",
+      "bytes": 767
+    },
+    {
+      "name": "length-borrowed-alias",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "dd37351f7a1c8ad89a725a98eed8a2d6deac95a0f56de51dad79b5d262fa058b",
+      "bytes": 1212
+    },
+    {
+      "name": "length-bytes-tail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "121f3f3f7a04255fbe7236fa2b730efb23c841d774dd5ca1fd1aa00e14e0a624",
+      "bytes": 718
+    },
+    {
+      "name": "length-signed-discard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "9384d51fbc8ca23eb9ac6eb895fa42f3a9499cd2452d4c9a8714a421adc75903",
+      "bytes": 767
+    },
+    {
+      "name": "length-descriptor-entry",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5e4c3203c12457b1d10247cf7f5641f06205f3e790a9e59e61eaed6dfcf13914",
+      "bytes": 807
+    },
+    {
+      "name": "length-reject-increment-two",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "4b9f6291a3160957dd30638eabbaed8d2e57ff32619441d89cc10e6ac18ce1ee",
+      "bytes": 991
+    },
+    {
+      "name": "length-reject-base-change",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8904ab2ed0985a27d1cd7da41575c26b0dfdbded26ca64b0619adb567edd130a",
+      "bytes": 1010
+    },
+    {
+      "name": "length-reject-effect",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bf086fc81f8bda116457d69e0b56a1006216cfdbedcb10247a2705370d93badf",
+      "bytes": 1003
+    },
+    {
+      "name": "length-reject-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aaa5acb88c35e0f7955bb3ae1735157789cade734743b63cf61cd6f8702db7c4",
+      "bytes": 1077
+    },
+    {
+      "name": "length-reject-other-callee",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "f0aa37e9dbed11cfda8a0dd592b5f7db23014a09cb957b44987ea0be7e0de8de",
+      "bytes": 1021
+    },
+    {
+      "name": "length-large-no-garbage",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8bf0b88fcf39bef3a006b564c75e2f52903cc2e8630da501b479cb55d9158cb1",
+      "bytes": 997
+    },
+    {
+      "name": "known-local-variant",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "4cf4b84ca2c319d16977e6c9752e1ec8a5a7709deae953e24b2efbb670d08e29",
+      "bytes": 590
+    },
+    {
+      "name": "zero-field-is-not-callable",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Zero-field constructor is a value, not a function: Zero\n"
+    },
+    {
+      "name": "private-type-in-public-api",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private type used in public interface: A\n"
+    },
+    {
+      "name": "unknown-variant-let",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "custom-result-names",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "3c18648d26d0180533b377c07a883b430475e232ec43588d6f4f78d530e7a569",
+      "bytes": 576
+    },
+    {
+      "name": "missing-variant",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Non-exhaustive custom-type case: add missing variants or a catch-all\n"
+    },
+    {
+      "name": "wrong-field-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "nested-constructor-not-refined",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "generic-repeated-parameter",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "generic-argument-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+    },
+    {
+      "name": "label-declaration-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "d1ac17bc8cd68772aa288f722349c6630d4b64dfc3ad32449db9e969d05d2161",
+      "bytes": 636
+    },
+    {
+      "name": "generic-record",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "31235c14cd659adb258e372d595be0c47815f33c1a32dbc1f5e4c5014e440817",
+      "bytes": 677
+    },
+    {
+      "name": "record-offset-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Record field must have the same position and declared type across variants\n"
+    },
+    {
+      "name": "record-template-mismatch",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function read: Record field must have the same position and declared type across variants\n"
+    },
+    {
+      "name": "label-positional-order",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Positional argument after labelled argument\n"
+    },
+    {
+      "name": "generic-function-instantiation",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "cd59bfc04c0d6915251772c3592b40cf6061e0d1dab44262dc032194107587f3",
+      "bytes": 498
+    },
+    {
+      "name": "higher-order-function",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "034ee84cf1858273bdf2755c5bad6c4a8d215d34917e68976e92db6722de6a71",
+      "bytes": 645
+    },
+    {
+      "name": "indirect-evaluation-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "91f3d54e7440b67ae317d060c7623c779a3614ae9fad002f81f2f01c6caa1d87",
+      "bytes": 662
+    },
+    {
+      "name": "generic-rigid-body",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Type mismatch: expected a, found Int\n"
+    },
+    {
+      "name": "generic-self-recursion",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Type mismatch: expected List(a), found a\n"
+    },
+    {
+      "name": "generic-mutual-recursion",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ca4e764c95ca54079d7dd0c17df4fa8297740fd74570f1ed784ba8907c933139",
+      "bytes": 575
+    },
+    {
+      "name": "private-function-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "Private type used in public interface: Private\n"
+    },
+    {
+      "name": "returned-closure-capture",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "890e11baad34ff773efa684b2dac2d78dcbaa4c35013f198e914a02e75cb5cf6",
+      "bytes": 702
+    },
+    {
+      "name": "nested-closure-capture",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "67b1ef37a3e16ab7080866ee60c92c9c5e2652d16a1ce8a9a7ced6034bb01491",
+      "bytes": 931
+    },
+    {
+      "name": "use-callback-scope",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "30c2c69baaf5e24dbacae806d4478cbe5c911625def1f6d81e49a5bb8ebd2be7",
+      "bytes": 724
+    },
+    {
+      "name": "use-tuple-pattern",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2c0f56cbc66378418efa530043f48a42630857819bacfe3f8ef7376fcab83249",
+      "bytes": 765
+    },
+    {
+      "name": "use-lazy-continuation",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0132d6b69aa57ea3779a2ca2800f34da37859b02b967375f9bab824afec0ab06",
+      "bytes": 591
+    },
+    {
+      "name": "closure-wrong-return",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Bool, found Int\n"
+    },
+    {
+      "name": "use-refutable-pattern",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "discarded-callable",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Discarded variable cannot be read\n"
+    },
+    {
+      "name": "closure-case-context",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "bdfda24181d2219ffe1ec13b74a5bd355603c2cf5066d09a47876ee2e44a1b3e",
+      "bytes": 903
+    },
+    {
+      "name": "update-evaluation-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "dd9d2e56b873d78b326b6317d87657021af61bee333a3fa215e6a64275daf270",
+      "bytes": 766
+    },
+    {
+      "name": "update-type-change",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "33e846972f54ed4d054468a202b1d4a1717e9789ae8db6c7d1bc57183f2d36f3",
+      "bytes": 682
+    },
+    {
+      "name": "update-unsafe-variant",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function update: Unsafe record update: target constructor is not known\n"
+    },
+    {
+      "name": "update-known-variant",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "2868da252d2d8899da716e0af19287f3d6b4ef81c5d1a0a57870dfefba4e04c5",
+      "bytes": 625
+    },
+    {
+      "name": "update-empty",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "7d911ec937bc89b7099cc083a931d6c83b060537f851512c8de0c658b6fc931d",
+      "bytes": 657
+    },
+    {
+      "name": "update-partial-type-change-rejected",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+    },
+    {
+      "name": "update-unknown-label",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Unknown constructor label: y\n"
+    },
+    {
+      "name": "update-original-effects",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "da6e44240f29fcc5b822747bb573aed2fabb6800aeac155283d0054aae328ac6",
+      "bytes": 687
+    },
+    {
+      "name": "update-zero-field-invalid",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Invalid record update constructor: no fields\n"
+    },
+    {
+      "name": "update-phantom-type-change",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "5bb8514f9433c931aeb6dde383fc9fb5f64bde12f98c5fbb20bfac9a7139968e",
+      "bytes": 658
+    },
+    {
+      "name": "update-lambda-retained-context",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e95d180f4e9c3fbf13241cb805dd7c3e0f117ccbc27d614e09f0c0b6690ee0f7",
+      "bytes": 961
+    },
+    {
+      "name": "bits-signed-and-truncation",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a2ce83c41f3a89e704cb9609d7b66cc4cf76ffe72ac00f619096b3d7cdb8e88b",
+      "bytes": 939
+    },
+    {
+      "name": "bits-signed-pattern",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "a8ed492357982a11ddec0e60bcc5010df65248bb2ea37b132e6efd90c0ac86ad",
+      "bytes": 728
+    },
+    {
+      "name": "bits-concat-order",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "8facdac5093bd6719abf51b4553d1935d5637ba3e61ee078891ac017ba629e6e",
+      "bytes": 1087
+    },
+    {
+      "name": "bits-full-tail",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "935bb0ea62439f27194748c480226787b6753711b495ae2ec01508966a103f4f",
+      "bytes": 954
+    },
+    {
+      "name": "bits-exact-length-guard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "ecbd41060fefe66a37383c3a3f3a746540b73591c38b850f69f46c850ba48a90",
+      "bytes": 1661
+    },
+    {
+      "name": "bits-64-safe-range",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "e12697052de1bf3ded4989e3008dd463a3cf95d822ecab4760af3f665cea94b5",
+      "bytes": 1203
+    },
+    {
+      "name": "bits-64-literal-discard",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "eac9134eeaf555d2ce9e7d859674c3b6ae39a36bb7a79c960f588d081f728567",
+      "bytes": 1150
+    },
+    {
+      "name": "bits-mismatching-literals",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "aa265e49be570886a6816ee896a14c96c541431cc59c76430af67274915c4265",
+      "bytes": 1088
+    },
+    {
+      "name": "bits-unsigned-pattern",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "0f94c4df0de7b53aac91b2bfb0a87e0314bc01721edf04b9f22a3234bc2c806f",
+      "bytes": 720
+    },
+    {
+      "name": "bits-options-size",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "b2df5d2b255e458761a4e50246b2ce8d1e889a22690b7d34547d37af0386d7f0",
+      "bytes": 747
+    },
+    {
+      "name": "bits-empty",
+      "accepted": true,
+      "identical": true,
+      "outputSHA256": "689cec0a56692a8ca84506ece1c7515e0a26a0ef6e2500951eaf3e801b7d37b7",
+      "bytes": 639
+    },
+    {
+      "name": "bits-wrong-segment-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected Int, found Bool\n"
+    },
+    {
+      "name": "bits-wrong-concat-type",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Type mismatch: expected BitArray, found Int\n"
+    },
+    {
+      "name": "bits-pattern-only-sign",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Bit-array option is only valid in patterns: signed\n"
+    },
+    {
+      "name": "bits-pattern-only-bytes",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Bit-array option is only valid in patterns: bytes\n"
+    },
+    {
+      "name": "bits-duplicate-size",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate/conflicting bit-array option\n"
+    },
+    {
+      "name": "bits-duplicate-endian",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function main: Duplicate/conflicting bit-array option\n"
+    },
+    {
+      "name": "bits-zero-pattern-size",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Native seed supports only byte-aligned integer segments of 0..64 bits\n"
+    },
+    {
+      "name": "bits-unsized-tail-last",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Unsized bit-array pattern tail must be last and bind a variable or discard\n"
+    },
+    {
+      "name": "bits-nonexhaustive",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Non-exhaustive case: add a catch-all pattern\n"
+    },
+    {
+      "name": "bits-refutable-bytes-tail",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In function f: Refutable let pattern: use case (let assert is not implemented)\n"
+    },
+    {
+      "name": "bits-unbraced-expression",
+      "accepted": false,
+      "identical": true,
+      "exitCode": 1,
+      "diagnostic": "In main: byte 33: Expected ',' or '>>' in bit array\n"
+    }
+  ],
+  "total": 404,
+  "accepted": 284,
+  "rejected": 120
+}

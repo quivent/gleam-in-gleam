@@ -1,0 +1,21 @@
+{
+  "schema": "gta.compiler-experiment-attempt/1",
+  "fullSuiteAttempts": [
+    {
+      "tests": 779,
+      "passed": 777,
+      "failed": 2
+    },
+    {
+      "tests": 779,
+      "passed": 778,
+      "failed": 1
+    }
+  ],
+  "adjustments": [
+    "Existing capture metadata now carries (name, incoming-parameter-offset) rather than a bare name; the prior lexical-free-variable assertion is updated to require the same sole variable and offset 0 for a captured local.",
+    "Named lambda parameters retain existing synthetic-argument/pattern-local lowering; nested y is a local capture, not a raw parent parameter."
+  ],
+  "runtimeRegressionObserved": false,
+  "compilerCorrectionRequiredForTheseAssertions": false
+}

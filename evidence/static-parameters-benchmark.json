@@ -1,0 +1,315 @@
+{
+  "schema": "gta.parameter-binding-benchmark/1",
+  "observedAt": "2026-11-09T01:36:02.470779+00:00",
+  "harnessSHA256": "d03ebfd5caf38d3ff2cfe840af5a3b09350b4a3db535981368ef24d09a08667e",
+  "complete": true,
+  "qualification": "evidence/static-parameters-qualification.json",
+  "binaries": {
+    "baseline": {
+      "bytes": 660173,
+      "sha256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4"
+    },
+    "candidate": {
+      "bytes": 662857,
+      "sha256": "b16a188e0d668ad252503d201f414b668a912da3c7ca03a0bb461164ed8beea3"
+    }
+  },
+  "compilationInput": {
+    "sourceRevision": "c2f565438c5c1ff308eb1160bd66131c3fe8eba1",
+    "sourceSHA256": {
+      "src/native/assembler.gleam": "df1a0748bb75d00b62688f00cf369f354f002de359712f5871c35d9e0179619d",
+      "src/native/ast.gleam": "ad41f2dd6f43c87bb34d9d965397926742421b4880949fd0cddec30571af07e1",
+      "src/native/bit_options.gleam": "f865163a8f3370531c76b93714b6b243c3ca310894e72d733713acd466a991c5",
+      "src/native/check.gleam": "28a94b56df7dc8b5b178c17631a963fd20e41b4d44febd4a961c56992d03a742",
+      "src/native/cli.gleam": "ce53fc048e7c8c42a1b19d3247f89cdd6c79159d8042ac6bd5ff04affc62b5ec",
+      "src/native/cli_builder.gleam": "19dade516f666c59c0d17e7ae0e652d054757819ac631394dbd51d6acef538c1",
+      "src/native/cli_limits.gleam": "05a70e611f70dd5286504cc6336a9f58e9526d7eba9439410d1e744f7e57c773",
+      "src/native/cli_runtime.gleam": "f070363225de89a336930590add48c061c12221f222c5228e0922acd0672aed4",
+      "src/native/compiler.gleam": "11ef62fa10372506c3086f72c3b3d644025f6eaac8eb5caeb4200db3e775ea1b",
+      "src/native/core.gleam": "f150c7ded0ddf623276575687c53a9053bbbac3b777a21ee93384814ca7e25e5",
+      "src/native/coverage.gleam": "6eb8115edbc65ef961a1251d3a419514aa029936ddddd9ec009a70457ac84b1f",
+      "src/native/definitions.gleam": "5f6f4fd13dd94a5dff462e16e96b75028674231519ea5e5182b8c85f21530338",
+      "src/native/elf.gleam": "db14c1ee997c4c7907bea8c465efe0e6ed7d13509ea140e44caa509a056787cc",
+      "src/native/equality.gleam": "36f86a547190f8631b498aeeb5edf35427741ab91b0a96d346ca1d74789e7dcd",
+      "src/native/equality_runtime.gleam": "6a0cf49448a13819d1d7c893e43ccf29d7716cbccabc8d272b03c54b418444a0",
+      "src/native/free_names.gleam": "e68c8f47e9de8a31bf60e9077a645824d166aeccb6c9f2e3fa29112e07f06473",
+      "src/native/heap.gleam": "afa245e30551f0a5610f8a851ffe1600cb344ae99f8c6a1191c13d5158153cf1",
+      "src/native/labels.gleam": "26a18172d361e5d2fb2189cd3c7a87a06eb619109c74150c510b38d763295c31",
+      "src/native/lexer.gleam": "dfdaf14e88f7ba0dac3ddefccd7b8f2fd4913fcf571ff10953f3a6977ed14cb3",
+      "src/native/loop_idioms.gleam": "115db1fe1f47a1f51d1bf5ddaa982503818635fe51798a186485d12b5e244cba",
+      "src/native/parser.gleam": "4f5d2c0b7fd277aa9941dbbd5df202ee7d406915d46385b6d0f91f8ff98084b6",
+      "src/native/prelude.gleam": "5e16f77603958467d0669e65ee66fa9c2e4d25dc765a6ddc729fdee9b9e1a48f",
+      "src/native/project.gleam": "bffb656450be1864142798b171564b87df39cfc7eae6d437216bc505ae51e812",
+      "src/native/registers.gleam": "22c505f7b5e73d5eca6c016c32b718398fc5d51c13357cba67d9a05fe7646ca6",
+      "src/native/string_runtime.gleam": "0519095f21e0bb9e23aff5ca24068bab93c69c0eca5a2ea60833be54b306c484",
+      "src/native/type_system.gleam": "b17c784f8e1bfb162451b5c75fc12e2bc4e26d1ecd275b42ed23a3f11539ef63",
+      "src/native/utf8.gleam": "95cfe86ae97ebb79300736dc6f0a2b0b4ae80c584a2652b02b18311725348a08",
+      "src/native/x64.gleam": "7736070c44b670cdba440b248232c19d59972ef82ef82fe63040c2dbb27e0453"
+    },
+    "sourceBytes": 275945,
+    "sourceModules": 28
+  },
+  "expectedOutputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+  "methodology": {
+    "repetitions": 9,
+    "warmupsPerVariant": 1,
+    "order": "alternating; reversed on odd repetitions",
+    "measurement": "Small C parent: monotonic wall, wait4 CPU and RSS; one pinned CPU; fresh output per sample",
+    "cache": "OS caches uncontrolled; no cold-cache claim",
+    "scope": "whole native compiler process including source IO and output, no external process run by the compiler"
+  },
+  "environment": {
+    "kernel": "6.8.0-147-generic",
+    "pinnedCPU": 3,
+    "loadBefore": [
+      9.09326171875,
+      10.30029296875,
+      9.447265625
+    ],
+    "loadAfter": [
+      9.67578125,
+      10.36767578125,
+      9.48388671875
+    ]
+  },
+  "samples": [
+    {
+      "variant": "baseline",
+      "repetition": 0,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.580123037,
+      "userSeconds": 0.292449,
+      "systemSeconds": 0.176056,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 0,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.504431187,
+      "userSeconds": 0.304826,
+      "systemSeconds": 0.150951,
+      "peakRSSKiB": 205184,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 1,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.557578723,
+      "userSeconds": 0.287506,
+      "systemSeconds": 0.181422,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 1,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.77187733,
+      "userSeconds": 0.310514,
+      "systemSeconds": 0.182378,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 2,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.834284968,
+      "userSeconds": 0.319275,
+      "systemSeconds": 0.175222,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 2,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.546330763,
+      "userSeconds": 0.289876,
+      "systemSeconds": 0.189932,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 3,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.589620778,
+      "userSeconds": 0.295539,
+      "systemSeconds": 0.186447,
+      "peakRSSKiB": 205184,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 3,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.528574892,
+      "userSeconds": 0.307477,
+      "systemSeconds": 0.167508,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 4,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.726172961,
+      "userSeconds": 0.317938,
+      "systemSeconds": 0.17157,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 4,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.611386796,
+      "userSeconds": 0.305238,
+      "systemSeconds": 0.172317,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 5,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.584346647,
+      "userSeconds": 0.304602,
+      "systemSeconds": 0.179987,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 5,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.522752415,
+      "userSeconds": 0.306228,
+      "systemSeconds": 0.17797,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 6,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.530081304,
+      "userSeconds": 0.312535,
+      "systemSeconds": 0.178752,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 6,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.53444328,
+      "userSeconds": 0.313024,
+      "systemSeconds": 0.174895,
+      "peakRSSKiB": 205184,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 7,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.511411973,
+      "userSeconds": 0.312302,
+      "systemSeconds": 0.178024,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 7,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.696903826,
+      "userSeconds": 0.291431,
+      "systemSeconds": 0.198882,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "baseline",
+      "repetition": 8,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.588089771,
+      "userSeconds": 0.302054,
+      "systemSeconds": 0.187679,
+      "peakRSSKiB": 205056,
+      "exitCode": 0,
+      "timedOut": false
+    },
+    {
+      "variant": "candidate",
+      "repetition": 8,
+      "outputSHA256": "55bc7dd3b96886593ae18806205399dfd27be2d88a50fe9073d692c0f885ebd4",
+      "wallSeconds": 0.670768602,
+      "userSeconds": 0.295393,
+      "systemSeconds": 0.196274,
+      "peakRSSKiB": 205312,
+      "exitCode": 0,
+      "timedOut": false
+    }
+  ],
+  "summaries": [
+    {
+      "variant": "baseline",
+      "medianCPUSeconds": 0.489733,
+      "medianWallSeconds": 0.588089771,
+      "minWallSeconds": 0.522752415,
+      "maxWallSeconds": 0.834284968,
+      "maxPeakRSSKiB": 205056
+    },
+    {
+      "variant": "candidate",
+      "medianCPUSeconds": 0.481986,
+      "medianWallSeconds": 0.557578723,
+      "minWallSeconds": 0.504431187,
+      "maxWallSeconds": 0.670768602,
+      "maxPeakRSSKiB": 205312
+    }
+  ],
+  "limitations": [
+    "Shared virtual host; no general language-wide ranking",
+    "Hardware instruction/cycle counts are separate from CPU time and elapsed time"
+  ],
+  "hardwareCounterProbe": {
+    "command": [
+      "sudo",
+      "-n",
+      "perf",
+      "stat",
+      "-x,",
+      "-e",
+      "cycles:u,instructions:u",
+      "--",
+      "/home/oscillihue/gleam-in-gleam/out/fusion-final/compiler",
+      "--version"
+    ],
+    "exitCode": 0,
+    "stdout": "gleam-native 0.1.0 (Linux x86-64; experimental)\n",
+    "stderr": "<not supported>,,cycles:u,0,100.00,,\n<not supported>,,instructions:u,0,100.00,,\n",
+    "available": false
+  }
+}
