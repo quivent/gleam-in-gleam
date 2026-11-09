@@ -290,6 +290,8 @@ fn statement_mode(
 
 fn expression(e: t.Typed, state: State) -> Generated {
   case e.node {
+    // Bound inputs have no planning, lookup or mutable state effect.
+    t.ParameterNode(offset) -> Ok(#([load(offset)], state))
     t.BinaryNode(_, _, _)
     | t.UnaryNode(_, _)
     | t.CallNode(_, _)
